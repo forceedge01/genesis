@@ -1,6 +1,6 @@
 <?php
 
-define('HOST', 'http://localhost/WPCloner/');
+define('HOST', 'http://localhost/GENESIS/');
 
 define('APPLICATION_FOLDER', ROOT . 'Application/');
 

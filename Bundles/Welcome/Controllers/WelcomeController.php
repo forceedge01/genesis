@@ -1,0 +1,106 @@
+<?php
+
+class WelcomeController extends Application {
+
+    public function indexAction() {
+
+        $params['PageTitle'] = 'Welcome to ' . APPLICATION_NAME;
+
+        $params['table'] = array(
+
+            'class' => 'dTable',
+            'id' => 'AwesomeTable',
+            'title' => 'All results',
+
+            'thead' => array(
+
+                'Name',
+                'Address',
+            ),
+
+            'tbody' => array(
+
+                '0' => array(
+
+                    'ID' => '1',
+                    'Name' => 'A. Wahhab',
+                    'Address' => '182 Burlington Road',
+                ),
+
+                '1' => array(
+
+                    'ID' => '2',
+                    'Name' => 'Qureshi',
+                    'Address' => 'dafdasdf Burlington Road',
+                ),
+
+                '3' => array(
+
+                    'ID' => '3',
+                    'Name' => 'A. Wahhab',
+                    'Address' => '182 Burlington Road',
+                ),
+            ),
+
+            'actions' => array(
+
+                'view' => array(
+
+                    'route' => 'Welcome_View',
+                    'routeParam' => 'id',
+                    'dataParam' => 'ID',
+                    'message' => 'Are you sure you want to do this?',
+                ),
+                'list' => array(
+
+                    'route' => 'Welcome_List'
+                ),
+            ),
+
+            'ignoreFields' => array(
+
+                'ID'
+            )
+
+        );
+
+        $params['form'] = array(
+
+            'action' => 'Welcome_View',
+            'class ' => 'confirm',
+
+            'inputs' => array(
+
+                'text' => array(
+
+                    'label' => 'Email',
+                    'value' => 'some value',
+                    'name' => 'email',
+                ),
+
+                'textarea' => array(
+
+                    'label' => 'Textarea',
+                    'value' => 'bla',
+                    'name' => 'blabla',
+                ),
+            ),
+
+            'submission' => array(
+
+                'submit' => array(
+                    'value' => 'Submit this form',
+                 ),
+
+                'reset' => array(
+                    'value' => 'reset this form'
+                ),
+
+            )
+
+        );
+
+        $this->Render('Bundle:Welcome:index.html.php', $params);
+    }
+
+}

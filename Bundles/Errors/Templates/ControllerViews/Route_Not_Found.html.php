@@ -1,6 +1,6 @@
 <div class="errorPage">
 
-    <h1>ROUTE: $this -> setRoute ( <span><?=$params['Error']['routeName'];?></span> ); WAS NOT FOUND, PLEASE CHECK IF THE SPECIFIED ROUTE EXISTS</h1>
+    <h1>ROUTE: $this -> setRoute ( <span><?=$params['Error']['Route'];?></span> ); WAS NOT FOUND, PLEASE CHECK IF THE SPECIFIED ROUTE EXISTS</h1>
 
 <p>Error Originated from:</p>
 

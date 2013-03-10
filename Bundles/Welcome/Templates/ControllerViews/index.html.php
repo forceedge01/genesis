@@ -11,7 +11,9 @@
 
         <div class="widget index">
 
-            <?=$this->Output($params['table'],'table')?>
+            <!--
+            <?$this->Output($params['table'],'table')?>
+            -->
 
             <br />
 

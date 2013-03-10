@@ -10,7 +10,6 @@ class WelcomeController extends Application {
 
             'class' => 'dTable paginate',
             'id' => 'AwesomeTable',
-            'title' => 'All results',
 
             'thead' => array(
 
@@ -105,7 +104,7 @@ class WelcomeController extends Application {
             'Normal Section' => array(
 
                 'header' => 'this is one header',
-                'body' => 'random body',
+                'body' => $this->Output($params['table'], 'table'),
                 'footer' => 'and a footer',
 
             ),

@@ -900,7 +900,7 @@ class Template extends Router {
                     break;
             }
 
-         echo $string;
+         return $string;
     }
 
 }

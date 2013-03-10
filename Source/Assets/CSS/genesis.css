@@ -2,8 +2,7 @@
     Document   : mystyle
     Created on : Feb 12, 2013, 2:36:26 PM
     Author     : Abdul Wahab Qureshi
-    Description:
-        CSS for WP Builder.
+    Description: CSS for WP Builder.
 */
 
 root {
@@ -226,7 +225,7 @@ table tr{
     border: 3px solid white;
 }
 
-table tr:hover{
+table tbody tr:hover{
     border: 1px solid red;
     background: ghostwhite;
 }
@@ -525,8 +524,6 @@ td .settingsMenu a:hover, td .settingsMenu span:hover{
     font-style: italic;
 }
 
-
-
 .oneTwo{
     width: 46% !important;
     float: left;
@@ -578,10 +575,88 @@ td .settingsMenu a:hover, td .settingsMenu span:hover{
     float: right;
 }
 
+.pagination span#navButtons input{
+    -webkit-appearance: none;
+    width: 150px !important;
+    padding: 10px;
+    margin-right: 10px;
+    background: -webkit-linear-gradient(#FAFAFA, #EFEFEF);
+    border: 1px solid whitesmoke;
+}
+
 .pagination input[type=text]{
 
     font-size: 9px;
     padding: 1px;
     color: gray;
     font-style: italic;
+    background-color: white;
+}
+
+.paginate tr.searchResult{
+
+    background: #FAFFFF;
+}
+
+.Sections .section{
+
+    border: 1px solid whitesmoke;
+}
+
+.Sections .section .sectionHeader{
+
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px;
+
+}
+
+.Sections .section .sectionBody{
+
+    font-size: 14px;
+    line-height: 25px;
+    padding: 10px;
+
+}
+
+.Sections .section .sectionFooter{
+
+    font-weight: bold;
+    font-size: 10px;
+    padding: 10px;
+
+}
+
+.Sections .SectionsFooter{
+
+    padding: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 9px 12px 8px;
+    margin: 0px;
+    background: linear-gradient(to bottom, #EFEFEF 0%, #FAFAFA 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(#FFFFFF, #FAFAFA);
+    height: 36px;
+
+}
+
+.Sections .SectionsFooter .SectionStats{
+
+    float: left;
+    padding-top: 10px;
+}
+
+.Sections .SectionsFooter .SectionsButtons{
+
+    float: right;
+}
+
+.Sections .SectionsFooter .SectionsButtons input{
+
+    -webkit-appearance: none;
+    width: 150px !important;
+    padding: 10px;
+    margin-right: 10px;
+    background: -webkit-linear-gradient(#FAFAFA, #EFEFEF);
+    border: 1px solid whitesmoke;
 }

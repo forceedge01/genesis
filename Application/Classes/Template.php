@@ -825,7 +825,7 @@ class Template extends Router {
 
             }
 
-            $sections .= '<div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div>';
+            $sections .= '<div class="SectionsFooter"><div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div></div>';
 
             $sections .= '</div>';
 

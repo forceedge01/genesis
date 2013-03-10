@@ -11,22 +11,6 @@
 
         <div class="widget index">
 
-<!--            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Post Code</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>-->
-
             <?=$this->Output($params['table'],'table')?>
 
             <br />
@@ -36,10 +20,6 @@
             <br />
 
             <?=$this->Output($params['sections'], 'sections')?>
-
-<!--                </tbody>
-
-            </table>-->
 
             <p>This page will tell you how to use The Genesis project to build your own web application.</p>
 

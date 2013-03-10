@@ -170,7 +170,10 @@ $(document).ready(function() {
 
     $('table.paginate').each(function() {
 
-        var $cols = ($('thead tr td').length);
+        if($(this).children('tbody').length < 1)
+            alert('Pagination cannot be rendered without a tbody element in table.');
+
+        var $cols = ($('tbody tr td').length);
 
         $('tbody tr').each(function(item) {
 
@@ -221,8 +224,9 @@ $(document).ready(function() {
 
     $('table').delegate('#searchTable', 'blur', function(e) {
 
-        if ($(this).val() == '')
+        if ($(this).val() == ''){
             $(this).val($(this).prop('defaultValue'));
+        }
     });
 
     $searchTag = '';
@@ -232,10 +236,11 @@ $(document).ready(function() {
 
         $('.paginate tbody tr').each(function() {
 
-            $(this).hide(0);
+            $(this).removeClass('searchResult').css('display', 'none');
+
         });
 
-        if ($searchTag != '') {
+        if ($searchTag !== '') {
 
             $('.paginate tbody tr td').each(function() {
 
@@ -245,16 +250,18 @@ $(document).ready(function() {
 
                 if ($regex.test($string)) {
 
-                    $(this).parents('tr').show(0);
+                    if(!$(this).parents('tr').hasClass('searchResult'))
+                        $(this).parents('tr').addClass('searchResult').css('display', 'table-row');
                 }
+
             });
+
         }
         else {
 
-            $('.paginate tbody tr[visible="1"]').each(function() {
+            $('.paginate tbody tr.searchResult').removeClass('searchResult');
 
-                $(this).show(0);
-            });
+            $('.paginate tbody tr[visible="1"]').show(0);
         }
 
     });

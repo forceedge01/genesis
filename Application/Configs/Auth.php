@@ -16,4 +16,4 @@ define('AUTH_USER_POPULATE_METHOD', 'populateUser');
 
 define('AUTH_PASSWORD_ENCRYPTION_ALGORITHM', 'SHA512');
 
-define('AUTH_LOGIN_ROUTE', 'Login_Home');
+define('AUTH_LOGIN_ROUTE', 'Login_Home');//You have to define your own logout action in users controller.

@@ -84,6 +84,9 @@ class Application extends Template{
         return $randomString;
     }
 
+    /**
+     * Checks to see if the user is logged into the application or not.
+     */
     public function isLoggedIn(){
 
         if(!empty($_SESSION['login_expires']))
@@ -92,6 +95,13 @@ class Application extends Template{
             return false;
     }
 
+    /**
+     *
+     * @param type $roleId, provide the role id to match against.
+     * @return boolean returns true on accable, redirects to APPLICATION BASE ROUTE NAME on false.<br />
+     * You can use this function of you have a user role id set in your application and database, to make this work, you need to have role id assigned<br />
+     * in user populate function by the name RoleId. The roles should be ascending where the higher the role id the lesser the permissions.
+     */
     public function checkIfAccessableBy($roleId = 1){
 
         if($this->User->RoleId <= $roleId){
@@ -106,6 +116,13 @@ class Application extends Template{
 
     }
 
+    /**
+     *
+     * @param type $roleId provide the role id to match against.
+     * @return boolean returns true on success, false on failure.<br />
+     * You can use this function of you have a user role id set in your application and database, to make this work, you need to have role id assigned<br />
+     * in user populate function by the name RoleId. The roles should be ascending where the higher the role id the lesser the permissions. Useful in templating.
+     */
     public function userRoleIs($roleId = 1){
 
         if($this->User->RoleId <= $roleId){

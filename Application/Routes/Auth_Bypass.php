@@ -3,6 +3,7 @@
 $_SESSION['AUTH']['BYPASS'] = array(
 
     'Application',
-    'Welcome'
+    'Welcome',
+    AUTH_LOGIN_ROUTE
 
 );

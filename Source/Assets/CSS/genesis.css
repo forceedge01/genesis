@@ -596,6 +596,11 @@ td .settingsMenu a:hover, td .settingsMenu span:hover{
 .paginate tr.searchResult{
 
     background: #FAFFFF;
+    animation: searchResult 3s linear infinite;
+    -moz-animation: searchResult 3s linear infinite; /* Firefox */
+    -webkit-animation: searchResult 3s linear infinite; /* Safari and Chrome */
+    -o-animation: searchResult 3s linear infinite; /* Opera */
+
 }
 
 .Sections .section{
@@ -659,4 +664,32 @@ td .settingsMenu a:hover, td .settingsMenu span:hover{
     margin-right: 10px;
     background: -webkit-linear-gradient(#FAFAFA, #EFEFEF);
     border: 1px solid whitesmoke;
+}
+
+@keyframes searchResult
+{
+    0% {background: ghostwhite;}
+    50% {background: #92E1FF;}
+    100% {background: ghostwhite;}
+}
+
+@-moz-keyframes searchResult /* Firefox */
+{
+    0% {background: ghostwhite;}
+    50% {background: #92E1FF;}
+    100% {background: ghostwhite;}
+}
+
+@-webkit-keyframes searchResult /* Safari and Chrome */
+{
+    0% {background: ghostwhite;}
+    50% {background: #ADD8E6;}
+    100% {background: ghostwhite;}
+}
+
+@-o-keyframes searchResult /* Opera */
+{
+    0% {background: ghostwhite;}
+    50% {background: #92E1FF;}
+    100% {background: ghostwhite;}
 }

@@ -230,7 +230,7 @@ $(document).ready(function() {
     });
 
     $searchTag = '';
-    $('table').delegate('#searchTable', 'keyup', function(e) {
+    $('table').delegate('#searchTable', 'keyup', function() {
 
         $searchTag = $(this).val();
 
@@ -252,10 +252,10 @@ $(document).ready(function() {
 
                     if(!$(this).parents('tr').hasClass('searchResult'))
                         $(this).parents('tr').addClass('searchResult').css('display', 'table-row');
+
                 }
 
             });
-
         }
         else {
 

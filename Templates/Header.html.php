@@ -5,9 +5,9 @@
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-        <?=$this->RenderTemplate('Templates::CSS/css.html.php')?>
+        <?=$this->RenderTemplate('Templates::CSS/basic.css.html.php')?>
 
-        <?=$this->RenderTemplate('Templates::JS/js.html.php')?>
+        <?=$this->RenderTemplate('Templates::JS/basic.js.html.php')?>
 
     </head>
 

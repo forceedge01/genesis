@@ -113,7 +113,7 @@ class Template extends Router {
 
         require_once BUNDLES_FOLDER . '/Errors/Templates/Header.html.php';
 
-        require_once TEMPLATE_NOT_FOUND;
+        require_once BUNDLES_FOLDER . '/Errors/Templates/ControllerViews/Template_Not_Found.html.php';
 
         require_once BUNDLES_FOLDER . '/Errors/Templates/Footer.html.php';
 

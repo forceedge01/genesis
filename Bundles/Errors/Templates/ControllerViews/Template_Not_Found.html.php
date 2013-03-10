@@ -4,7 +4,7 @@
 
     <p>Error Originated from:</p>
 
-    <pre><?php print_r($params['Backtrace'][0]);?></pre>
+    <pre><?php print_r($params['Backtrace'][1]);?></pre>
 
 
     <p>Full Backtrace:</p>

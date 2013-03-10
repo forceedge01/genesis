@@ -524,3 +524,64 @@ td .settingsMenu a:hover, td .settingsMenu span:hover{
 .code .this{
     font-style: italic;
 }
+
+
+
+.oneTwo{
+    width: 46% !important;
+    float: left;
+    display: block;
+    margin-right: 10px;
+}
+
+.disabled {
+    color: gray;
+}
+
+.tip{
+    font-size: 10px;
+    color: gray;
+    font-style: italic;
+    padding-top: 3px;
+}
+
+.tip:before{
+    content: 'Tip: ';
+}
+
+.pagination{
+
+    background: whitesmoke;
+}
+
+.pagination input{
+
+    padding: 5px;
+}
+
+.pagination span{
+
+    float: left;
+    display: inline-block;
+    font-size: 10px;
+    vertical-align: bottom;
+}
+
+.pagination span#currentPage{
+
+    float: right;
+    display: block;
+}
+
+.pagination span#navButtons{
+
+    float: right;
+}
+
+.pagination input[type=text]{
+
+    font-size: 9px;
+    padding: 1px;
+    color: gray;
+    font-style: italic;
+}

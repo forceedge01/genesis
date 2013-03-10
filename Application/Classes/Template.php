@@ -796,6 +796,46 @@ class Template extends Router {
         return $rows;
     }
 
+    public function RenderSections($sectionData){
+
+        if(is_array($sectionData)){
+            $sections = '<div class="Sections">';
+
+            $index = 1;
+            foreach($sectionData as $title => $section){
+
+                $sections .= '<div class="section '.$section['class'].'" id="section'.$index.'">';
+                $sections .= '<div class="title"><h6>'.$title.'</h6></div>';
+
+                    $sections .= '<div class="sectionHeader">';
+                    $sections .= $section['header'];
+                    $sections .= '</div>';
+
+                    $sections .= '<div class="sectionBody">';
+                    $sections .= $section['body'];
+                    $sections .= '</div>';
+
+                    $sections .= '<div class="sectionFooter">';
+                    $sections .= $section['footer'];
+                    $sections .= '</div>';
+
+                $sections .= '</div>';
+
+                $index += 1;
+
+            }
+
+            $sections .= '<div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div>';
+
+            $sections .= '</div>';
+
+            return $sections;
+
+        }
+        else
+            echo 'INVALID DATA FOR RENDERING SECTIONS';
+    }
+
     /**
      * You can use the output method to filter your output character cases.<br /><br />
      * Four filters can be applied:<br />
@@ -850,6 +890,10 @@ class Template extends Router {
                     break;
                 case 'indextable':
                     $string = $this->RenderIndexTable($string);
+                    break;
+                case 'sections':
+                case 'Sections':
+                    $string = $this->RenderSections($string);
                     break;
                 default:
                     echo 'invalid filter';

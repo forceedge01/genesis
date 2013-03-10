@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 
-    //Confirm action for all forms
+    //-------------------------------------------------------------------------------------------------//Confirm action for all forms-------------------------------------------------------------------------------------------------//
     $('.confirmAction').click(function() {
 
         var answer = confirm($(this).next().val());
@@ -41,14 +41,14 @@ $(document).ready(function() {
 
     });
 
-    //build menu item
+    //-------------------------------------------------------------------------------------------------//build menu item-------------------------------------------------------------------------------------------------//
     $('#Menu,#menuList').on('click', function() {
 
         $('#menuList').slideToggle('fast');
 
     });
 
-    //enable tips for inputs
+    //-------------------------------------------------------------------------------------------------//enable tips for inputs-------------------------------------------------------------------------------------------------//
     $('input[type=text]').on('focus', function() {
         $(this).next('.tip').show();
     }).on('blur', function() {
@@ -56,34 +56,32 @@ $(document).ready(function() {
     });
 
 
-    //one create domain button is clicked, the button is disabled untill the process is finished.
+    //one create domain button is clicked, the button is disabled untill the process is finished.-------------------------------------------------------------------------------------------------//
     $('body').on('submit', 'form', function(e) {
 
         $('input[type=submit]').parent().parent().fadeOut(200);
 
         $('div#loading').show();
 
-        if($(this).hasClass('confirm')){
+        if ($(this).hasClass('confirm')) {
 
             var answer = confirm($(this).attr('message'));
 
             if (answer) {
 
-                $error =  true;
+                return true
 
             }
-            else{
+            else {
 
                 $('div#loading').hide();
                 $('input[type=submit]').parent().parent().fadeIn(200);
 
-                $error =  false;
+                return false
 
             }
 
         }
-
-        return true;
 
     });
 
@@ -93,7 +91,7 @@ $(document).ready(function() {
 
     });
 
-    //on text focus, set color and remove default message.
+    //-------------------------------------------------------------------------------------------------//on text focus, set color and remove default message.-------------------------------------------------------------------------------------------------//
     var CurrentLabel = null;
 
     $('input[type=text]').on('focus', function() {
@@ -109,7 +107,7 @@ $(document).ready(function() {
 
     });
 
-    //on text blur, set color and default message if applicable.
+    //-------------------------------------------------------------------------------------------------//on text blur, set color and default message if applicable.//-------------------------------------------------------------------------------------------------//
     $('input[type=text]').on('blur', function() {
 
         if ($(this).val() == '') {
@@ -123,20 +121,20 @@ $(document).ready(function() {
 
     $('table').attr('cellspacing', '0').attr('cellpadding', '0');
 
-    //show hide actions menu in tables.
+    //-------------------------------------------------------------------------------------------------//show hide actions menu in tables.-------------------------------------------------------------------------------------------------//
     var $previous = null;
 
     $('.settings').each(function() {
 
-        $(this).click(function(){
+        $(this).click(function() {
 
-            if($previous == null){
+            if ($previous == null) {
 
                 $previous = this;
 
             }
 
-            if($previous != this){
+            if ($previous != this) {
 
                 $($previous).next().hide();
             }
@@ -154,7 +152,239 @@ $(document).ready(function() {
 
     });
 
-    //enable first element of the form
+    //-------------------------------------------------------------------------------------------------//enable first element of the form-------------------------------------------------------------------------------------------------//
     $('form:not(.filter) :input:visible:enabled:first').focus();
+
+
+    //------------------------------------------------------------------------------------------------pagination if tables-------------------------------------------------------------------------------------------------//
+
+    //---------------- change value to set pagination limit, Global to all --------------------//
+
+    var $paginate = 2;
+
+    //----------------------------end of custom value---------------------------//
+
+    var $currentpage = 1;
+    var $index = 1;
+    var $visibleRows = [];
+
+    $('table.paginate').each(function() {
+
+        var $cols = ($('thead tr td').length);
+
+        $('tbody tr').each(function(item) {
+
+            $(this).attr('rowId', $index);
+
+            if ($index > $paginate) {
+
+                $(this).hide();
+            } else
+                $(this).attr('visible', '1');
+
+            $index++;
+
+        });
+
+        var $rows = ($('tbody tr').length);
+
+        if ($rows == 0)
+            $rows = 1;
+
+        var $colspan = $cols / $rows;
+
+        $(this).append('<tfoot>' +
+                '<tr class="pagination">' +
+                '<td colspan="' + $colspan + '">' +
+                '<span>Showing ' + $paginate + ' Records per page, Total: ' + ($index - 1) + ' Current Page:  <span id="currentPage">' + $currentpage + '</span></span>' +
+                '<span id="navButtons">' +
+                ' <input type="text" id="searchTable" value="Search...">' +
+                ' <input type="button" value="Prev" class="prevResults">' +
+                ' <input type="button" value="Next" class="nextResults">' +
+                '</span>' +
+                '</td>' +
+                '</tr>' +
+                '</tfoot>');
+
+        $('tfoot .prevResults').attr('disabled', 'disabled');
+
+        if ($paginate >= $index - 1)
+            $('tfoot .nextResults').attr('disabled', 'disabled');
+    });
+
+    //-------------------------------------------------------------------------------------------------//Search in table function//----------------------------------------------------------------------------------------------//
+    $('table').delegate('#searchTable', 'focus', function(e) {
+
+        if ($(this).val() == $(this).prop('defaultValue'))
+            $(this).val('');
+    });
+
+    $('table').delegate('#searchTable', 'blur', function(e) {
+
+        if ($(this).val() == '')
+            $(this).val($(this).prop('defaultValue'));
+    });
+
+    $searchTag = '';
+    $('table').delegate('#searchTable', 'keyup', function(e) {
+
+        $searchTag = $(this).val();
+
+        $('.paginate tbody tr').each(function() {
+
+            $(this).hide(0);
+        });
+
+        if ($searchTag != '') {
+
+            $('.paginate tbody tr td').each(function() {
+
+                var $string = $(this).text();
+
+                var $regex = new RegExp("^(" + $searchTag + ")(.|( ))*$", 'i');
+
+                if ($regex.test($string)) {
+
+                    $(this).parents('tr').show(0);
+                }
+            });
+        }
+        else {
+
+            $('.paginate tbody tr[visible="1"]').each(function() {
+
+                $(this).show(0);
+            });
+        }
+
+    });
+
+    //-------------------------------------------------------------------------------------------------//Next Button Function//-------------------------------------------------------------------------------------------------//
+    $('tfoot').delegate('.nextResults', 'click', function() {
+
+        $currentpage += 1;
+
+        $startIndex = ($currentpage * $paginate) - $paginate + 1;
+
+        $endIndex = $startIndex + $paginate;
+
+        $hideStartIndex = $startIndex - $paginate;
+
+        $hideEndIndex = $endIndex - $paginate;
+
+        for ($hideStartIndex; $hideStartIndex < $hideEndIndex; $hideStartIndex++) {
+            $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').hide(0);
+            $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').removeAttr('visible');
+        }
+
+        for ($startIndex; $startIndex < $endIndex; $startIndex++) {
+
+            $(this).parents('table').find('tr[rowid="' + $startIndex + '"]').fadeIn(300);
+            $(this).parents('table').find('tr[rowid="' + ($startIndex) + '"]').attr('visible', '1');
+        }
+
+        $('#currentPage').html($currentpage);
+
+        $('.prevResults').removeAttr('disabled');
+
+        if ($endIndex >= $index)
+            $(this).attr('disabled', 'disabled');
+
+    });
+
+    //-------------------------------------------------------------------------------------------------//Prev Button function//-------------------------------------------------------------------------------------------------//
+
+    $('tfoot').delegate('.prevResults', 'click', function() {
+
+        $currentpage -= 1;
+
+        $startIndex = ($currentpage * $paginate) - $paginate + 1;
+
+        $endIndex = $startIndex + $paginate;
+
+        $hideStartIndex = $startIndex + $paginate;
+
+        $hideEndIndex = $endIndex + $paginate;
+
+        for ($hideStartIndex; $hideStartIndex < $hideEndIndex; $hideStartIndex++) {
+
+            $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').hide(0);
+            $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').removeAttr('visible');
+        }
+
+        for ($startIndex; $startIndex < $endIndex; $startIndex++) {
+
+            $(this).parents('table').find('tr[rowid="' + $startIndex + '"]').fadeIn(300);
+            $(this).parents('table').find('tr[rowid="' + ($startIndex) + '"]').attr('visible', '1');
+        }
+
+        $('#currentPage').html($currentpage);
+
+        $('.nextResults').removeAttr('disabled');
+
+        if ($startIndex == 1 + $paginate)
+            $(this).attr('disabled', 'disabled');
+
+    });
+
+    //-------------------------------------------------------------------------------------------------//End of pagination //-------------------------------------------------------------------------------------------------//
+
+    //-------------------------------------------------------------------------------------------------//Sections//-------------------------------------------------------------------------------------------------//
+
+    var $currentSection = 1;
+    var $index = 0;
+
+    $('.Sections .section').each(function() {
+
+        if($index >0)
+            $(this).hide(0);
+
+        $index += 1;
+
+    });
+
+    $('.Sections .prev').attr('disabled', 'disabled');
+
+    //-------------------------------------------------------------------------------------------------//Next Sections//-------------------------------------------------------------------------------------------------//
+    $('body').delegate('.Sections .next', 'click', function() {
+
+        $('div #section' + $currentSection).hide(0);
+
+        $currentSection += 1;
+
+        $('div #section' + $currentSection).fadeIn(200);
+
+        $(this).parents('.Sections').find('.SectionsButtons .prev').removeAttr('disabled');
+
+        if ($currentSection >= $index) {
+
+            $(this).attr('disabled', 'disabled');
+        }
+
+        $(this).parents('.Sections').find('.SectionStats span#Section').html($currentSection);
+
+    });
+
+    //-------------------------------------------------------------------------------------------------//Previous Sections//-------------------------------------------------------------------------------------------------//
+    $('body').delegate('.Sections .prev', 'click', function() {
+
+        $('div #section' + $currentSection).hide(0);
+
+        $currentSection -= 1;
+
+        $('div #section' + $currentSection).fadeIn(200);
+
+        $(this).parents('.Sections').find('.SectionsButtons .next').removeAttr('disabled');
+
+        if ($currentSection === 1) {
+
+            $(this).attr('disabled', 'disabled');
+        }
+
+        $(this).parents('.Sections').find('.SectionStats span#Section').html($currentSection);
+
+    });
+
+    //-------------------------------------------------------------------------------------------------//End of Sections//-------------------------------------------------------------------------------------------------//
 
 });

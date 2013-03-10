@@ -33,6 +33,10 @@
 
             <?=$this->Output($params['form'],'form')?>
 
+            <br />
+
+            <?=$this->Output($params['sections'], 'sections')?>
+
 <!--                </tbody>
 
             </table>-->
@@ -261,6 +265,8 @@
                 'RenderTemplate',
                 'Render',
                 'RenderIndexTable',
+                'form',
+                'Output',
                 'setRoute',
                 'setAsset',
                 'FlashAll',

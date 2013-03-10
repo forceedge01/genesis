@@ -8,7 +8,7 @@ class WelcomeController extends Application {
 
         $params['table'] = array(
 
-            'class' => 'dTable',
+            'class' => 'dTable paginate',
             'id' => 'AwesomeTable',
             'title' => 'All results',
 
@@ -97,6 +97,34 @@ class WelcomeController extends Application {
                 ),
 
             )
+
+        );
+
+        $params['sections'] = array(
+
+            'Normal Section' => array(
+
+                'header' => 'this is one header',
+                'body' => 'random body',
+                'footer' => 'and a footer',
+
+            ),
+
+            '2nd Normal Section' => array(
+
+                'header' => '2nd header',
+                'body' => '2nd body',
+                'footer' => '2nd footer',
+
+            ),
+
+            '3nd Normal Section' => array(
+
+                'header' => '2nd header',
+                'body' => '2nd body',
+                'footer' => '2nd footer',
+
+            ),
 
         );
 

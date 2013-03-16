@@ -1,0 +1,9 @@
+<phpunit
+
+    bootstrap="/Users/sabhatqureshi/NetBeansProjects/GENESIS/vendor/autoload.php"
+    colors="true"
+    verbose="true"
+
+>
+
+</phpunit>

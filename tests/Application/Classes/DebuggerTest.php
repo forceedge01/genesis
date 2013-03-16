@@ -1,33 +1,15 @@
 <?php
 
-require '/users/sabhatqureshi/NetBeansProjects/GENESIS/Application/Classes/Debugger.php';
-
-class DebuggerTest extends PHPUnit_Framework_TestCase{
+class ApplicationTest extends PHPUnit_Framework_TestCase{
 
     public function setup(){
 
-        $this->fetch = new Debugger;
+        $this->fetch = new Application;
     }
 
-    public function testVariables(){
+    public function testIsLoggedIn(){
 
-        $this->assertClassHasAttribute('assets', 'debugger');
-        $this->assertArrayHasKey('jquery', debugger::$assets);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testRunningClass(){
-
-        $this->fetch->run();
-
-    }
-
-    public function testDownloadAssets(){
-
-        $this->fetch->run(array('jquery'));
-        $this->assertFileExists('js/jquery.js');
-        $this->expectOutputString('your asset has been generated.');
+        $this->assertClassHasAttribute('User', 'Application');
+        $this->assertEquals(false, $this->fetch->isLoggedIn());
     }
 }

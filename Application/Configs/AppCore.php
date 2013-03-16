@@ -1,5 +1,7 @@
 <?php
 
+@define('ROOT', __DIR__ );
+
 define('HOST', 'http://localhost/GENESIS/');
 
 define('APPLICATION_FOLDER', ROOT . 'Application/');

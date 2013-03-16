@@ -4,6 +4,7 @@ class Cloner extends Database{
 
     public
             $domain,
+            $db,
             $verbose,
             $portal_id,
             $product_id,
@@ -157,7 +158,7 @@ class Cloner extends Database{
 
         if($file = file_get_contents(SITES_FOLDER . $this->domain . $filename)){
 
-            $file = str_replace("'DB_NAME', 'wordpress'", "'DB_NAME', '" . $this->domain . "'", $file);
+            $file = str_replace("'DB_NAME', 'wordpress'", "'DB_NAME', '" . $this->domain . "Multisites'", $file);
 
             $file = str_replace("'DB_USER', 'root'", "'DB_USER', '" . NEW_WP_DB_USER . "'", $file);
 
@@ -277,7 +278,7 @@ class Cloner extends Database{
                     }
                     else{
 
-                        $sql = "REVOKE all ON `$domain`.* FROM '".NEW_WP_DB_USER."'@'".NEW_WP_DB_HOST."'";
+                        $sql = "REVOKE all ON `".$domain."Multisites`.* FROM '".NEW_WP_DB_USER."'@'".NEW_WP_DB_HOST."'";
 
                         if(!$db->Query($sql)){
 
@@ -287,7 +288,7 @@ class Cloner extends Database{
 
                         }
 
-                        $db->queries[] = 'use `'.$domain.'`';
+                        $db->queries[] = 'use `'.$domain.'Multisites`';
 
                         $db->queries[] = "show tables";
 
@@ -302,7 +303,7 @@ class Cloner extends Database{
 
                         }
 
-                        $db->queries[] = 'drop database `' . $domain .'`';
+                        $db->queries[] = 'drop database `' . $domain .'Multisites`';
 
                         $db->queries[] = 'use `'. DBNAME . '`';
 
@@ -360,13 +361,13 @@ class Cloner extends Database{
         try{
             if($this->verbose)
                 error_log ('Creating database for WP site...<br /><br />');
-            $sql = "create database if not exists `{$this->domain}`";
+            $sql = "create database if not exists `{$this->db}`";
 
             $this->Query($sql);
 
             if($this->verbose)
                 error_log ('Granting permissions on the database...<br /><br />');
-            $sql = "grant all on `{$this->domain}`.* to '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "' identified by '" . NEW_WP_DB_PASSWORD . "'";
+            $sql = "grant all on `{$this->db}`.* to '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "' identified by '" . NEW_WP_DB_PASSWORD . "'";
 
             $this->Query($sql);
 
@@ -427,14 +428,12 @@ class Cloner extends Database{
 
                 $this->portal_id = DEFAULT_PORTAL_ID;
 
-                $this->merchant_id = DEFAULT_PORTAL_ID;
+                $this->merchant_id = DEFAULT_MERCHANT_ID;
 
                 $this->product_id = DEFAULT_PRODUCT_ID;
 
             }
             else{
-
-//                $api = new FandistAPI();
 
                 ini_set("soap.wsdl_cache_enabled", 0);
 
@@ -493,7 +492,7 @@ class Cloner extends Database{
 
             if($this->verbose)
                 error_log ('Switching to new site Database...<br /><br />');
-            $sql = "use `{$this->domain}`";
+            $sql = "use `{$this->db}`";
 
             $this->Query($sql);
 

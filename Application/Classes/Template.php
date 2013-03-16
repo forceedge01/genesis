@@ -256,16 +256,16 @@ class Template extends Router {
      * @param type $array - the flash message to set
      * Set a flash message for the immidiate next template to be rendered, after displaying the message is deleted.
      */
-    protected function setFlash($array) {
+    protected function setFlash($message) {
 
-        if(is_array($array)){
-            foreach ($array as $message) {
+        if(is_array($message)){
+            foreach ($message as $me) {
 
-                $_SESSION['FlashMessages'][] = $message;
+                $_SESSION['FlashMessages'][] = $me;
             }
         }
         else
-            $_SESSION['FlashMessages'][] = $array;
+            $_SESSION['FlashMessages'][] = $message;
     }
 
     /**
@@ -273,16 +273,16 @@ class Template extends Router {
      * @param type $array - The error message to display
      * Sets an Error message for the immidiate next template to be rendered, after displaying message is deleted.
      */
-    protected function setError($array) {
+    protected function setError($message) {
 
-        if(is_array($array)){
-            foreach ($array as $error) {
+        if(is_array($message)){
+            foreach ($message as $error) {
 
                 $_SESSION['Errors'][] = $error;
             }
         }
         else
-            $_SESSION['Errors'][] = $array;
+            $_SESSION['Errors'][] = $message;
     }
 
     /**

@@ -76,7 +76,28 @@ class Database extends Template{
 
                 if(!empty($this->activeConnection->error))
                 {
-                    $this->setError('There was a database failure, check your logs.');
+
+                    if(SHOW_DATABASE_ERRORS)
+                        $this->setError('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' .$sql);
+
+                    if(MAIL_DATABASE_ERROR){
+
+                            $mail = new Mail();
+
+                            $params['to'] = MAIL_DATABASE_ERROR;
+
+                            $params['from_name'] = 'Multisites sql error';
+
+                            $params['from'] = APPLICATION_ADMIN_EMAIL;
+
+                            $params['message'] = 'SQL Query: ' . $sql;
+
+                            $params['message'] .= 'Error: ' . $this->activeConnection->error;
+
+                            $params['subject'] = 'multisite error';
+
+    	            $mail->send($params);
+                    }
 
                     trigger_error($this->activeConnection->error . 'SQL: '.$sql);
                 }

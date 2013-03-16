@@ -119,7 +119,7 @@ class Application extends Template{
     /**
      *
      * @param type $roleId provide the role id to match against.
-     * @return boolean returns true on success, false on failure.<br />
+     * @return boolean returns true on success, false on failure.
      * You can use this function of you have a user role id set in your application and database, to make this work, you need to have role id assigned<br />
      * in user populate function by the name RoleId. The roles should be ascending where the higher the role id the lesser the permissions. Useful in templating.
      */
@@ -133,6 +133,91 @@ class Application extends Template{
 
             return false;
         }
+
+    }
+
+    /**
+     *
+     * @return boolean
+     * Returns true if the request is an ajax request
+     */
+    public function isAjax(){
+
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+
+            return true;
+        }
+        else{
+
+            return false;
+        }
+
+    }
+
+    /**
+     *
+     * @return boolean
+     * Returns true if the request is a post request
+     */
+    public function isPost(){
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            return true;
+        }
+        else{
+
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @return boolean
+     * Returns true if the request is an get request
+     */
+    public function isGet(){
+
+        if($_SERVER['REQUEST_METHOD'] == 'GET') {
+
+            return true;
+        }
+        else{
+
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @param type $Name - name of the cookie you want to setup
+     * @param type $Value - Value of the cookie your setting up
+     * @param type $time - Expiration time, has to be in seconds.
+     * @return boolean
+     * Returns true on successful cookie setup.
+     */
+    protected function setCookie($Name, $Value , $time = 2592000){
+
+        setcookie($Name, '', -(time() + 2592000));
+        if(setcookie($Name, $Value, time() + $time, '/'))
+             return true;
+        else
+            return false;
+    }
+
+
+    /**
+     *
+     * @param type $Name - name of the cookie you want to setup
+     * @return boolean
+     * Returns true on successful cookie unset.
+     */
+    protected function unsetCookie($Name){
+
+        if(setcookie($Name, '', -(time() + 2592000)))
+            return true;
+        else
+            return false;
 
     }
 

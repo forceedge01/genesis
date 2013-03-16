@@ -80,7 +80,7 @@ class Mail{
                     $this->error_msg .= '</p></blockquote>';
                     $this->error_msg .= '</div>';
 
-                    echo $this->error_msg;
+                    trigger_error($this->error_msg);
             }
 
         }

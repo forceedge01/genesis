@@ -10,6 +10,7 @@ class Router extends Debugger{
             $controllerObject,
             $currentObject,
             $error,
+            $lastURL,
             $pageTitle,
             $funcVariable,
             $routePattern,
@@ -101,9 +102,9 @@ class Router extends Debugger{
 
         $URL = HOST . 'index.php' . $this->routePattern;
 
-        $this->lastRoute = $URL;
+        $this->lastURL = $URL;
 
-        return $this->lastRoute;
+        return $this->lastURL;
     }
 
     /**
@@ -142,8 +143,6 @@ class Router extends Debugger{
             if($key == $this->route){
 
                 $URL = $value['Pattern'];
-
-                $this->pageTitle = @$value['Title'];
 
                 $this->lastRoute = $URL;
                 $this->routePattern = $URL;
@@ -184,8 +183,6 @@ class Router extends Debugger{
                 $URL = $value['Pattern'];
                 $controller = $value['Controller'];
 
-                $this->pageTitle = @$value['Title'];
-
                 $this->lastRoute = $URL;
                 $this->routePattern = $URL;
 
@@ -215,6 +212,8 @@ class Router extends Debugger{
      * Redirects to a route.
      */
     public function forwardTo($route, $urlQueryString = null){
+
+        $_SESSION['lastRoute'] = $this->pattern;
 
         $route = $this->getRoute($route);
 
@@ -393,5 +392,40 @@ class Router extends Debugger{
         }
 
         return true;
+    }
+
+    protected function lastAccessedPage(){
+
+        return $this->getRouteFromPattern($_SESSION['lastRoute']);
+    }
+
+    protected function getRouteFromPattern($pattern = null){
+
+        if(!empty($pattern))
+            $this->pattern = $pattern;
+
+        foreach($_SESSION['Routes'] as $routeKey => $routes){
+
+                if($routes['Pattern'] == $this->pattern){
+
+                    $this->route = $routeKey;
+
+                    $this->routePattern = $pattern;
+
+                    unset($_SESSION['routeError']);
+
+                    return $this->route;
+                }
+
+        }
+
+        $error = array(
+
+            'Pattern' => $this->pattern,
+            'Backtrace' => debug_backtrace()
+
+        );
+
+        $this->forwardToController('Error_Route_Not_Found', $error);
     }
 }

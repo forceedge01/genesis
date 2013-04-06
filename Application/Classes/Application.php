@@ -155,15 +155,24 @@ class Application extends Template{
     }
 
     /**
-     *
+     * @param String The element to check (optional)
      * @return boolean
      * Returns true if the request is a post request
      */
-    public function isPost(){
+    public function isPost($Element = null){
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            return true;
+            if(!empty($Element)){
+            
+                if(isset($_POST[$Element]))
+                    return true;
+                else
+                    return false;
+            
+            }
+            else
+                return true;
         }
         else{
 
@@ -172,15 +181,24 @@ class Application extends Template{
     }
 
     /**
-     *
+     * @param String The element to check (optional)
      * @return boolean
      * Returns true if the request is an get request
      */
-    public function isGet(){
+    public function isGet($Element = null){
 
         if($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-            return true;
+            if(!empty($Element)){
+            
+                if(isset($_GET[$Element]))
+                    return true;
+                else
+                    return false;
+            
+            }
+            else
+                return true;
         }
         else{
 
@@ -220,5 +238,18 @@ class Application extends Template{
             return false;
 
     }
-
+    
+    protected function setSession($Name, $Value){
+        
+        $_SESSION[$Name] = $Value;
+        
+        return true;
+    }
+    
+    protected function unsetSession($Name){
+        
+        unset($_SESSION[$Name]);
+        
+        return true;
+    }
 }

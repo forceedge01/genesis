@@ -52,11 +52,18 @@ while(true){
             case 'delete':
                 $bundle->deleteBundle();
                 break;
+            case '0':
+            case 'exit':
+                exit(0);
+                break;
 
         }
     }
     else{
 
+        if($args[0][0] == 'exit')
+            exit;
+        
         $console->unknownOption();
 
     }

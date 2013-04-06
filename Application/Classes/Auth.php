@@ -2,11 +2,14 @@
 
 class Auth extends Application{
 
-    public
+    protected
             $username,
             $password,
             $authTable,
             $authField;
+            
+    public
+            $User;
 
     public function __construct(){
 
@@ -45,7 +48,7 @@ class Auth extends Application{
 
             $_SESSION['login_time'] = time();
 
-            $_SESSION['login_expires'] = time() + SESSION_TIME_INTERVAL;
+//            $_SESSION['login_expires'] = time() + SESSION_TIME_INTERVAL;
 
             $objectMethod = AUTH_USER_POPULATE_METHOD;
 
@@ -67,13 +70,13 @@ class Auth extends Application{
 
             $password = $hash = hash(AUTH_PASSWORD_ENCRYPTION_ALGORITHM, $this->password);
 
-            $sql = "select * from {$this->authTable} where {$this->authField} = '{$this->username}' and password = '{$password}'";
+//            $sql = "select * from {$this->authTable} where {$this->authField} = '{$this->username}' and password = '{$password}'";
 
             $db = new Database();
 
-            $db->Query($sql);
+            $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
 
-            if($db->rowsAffected != false)
+            if($db->numRows)
                 return true;
             else
                 return false;
@@ -86,7 +89,7 @@ class Auth extends Application{
      */
     public function isValidEmail($email){
 
-        $pattern = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
+        $pattern = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i';
 
         if(preg_match($pattern, $email))
             return true;

@@ -36,7 +36,8 @@ class Console{
 
         $options = array(
            'bundle:create',
-           'bundle:delete'
+           'bundle:delete',
+           'exit'
         );
 
         $this->linebreak(2);

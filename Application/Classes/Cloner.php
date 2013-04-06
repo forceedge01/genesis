@@ -1,6 +1,6 @@
 <?php
 
-class Cloner extends Database{
+class Cloner extends Database {
 
     public
             $domain,
@@ -8,7 +8,9 @@ class Cloner extends Database{
             $verbose,
             $portal_id,
             $product_id,
-            $merchant_id;
+            $merchant_id,
+            $scenario,
+            $path;
 
     /**
      *
@@ -16,14 +18,13 @@ class Cloner extends Database{
      * <br /><br />Verifies if the domain passed on is a valid domain if specified to do so in Cloner config,<br />
      * checks if site directory already exists, if it does will show a repair link.
      */
-    private function VerifySite(){
+    private function VerifySite() {
 
-        if(ALLOW_ONLY_FANDIST_SUBDOMAINS){
+        if (ALLOW_ONLY_FANDIST_SUBDOMAINS) {
 
-            if(strpos($this->domain, '.fandistribution.com')>0){
-
-            }
-            else{
+            if (strpos($this->domain, '.fandistribution.com') > 0) {
+                
+            } else {
 
                 $this->setError(array('Failure' => 'You can only create .fandistribution.com subdomains.'));
 
@@ -31,14 +32,14 @@ class Cloner extends Database{
             }
         }
 
-        if(is_dir(SITES_FOLDER . $this->domain)){
+        if (is_dir(SITES_FOLDER . $this->domain)) {
 
             $site = new Site();
 
             $site->GetByDomain($this->domain);
 
-            if(!isset($site->id))
-                $this->setError(array('Failure' => 'Unable to build site, directory already exists. <a href="'.$this->setRoute('Site_Repair', array('domain' => $this->domain)).'">Click here to attempt to repair.</a>'));
+            if (!isset($site->id))
+                $this->setError(array('Failure' => 'Unable to build site, directory already exists. <a href="' . $this->setRoute('Site_Repair', array('domain' => $this->domain)) . '">Click here to attempt to repair.</a>'));
             else
                 $this->setError(array('Failure' => 'Site already exists.'));
 
@@ -54,51 +55,87 @@ class Cloner extends Database{
      * <br />Will create a new site where defined in the Cloner config.
      *
      */
-    public function CloneSite(){
+    public function CloneSite($scenario = 'live') {
 
-        if(!empty($this->domain)){
+        if ($scenario == 'test') {
+            
+            $this->domain = 'testCandidate';
+            
+            if(is_dir(SITES_FOLDER . $this->domain))
+                @$this->removeClone('testCandidate');
 
-            if($this->VerifySite()){
+            if ($this->CreateDirectory()) {
 
-                if($this->CreateDirectory()){
+                if ($this->CopyMaterial()) {
 
-                    if($this->CopyMaterial()){
+                    if ($this->ExpandClone()) {
 
-                        if($this->ExpandClone()){
+                        if ($this->setConfig()) {
 
-                            if($this->setConfig()){
+                            if ($this->AlterConfigsAndImportSQL()) {
 
-                                if($this->AlterConfigsAndImportSQL()){
+                                $this->Cleanup();
 
-                                    $this->Cleanup();
-
-                                    return true;
-
-                                }
-                                else
-                                    $this->setError(array('Failure' => 'Unable to alter and import SQL'));
+                                return true;
                             }
                             else
-                                $this->setError(array('Failure' => 'Unable to alter wp-config file, file not found'));
+                                $this->setError(array('Failure' => 'Unable to alter and import SQL'));
                         }
                         else
-                            $this->setError(array('Failure' => 'Unable to unzip clone'));
+                            $this->setError(array('Failure' => 'Unable to alter wp-config file, file not found'));
                     }
                     else
-                        $this->setError(array('Failure' => 'Unable to copy material to the new site.'));
+                        $this->setError(array('Failure' => 'Unable to unzip clone'));
                 }
                 else
-                    $this->setError(array('Failure' => 'Unable to create directory'));
-
-                $directory = new Dir();
-
-//                $directory->removeDirectory(SITES_FOLDER . $this->domain);
+                    $this->setError(array('Failure' => 'Unable to copy material to the new site.'));
             }
         }
-        else
-            $this->setError(array('Failure' => 'You must assign a domain name to build to the cloner.'));
+        else {
 
-        return false;
+            if (!empty($this->domain)) {
+
+                if ($this->VerifySite()) {
+
+                    if ($this->CreateDirectory()) {
+
+                        if ($this->CopyMaterial()) {
+
+                            if ($this->ExpandClone()) {
+
+                                if ($this->setConfig()) {
+
+                                    if ($this->AlterConfigsAndImportSQL()) {
+
+                                        $this->Cleanup();
+
+                                        return true;
+                                    }
+                                    else
+                                        $this->setError(array('Failure' => 'Unable to alter and import SQL'));
+                                }
+                                else
+                                    $this->setError(array('Failure' => 'Unable to alter wp-config file, file not found'));
+                            }
+                            else
+                                $this->setError(array('Failure' => 'Unable to unzip clone'));
+                        }
+                        else
+                            $this->setError(array('Failure' => 'Unable to copy material to the new site.'));
+                    }
+                    else
+                        $this->setError(array('Failure' => 'Unable to create directory'));
+
+                    $directory = new Dir();
+
+//                $directory->removeDirectory(SITES_FOLDER . $this->domain);
+                }
+            }
+            else
+                $this->setError(array('Failure' => 'You must assign a domain name to build to the cloner.'));
+
+            return false;
+        }
     }
 
     /**
@@ -106,22 +143,31 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Copies the site material over to the destination site for extraction. Site material and destination sites can be defined in the Cloner config.
      */
-    private function CopyMaterial(){
+    private function CopyMaterial() {
 
-        try{
+        try {
+            
+            $path = null;
 
-            if($this->verbose)
-                error_log ('copying over site material .zip ...');
-            copy(SITE_MATERIAL_FOLDER . CLONE_ZIP_NAME, SITES_FOLDER . $this->domain . '/'. CLONE_ZIP_NAME);
+            if($this->domain == 'testCandidate'){
+                
+                $path = TEST_CANDIDATE_DIR;
+                
+                $this->setFlash('Creating Test Candidate from: ' . $path . STREETTEAM_ZIP_NAME);
+            }
+            else
+                $path = SITE_MATERIAL_FOLDER;
+            
+            if ($this->verbose)
+                error_log('copying over site material .zip ...');
+            copy($path . STREETTEAM_ZIP_NAME, SITES_FOLDER . $this->domain . '/' . STREETTEAM_ZIP_NAME);
 
-            if($this->verbose)
-                error_log ('copying over .sql ...');
-            copy(SITE_MATERIAL_FOLDER . CLONE_SQL_NAME, SITES_FOLDER . $this->domain . '/'. CLONE_SQL_NAME);
+            if ($this->verbose)
+                error_log('copying over .sql ...');
+            copy(SITE_MATERIAL_FOLDER . CLONE_SQL_NAME, SITES_FOLDER . $this->domain . '/' . CLONE_SQL_NAME);
 
             return true;
-
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
 
             echo $e->getMessage();
         }
@@ -132,11 +178,11 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Create an empty directory for the domain.
      */
-    private function CreateDirectory(){
-
-        if($this->verbose)
-            error_log ('creating directory ' . $this->domain . '...');
-        if(mkdir(SITES_FOLDER . $this->domain))
+    private function CreateDirectory() {
+        
+        if ($this->verbose)
+            error_log('creating directory ' . $this->domain . '...');
+        if (mkdir(SITES_FOLDER . $this->domain))
             return true;
         else
             return false;
@@ -147,16 +193,16 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Alters the new wordpress site's config file with new credentials.
      */
-    private function setConfig(){
+    private function setConfig() {
 
         //wp-config of new file to be edited here.
 
         $filename = '/wp-config.php';
 
-        if($this->verbose)
-            error_log ('Editing file '. SITES_FOLDER . $this->domain . $filename . ' ...');
+        if ($this->verbose)
+            error_log('Editing file ' . SITES_FOLDER . $this->domain . $filename . ' ...');
 
-        if($file = file_get_contents(SITES_FOLDER . $this->domain . $filename)){
+        if ($file = file_get_contents(SITES_FOLDER . $this->domain . $filename)) {
 
             $file = str_replace("'DB_NAME', 'wordpress'", "'DB_NAME', '" . $this->domain . "Multisites'", $file);
 
@@ -170,20 +216,19 @@ class Cloner extends Database{
         }
         else
             return false;
-
     }
 
     /**
      * Cleans up the site material files from the newly created wordpress directory.
      */
-    private function Cleanup(){
+    private function Cleanup() {
 
-        if($this->verbose)
-            error_log ('Removing .zip file....');
-        unlink(SITES_FOLDER . $this->domain . '/' . CLONE_ZIP_NAME);
+        if ($this->verbose)
+            error_log('Removing .zip file....');
+        unlink(SITES_FOLDER . $this->domain . '/' . STREETTEAM_ZIP_NAME);
 
-        if($this->verbose)
-            error_log ('Removing .sql file....');
+        if ($this->verbose)
+            error_log('Removing .sql file....');
         unlink(SITES_FOLDER . $this->domain . '/' . CLONE_SQL_NAME);
     }
 
@@ -192,14 +237,14 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Will unzip files of the zip copied over from the site material folder
      */
-    private function ExpandClone(){
+    private function ExpandClone() {
 
-        $zip = new Zip(SITES_FOLDER . $this->domain . '/'. CLONE_ZIP_NAME);
+        $zip = new Zip(SITES_FOLDER . $this->domain . '/' . STREETTEAM_ZIP_NAME);
 
-        if($this->verbose)
-            error_log ('Extracting files from '.$this->domain);
+        if ($this->verbose)
+            error_log('Extracting files from ' . $this->domain);
 
-        if($zip->unzip(SITES_FOLDER . $this->domain)){
+        if ($zip->unzip(SITES_FOLDER . $this->domain)) {
 
             return true;
         }
@@ -210,14 +255,15 @@ class Cloner extends Database{
     /**
      * Alters the wp-config file of the new wordpress site (setConfig used), imports the new sql schema for the site into mysql. Transaction based.
      */
-    private function AlterConfigsAndImportSQL(){
+    private function AlterConfigsAndImportSQL() {
 
-        if($this->verbose)
-            error_log ('Altering wordpress wp-config file...');
+        if ($this->verbose)
+            error_log('Altering wordpress wp-config file...');
         $this->setConfig($this->domain, SITES_FOLDER . $this->domain . '/wp-config.php');
 
-        if($this->verbose)
-            error_log ('Connecting to the database....');
+        if ($this->verbose)
+            error_log('Connecting to the database....');
+        
         $db = new Database();
 
         $db->verbose = $this->verbose;
@@ -226,16 +272,16 @@ class Cloner extends Database{
 
         $db->BeginTransaction();
 
-        if($this->verbose)
-            error_log ('Creating new wordpress database and setting up initial schema....');
+        if ($this->verbose)
+            error_log('Creating new wordpress database and setting up initial schema....');
         $this->createWPDB();
 
-        if($this->verbose)
-            error_log ('Inserting record into WPBuilder database....');
+        if ($this->verbose)
+            error_log('Inserting record into WPBuilder database....');
         $this->registerSite();
 
-        if($this->verbose)
-            error_log ('Committing all changes....');
+        if ($this->verbose)
+            error_log('Committing all changes....');
         $db->Commit();
 
         return true;
@@ -247,79 +293,83 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Removes a clone created by the cloner
      */
-    public function removeClone($id){
+    public function removeClone($id) {
 
-        try{
-
+        try {
+            
             $db = new Database();
 
             $error = false;
+            
+            if(is_numeric($id)){
 
-            $sql = "select site from Sites where id = $id";
+                $sql = "select site from Sites where id = $id";
 
+            }
+            else{
+                
+                $sql = "select site from Sites where site = '$id'";
+            }
+            
             $db->Query($sql);
 
             $domain = $db->queryResult[0]->site;
 
-            if($domain){
+            if ($domain) {
 
-                if(is_dir(SITES_FOLDER . $domain)){
+                if (is_dir(SITES_FOLDER . $domain)) {
 
                     $directory = new Dir();
 
-                    if(!$directory->removeDirectory(SITES_FOLDER . $domain)){
+                    if (!$directory->removeDirectory(SITES_FOLDER . $domain)) {
 
 //                        $this->setError(array('Directory error' => 'Unable to remove'));
 
                         trigger_error('unable to remove directory');
 
                         $error = true;
+                    } else {
 
-                    }
-                    else{
+                        $sql = "REVOKE all ON `" . $domain . "Multisites`.* FROM '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "'";
 
-                        $sql = "REVOKE all ON `".$domain."Multisites`.* FROM '".NEW_WP_DB_USER."'@'".NEW_WP_DB_HOST."'";
-
-                        if(!$db->Query($sql)){
+                        if (!$db->Query($sql)) {
 
                             trigger_error('Unable to revoke db previliges');
 
                             $error = true;
-
                         }
 
-                        $db->queries[] = 'use `'.$domain.'Multisites`';
+                        $db->queries[] = 'use `' . $domain . 'Multisites`';
 
                         $db->queries[] = "show tables";
 
                         $db->multiQuery();
 
-                        foreach($db->queryResult as $result){
+                        foreach ($db->queryResult as $result) {
 
-                            foreach($result as $table)
-                            {
+                            foreach ($result as $table) {
                                 $db->queriesl[] = "drop table if exists ` " . $domain . "`.`" . $table . "`";
                             }
-
                         }
 
-                        $db->queries[] = 'drop database `' . $domain .'Multisites`';
+                        $db->queries[] = 'drop database `' . $domain . 'Multisites`';
 
-                        $db->queries[] = 'use `'. DBNAME . '`';
+                        $db->queries[] = 'use `' . DBNAME . '`';
 
-                        $db->queries[] = 'delete from Sites where id = '.$id;
+                        if(is_numeric($id))
+                            $db->queries[] = 'delete from Sites where id = ' . $id;
+                        else
+                            $db->queries[] = 'delete from Sites where site = "' . $id . '"';
 
-                        if(!$db->multiQuery()){
+                        if (!$db->multiQuery()) {
 
 //                            $this->setError (array('Site Database' => 'Could not remove database entries, resort to manual cleanup. Aborting'));
                             trigger_error('Could not remove database entries, resort to manual cleanup. Aborting');
 
                             $error = true;
                         }
-
                     }
-                }
-                else{
+                } else {
 
                     $sql = "delete from Sites where id = $id";
 
@@ -328,24 +378,19 @@ class Cloner extends Database{
                     trigger_error('Could not remove database entries, resort to manual cleanup. Aborting');
 
                     $error = true;
-
                 }
-
-            }
-            else{
+            } else {
 
                 trigger_error('Specified domain could not be found in the database, you will have to resort to manual removal.');
 
                 $error = true;
             }
 
-            if($error)
+            if ($error)
                 return false;
             else
                 return true;
-
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
 
             trigger_error($e->getMessage());
         }
@@ -356,27 +401,27 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />Creates a new wordpress database and adds a user to its previleges.
      */
-    public function createWPDB(){
+    public function createWPDB() {
 
-        try{
-            if($this->verbose)
-                error_log ('Creating database for WP site...<br /><br />');
-            $sql = "create database if not exists `{$this->db}`";
-
-            $this->Query($sql);
-
-            if($this->verbose)
-                error_log ('Granting permissions on the database...<br /><br />');
-            $sql = "grant all on `{$this->db}`.* to '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "' identified by '" . NEW_WP_DB_PASSWORD . "'";
+        try {
+            if ($this->verbose)
+                error_log('Creating database for WP site...<br /><br />');
+            $sql = "create database if not exists `{$this->domain}Multisites`";
 
             $this->Query($sql);
 
-            if($this->verbose)
-                error_log ('Verifying creation and permissions...<br /><br />');
-            if($this->verifyDB()){
+            if ($this->verbose)
+                error_log('Granting permissions on the database...<br /><br />');
+            $sql = "grant all on `{$this->domain}Multisites`.* to '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "' identified by '" . NEW_WP_DB_PASSWORD . "'";
 
-                if($this->verbose)
-                    error_log ('Populating Database...<br /><br />');
+            $this->Query($sql);
+
+            if ($this->verbose)
+                error_log('Verifying creation and permissions...<br /><br />');
+            if ($this->verifyDB()) {
+
+                if ($this->verbose)
+                    error_log('Populating Database...<br /><br />');
                 $this->configureDB();
             }
 
@@ -385,10 +430,8 @@ class Cloner extends Database{
             $this->Query($sql);
 
             return true;
-
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
+            
             $this->RollBack();
 
             $site = new SiteController();
@@ -397,7 +440,6 @@ class Cloner extends Database{
 
             echo 'Error in createWPDB: ' . $e->getMessage();
         }
-
     }
 
     /**
@@ -405,7 +447,7 @@ class Cloner extends Database{
      * @return boolean - true on success, false on failure<br />
      * <br />
      */
-    private function verifyDB(){
+    private function verifyDB() {
 
         return true;
     }
@@ -413,27 +455,25 @@ class Cloner extends Database{
     /**
      * Alters the .sql file to change the base address over to the new domain.
      */
-    private function configureDB(){
+    private function configureDB() {
 
-        try{
+        try {
 
-            if($this->verbose)
-                error_log ('Re-configuring database file to import...<br /><br />');
+            if ($this->verbose)
+                error_log('Re-configuring database file to import...<br /><br />');
 
-            $file = file_get_contents(SITES_FOLDER . $this->domain . '/'. CLONE_SQL_NAME);
+            $file = file_get_contents(SITES_FOLDER . $this->domain . '/' . CLONE_SQL_NAME);
 
             $file = str_replace("http://st-wordpress", WP_SITE_BASE . 'Sites/' . $this->domain, $file);
 
-            if(USE_DEFAULT_API_CREDENTIALS){
+            if (USE_DEFAULT_API_CREDENTIALS) {
 
                 $this->portal_id = DEFAULT_PORTAL_ID;
 
                 $this->merchant_id = DEFAULT_MERCHANT_ID;
 
                 $this->product_id = DEFAULT_PRODUCT_ID;
-
-            }
-            else{
+            } else {
 
                 ini_set("soap.wsdl_cache_enabled", 0);
 
@@ -463,19 +503,19 @@ class Cloner extends Database{
 
             $file = str_replace("'lb_sh_product_id', '1'", "'lb_sh_product_id', '{$this->product_id}'", $file);
 
-            if(DEFAULT_WP_ADMIN_USERNAME != 'admin')
+            if (DEFAULT_WP_ADMIN_USERNAME != 'admin')
                 $file = str_replace("1, 'admin'", "1, '" . DEFAULT_WP_ADMIN_USERNAME . "'", $file);
 
             file_put_contents(SITES_FOLDER . $this->domain . '/' . CLONE_SQL_NAME, $file);
 
             //import sql into db here.
 
-            if($this->verbose)
-                error_log ('Init Import into MySQL...<br /><br />');
+            if ($this->verbose)
+                error_log('Init Import into MySQL...<br /><br />');
+            
             $this->importSQL();
-
-        }
-        catch(Exception $e){
+            
+        } catch (Exception $e) {
 
             $this->RollBack();
 
@@ -486,32 +526,32 @@ class Cloner extends Database{
     /**
      * Imports the .sql file into mysql
      */
-    public function importSQL($sqlpath){
+    public function importSQL($sqlpath = null) {
 
-        try{
+        try {
 
-            if($this->verbose)
-                error_log ('Switching to new site Database...<br /><br />');
-            $sql = "use `{$this->db}`";
+            if ($this->verbose)
+                error_log('Switching to new site Database...<br /><br />');
+            
+            $sql = "use `{$this->domain}Multisites`";
 
             $this->Query($sql);
 
-            if(!$sqlpath)
-                $file = file_get_contents(SITES_FOLDER . $this->domain . '/'. CLONE_SQL_NAME);
+            if (!$sqlpath)
+                $file = file_get_contents(SITES_FOLDER . $this->domain . '/' . CLONE_SQL_NAME);
             else
                 $file = file_get_contents($sqlpath);
 
             $queries = explode('--*--', $file);
 
-            if($this->verbose)
-                error_log ('Importing SQL data...<br /><br />');
-            foreach($queries as $query){
+            if ($this->verbose)
+                error_log('Importing SQL data...<br /><br />');
+            
+            foreach ($queries as $query) {
 
                 $this->Query($query);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
 
             trigger_error('Error in importSQL: ' . $e->getMessage());
         }
@@ -520,9 +560,9 @@ class Cloner extends Database{
     /**
      * Inserts a record of the new site into mysql
      */
-    public function registerSite(){
+    public function registerSite() {
 
-        try{
+        try {
 
             $site = new Site();
 
@@ -537,10 +577,7 @@ class Cloner extends Database{
             $site->productId = $this->product_id;
 
             $site->create();
-
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             echo 'Unable to register site: ' . $e->getMessage();
         }
     }

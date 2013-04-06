@@ -35,5 +35,13 @@ class Debugger{
         $this->pre(debug_backtrace());
 
     }
+    
+    public function isLoopable($param){
+        
+        if(is_array($param) || is_object($param))
+            return true;
+        else
+            return false;
+    }
 
 }

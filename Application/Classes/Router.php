@@ -396,7 +396,10 @@ class Router extends Debugger{
 
     protected function lastAccessedPage(){
 
-        return $this->getRouteFromPattern($_SESSION['lastRoute']);
+        if(isset($_SESSION['lastRoute']))
+            return $this->getRouteFromPattern($_SESSION['lastRoute']);
+        else
+            return true;
     }
 
     protected function getRouteFromPattern($pattern = null){

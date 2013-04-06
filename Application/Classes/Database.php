@@ -1,28 +1,33 @@
 <?php
 
-class Database extends Template{
+class Database extends Template {
 
     private
-        $host,
-        $username,
-        $password,
-        $name,
-        $port,
-        $socket;
-
+            $host,
+            $username,
+            $password,
+            $name,
+            $port,
+            $socket,
+            $query,
+            $verbose,
+            $queries,
+            $queryTable,
+            $queryColumns,
+            $queryTablePrimaryKey,
+            $queryTableColumns,
+            $queryJoinClause,
+            $foreignKeys,
+            $rowsAffected,
+            $queryTables;
     public
-        $domain,
-        $queryResult,
-        $queryMeta,
-        $verbose,
-        $queries,
-        $lastQuery,
-        $rowsAffected,
-        $insert_id,
-        $numRows;
-
-    protected
-        $activeactiveConnection;
+            $queryMeta,
+            $queriesResult,
+            $queryResult,
+            $numRows,
+            $insert_id,
+            $lastQuery,
+            $activeConnection;
 
     /**
      *
@@ -39,20 +44,18 @@ class Database extends Template{
         $this->port = @$params['port'];
         $this->socket = @$params['socket'];
 
-        try{
+        try {
 
             $this->activeConnection = new mysqli($this->host, $this->username, $this->password, $this->name);
-
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
 
             $site = new SiteController();
 
-            if($this->verbose)
-                trigger_error ('Error: Removing directory from sites...');
+            if ($this->verbose)
+                trigger_error('Error: Removing directory from sites...');
             $site->removeDirectory(SITES_FOLDER . $this->domain);
 
-            trigger_error('Error connecting to mysql Database on INIT: ' . $e->getMessage());
+            trigger_error('Error connecting to mysql Database on INIT: ' . $e->GetMessage());
         }
     }
 
@@ -60,144 +63,169 @@ class Database extends Template{
      *
      * @param string $sql - the SQL query you want to execute
      * @return boolean - true on success, false on failure<br />
-     * <br />Execute an SQL query and get appropriate result back in $this->queryResult and $this->rowsAffected
+     * <br />Execute an SQL query and Get appropriate result back in $this->queryResult and $this->rowsAffected
      */
-    public function Query($sql){
+    public function Query($sql = null) {
 
-        try{
+        try {
 
             $this->queryResult = null;
 
-            if(!empty($sql)){
+            if (empty($sql))
+                $sql = $this->query;
+
+            if (!empty($sql)) {
 
                 $this->lastQuery = $sql;
 
                 $result = $this->activeConnection->query($sql);
 
-                if(!empty($this->activeConnection->error))
-                {
+                if (!empty($this->activeConnection->error)) {
 
-                    if(SHOW_DATABASE_ERRORS)
-                        $this->setError('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' .$sql);
+                    if (SHOW_DATABASE_ERRORS)
+                        $this->setError('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' . $sql);
 
-                    if(MAIL_DATABASE_ERROR){
+                    if (MAIL_DATABASE_ERROR) {
 
-                            $mail = new Mail();
+                        $mail = new Mail();
 
-                            $params['to'] = MAIL_DATABASE_ERROR;
+                        $params['to'] = MAIL_DATABASE_ERROR;
 
-                            $params['from_name'] = 'Multisites sql error';
+                        $params['from_name'] = 'Multisites sql error';
 
-                            $params['from'] = APPLICATION_ADMIN_EMAIL;
+                        $params['from'] = APPLICATION_ADMIN_EMAIL;
 
-                            $params['message'] = 'SQL Query: ' . $sql;
+                        $params['message'] = 'SQL Query: ' . $sql;
 
-                            $params['message'] .= 'Error: ' . $this->activeConnection->error;
+                        $params['message'] .= 'Error: ' . $this->activeConnection->error;
 
-                            $params['subject'] = 'multisite error';
+                        $params['subject'] = 'multisite error';
 
-    	            $mail->send($params);
+                        $mail->send($params);
                     }
 
-                    trigger_error($this->activeConnection->error . 'SQL: '.$sql);
-                }
-                else
-                {
+                    trigger_error($this->activeConnection->error . 'SQL: ' . $sql);
+                } else {
 
-                    if(is_object($result))
+                    if (is_object($result))
                         $this->numRows = $result->num_rows;
 
-                    if(@$result->num_rows > 0){
+                    if (@$result->num_rows > 0) {
 
-                        if(strpos($sql, 'SELECT ') === 0 || strpos($sql, 'SHOW ') === 0 || strpos($sql, 'show ') === 0 || strpos($sql, 'select ') === 0){
+                        if (is_numeric($this->activeConnection->insert_id) && $this->activeConnection->insert_id != 0) {
 
-                            while ($row = $result->fetch_object()){
+                            $this->insert_id = $this->activeConnection->insert_id;
+                        } else {
+
+                            while ($row = $result->fetch_object()) {
 
                                 $this->queryResult[] = $row;
                             }
 
                             $result->close();
-
                         }
-                        else{
-
-                            $this->insert_id = $this->activeConnection->insert_id;
-                        }
-
                     }
 
-                    $this->rowsAffected = ($this->activeConnection->affected_rows == -1 ? false : $this->activeConnection->affected_rows);
+                    $this->queryMeta = $this->activeConnection->stat;
 
-                    return true;
+                    $this->rowsAffected = $this->activeConnection->affected_rows;
+
+                    return $this;
                 }
-
             }
+        } catch (Exception $e) {
 
+            trigger_error($e->GetMessage());
         }
-        catch(Exception $e){
-
-            trigger_error($e->getMessage());
-        }
-
     }
 
     /**
      *
-     * @param string $table - the name of the table you want to insert a record into.
      * @param array $params - array of table column name and its values as $params['keys'] and $params['values']
      * @return boolean - true on success, false on failure<br />
      * <br />Insert a record into a table
      */
-    public function Insert($table, $params){
+    private function CreateRecord($params) {
 
         $params = $this->prepareForInsert($params);
 
-        $sql = 'INSERT INTO '. $table . ' (' . $params['keys'] . ') VALUES (' . $params['values'] . ') ';
+        $sql = 'INSERT INTO ' . $this->queryTable . ' (' . $params['keys'] . ') VALUES (' . $params['values'] . ') ';
 
-        if($this->Query($sql))
-            return $this->rowsAffected;
+        if ($this->Query($sql))
+            return $this->activeConnection->insert_id;
         else
             return false;
-
     }
 
     /**
      *
-     * @param string $table - name of table to delete from
      * @param array $params - where clause
      * @return boolean - true on success, false on failure<br />
      * <br />Delete a record from a table.
      */
-    public function Delete($table, $params){
+    public function Delete($params) {
 
         $params = $this->prepare($params);
 
-        $sql = 'DELETE FROM '. $table . ' WHERE ' . $params;
+        $sql = 'DELETE FROM `' . $this->queryTable . '` WHERE ' . $params;
 
-        if($this->Query($sql))
+        if ($this->Query($sql))
             return $this->rowsAffected;
         else
             return false;
-
     }
 
     /**
      *
-     * @param string $table - table you want to update
      * @param array $params - set clause
      * @return boolean - true on success, false on failure<br />
      * <br />Update a table record(s)
      */
-    public function Update($table, $params){
+    public function SaveRecord(array $params = array()) {
+        if (count($params) == 0)
+            $params = $_REQUEST;
 
-        $params = $this->prepare($params);
+        if (($params[str_replace('.','__', $this->queryTablePrimaryKey)]) != null)
+            return $this->CreateRecord($params);
+        else {
+            
+            $params = $this->prepareForMultiQuery($params, 'update');
 
-        $sql = 'UDPATE '. $table . ' SET ' . $params;
+            $sql = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTable . '.' . $this->queryTablePrimaryKey . ' = ' . $_REQUEST[$this->queryTablePrimaryKey];
 
-        if($this->Query($sql))
-            return $this->rowsAffected;
-        else
-            return false;
+            if ($this->Query($sql))
+                return $this;
+            else
+                return false;
+        }
+    }
+    
+    /**
+     * 
+     * @param array $params
+     * @return null Work in progress
+     * Make a prepare for multiquery and use in save for multiple tables with update and insert queries.
+     */
+    private function prepareForMultiQuery(array $params = array()){
+        
+        $query = null;
+
+        foreach ($params as $key => $value) {
+
+                if (strpos($key, '__') > 0) {
+
+                    $tableData = explode('__', $key);
+
+                    if (count($tableData) > 0) {
+
+                        $this->queryTables[$tableData[0]][$tableData[1]] = $value;
+                    } 
+                }
+            }
+
+        $this->pre($this->queryTables);
+
+        return $query;
     }
 
     /**
@@ -206,21 +234,31 @@ class Database extends Template{
      * @return type - true on success, false on failure<br />
      * <br />Prepare statement arrays for proper SQl query build.
      */
-    private function prepare($params){
+    private function prepare(array $params = array(), $type = null) {
 
         $query = null;
 
-        foreach($params as $key => $value){
+        foreach ($params as $key => $value) {
 
-            $query .= $key .' = ';
+            foreach ($this->queryTableColumns as $column) {
 
-            if(is_int($value))
-                $query .= $value . ' AND ';
-            else
-                $query .= "'" .$value . "' AND ";
+                  if ($this->queryTable . '__' . $key == $column->Field && $this->queryTable . '__' . $key != $this->queryTablePrimaryKey) {
+
+                    if (strpos($key, '__') > 0)
+                        $query .= '`' . str_replace('__', '`.`', $key) . '` = ';
+                    else
+                        $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
+
+                    if (is_numeric($value))
+                        $query .= $value . ($type == 'update' ? ',' : ' AND ');
+                    else
+                        $query .= "'" . $value . "' " . ($type == 'update' ? ',' : ' AND ');
+                }
+            }
         }
 
-        $query = trim($query, 'AND');
+        $query = trim($query, ' AND ');
+        $query = trim($query, ',');
 
         return $query;
     }
@@ -231,23 +269,29 @@ class Database extends Template{
      * @return type - true on success, false on failure<br />
      * <br />Prepare statement arrays for proper SQL build
      */
-    private function prepareForInsert($params){
+    private function prepareForInsert(array $params = array()) {
 
         $keys = null;
         $values = null;
 
-        foreach($params as $key => $value){
+        foreach ($params as $key => $value) {
 
-            $keys .= $key .', ';
+            foreach ($this->queryTableColumns as $column) {
 
-            if(is_int($value))
-                $values .= $value . ',';
-            else
-                $values .= "'" .$value . "',";
+                if ($key == $column->Field) {
+
+                    $keys .= $key . ',';
+
+                    if (is_int($value))
+                        $values .= $value . ',';
+                    else
+                        $values .= "'" . $value . "',";
+                }
+            }
         }
 
-        $params['keys'] = substr($keys, 0, -1);
-        $params['values'] = substr($values, 0, -1);
+        $params['keys'] = trim($keys, ',');
+        $params['values'] = trim($values, ',');
 
         return $params;
     }
@@ -255,28 +299,28 @@ class Database extends Template{
     /**
      * close connection to database
      */
-    public function CloseactiveConnection(){
+    public function CloseactiveConnection() {
         $this->activeConnection->close();
     }
 
     /**
      * Begin a transaction
      */
-    public function BeginTransaction(){
+    public function BeginTransaction() {
         $this->activeConnection->autocommit(FALSE);
     }
 
     /**
      * commit a transaction
      */
-    public function Commit(){
+    public function Commit() {
         $this->activeConnection->commit();
     }
 
     /**
      * perform a rollback on a transaction
      */
-    public function RollBack(){
+    public function RollBack() {
         $this->activeConnection->rollback();
     }
 
@@ -290,27 +334,25 @@ class Database extends Template{
      * You need to have the SQL file seperated with --*-- symbols for each separate query. <br />
      * The easiest way to do this is a replace function with a certain comment present in the sql file.
      */
-    public function importSQLFromFile($file){
+    public function importSQLFromFile($file) {
 
-        try{
+        try {
 
-            $file = file_get_contents($file);
+            $file = file_Get_contents($file);
 
             $queries = explode('--*--', $file);
 
-            if($this->verbose)
-                error_log ('Importing SQL data...<br /><br />');
-            foreach($queries as $query){
+            if ($this->verbose)
+                error_log('Importing SQL data...<br /><br />');
+            foreach ($queries as $query) {
 
                 $this->Query($query);
             }
 
             return true;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
 
-            trigger_error('Error in importSQL: ' . $e->getMessage());
+            trigger_error('Error in importSQL: ' . $e->GetMessage());
         }
     }
 
@@ -320,23 +362,22 @@ class Database extends Template{
      * @return boolean - true on success, false on failure<br />
      * <br />Drop a database, it may not be empty, will drop all tables in it and then drop the database schema.
      */
-    public function DropDatabase($dbname = null){
+    public function DropDatabase($dbname = null) {
 
-        if(empty($dbname))
+        if (empty($dbname))
             $dbname = $this->domain;
 
         $tables = $this->Query('Show tables');
 
-        foreach($tables as $table)
-        {
-            $sql = 'DROP TABLE IF EXISTS `'.$table.'`';
+        foreach ($tables as $table) {
+            $sql = 'DROP TABLE IF EXISTS `' . $table . '`';
 
             $this->Query($sql);
         }
 
         $sql = "drop database $dbname";
 
-        if($this->query($sql))
+        if ($this->query($sql))
             return true;
         else
             return false;
@@ -344,46 +385,324 @@ class Database extends Template{
 
     /**
      *
-     * @param array Process multiple queries at once.
-     *
+     * @return boolein
+     * Process multiple queries at once stored in $queries[]
      */
-    public function multiQuery(){
+    public function multiQuery() {
 
-        try{
+        try {
 
-            if(!empty($this->queries)){
+            if (!empty($this->queries)) {
 
                 $this->queryResult = array();
 
-                foreach($this->queries as $sql){
+                foreach ($this->queries as $sql) {
 
-                    $this->queryResult[] = $this->Query($sql);
+                    $this->Query($sql);
 
+                    if (!empty($this->queryResult))
+                        $this->queriesResult[] = $this->queryResult;
                 }
             }
 
             unset($this->queries);
 
             return true;
+        } catch (Exception $e) {
 
-        }
-        catch(Exception $e){
-
-            echo $e->getMessage();
+            echo $e->GetMessage();
 
             return false;
         }
     }
 
-    public function databaseExists($dbname){
+    /**
+     * 
+     * @param string $dbname
+     * @return boolean
+     * Checks if a database exists
+     */
+    public function databaseExists($dbname) {
 
-        $sql = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'.$dbname.'"';
+        $sql = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "' . $dbname . '"';
 
         $this->Query($sql);
 
-        if($this->numRows == 1)
+        if ($this->numRows == 1)
             return true;
         else
             return false;
     }
+
+    /**
+     * 
+     * @param type $name
+     * @param array $columns
+     * @param array $conditions
+     * return Mixed Sets the current table for operation
+     */
+    public function Table($name, array $columns = null) {
+
+        $this->queryTable = $name;
+
+        $this->queryColumns = $columns;
+
+        $this->resetQueryData();
+
+        $this->GetPrimaryKey();
+
+        $this->GetForeignKeys();
+
+        $this->GetColumns();
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param mixed $id either an int with the id of the record or an array of filter params
+     * @return Mixed Returns dataset for a primary key id
+     */
+    public function GetRecordBy($id, array $params = array()) {
+
+        $this->queryInit($id, $params)->Query();
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param mixed $id either an int with the id of the record or an array of filter params
+     * @param array $params
+     * @return mixed Returns just one of matching records
+     */
+    public function GetOneRecordBy($id, array $params = array()) {
+
+        $params['limit'] = 1;
+
+        $this->queryInit($id, $params)->Query();
+
+        return $this->queryResult[0];
+    }
+
+    /**
+     * 
+     * @param mixed $id either an int with the id of the record or an array of filter params
+     * @param array $params
+     * @return boolean Check if a record exists
+     */
+    public function FindExistanceBy($id, array $params = array()) {
+
+        $params['limit'] = 1;
+
+        $this->queryInit($id, $params)->Query();
+
+        if ($this->numRows)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * 
+     * @param array $params
+     * @return mixed Get All records either filtered or not.
+     */
+    public function GetRecords(array $params = array()) {
+
+        $this->queryInit('*', $params)->Query();
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @return object Gets the result set from the database object for a processed query
+     */
+    public function GetResultSet() {
+
+        if ($this->queriesResult)
+            return $this->queriesResult;
+        else
+            return $this->queryResult;
+    }
+
+    private function resetQueryData() {
+
+        $this->queries = array();
+        $this->queriesResult = array();
+        $this->foreignKeys = array();
+        $this->queryTableColumns = array();
+        $this->queryTables = array();
+    }
+
+    /**
+     * 
+     * @param type $id
+     * @return Mixed Returns the dataset for a query constructed with the table and Get methods
+     */
+    private function queryInit($id = null, array $params = array()) {
+
+        $this->buildRelationsShipsQuery();
+
+        if (is_array($this->queryTableColumns)) {
+
+            $columns = $this->queryTableColumns;
+
+            $this->queryColumns = null;
+
+            foreach ($columns as $column)
+                $this->queryColumns .= $column->Field . ' as "' . str_replace('.', '__', $column->Field) . '",';
+
+            $this->queryColumns = trim($this->queryColumns, ',');
+        }
+
+        $this->query = 'select ' . $this->queryColumns . ' from ' . $this->queryTable . ' ' . $this->queryJoinClause;
+
+        if (is_array($id)) {
+
+            $params = $this->prepare($id);
+
+            $this->query .= ' where ' . $params;
+        } else if (is_numeric($id)) {
+
+            $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
+        }
+
+        $limit = null;
+        $order = null;
+
+        if (count($params) != 0) {
+
+            foreach (@$params as $key => $param) {
+
+                if ($key == 'where')
+                    $order = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
+
+                if ($key == 'order by')
+                    $order = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
+
+                if ($key == 'limit')
+                    $limit = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
+            }
+
+            $this->query .= $order . $limit;
+        }
+
+        return $this;
+    }
+
+    private function buildRelationsShipsQuery() {
+
+        if (isset($this->foreignKeys) && count($this->foreignKeys != 0)) {
+
+            $this->queryJoinClause = null;
+
+            foreach ($this->foreignKeys as $keys) {
+
+                if (isset($keys->REFERENCED_TABLE_NAME)) {
+
+                    $this->GetColumns($keys->REFERENCED_TABLE_NAME);
+
+                    $this->queryJoinClause .= ' ' .
+                            'LEFT JOIN ' . $keys->REFERENCED_TABLE_NAME . ' ' .
+                            'ON ' . $keys->TABLE_NAME . '.' . $keys->COLUMN_NAME . ' = ' . $keys->REFERENCED_TABLE_NAME . '.' . $keys->REFERENCED_COLUMN_NAME;
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param int $id
+     * @return int Returns Rows Affected
+     * Delete a record from a table using its primary key
+     */
+    public function DeleteRecord($id) {
+
+        $this->Query('delete from `' . DBNAME . '`.`' . $this->queryTable . '` where ' . $this->queryTablePrimaryKey . ' = ' . $id);
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $table
+     * @return mixed Gets primary key for a table
+     */
+    protected function GetPrimaryKey($table = null) {
+
+        if ($table == null)
+            $table = $this->queryTable;
+
+        $this->Query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
+
+        $this->queryTablePrimaryKey = '`' . $table . '`.`' . $this->queryResult[0]->Column_name . '`';
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $table
+     * @return mixed Gets foreign keys for a table
+     */
+    protected function GetForeignKeys($table = null) {
+
+        if ($table == null)
+            $table = $this->queryTable;
+
+        $this->Query("select
+            table_name as 'TABLE_NAME',
+            column_name as 'COLUMN_NAME', 
+            referenced_table_name as 'REFERENCED_TABLE_NAME',
+            referenced_column_name as 'REFERENCED_COLUMN_NAME'
+        from
+            information_schema.key_column_usage
+        where
+            referenced_table_name is not null
+        AND
+            table_name = '$table'");
+
+        if ($this->isLoopable($this->queryResult))
+            foreach ($this->queryResult as $key) {
+
+                $this->foreignKeys[] = $key;
+            }
+
+        $this->multiQuery();
+
+        return $this;
+    }
+
+    protected function GetColumns($table = null) {
+
+        if ($table == null)
+            $table = $this->queryTable;
+
+        $this->Query("SHOW COLUMNS FROM {$table} FROM " . DBNAME);
+
+        foreach ($this->queryResult as $columns) {
+
+            $columns->Field = $table . '.' . $columns->Field;
+
+            $this->queryTableColumns[] = $columns;
+        }
+
+        if ($this->queryTableColumns)
+            return true;
+        else
+            return false;
+    }
+
+    public function GetAffectedRows() {
+
+        return $this->rowsAffected;
+    }
+
+    public function GetNumberOfRows() {
+
+        return $this->numRows;
+    }
+
 }

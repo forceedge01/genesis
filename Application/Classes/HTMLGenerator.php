@@ -93,11 +93,16 @@ class HTMLGenerator extends Router{
     }
 
     public function generateForm($input){
-
+        
+        $form = null;
+//
         $form .= '<div class="widget">
             <div class="title"><h6>'.@($input['title'] ? $input['title'] : 'Default title' ).'</h6></div>
-            <form method="'.@(($input['method']) ? $input['method'] : 'POST' ).'" message="'.@$input['message'].'" action="'.$this->setRoute($input['action']).'" enctype="'.$input['enctype'].'" class="'.@(($input['class']) ? $input['class'] : 'form' ).'" id="'.$input['id'].'">
+            <form method="'.@(($input['method']) ? $input['method'] : 'POST' ).'" message="'.@$input['message'].'" action="'.@$input['action'].'" enctype="'.@$input['enctype'].'" class="'.@(($input['class']) ? $input['class'] : 'form' ).'" id="'.@$input['id'].'">
             <fieldset>';
+        
+        if(isset($input['data']))
+            $form .= $this->DBForm($input['data']);
 
         foreach($input['inputs'] as $key => $element){
 
@@ -108,7 +113,7 @@ class HTMLGenerator extends Router{
 
             if($key != 'hidden')
                 $form .= '<label for="'.@$element['id'].'">'.@$element['label'].'</label>
-                    <div class="rowRight">';
+                    <div class="formRight">';
 
             $form .= $this->generateInput($element);
 
@@ -131,7 +136,50 @@ class HTMLGenerator extends Router{
     }
 
 
+    protected function DBForm($inputs){
+        
+        $html = null;
+        
+        if($this->isLoopable($inputs[0])){
+        
+            foreach($inputs[0] as $key => $input){
 
+                $html .= '<div class="formRow">';
+                $element['value'] = $input;
+                $element['name'] = $key;
+                $element['label'] = $this->FirstCharacterToUpperCase($key);
+
+                if(is_numeric($input)){
+
+                    $element['type'] = 'text'; 
+                    $element['value'] = $input;
+                }
+                else if(is_array($input)){
+
+                    $element['type'] = 'text';                
+                }
+                else if(strlen($input) > 70){
+
+                    $element['type'] = 'textarea';
+                }
+                else if(is_string($input)){
+
+                    $element['type'] = 'text';                
+                }                
+
+                $html .= '<label for="'.@$element['id'].'">'.@str_replace('_', ' ', $element['label']).'</label>
+                    <div class="formRight">';
+
+                $html .= $this->generateInput($element);
+
+                $html .= '</div></div>';
+
+            }
+            
+        }
+            
+        return $html;
+    }
 
 
     function startSection($params = array()){
@@ -161,13 +209,15 @@ class HTMLGenerator extends Router{
     function add($params){//this function should store data in an array so that they can be re-arranged or modified individually.
 
     $i = 0;
+    
+    $element = null;
 
     switch($params['type']){
             case 'text':
                     {
                             $element .= '
                             <!-- input -->
-                            <input type="text" class="'.@$params['class'];
+                            <input type="text" class="'.@$params['class'].'"';
                             if(isset($params['disabled']))
                                     $element .= ' disabled="disabled" ';
                             $element .= ' value="'.@$params['value'].'" name="'.$params['name'].'"
@@ -643,5 +693,539 @@ class HTMLGenerator extends Router{
 
     function useVariable($varName, $var){
             $this->form = str_replace('<#'.$varName.'>', $var, $this->form);
+    }
+    
+    
+    /**
+     *
+     * @param type $items
+     * @param type $contentDescriptiveOutput - will show the Div sections below the table with more information.
+     * @return string - formated table of index
+     * Renders a fully functional index table.
+     */
+    public function RenderIndexTable($items, $contentDescriptiveOutput = true) {
+
+        $content = null;
+
+        ob_start();
+
+        echo '<ol>';
+
+        foreach ($items as $key => $value) {
+
+            if (is_array($value)) {
+
+                $content .= '<div class="tableHeadingSection" id="'.$key.'">' . $key . '</div>';
+
+                $content .= $this->outputIndexItems($key, $value);
+            } else {
+                if (is_numeric($key))
+                    echo '<li class="indexHeading"><a href="#' . $value . '">' . $value . '</a></li>';
+                else {
+                    echo '<li class="indexHeading"><a href="#' . $key . '">' . $key . '</a></li>';
+
+                    $content .= '<div class="widget"><div id="' . $key . '" class="indexTableContentHeading">' . $key . '</div>
+                        <p>' . $this->formatCode($value) . '</p>
+                        </div>
+                    ';
+                }
+            }
+        }
+
+        echo '</ol><hr>';
+
+        if($contentDescriptiveOutput)
+            echo $content;
+
+        $table = ob_get_clean();
+
+        return $table;
+    }
+
+    /**
+     *
+     * @param type $keys
+     * @param type $items
+     * @return string - creates headings within the menu for the RenderTableIndex method
+     */
+    private function outputIndexItems($keys, $items) {
+
+        $content = null;
+
+        echo '<li class="indexHeading"><a href="#' . $keys . '">' . $keys . '</a><ul>';
+
+        foreach ($items as $key => $item) {
+
+            if (is_array($item)) {
+
+                $content .= '<div class="tableHeadingSection" id="'.$key.'">' . $key . '</div>';
+
+                $this->outputIndexItems($key, $item);
+            } else {
+                if (is_numeric($key))
+                    echo '<li><a href="#' . $item . '">' . $item . '</a></li>';
+                else {
+                    echo '<li><a href="#' . $key . '">' . $key . '</a></li>';
+
+                    $content .= '<div class="widget"><div id="' . $key . '" class="indexTableContentHeading">' . $key . '</div>
+                        <p>' . $this->formatCode($item) . '</p>
+                        </div>
+                    ';
+                }
+            }
+        }
+
+        echo '</ul></li>';
+
+        return $content . '<hr>';
+    }
+
+    /**
+     *
+     * @param type $index
+     * @return string - format code for displaying on html page.
+     */
+    public function formatCodeToHTML($index) {
+
+//        $indexes = explode('<li>' , $code);
+//
+//        $reconstructed = null;
+//
+//        foreach($indexes as $index){
+//
+//            if(strpos($index, '<div class="code">') > 0){
+
+                $index = str_replace('<php', '&#60;php', $index);
+                $index = str_replace('<', '&#60;', $index);
+                $index = str_replace('&#60;br />', '<br />', $index);
+                $index = str_replace('&#60;p>', '<p>', $index);
+                $index = str_replace('&#60;/p>', '</p>', $index);
+                $index = str_replace('&#60;/ol>', '</ol>', $index);
+                $index = str_replace('&#60;/li>', '</li>', $index);
+                $index = str_replace('&#60;li', '<li', $index);
+                $index = str_replace('&#60;ol', '<ol', $index);
+                $index = str_replace('&#60;div', '<div', $index);
+                $index = str_replace('&#60;/div', '</div', $index);
+
+//            }
+//
+//            $reconstructed .= $index . '<li>';
+//        }
+
+        return $index;
+
+    }
+
+    /**
+     *
+     * @param type $code
+     * @return string - format code all together, code for html and colors.
+     */
+    public function formatCode($code){
+
+        $code = $this->formatCodeToHTML($code);
+        $code = $this->formatCodeColors($code);
+
+        return $code;
+    }
+
+    /**
+     *
+     * @param type $code
+     * @return string - format html code colors.
+     */
+    public function formatCodeColors($code){
+
+        $replace = array(
+
+            '&#60;php' => '<span class="red">&#60;php</span>',
+            'if(' => '<span class="blue"> if ( </span>',
+            '->' => '<span class="green"> -> </span>',
+            '(' => '<span class="orange"> ( </span>',
+            ')' => '<span class="orange"> )</span>',
+            ' new ' => '<span class="lightgreen"> new </span>',
+            ';' => '<span class="yellow"> ;</span>',
+            '$this' => '<span class="this lightblue"> $this</span>',
+            '$' => '<span class="brown"> $</span>',
+            '::' => '<span class="blue"> <b>::</b> </span>',
+            'Configs/' => '<b>Configs/</b>'
+
+        );
+
+        $code = $this->replaceWithMultiple($code, $replace);
+
+        return $code;
+    }
+
+    /**
+     *
+     * @param type $haystack
+     * @param type $needlesArray
+     * @return string - Run a multiple search and replace function.
+     */
+    public function replaceWithMultiple($haystack, $needlesArray){
+
+        foreach($needlesArray as $key => $value){
+
+            $haystack = str_replace($key, $value, $haystack);
+
+        }
+
+        return $haystack;
+    }
+
+    public function ToUpperCase($string){
+
+        $string = strtoupper($string);
+
+        return $string;
+    }
+
+    public function ToLowerCase($string){
+
+        $string = strtolower($string);
+
+        return $string;
+    }
+
+    public function FirstCharacterToUpperCase($string){
+
+        $string = strtoupper(substr($string, 0, 1)) .  substr($string, 1);
+
+        return $string;
+    }
+
+    public function FirstCharacterToLowerCase($string){
+
+        $string = strtolower(substr($string, 0, 1)) .  substr($string, 1);
+
+        return $string;
+    }
+
+    public function SpaceToBreak($string){
+
+        $string = str_replace(' ', '<br />', $string);
+
+        return $string;
+    }
+
+    public function RenderRows($array){
+
+        $index = 1;
+
+        $rows = null;
+
+        foreach($array['tbody'] as $arr){
+
+            if(isset($array['ignoreFields'])){
+
+                foreach($array['ignoreFields'] as $ignore){
+
+                    if(is_array($arr))
+                           unset($arr[$ignore]);
+                   else if(is_object($arr))
+                           unset($arr->$ignore);
+
+                }
+            }
+
+            if($index%2 == 0)
+                $rows .= '<tr class="even">';
+            else
+                $rows .= '<tr class="odd">';
+
+            if(is_array($arr) || is_object($arr)){
+
+                foreach($arr as $item){
+
+                    $rows .= '<td>' . $item . '</td>';
+                }
+
+            }
+            else
+                $rows .= '<td>' . $arr . '</td>';
+
+            $rows .= '</tr>';
+
+            $index++;
+
+        }
+
+        return $rows;
+
+    }
+
+    public function RenderTable($array){
+
+        $index = 1;
+
+        $rows = null;
+
+        if(isset($array['title']))
+            $rows = '<div class="title"><h6>'.$array['title'].'</h6></div>';
+
+        $rows .= '
+            <table class="'.@$array['class'].'" id="'.@$array['id'].'"><thead><tr>';
+
+        if(isset($array['thead'])){
+
+            foreach($array['thead'] as $arr){
+
+                $rows .= '<th>'.$arr.'</th>';
+
+            }
+        }
+        else{
+            
+            foreach($array['tbody'] as $arr){
+
+                foreach($arr as $key => $val){
+                    
+                    if(is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0){
+
+                        foreach($array['ignoreFields'] as $ignore){
+                            
+                            if($key != $ignore)
+                                $rows .= '<th>'.str_replace('_', ' ', $this->FirstCharacterToUpperCase ($key)).'</th>';
+                        }
+                    
+                    }
+                    else
+                        $rows .= '<th>'.str_replace('_', ' ', $this->FirstCharacterToUpperCase ($key)).'</th>';
+
+                }
+                
+                break;
+            }
+        }
+        
+        if(isset($array['actions'])){
+
+            $rows .= '<th>Actions</th>';
+        }
+
+        $rows .= '</tr></thead><tbody>';
+
+        foreach($array['tbody'] as $arr){
+
+            if($index%2 == 0)
+                $rows .= '<tr id="record_'.$index.'" class="even">';
+            else
+                $rows .= '<tr id="record_'.$index.'" class="odd">';
+
+            if(is_array($arr) || is_object($arr)){
+
+                foreach($arr as $key => $item){
+                    
+                    if(is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0){
+
+                        foreach($array['ignoreFields'] as $ignore){
+
+                            if($key != $ignore)
+                                $rows .= '<td>' . $item . '</td>';
+                        }
+                    }
+                    else
+                        $rows .= '<td>' . $item . '</td>';
+                }
+
+                if(isset($array['actions'])){
+
+                    $rows .= '<td class="actions">
+
+                        <div class="settings"></div>
+
+                                <div class="settingsMenu">';
+
+                    foreach($array['actions'] as $key => $action){
+
+                        if(isset($action['message'])){
+
+                            $rows .= '<input type="hidden" value="'.@(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($arr) ? $arr->$action['dataParam'] : $arr[$action['dataParam']] ) ) ) : $action['url'] ).'">';
+
+                            $rows .= ' <span class="confirmAction '.@$action['class'].'" id="'.$key.'_'.$index.'">'.$key.'</span> ';
+
+                            $rows .= '<input type="hidden" value="'.$action['message'].'">';
+
+                        }
+                        else{
+
+                            $rows .= ' <a id="'.$key.'_'.$index.'" target="'.@$action['target'].'" class="'.@$action['class'].'" href="'.@(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($arr) ? $arr->$action['dataParam'] : $arr[$action['dataParam']] ) ) ) : @$action['url'] ).'">'.$key.'</a> ';
+                        }
+
+                        $rows .= '<br />';
+
+                    }
+
+                    $rows .= '</div></td>';
+
+                }
+
+            }
+            else
+                $rows .= '<td>' . $arr . '</td>';
+
+            $rows .= '</tr>';
+
+            $index++;
+
+        }
+
+        $rows .= '</tbody><tfoot><tr>';
+
+        if(isset($array['tfoot']))
+            foreach($array['tfoot'] as $arr){
+
+                $rows .= '<td>'.$arr.'</td>';
+
+            }
+
+        $rows .= '</tr></tfoot></table>';
+
+        return $rows;
+    }
+
+    public function renderTableHead($array){
+
+        if(isset($array['title']))
+            $rows = '<div class="title"><h6>'.$array['title'].'</h6></div>';
+
+        $rows .= '
+            <table class="'.@$array['class'].'" id="'.@$array['id'].'"><thead><tr>';
+
+        foreach($array['thead'] as $arr){
+
+            $rows .= '<th>'.$arr.'</th>';
+
+        }
+
+        $rows .= '</tr></thead>';
+
+        return $rows;
+    }
+
+    public function RenderSections($sectionData){
+
+        if(is_array($sectionData)){
+            $sections = '<div class="Sections">';
+
+            $index = 1;
+            foreach($sectionData as $title => $section){
+
+                $sections .= '<div class="section '.$section['class'].'" id="section'.$index.'">';
+                $sections .= '<div class="title"><h6>'.$title.'</h6></div>';
+
+                    $sections .= '<div class="sectionHeader">';
+                    $sections .= $section['header'];
+                    $sections .= '</div>';
+
+                    $sections .= '<div class="sectionBody">';
+                    $sections .= $section['body'];
+                    $sections .= '</div>';
+
+                    $sections .= '<div class="sectionFooter">';
+                    $sections .= $section['footer'];
+                    $sections .= '</div>';
+
+                $sections .= '</div>';
+
+                $index += 1;
+
+            }
+
+            $sections .= '<div class="SectionsFooter"><div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div></div>';
+
+            $sections .= '</div>';
+
+            return $sections;
+
+        }
+        else
+            echo 'INVALID DATA FOR RENDERING SECTIONS';
+    }
+
+    /**
+     * @param Mixed $string Can be an array or string depending on the filter applied
+     * @param string $filter Options given below
+     * 
+     * You can use the output method to filter your output character cases.<br /><br />
+     * Four filters can be applied:<br /><br />
+     * upper - subject: string<br />
+     * lower - subject: string<br />
+     * firstUpper or charUpper - subject: string<br />
+     * firstLower or charLower - subject: string<br />
+     * spacetobreak - subject: string<br />
+     * list/orderedlist - subject: array<br />
+     * unorderelist - subject: array<br />
+     * tablebody/tablerows - subject: array<br />
+     * table - subject: array<br />
+     * tablehead - subject: array<br />
+     * form - subject: array<br />
+     * indextable - subject: array<br />
+     * sections - subject: array <br />
+     *
+     */
+    public function Output($subject, $filter = null){
+
+        $filter = strtolower(str_replace(' ', '', $filter));
+
+        if(!empty($filter))
+            switch($filter){
+
+                case 'upper':
+                    $subject = $this->ToUpperCase($subject);
+                    break;
+                case 'lower':
+                    $subject = $this->ToLowerCase($subject);
+                    break;
+                case 'charupper':
+                case 'firstupper':
+                    $subject = $this->FirstCharacterToUpperCase($subject);
+                    break;
+                case 'charlower':
+                case 'firstlower':
+                    $subject = $this->FirstCharacterToLowerCase($subject);
+                    break;
+                case 'spacetobreak':
+                    $subject = $this->SpaceToBreak($subject);
+                    break;
+                case 'list':
+                case 'orderedlist':
+                    $subject = '<ol><li>'.str_replace(' ', '</li><li>', $subject) . '</li></ol>';
+                    break;
+                case 'unorderedlist':
+                    $subject = '<ul><li>'.str_replace(' ', '</li><li>', $subject) . '</li></ul>';
+                    break;
+                case 'tablebody':
+                case 'tablerows':
+                    $html = new HTMLGenerator();
+                    $subject = $html->renderRows($subject);
+                    break;
+                case 'table':
+                    $html = new HTMLGenerator();
+                    $subject = $html->renderTable($subject);
+                    break;
+                case 'tablehead':
+                    $html = new HTMLGenerator();
+                    $subject = $html->renderTableHead($subject);
+                    break;
+                case 'form':
+                    $html = new HTMLGenerator();
+                    $subject = $html->generateForm($subject);
+                    break;
+                case 'indextable':
+                    $html = new HTMLGenerator();
+                    $subject = $html->RenderIndexTable($subject);
+                    break;
+                case 'sections':
+                    $html = new HTMLGenerator();
+                    $subject = $html->RenderSections($subject);
+                    break;
+                default:
+                    echo 'invalid filter';
+                    break;
+            }
+
+         return $subject;
     }
 }

@@ -12,22 +12,22 @@
         <div class="widget index">
 
             <!--
-            <?$this->Output($params['table'],'table')?>
+            <?$this->htmlgen->Output($params['table'],'table')?>
             -->
 
             <br />
 
-            <?=$this->Output($params['form'],'form')?>
+            <?=$this->htmlgen->Output($params['form'],'form')?>
 
             <br />
 
-            <?=$this->Output($params['sections'], 'sections')?>
+            <?=$this->htmlgen->Output($params['sections'], 'sections')?>
 
             <p>This page will tell you how to use The Genesis project to build your own web application.</p>
 
             <h3>Index</h3>
 
-            <?=$this->renderIndexTable(array(
+            <?=$this->htmlgen->renderIndexTable(array(
 
             'Introduction' => 'Project Genesis is a very novice but powerful framework built by A. Wahhab Qureshi. You can use this framework to build your own web application with dramatic speed increase.',
 

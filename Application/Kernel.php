@@ -19,6 +19,7 @@ class AppKernal {
         $bundlesDIR = ROOT . 'Bundles/';
 
         $this->bundles[] = $bundlesDIR . 'Welcome';
+        $this->bundles[] = $bundlesDIR . 'testBundle';
 
     }
 

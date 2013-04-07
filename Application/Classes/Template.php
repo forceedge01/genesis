@@ -15,11 +15,11 @@ class Template extends Router {
         ;
     }
 
-    public function Render($template, $params = null) {
+    public function Render($template, array $params = array()) {
 
         $error = null;
 
-        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->Router->pageTitle );
+        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
 
         extract($params);
 
@@ -28,7 +28,7 @@ class Template extends Router {
         $templateParams = explode(':', $template);
 
         if (strtolower($templateParams[0]) == 'bundle') {
-            
+
             $path = BUNDLES_FOLDER . $templateParams[1] . '/Templates/';
 
             $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . '/Templates/ControllerViews/' . $templateParams[2]);
@@ -36,7 +36,9 @@ class Template extends Router {
             if (is_file($templateURL)) {
 
                 if (is_file($path . 'Header.html.php')) require_once $path . 'Header.html.php';
+
                 require_once $templateURL;
+
                 if (is_file($path . 'Footer.html.php')) require_once $path . 'Footer.html.php';
             }
             else
@@ -68,7 +70,7 @@ class Template extends Router {
         $html = ob_get_clean();
 
         if(ENABLE_HTML_VALIDATION && !empty($html)){
-         
+
             $validation = new ValidationEngine();
             $validation->validateHTML ($html);
         }
@@ -105,16 +107,15 @@ class Template extends Router {
      * @param type $params
      * @return string $html - returns the html of the page rendered for further process or output.
      */
-    public function RenderTemplate($template, $params = null) {
+    public function RenderTemplate($template, array $params = array()) {
 
-        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->Router->pageTitle );
+        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
 
-        if(is_array($params))
-            extract($params);
+        extract($params);
 
         $templateParams = explode(':', $template);
 
-        $dirRoot = ($templateParams[0] == 'Bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Templates/ControllerViews' : TEMPLATES_FOLDER);
+        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Templates/ControllerViews' : TEMPLATES_FOLDER);
 
         $templateURL = $dirRoot . '/' . $templateParams[2];
 
@@ -361,9 +362,15 @@ class Template extends Router {
             unset($_SESSION['FlashMessages']);
         }
     }
-    
+
+    /**
+     *
+     * @param type $string
+     * @return string <br>
+     * Returns string with stripped double slashes
+     */
     public function stripDoubleSlashes($string){
-        
+
         return str_replace('//', '/', $string);
     }
 

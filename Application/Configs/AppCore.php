@@ -21,5 +21,3 @@ define('IMAGES_FOLDER', HOST . 'Source/Assets/Images/');
 define('CSS_FOLDER', HOST . 'Source/Assets/CSS/');
 
 define('JS_FOLDER', HOST . 'Source/Assets/JS/');
-
-define('ENABLE_HTML_VALIDATION', true);

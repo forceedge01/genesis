@@ -117,6 +117,11 @@ fieldset{
     width: 69%;
 }
 
+.form .formRight{
+    float: right;
+    width: 69%;
+}
+
 .form .buttons{
 
     display: block;

@@ -104,7 +104,7 @@ class WelcomeController extends Application {
             'Normal Section' => array(
 
                 'header' => 'this is one header',
-                'body' => $this->Output($params['table'], 'table'),
+                'body' => 'abc',
                 'footer' => 'and a footer',
 
             ),
@@ -126,6 +126,8 @@ class WelcomeController extends Application {
             ),
 
         );
+
+        $this->htmlgen = $this->HTMLGenerator();
 
         $this->Render('Bundle:Welcome:index.html.php', $params);
     }

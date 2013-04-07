@@ -1,13 +1,10 @@
 <?php
 
-class ApplicationEntity extends Debugger{
-
-    protected
-            $activeConnection;
+class ApplicationEntity extends Database{
 
     public function __construct(){
 
-        $this->activeConnection = new Database();
+        parent::__construct();
 
     }
 }

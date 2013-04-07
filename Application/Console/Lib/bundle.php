@@ -1,8 +1,8 @@
 <?php
 
 class Bundle extends Console {
-    
-    private 
+
+    private
             $name;
 
     public function createBundle() {
@@ -58,26 +58,26 @@ class Bundle extends Console {
             }
         }
     }
-    
+
     private function createConfig(){
-        
+
         mkdir(BUNDLES_FOLDER . $this->name . '/Configs');
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Configs/' . $this->name . '.php', 'w+');
 
-        $initTemplate = '<?php 
-            
+        $initTemplate = '<?php
+
 DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->name.'\');';
 
         fwrite($handle, $initTemplate);
 
         fclose($handle);
-        
+
         return $this;
     }
-    
+
     private function createEntity(){
-        
+
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/' . 'Entity.php', 'w+');
 
         $initEntity = '<?php
@@ -96,15 +96,13 @@ class ' . $this->name . ' extends ApplicationEntity{
 
          $this->tableColumns = array(\'*\');
 
-         $this->joinQuery = ""; //Instead of a nested select, using join in queries will dramatically increase your application\'s performance
-
-         $this->tableName = \'' . $this->name . '\';
+         $this->tableName = \'__CLASS__\';
 
          if(is_numeric($id)){
-         
+
             $this->id = $id;
             $this->Get();
-            
+
          }
 
       }
@@ -115,7 +113,7 @@ class ' . $this->name . ' extends ApplicationEntity{
        * @return mixed Returns matching data set.
        */
       public function GetAll(array $params = array()){
-      
+
         //return $this->GetActiveConnection()->Query("select {$this->tableColumns} from {$this->tableName} {$this->joinQuery}")->GetResultSet();
 
         return $this->GetActiveConnection()->Table($this->tableName, $this->tableColumns)->GetRecords($params)->GetResultSet();
@@ -131,8 +129,8 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         if(!$id)
             $id = $this->id;
-            
-        return $this->GetActiveConnection()->Table($this->tableName, $this->tableColumns)->GetOneRecordBy($id);
+
+        return $this->GetActiveConnection()->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
 
       }
 
@@ -153,7 +151,7 @@ class ' . $this->name . ' extends ApplicationEntity{
        * @return int Number of rows affected
        */
       public function Delete($id = null){
-      
+
         if(!$id)
             $id = $this->id;
 
@@ -166,12 +164,12 @@ class ' . $this->name . ' extends ApplicationEntity{
         fwrite($handle, $initEntity);
 
         fclose($handle);
-        
+
         return $this;
     }
-    
+
     private function createViews(){
-        
+
         mkdir(BUNDLES_FOLDER . $this->name . '/Templates');
 
         mkdir(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews');
@@ -195,13 +193,13 @@ class ' . $this->name . ' extends ApplicationEntity{
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/list.html.php', 'w+');
 
         $initTemplate = '<div class="wrapper">
-            
+
     <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_Create\')?>">Create new '.$this->name.'</a></div>
-                
+
     <div class="widget">
 
         <?=$this->htmlgen->Output($table, \'table\')?>
-    
+
     </div>
 
 </div>';
@@ -213,13 +211,13 @@ class ' . $this->name . ' extends ApplicationEntity{
             $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/view.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
-                
+
     <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
-                
+
     <div class="widget">
 
         <?=$this->htmlgen->Output($table, \'table\')?>
-    
+
     </div>
 
 </div>';
@@ -231,13 +229,13 @@ class ' . $this->name . ' extends ApplicationEntity{
             $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/create.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
-                
+
     <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
 
     <div class="widget">
 
         <?=$this->htmlgen->Output($form, \'form\')?>
-    
+
     </div>
 
 </div>';
@@ -249,13 +247,13 @@ class ' . $this->name . ' extends ApplicationEntity{
             $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/edit.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
-                
+
     <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
-        
+
     <div class="widget">
 
         <?=$this->htmlgen->Output($form, \'form\')?>
-    
+
     </div>
 
 </div>';
@@ -263,12 +261,12 @@ class ' . $this->name . ' extends ApplicationEntity{
             fwrite($handle, $initTemplate);
 
             fclose($handle);
-            
+
             return $this;
     }
-    
+
     private function createController(){
-        
+
         mkdir(BUNDLES_FOLDER . $this->name . '/Controllers');
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'Controller.php', 'w+');
@@ -291,39 +289,39 @@ class ' . $this->name . 'Controller extends Application{
 
               //Used by the HTMLGenerator in the list view.
               $params[\'table\'] = array(
-                  
+
                 \'class\' => \'paginate\',
                 \'title\' => \'Dataset\',
                 \'tbody\' => $' . $this->name . '->GetAll(array(\'order by\' => \'id desc\')),
                 \'ignoreFields\' => array(),
                 \'actions\' => array(
-                
+
                     \'Edit\' => array(
-                        
+
                         \'route\' => \'' . $this->name . '_Edit\',
                         \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '\',
+                        \'dataParam\' => \'' . $this->name . '__id\',
                     ),
-                
+
                     \'View\' => array(
-                        
+
                         \'route\' => \'' . $this->name . '_View\',
                         \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '\',
+                        \'dataParam\' => \'' . $this->name . '__id\',
                     ),
-                    
+
                     \'Delete\' => array(
-                        
+
                         \'message\' => \'Are you sure you want to delete this record?\',
                         \'class\' => \'remove\',
                         \'route\' => \'' . $this->name . '_Delete\',
                         \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '\',
+                        \'dataParam\' => \'' . $this->name . '__id\',
                     ),
                 )
-                  
+
               );
-              
+
               //This will be used in the template to generate the above declared table.
               $this->htmlgen = new HTMLGenerator();
 
@@ -338,21 +336,21 @@ class ' . $this->name . 'Controller extends Application{
               $' . $this->name . ' = new ' . $this->name . '();
 
               $params["table"] = array(
-                  
+
                   \'title\' => \'View\',
                   \'class\' => \'paginate\',
                   \'tbody\' => $' . $this->name . '->Get($id),
                   \'actions\' => array(
-                      
+
                       \'Edit\' => array(
-                        
+
                         \'route\' => \'' . $this->name . '_Edit\',
                         \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '\',
+                        \'dataParam\' => \'' . $this->name . '__id\',
                     ),
                   ),
               );
-              
+
               $this->htmlgen = new HTMLGenerator();
 
               $this->Render("Bundle:' . $this->name . ':view.html.php", $params);
@@ -375,26 +373,27 @@ class ' . $this->name . 'Controller extends Application{
             }
 
             $params["PageTitle"] = "Create New ' . $this->name . '";
-                
+
             $params[\'form\'] = array(
-                  
+
                 \'class\' => \'form\',
                 \'action\' => $this->setRoute(\'' . $this->name . '_Create\'),
                 \'title\' => \'Random Title\',
                 \'inputs\' => array(
-                    
+
                     \'text\' => array(
-                        
+
                         \'label\' => \'Name\',
                         \'name\' => \'Name\',
                         \'value\' => \'Enter your name\',
                     )
                 ),
-                  
+                \'table\' => $'.$this->name.'->GetFormFields(),
+
                 \'submission\' => array(
-                    
+
                     \'submit\' => array(
-                        
+
                         \'value\' => \'Create new record\',
                         \'name\' => \'submit\'
                     ),
@@ -425,23 +424,23 @@ class ' . $this->name . 'Controller extends Application{
             }
 
             $params["form"] = array(
-                
+
                 \'title\' => \'Edit\',
                 \'action\' => $this->setRoute(\''.$this->name.'_Edit\', array(\'id\' => $id)),
-                \'data\' => $'.$this->name.'->Get($id),
+                \'table\' => $'.$this->name.'->Get($id),
                 \'submission\' => array(
-                 
+
                     \'submit\' => array(
-                        
+
                         \'value\' => \'Save changes\',
                         \'name\' => \'submit\'
                     ),
                 )
-            
+
             );
 
             $params["PageTitle"] = "Edit testBundle";
-            
+
             $this->htmlgen = new HTMLGenerator();
 
             $this->Render("Bundle:' . $this->name . ':edit.html.php", $params);
@@ -472,12 +471,12 @@ class ' . $this->name . 'Controller extends Application{
             fwrite($handle, $initController);
 
             fclose($handle);
-            
+
             return $this;
     }
-    
+
     private function createRoutes(){
-        
+
         mkdir(BUNDLES_FOLDER . $this->name . '/Routes');
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Routes/' . $this->name . '.php', 'w+');
@@ -530,7 +529,7 @@ $_SESSION[\'Routes\'][\'' . $this->name . '_Delete\'] = array(
             fwrite($handle, $initRoute);
 
             fclose($handle);
-            
+
             return $this;
     }
 

@@ -19,15 +19,17 @@ class Database extends Template {
             $queryJoinClause,
             $foreignKeys,
             $rowsAffected,
-            $queryTables;
-    public
-            $queryMeta,
+            $queryTables,
             $queriesResult,
             $queryResult,
+            $activeConnection,
+            $lastQuery,
             $numRows,
             $insert_id,
-            $lastQuery,
-            $activeConnection;
+            $formFields;
+
+    protected
+            $queryMeta;
 
     /**
      *
@@ -145,14 +147,24 @@ class Database extends Template {
      * @return boolean - true on success, false on failure<br />
      * <br />Insert a record into a table
      */
-    private function CreateRecord($params) {
+    private function CreateRecord() {
 
-        $params = $this->prepareForInsert($params);
+        $this->queryTables = array_reverse($this->queryTables);
 
-        $sql = 'INSERT INTO ' . $this->queryTable . ' (' . $params['keys'] . ') VALUES (' . $params['values'] . ') ';
+        foreach($this->queryTables as $key => $table){
 
-        if ($this->Query($sql))
-            return $this->activeConnection->insert_id;
+            $this->Table($key);
+
+            $params = $this->prepareForInsert($table);
+
+            $queries[] = 'insert into ' . $key . ' ('.$params['keys'].') values ('.$params['values'].')';
+
+        }
+
+        $this->queries = $queries;
+
+        if ($this->multiQuery())
+            return $this;
         else
             return false;
     }
@@ -185,47 +197,71 @@ class Database extends Template {
         if (count($params) == 0)
             $params = $_REQUEST;
 
-        if (($params[str_replace('.','__', $this->queryTablePrimaryKey)]) != null)
-            return $this->CreateRecord($params);
-        else {
-            
-            $params = $this->prepareForMultiQuery($params, 'update');
+        $this->prepareForMultiQuery($params);
 
-            $sql = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTable . '.' . $this->queryTablePrimaryKey . ' = ' . $_REQUEST[$this->queryTablePrimaryKey];
-
-            if ($this->Query($sql))
-                return $this;
-            else
-                return false;
-        }
+        if (!isset($params[str_replace('`', '', str_replace('.','__', $this->queryTablePrimaryKey))]))
+            return $this->CreateRecord();
+        else
+            return $this->UpdateRecord();
     }
-    
+
     /**
-     * 
+     *
+     * Updates a record with multiquery
+     */
+    protected function UpdateRecord(){
+
+        foreach($this->queryTables as $key => $table){
+
+            $this->Table($key);
+
+            $params = $this->prepare($table, 'update');
+
+            $pkey = $this->GetUnformattedFieldOrKey($this->queryTablePrimaryKey);
+
+            $queries[] = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTablePrimaryKey . ' = ' . $table[$pkey];
+
+        }
+
+        $this->queries = $queries;
+
+        if ($this->multiQuery())
+            return $this;
+        else
+            return false;
+    }
+
+    /**
+     *
+     * Removed table name and backticks formatting from a field
+     */
+    protected function GetUnformattedFieldOrKey($key){
+
+        return str_replace('`', '', end(explode('.', $this->queryTablePrimaryKey)));
+    }
+
+    /**
+     *
      * @param array $params
      * @return null Work in progress
      * Make a prepare for multiquery and use in save for multiple tables with update and insert queries.
      */
     private function prepareForMultiQuery(array $params = array()){
-        
-        $query = null;
 
         foreach ($params as $key => $value) {
 
-                if (strpos($key, '__') > 0) {
+            if (strpos($key, '__') > 0) {
 
-                    $tableData = explode('__', $key);
+                $tableData = explode('__', $key);
 
-                    if (count($tableData) > 0) {
+                if (count($tableData) > 0) {
 
-                        $this->queryTables[$tableData[0]][$tableData[1]] = $value;
-                    } 
+                    $this->queryTables[$tableData[0]][$tableData[1]] = $value;
                 }
             }
+        }
 
-        $this->pre($this->queryTables);
-
-        return $query;
+        return true;
     }
 
     /**
@@ -238,15 +274,17 @@ class Database extends Template {
 
         $query = null;
 
+//        $this->pre($params);
+
         foreach ($params as $key => $value) {
 
             foreach ($this->queryTableColumns as $column) {
 
-                  if ($this->queryTable . '__' . $key == $column->Field && $this->queryTable . '__' . $key != $this->queryTablePrimaryKey) {
+                  if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`','', $this->queryTablePrimaryKey)) {
 
-                    if (strpos($key, '__') > 0)
-                        $query .= '`' . str_replace('__', '`.`', $key) . '` = ';
-                    else
+//                    if (strpos($key, '__') > 0)
+//                        $query .= '`' . str_replace('__', '`.`', $key) . '` = ';
+//                    else
                         $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
                     if (is_numeric($value))
@@ -278,7 +316,7 @@ class Database extends Template {
 
             foreach ($this->queryTableColumns as $column) {
 
-                if ($key == $column->Field) {
+                if ($this->queryTable .'.'. $key == $column->Field) {
 
                     $keys .= $key . ',';
 
@@ -417,7 +455,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param string $dbname
      * @return boolean
      * Checks if a database exists
@@ -435,7 +473,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param type $name
      * @param array $columns
      * @param array $conditions
@@ -451,7 +489,7 @@ class Database extends Template {
 
         $this->GetPrimaryKey();
 
-        $this->GetForeignKeys();
+        $this->ForeignKeys();
 
         $this->GetColumns();
 
@@ -459,7 +497,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param mixed $id either an int with the id of the record or an array of filter params
      * @return Mixed Returns dataset for a primary key id
      */
@@ -471,7 +509,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param mixed $id either an int with the id of the record or an array of filter params
      * @param array $params
      * @return mixed Returns just one of matching records
@@ -486,7 +524,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param mixed $id either an int with the id of the record or an array of filter params
      * @param array $params
      * @return boolean Check if a record exists
@@ -504,7 +542,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param array $params
      * @return mixed Get All records either filtered or not.
      */
@@ -516,7 +554,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @return object Gets the result set from the database object for a processed query
      */
     public function GetResultSet() {
@@ -537,7 +575,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param type $id
      * @return Mixed Returns the dataset for a query constructed with the table and Get methods
      */
@@ -583,7 +621,7 @@ class Database extends Template {
                     $order = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
 
                 if ($key == 'limit')
-                    $limit = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
+                    $limit = ' ' . $key . ' ' . $param;
             }
 
             $this->query .= $order . $limit;
@@ -613,7 +651,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param int $id
      * @return int Returns Rows Affected
      * Delete a record from a table using its primary key
@@ -626,7 +664,7 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param type $table
      * @return mixed Gets primary key for a table
      */
@@ -643,18 +681,18 @@ class Database extends Template {
     }
 
     /**
-     * 
+     *
      * @param type $table
      * @return mixed Gets foreign keys for a table
      */
-    protected function GetForeignKeys($table = null) {
+    protected function ForeignKeys($table = null) {
 
         if ($table == null)
             $table = $this->queryTable;
 
         $this->Query("select
             table_name as 'TABLE_NAME',
-            column_name as 'COLUMN_NAME', 
+            column_name as 'COLUMN_NAME',
             referenced_table_name as 'REFERENCED_TABLE_NAME',
             referenced_column_name as 'REFERENCED_COLUMN_NAME'
         from
@@ -675,6 +713,12 @@ class Database extends Template {
         return $this;
     }
 
+    /**
+     *
+     * @param type $table
+     * @return boolean<br>
+     * Sets All the columns for a given table from the database into queryTableColumns
+     */
     protected function GetColumns($table = null) {
 
         if ($table == null)
@@ -695,14 +739,81 @@ class Database extends Template {
             return false;
     }
 
+    /**
+     *
+     * @return int Number of rows affected from a query
+     */
     public function GetAffectedRows() {
 
         return $this->rowsAffected;
     }
 
+    /**
+     *
+     * @return int Number of rows in a select query
+     */
     public function GetNumberOfRows() {
 
         return $this->numRows;
+    }
+
+    /**
+     *
+     * @return int the insert id of an insert query
+     */
+    public function GetInsertID(){
+
+        return $this->insert_id;
+    }
+
+    /**
+     *
+     * @return Object Returns the first result set from a select query
+     */
+    public function GetFirstResult(){
+
+        if ($this->queriesResult)
+            return $this->queriesResult[0];
+        else
+            return $this->queryResult[0];
+    }
+
+    public function GetTableColumns(){
+
+        return $this->queryTableColumns;
+    }
+
+    public function GetFormFields(){
+
+        $this->Table(get_called_class());
+
+        $foreignkeys = $this->ForeignKeys()->GetResultSet();
+
+        $this->formFields[get_called_class()] = $this->GetTableColumns();;
+
+        if($foreignkeys)
+            foreach($foreignkeys as $key){
+
+                  $this->TableFields ($key->REFERENCED_TABLE_NAME);
+            }
+
+        return $this->formFields;
+
+    }
+
+    private function TableFields($table){
+
+        $this->formFields[$table] = $this->Table($table)->GetTableColumns();
+
+        $foreignkeys = $this->ForeignKeys()->GetResultSet();
+
+        if($foreignkeys)
+            foreach($foreignkeys as $key){
+
+                $this->TableFields ($key->REFERENCED_TABLE_NAME);
+            }
+
+        return $this;
     }
 
 }

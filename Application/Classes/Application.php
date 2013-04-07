@@ -2,11 +2,15 @@
 
 class Application extends Template{
 
-    public
+    private
+            $htmlgenerator,
+            $validationEngine,
+            $auth,
+            $directory,
+            $zip,
+            $mailer,
             $Router,
-            $User,
-            $Error,
-            $verbose;
+            $User;
 
     public function __construct() {
 
@@ -164,12 +168,12 @@ class Application extends Template{
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if(!empty($Element)){
-            
+
                 if(isset($_POST[$Element]))
                     return true;
                 else
                     return false;
-            
+
             }
             else
                 return true;
@@ -190,12 +194,12 @@ class Application extends Template{
         if($_SERVER['REQUEST_METHOD'] == 'GET') {
 
             if(!empty($Element)){
-            
+
                 if(isset($_GET[$Element]))
                     return true;
                 else
                     return false;
-            
+
             }
             else
                 return true;
@@ -238,18 +242,90 @@ class Application extends Template{
             return false;
 
     }
-    
+
     protected function setSession($Name, $Value){
-        
+
         $_SESSION[$Name] = $Value;
-        
+
         return true;
     }
-    
+
     protected function unsetSession($Name){
-        
+
         unset($_SESSION[$Name]);
-        
+
         return true;
+    }
+
+    protected function HTMLGenerator(){
+
+        if(is_object($this->htmlgenerator))
+            return $this->htmlgenerator;
+        else{
+
+            $this->htmlgenerator = new HTMLGenerator();
+
+            return $this->htmlgenerator;
+        }
+    }
+
+    protected function ValidationEngine(){
+
+        if(is_object($this->validationEngine))
+            return $this->validationEngine;
+        else{
+
+            $this->validationEngine = new ValidationEngine();
+            return $this->validationEngine;
+        }
+    }
+
+    protected function Mailer(){
+
+        if(is_object($this->mailer))
+            return $this->mailer;
+        else{
+
+            $this->mailer = new Mail();
+            return $this->mailer;
+        }
+    }
+
+    protected function Directory(){
+
+        if(is_object($this->directory))
+            return $this->directory;
+        else{
+
+            $this->directory = new Directory();
+            return $this->directory;
+        }
+    }
+
+    protected function Zip(){
+
+        if(is_object($this->zip))
+            return $this->zip;
+        else{
+
+            $this->zip = new Zip();
+            return $this->zip;
+        }
+    }
+
+    protected function Auth(){
+
+        if(is_object($this->auth))
+            return $this->auth;
+        else{
+
+            $this->auth = new Auth();
+            return $this->auth;
+        }
+    }
+
+    public function GetCurrentUser(){
+
+        return $this->User;
     }
 }

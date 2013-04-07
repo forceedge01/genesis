@@ -2,19 +2,19 @@
 
 class Router extends Debugger{
 
-    public
-            $params,
+    private
+            $controllerObject,
+            $currentObject,
             $url,
             $pattern,
             $lastRoute,
-            $controllerObject,
-            $currentObject,
-            $error,
             $lastURL,
-            $pageTitle,
             $funcVariable,
             $routePattern,
-            $route;
+            $route,
+            $params,
+            $pageTitle,
+            $Router;
 
     public function __construct() {
 
@@ -394,6 +394,11 @@ class Router extends Debugger{
         return true;
     }
 
+    /**
+     *
+     * @return boolean<br>
+     * Returns the last accessed page route
+     */
     protected function lastAccessedPage(){
 
         if(isset($_SESSION['lastRoute']))
@@ -402,6 +407,12 @@ class Router extends Debugger{
             return true;
     }
 
+    /**
+     *
+     * @param type $pattern
+     * @return route <br>
+     * Returns a route for a given pattern
+     */
     protected function getRouteFromPattern($pattern = null){
 
         if(!empty($pattern))
@@ -430,5 +441,38 @@ class Router extends Debugger{
         );
 
         $this->forwardToController('Error_Route_Not_Found', $error);
+    }
+
+    /**
+     *
+     * @param type $title
+     * @return \Router <br>
+     * Sets the page title
+     */
+    public function SetPageTitle($title){
+
+        $this->pageTitle = $title;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return string pageTitle
+     * Returns the page title of the current page
+     */
+    public function GetPageTitle(){
+
+        return $this->pageTitle;
+    }
+
+    /**
+     *
+     * @return Router
+     * Returns the router object for further processing
+     */
+    public function GetRouter(){
+
+        return $this->Router;
     }
 }

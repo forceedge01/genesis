@@ -3,10 +3,7 @@
 class Router extends Debugger{
 
     private
-            $controllerObject,
-            $currentObject,
             $url,
-            $pattern,
             $lastRoute,
             $lastURL,
             $funcVariable,
@@ -15,6 +12,9 @@ class Router extends Debugger{
             $params,
             $pageTitle,
             $Router;
+
+    public
+            $pattern;
 
     public function __construct() {
 

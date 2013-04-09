@@ -1,10 +1,6 @@
 <?php
 
-define('ROOT', __DIR__) ;
-
-define('LIB_FOLDER', ROOT . '/Lib/') ;
-
-define('BUNDLES_FOLDER', ROOT . '/../../Bundles/') ;
+require_once __DIR__ . '/Configs/ConsoleDirs.php';
 
 function requireAll($directory){
 
@@ -13,15 +9,16 @@ function requireAll($directory){
     foreach($files as $file){
 
         if($file != '.' && $file != '..' && $file != 'index.php'){
-            if(is_file(LIB_FOLDER . '/' .$file))
-                require_once LIB_FOLDER . '/' . $file;
+
+            if(is_file(CONSOLE_LIB_FOLDER . '/' .$file))
+                require_once CONSOLE_LIB_FOLDER . '/' . $file;
             else
-                requireAll (LIB_FOLDER . '/' .$file);
+                requireAll (CONSOLE_LIB_FOLDER . '/' .$file);
         }
     }
 }
 
-requireAll(LIB_FOLDER);
+requireAll(CONSOLE_LIB_FOLDER);
 
 $console  = new Console();
 
@@ -63,7 +60,7 @@ while(true){
 
         if($args[0][0] == 'exit')
             exit;
-        
+
         $console->unknownOption();
 
     }

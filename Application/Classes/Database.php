@@ -3,33 +3,36 @@
 class Database extends Template {
 
     private
-            $host,
-            $username,
-            $password,
-            $name,
-            $port,
-            $socket,
-            $query,
-            $verbose,
-            $queries,
-            $queryTable,
-            $queryColumns,
-            $queryTablePrimaryKey,
-            $queryTableColumns,
-            $queryJoinClause,
-            $foreignKeys,
-            $rowsAffected,
-            $queryTables,
-            $queriesResult,
-            $queryResult,
-            $activeConnection,
-            $lastQuery,
-            $numRows,
-            $insert_id,
-            $formFields;
-
+        $host,
+        $username,
+        $password,
+        $name,
+        $port,
+        $socket,
+        $query,
+        $queryTable,
+        $queryColumns,
+        $queryTablePrimaryKey,
+        $queryTableColumns,
+        $queryJoinClause,
+        $foreignKeys,
+        $rowsAffected,
+        $queryTables,
+        $queriesResult,
+        $queryResult,
+        $activeConnection,
+        $lastQuery,
+        $numRows,
+        $insert_id,
+        $formFields,
+        $aggregateTables;
+    
     protected
-            $queryMeta;
+        $queryMeta;
+    
+    public 
+        $verbose,
+        $queries;
 
     /**
      *
@@ -151,14 +154,13 @@ class Database extends Template {
 
         $this->queryTables = array_reverse($this->queryTables);
 
-        foreach($this->queryTables as $key => $table){
+        foreach ($this->queryTables as $key => $table) {
 
             $this->Table($key);
 
             $params = $this->prepareForInsert($table);
 
-            $queries[] = 'insert into ' . $key . ' ('.$params['keys'].') values ('.$params['values'].')';
-
+            $queries[] = 'insert into ' . $key . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
         }
 
         $this->queries = $queries;
@@ -199,7 +201,7 @@ class Database extends Template {
 
         $this->prepareForMultiQuery($params);
 
-        if (!isset($params[str_replace('`', '', str_replace('.','__', $this->queryTablePrimaryKey))]))
+        if (!isset($params[str_replace('`', '', str_replace('.', '__', $this->queryTablePrimaryKey))]))
             return $this->CreateRecord();
         else
             return $this->UpdateRecord();
@@ -209,9 +211,9 @@ class Database extends Template {
      *
      * Updates a record with multiquery
      */
-    protected function UpdateRecord(){
+    protected function UpdateRecord() {
 
-        foreach($this->queryTables as $key => $table){
+        foreach ($this->queryTables as $key => $table) {
 
             $this->Table($key);
 
@@ -220,7 +222,6 @@ class Database extends Template {
             $pkey = $this->GetUnformattedFieldOrKey($this->queryTablePrimaryKey);
 
             $queries[] = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTablePrimaryKey . ' = ' . $table[$pkey];
-
         }
 
         $this->queries = $queries;
@@ -235,7 +236,7 @@ class Database extends Template {
      *
      * Removed table name and backticks formatting from a field
      */
-    protected function GetUnformattedFieldOrKey($key){
+    protected function GetUnformattedFieldOrKey($key) {
 
         return str_replace('`', '', end(explode('.', $this->queryTablePrimaryKey)));
     }
@@ -246,7 +247,7 @@ class Database extends Template {
      * @return null Work in progress
      * Make a prepare for multiquery and use in save for multiple tables with update and insert queries.
      */
-    private function prepareForMultiQuery(array $params = array()){
+    private function prepareForMultiQuery(array $params = array()) {
 
         foreach ($params as $key => $value) {
 
@@ -280,12 +281,12 @@ class Database extends Template {
 
             foreach ($this->queryTableColumns as $column) {
 
-                  if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`','', $this->queryTablePrimaryKey)) {
+                if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)) {
 
 //                    if (strpos($key, '__') > 0)
 //                        $query .= '`' . str_replace('__', '`.`', $key) . '` = ';
 //                    else
-                        $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
+                    $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
                     if (is_numeric($value))
                         $query .= $value . ($type == 'update' ? ',' : ' AND ');
@@ -316,7 +317,7 @@ class Database extends Template {
 
             foreach ($this->queryTableColumns as $column) {
 
-                if ($this->queryTable .'.'. $key == $column->Field) {
+                if ($this->queryTable . '.' . $key == $column->Field) {
 
                     $keys .= $key . ',';
 
@@ -441,9 +442,9 @@ class Database extends Template {
                     if (!empty($this->queryResult))
                         $this->queriesResult[] = $this->queryResult;
                 }
+                
+                unset($this->queries);
             }
-
-            unset($this->queries);
 
             return true;
         } catch (Exception $e) {
@@ -501,9 +502,9 @@ class Database extends Template {
      * @param mixed $id either an int with the id of the record or an array of filter params
      * @return Mixed Returns dataset for a primary key id
      */
-    public function GetRecordBy($id, array $params = array()) {
+    public function GetRecordBy($params) {
 
-        $this->queryInit($id, $params)->Query();
+        $this->queryInit($params)->Query();
 
         return $this;
     }
@@ -529,13 +530,13 @@ class Database extends Template {
      * @param array $params
      * @return boolean Check if a record exists
      */
-    public function FindExistanceBy($id, array $params = array()) {
+    public function FindExistanceBy(array $params = array()) {
 
         $params['limit'] = 1;
 
-        $this->queryInit($id, $params)->Query();
+        $this->queryInit($params)->Query();
 
-        if ($this->numRows)
+        if ($this->GetNumberOfRows())
             return true;
         else
             return false;
@@ -602,6 +603,7 @@ class Database extends Template {
             $params = $this->prepare($id);
 
             $this->query .= ' where ' . $params;
+            
         } else if (is_numeric($id)) {
 
             $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
@@ -610,7 +612,7 @@ class Database extends Template {
         $limit = null;
         $order = null;
 
-        if (count($params) != 0) {
+        if ($this->isLoopable($params)) {
 
             foreach (@$params as $key => $param) {
 
@@ -630,21 +632,59 @@ class Database extends Template {
         return $this;
     }
 
+    /**
+     * Builds relationship data queries using joins
+     */
     private function buildRelationsShipsQuery() {
 
         if (isset($this->foreignKeys) && count($this->foreignKeys != 0)) {
 
             $this->queryJoinClause = null;
 
-            foreach ($this->foreignKeys as $keys) {
+            $this->RecurseOnTableRelations();
+        }
+    }
 
-                if (isset($keys->REFERENCED_TABLE_NAME)) {
+    /**
+     * recursive function for relationship query builder
+     */
+    private function RecurseOnTableRelations() {
+
+        foreach ($this->foreignKeys as $keys) {
+
+            if (isset($keys->REFERENCED_TABLE_NAME)) {
+                
+                if($this->isLoopable($this->aggregateTables)){
+                    
+                    foreach($this->aggregateTables as $table){
+                        
+                        if($table == $keys->REFERENCED_TABLE_NAME){
+                            
+                            $this->GetColumns($keys->REFERENCED_TABLE_NAME);
+                            
+                            $this->queryJoinClause .= ' ' .
+                            'LEFT JOIN ' . $keys->REFERENCED_TABLE_NAME . ' ' .
+                            'ON ' . $keys->TABLE_NAME . '.' . $keys->COLUMN_NAME . ' = ' . $keys->REFERENCED_TABLE_NAME . '.' . $keys->REFERENCED_COLUMN_NAME;
+
+                            $this->ForeignKeys($keys->REFERENCED_TABLE_NAME);
+
+                            $this->RecurseOnTableRelations();
+                            
+                        }
+                    }
+                }
+                else{
 
                     $this->GetColumns($keys->REFERENCED_TABLE_NAME);
 
                     $this->queryJoinClause .= ' ' .
                             'LEFT JOIN ' . $keys->REFERENCED_TABLE_NAME . ' ' .
                             'ON ' . $keys->TABLE_NAME . '.' . $keys->COLUMN_NAME . ' = ' . $keys->REFERENCED_TABLE_NAME . '.' . $keys->REFERENCED_COLUMN_NAME;
+
+                    $this->ForeignKeys($keys->REFERENCED_TABLE_NAME);
+
+                    $this->RecurseOnTableRelations();
+                
                 }
             }
         }
@@ -686,6 +726,8 @@ class Database extends Template {
      * @return mixed Gets foreign keys for a table
      */
     protected function ForeignKeys($table = null) {
+        
+        $this->foreignKeys = array();
 
         if ($table == null)
             $table = $this->queryTable;
@@ -761,7 +803,7 @@ class Database extends Template {
      *
      * @return int the insert id of an insert query
      */
-    public function GetInsertID(){
+    public function GetInsertID() {
 
         return $this->insert_id;
     }
@@ -770,7 +812,7 @@ class Database extends Template {
      *
      * @return Object Returns the first result set from a select query
      */
-    public function GetFirstResult(){
+    public function GetFirstResult() {
 
         if ($this->queriesResult)
             return $this->queriesResult[0];
@@ -778,41 +820,59 @@ class Database extends Template {
             return $this->queryResult[0];
     }
 
-    public function GetTableColumns(){
+    public function GetTableColumns() {
 
         return $this->queryTableColumns;
     }
 
-    public function GetFormFields(){
+    public function GetFormFields() {
 
         $this->Table(get_called_class());
 
         $foreignkeys = $this->ForeignKeys()->GetResultSet();
 
-        $this->formFields[get_called_class()] = $this->GetTableColumns();;
+        $this->formFields[get_called_class()] = $this->GetTableColumns();
+        ;
 
-        if($foreignkeys)
-            foreach($foreignkeys as $key){
+        if ($foreignkeys)
+            foreach ($foreignkeys as $key) {
 
-                  $this->TableFields ($key->REFERENCED_TABLE_NAME);
+                $this->TableFields($key->REFERENCED_TABLE_NAME);
             }
 
         return $this->formFields;
-
     }
 
-    private function TableFields($table){
+    public function GetForeignKeys() {
+
+        return $this->foreignKeys;
+    }
+
+    private function TableFields($table) {
 
         $this->formFields[$table] = $this->Table($table)->GetTableColumns();
 
         $foreignkeys = $this->ForeignKeys()->GetResultSet();
 
-        if($foreignkeys)
-            foreach($foreignkeys as $key){
+        if ($foreignkeys)
+            foreach ($foreignkeys as $key) {
 
-                $this->TableFields ($key->REFERENCED_TABLE_NAME);
+                $this->TableFields($key->REFERENCED_TABLE_NAME);
             }
 
+        return $this;
+    }
+    
+    /**
+     * 
+     * @param array $Tables
+     * @return \Database
+     * Join specific tables only in a select call
+     */
+    public function AggregateOnly(array $Tables){
+        
+        $this->aggregateTables = $Tables;
+        
         return $this;
     }
 

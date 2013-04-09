@@ -70,13 +70,11 @@ class Auth extends Application{
 
             $password = $hash = hash(AUTH_PASSWORD_ENCRYPTION_ALGORITHM, $this->password);
 
-//            $sql = "select * from {$this->authTable} where {$this->authField} = '{$this->username}' and password = '{$password}'";
-
             $db = new Database();
 
             $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
 
-            if($db->numRows)
+            if($db->GetNumberOfRows())
                 return true;
             else
                 return false;

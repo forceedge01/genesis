@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/Configs/AppDirs.php';
+
 class AppKernal {
 
     private
@@ -16,7 +18,7 @@ class AppKernal {
 
     private function fetchAllBundles(){
 
-        $bundlesDIR = ROOT . 'Bundles/';
+        $bundlesDIR = BUNDLES_FOLDER;
 
         $this->bundles[] = $bundlesDIR . 'Welcome';
         $this->bundles[] = $bundlesDIR . 'testBundle';
@@ -25,7 +27,7 @@ class AppKernal {
 
     private function fetchAllClasses(){
 
-        $classDir = __DIR__ . '/Classes/';
+        $classDir = APPLICATION_CLASSES_FOLDER;
 
         $this->classes[] = $classDir . 'Debugger.php';
         $this->classes[] = $classDir . 'Router.php';
@@ -63,56 +65,56 @@ class AppKernal {
 
     private function fetchAllConfigs(){
 
-        $directory = __DIR__ . '/Configs/';
+        $directory = APPLICATION_CONFIGS_FOLDER;
         $files = scandir($directory);
 
         foreach($files as $file){
 
             if(is_file($directory . $file)){
 
-                $this->configs[] = __DIR__ . '/Configs/' .$file;
+                $this->configs[] = $directory .$file;
             }
         }
     }
 
     private function fetchAllRoutes(){
 
-        $directory = __DIR__ . '/Routes/';
+        $directory = APPLICATION_ROUTES_FOLDER;
         $files = scandir($directory);
 
         foreach($files as $file){
 
             if(is_file($directory . $file)){
 
-                $this->routes[] = __DIR__ . '/Routes/' .$file;
+                $this->routes[] = $directory .$file;
             }
         }
     }
 
     private function fetchAllControllers(){
 
-        $directory = __DIR__ . '/Controllers/';
+        $directory = APPLICATION_CONTROLLERS_FOLDER;
         $files = scandir($directory);
 
         foreach($files as $file){
 
             if(is_file($directory . $file)){
 
-                $this->controllers[] = __DIR__ . '/Controllers/' .$file;
+                $this->controllers[] = $directory .$file;
             }
         }
     }
 
     private function fetchAllEntities(){
 
-        $directory = __DIR__ . '/Entities/';
+        $directory = APPLICATION_ENTITIES_FOLDER;
         $files = scandir($directory);
 
         foreach($files as $file){
 
             if(is_file($directory . $file)){
 
-                $this->entities[] = __DIR__ . '/Entities/' .$file;
+                $this->entities[] = $directory .$file;
             }
         }
     }
@@ -183,7 +185,7 @@ class AppKernal {
 
                     $params['Backtrace'] = debug_backtrace();
 
-                    require_once ROOT . '/Templates/Error_Pages/Bundle_Not_Found.html.php';
+                    require_once BUNDLES_FOLDER . 'Errors/Templates/ControllerViews/Bundle_Not_Found.html.php';
 
                     trigger_error('Unable to load Bundle: '.$bundle, E_USER_ERROR);
 
@@ -196,7 +198,7 @@ class AppKernal {
 
                 $message = ' not found in kernel::loadBundles()';
 
-                require_once ROOT . '/Templates/Error_Pages/Bundle_Not_Found.html.php';
+                require_once BUNDLES_FOLDER . 'Errors/Templates/ControllerViews/Bundle_Not_Found.html.php';
 
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
 

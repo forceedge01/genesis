@@ -90,6 +90,8 @@ class Cloner extends Database {
                 else
                     $this->setError(array('Failure' => 'Unable to copy material to the new site.'));
             }
+            else
+                $this->setError(array('Failure'=>'Site already exists'));
         }
         else {
 
@@ -313,7 +315,7 @@ class Cloner extends Database {
             
             $db->Query($sql);
 
-            $domain = $db->queryResult[0]->site;
+            $domain = $db->GetFirstResult()->site;
 
             if ($domain) {
 
@@ -323,36 +325,29 @@ class Cloner extends Database {
 
                     if (!$directory->removeDirectory(SITES_FOLDER . $domain)) {
 
-//                        $this->setError(array('Directory error' => 'Unable to remove'));
-
                         trigger_error('unable to remove directory');
 
                         $error = true;
                     } else {
-
-                        $sql = "REVOKE all ON `" . $domain . "Multisites`.* FROM '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "'";
-
-                        if (!$db->Query($sql)) {
-
-                            trigger_error('Unable to revoke db previliges');
-
-                            $error = true;
-                        }
 
                         $db->queries[] = 'use `' . $domain . 'Multisites`';
 
                         $db->queries[] = "show tables";
 
                         $db->multiQuery();
+                        
+                        $results = $db->GetFirstResult();
 
-                        foreach ($db->queryResult as $result) {
+                        foreach ($results as $result) {
 
                             foreach ($result as $table) {
-                                $db->queriesl[] = "drop table if exists ` " . $domain . "`.`" . $table . "`";
+                                $db->queries[] = "drop table if exists ` " . $domain . "`.`" . $table . "`";
                             }
                         }
 
                         $db->queries[] = 'drop database `' . $domain . 'Multisites`';
+                        
+                        $db->queries[] = "REVOKE all ON `" . $domain . "Multisites`.* FROM '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "'";
 
                         $db->queries[] = 'use `' . DBNAME . '`';
 
@@ -363,7 +358,6 @@ class Cloner extends Database {
 
                         if (!$db->multiQuery()) {
 
-//                            $this->setError (array('Site Database' => 'Could not remove database entries, resort to manual cleanup. Aborting'));
                             trigger_error('Could not remove database entries, resort to manual cleanup. Aborting');
 
                             $error = true;

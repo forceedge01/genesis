@@ -9,7 +9,8 @@ class Application extends Template{
             $directory,
             $zip,
             $mailer,
-            $Router,
+            $Router;
+    public
             $User;
 
     public function __construct() {

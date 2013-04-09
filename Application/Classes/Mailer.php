@@ -4,7 +4,8 @@ class Mail{
 
     private
             $phpmailer,
-            $error_msg;
+            $error_msg,
+            $options;
 
     public function __construct() {
 

@@ -35,7 +35,3 @@ define('IMAGES_FOLDER', ASSETS_FOLDER . 'Images/');
 define('CSS_FOLDER', ASSETS_FOLDER . 'CSS/');
 
 define('JS_FOLDER', ASSETS_FOLDER . 'JS/');
-
-define('ENABLE_HTML_VALIDATION', true);
-
-define('SHOW_DATABASE_ERRORS', true);

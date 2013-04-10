@@ -89,7 +89,7 @@ else{
 
             if ($args[0] == 'bundle') {
 
-                $bundle->name = ($_POST['bundleName'][0] ? $_POST['bundleName'][0] : $_POST['bundle'] );
+                $bundle->name = ($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] );
 
                 switch ($args[1]) {
 

@@ -1,8 +1,6 @@
 <?php
 
-define('ROOT', __DIR__ . '/');
-
-require_once ROOT . 'Application/Kernel.php';
+require_once './Application/Kernel.php';
 
 /**
  *

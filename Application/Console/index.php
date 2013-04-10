@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/Configs/ConsoleDirs.php';
+require_once __DIR__ . '/../Configs/ConsoleDirs.php';
 
 function requireAll($directory){
 

@@ -2,6 +2,8 @@
 
 define('HOST', 'http://localhost/GENESIS/');
 
+define('ROOT', __DIR__ . '/../../');
+
 define('APPLICATION_FOLDER', ROOT . 'Application/');
 
 define('APPLICATION_CONSOLE_FOLDER', APPLICATION_FOLDER . 'Console/');

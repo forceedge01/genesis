@@ -11,7 +11,7 @@ class Bundle extends Console {
 
         $this->name = $this->readUser();
 
-        if (mkdir(CONSOLE_BUNDLES_FOLDER . $this->name)) {
+        if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
             $this->createConfig()->createRoutes()->createController()->createEntity()->createViews();
         }
@@ -36,7 +36,7 @@ class Bundle extends Console {
         $bundleName = $this->readUser();
         $this->linebreak(1);
 
-        if ($this->removeDirectory(CONSOLE_BUNDLES_FOLDER . $bundleName))
+        if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
             echo 'Bundle has been deleted successfully.';
         else
             echo 'Unable to delete bundle.';
@@ -44,11 +44,11 @@ class Bundle extends Console {
 
     private function readBundles() {
 
-        $bundles = scandir(CONSOLE_BUNDLES_FOLDER);
+        $bundles = scandir(BUNDLES_FOLDER);
 
         foreach ($bundles as $bundle) {
 
-            if (is_dir(CONSOLE_BUNDLES_FOLDER . $bundle)) {
+            if (is_dir(BUNDLES_FOLDER . $bundle)) {
 
                 if($bundle != '.' && $bundle != '..') {
 
@@ -61,13 +61,13 @@ class Bundle extends Console {
 
     private function createConfig(){
 
-        mkdir(CONSOLE_BUNDLES_FOLDER . $this->name . '/Configs');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Configs');
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Configs/' . $this->name . '.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Configs/' . $this->name . '.php', 'w+');
 
         $initTemplate = '<?php
 
-DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', CONSOLE_BUNDLES_FOLDER . \''.$this->name.'\');';
+DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->name.'\');';
 
         fwrite($handle, $initTemplate);
 
@@ -78,7 +78,7 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', CONSOLE_BUNDLES_FOLDER . \''
 
     private function createEntity(){
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/' . 'Entity.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/' . 'Entity.php', 'w+');
 
         $initEntity = '<?php
 
@@ -168,11 +168,11 @@ class ' . $this->name . ' extends ApplicationEntity{
 
     private function createViews(){
 
-        mkdir(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Templates');
 
-        mkdir(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews');
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/' . 'Header.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/' . 'Header.html.php', 'w+');
 
         $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>';
 
@@ -180,7 +180,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/' . 'Footer.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/' . 'Footer.html.php', 'w+');
 
         $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>';
 
@@ -188,7 +188,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/list.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/list.html.php', 'w+');
 
         $initTemplate = '<div class="wrapper">
 
@@ -206,7 +206,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/view.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/view.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -224,7 +224,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/create.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/create.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -242,7 +242,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/edit.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/edit.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -265,9 +265,9 @@ class ' . $this->name . ' extends ApplicationEntity{
 
     private function createController(){
 
-        mkdir(CONSOLE_BUNDLES_FOLDER . $this->name . '/Controllers');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Controllers');
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'Controller.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'Controller.php', 'w+');
 
         $initController = '<?php
 
@@ -475,9 +475,9 @@ class ' . $this->name . 'Controller extends Application{
 
     private function createRoutes(){
 
-        mkdir(CONSOLE_BUNDLES_FOLDER . $this->name . '/Routes');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Routes');
 
-        $handle = fopen(CONSOLE_BUNDLES_FOLDER . $this->name . '/Routes/' . $this->name . '.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Routes/' . $this->name . '.php', 'w+');
 
         $initRoute = '<?php
 

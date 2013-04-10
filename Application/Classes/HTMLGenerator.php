@@ -189,7 +189,7 @@ class HTMLGenerator extends Router {
                         } else if (strpos($column->Type, 'varchar') > 0) {
 
                             $element['type'] = 'text';
-                            
+
                         } else if(strpos($column->Type, 'enum') > 0 ) {
 
                             $element['type'] = 'select';
@@ -1039,16 +1039,32 @@ class HTMLGenerator extends Router {
         return $rows;
     }
 
-    public function RenderSections($sectionData) {
+    /**
+     *
+     * @param array $sectionData
+     * @return string
+     * Renders sections html, can be set to two types:
+     * Pages
+     * Accordians
+     */
+    public function RenderSections(array $sectionData) {
 
         if (is_array($sectionData)) {
             $sections = '<div class="Sections">';
 
             $index = 1;
-            foreach ($sectionData as $title => $section) {
+
+            if(!isset($sectionData['type'])) $sectionData['type'] = 'pages';
+
+            if(strtolower($sectionData['type']) == 'pages')
+                $sections .= '<div class="title"><h6>' . $sectionData['title'] . '</h6></div>';
+
+            foreach ($sectionData['sections'] as $title => $section) {
+
+                if(strtolower($sectionData['type']) == 'accordian')
+                    $sections .= '<div class="title"><h6>' . $title . '</h6></div>';
 
                 $sections .= '<div class="section ' . $section['class'] . '" id="section' . $index . '">';
-                $sections .= '<div class="title"><h6>' . $title . '</h6></div>';
 
                 $sections .= '<div class="sectionHeader">';
                 $sections .= $section['header'];
@@ -1065,6 +1081,7 @@ class HTMLGenerator extends Router {
                 $sections .= '</div>';
 
                 $index += 1;
+
             }
 
             $sections .= '<div class="SectionsFooter"><div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div></div>';

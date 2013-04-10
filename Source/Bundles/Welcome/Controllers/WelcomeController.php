@@ -101,29 +101,36 @@ class WelcomeController extends Application {
 
         $params['sections'] = array(
 
-            'Normal Section' => array(
+            'type' => 'accordian',
+            'title' => 'This is a title',
 
-                'header' => 'this is one header',
-                'body' => 'abc',
-                'footer' => 'and a footer',
+            'sections' => array(
 
-            ),
+                'Normal Section' => array(
 
-            '2nd Normal Section' => array(
+                    'header' => 'this is one header',
+                    'body' => 'abc',
+                    'footer' => 'and a footer',
 
-                'header' => '2nd header',
-                'body' => '2nd body',
-                'footer' => '2nd footer',
+                ),
 
-            ),
+                '2nd Normal Section' => array(
 
-            '3nd Normal Section' => array(
+                    'header' => '2nd header',
+                    'body' => '2nd body',
+                    'footer' => '2nd footer',
 
-                'header' => '2nd header',
-                'body' => '2nd body',
-                'footer' => '2nd footer',
+                ),
 
-            ),
+                '3nd Normal Section' => array(
+
+                    'header' => '2nd header',
+                    'body' => '2nd body',
+                    'footer' => '2nd footer',
+
+                ),
+
+             )
 
         );
 

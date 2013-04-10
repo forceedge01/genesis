@@ -1,8 +1,8 @@
 <?php
 
-class Console{
+class Console {
 
-    public function unknownOption(){
+    public function unknownOption() {
 
         echo 'Unknown option!';
 
@@ -15,34 +15,33 @@ class Console{
         return $option;
     }
 
-    public function readUser($message = null){
+    public function readUser($message = null) {
 
-        if(!empty($message))
+        if (!empty($message))
             echo $message;
 
-        $handle = fopen('php://stdin', 'r');
+        if (!isset($_SERVER['SERVER_NAME'])) {
 
-        $line = trim(fgets($handle));
+            $handle = fopen('php://stdin', 'r');
 
-        return $line;
+            $line = trim(fgets($handle));
+
+            return $line;
+        }
+
+        return '';
     }
 
-    public function writeUser($message){
+    public function writeUser($message) {
 
         echo $message;
     }
 
-    public function showAllOptions(){
-
-        $options = array(
-           'bundle:create',
-           'bundle:delete',
-           'exit'
-        );
+    public function showAllOptions($options) {
 
         $this->linebreak(2);
 
-        foreach($options as $option){
+        foreach ($options as $option) {
 
             echo $option;
             $this->linebreak(1);
@@ -51,46 +50,39 @@ class Console{
         $this->linebreak(2);
     }
 
-    protected function removeDirectory($directory){
+    protected function removeDirectory($directory) {
 
-        try{
+        try {
 
-            if(is_dir($directory)){
+            if (is_dir($directory)) {
 
                 $files = scandir($directory);
 
-                foreach($files as $file)
-                {
-                    if(($file != '.' && $file != '..')){
+                foreach ($files as $file) {
+                    if (($file != '.' && $file != '..')) {
 
                         $absolutePath = $directory . '/' . $file;
 
-                        if(is_dir($absolutePath))
-                        {
+                        if (is_dir($absolutePath)) {
                             echo 'Entring direcotry';
                             $this->linebreak(1);
                             $this->removeDirectory($absolutePath);
-                        }
-                        else
-                        {
-                            echo 'deleting file: '. $absolutePath;
+                        } else {
+                            echo 'deleting file: ' . $absolutePath;
                             $this->linebreak(1);
                             unlink($absolutePath);
                         }
                     }
                 }
 
-                if(rmdir($directory))
+                if (rmdir($directory))
                     return true;
                 else
                     return false;
-
             }
             else
                 return false;
-
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
 
             echo $e->getMessage();
 
@@ -98,10 +90,15 @@ class Console{
         }
     }
 
-    public function linebreak($val){
+    public function linebreak($val) {
 
-        for($i = 0; $i < $val; $i++)
-            echo chr(10) . chr(13);
+        for ($i = 0; $i < $val; $i++) {
+
+            if (!isset($_SERVER['SERVER_NAME']))
+                echo chr(10) . chr(13);
+            else
+                echo '<br />';
+        }
     }
 
 }

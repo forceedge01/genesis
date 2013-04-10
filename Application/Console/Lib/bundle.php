@@ -2,14 +2,24 @@
 
 class Bundle extends Console {
 
-    private
-            $name;
+    public
+            $name,
+            $renderMethod;
+
+    public function __construct($type) {
+
+        $this->renderMethod = $type;
+    }
 
     public function createBundle() {
 
-        echo 'Enter name of the bundle you want to create: ';
+        if(!isset($_SERVER['SERVER_NAME'])){
 
-        $this->name = $this->readUser();
+            echo 'Enter name of the bundle you want to create: ';
+
+            $this->name = $this->readUser();
+
+        }
 
         if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
@@ -17,34 +27,47 @@ class Bundle extends Console {
         }
 
         echo 'Bundle ' . $this->name . ' has been created successfully!';
+
+        $this->linebreak(2);
     }
 
     public function deleteBundle() {
 
-        $this->linebreak(1);
+        if(!isset($_SERVER['SERVER_NAME'])){
 
-        echo 'Bundles you have in your application: ';
+            $this->linebreak(1);
 
-        $this->linebreak(1);
+            echo 'Bundles you have in your application: ';
 
-        $this->readBundles();
+            $this->linebreak(1);
 
-        $this->linebreak(1);
+            $this->readBundles(false);
 
-        echo 'Enter name of the bundle you want to delete: ';
+            $this->linebreak(1);
 
-        $bundleName = $this->readUser();
-        $this->linebreak(1);
+            echo 'Enter name of the bundle you want to delete: ';
 
-        if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
-            echo 'Bundle has been deleted successfully.';
+            $bundleName = $this->readUser();
+            $this->linebreak(1);
+
+        }
         else
-            echo 'Unable to delete bundle.';
+            $bundleName = $this->name;
+
+        if(!empty($bundleName))
+            if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
+                echo 'Bundle has been deleted successfully.';
+            else
+                echo 'Unable to delete bundle.';
+        else
+            echo 'Bundle must have a name!';
     }
 
-    private function readBundles() {
+    public function readBundles($return) {
 
         $bundles = scandir(BUNDLES_FOLDER);
+
+        $bundlesArray = array();
 
         foreach ($bundles as $bundle) {
 
@@ -52,11 +75,18 @@ class Bundle extends Console {
 
                 if($bundle != '.' && $bundle != '..') {
 
-                    echo $bundle;
-                    $this->linebreak(1);
+                    if($return)
+                        $bundlesArray[] = $bundle;
+                    else{
+
+                        echo $bundle;
+                        $this->linebreak(1);
+                    }
                 }
             }
         }
+
+        return $bundlesArray;
     }
 
     private function createConfig(){

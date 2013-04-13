@@ -6,6 +6,8 @@ function requireAll($directory) {
 
     $files = scandir($directory);
 
+    $files = array_reverse($files);
+
     foreach ($files as $file) {
 
         if ($file != '.' && $file != '..' && $file != 'index.php') {

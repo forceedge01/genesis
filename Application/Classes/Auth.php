@@ -101,4 +101,15 @@ class Auth extends Application{
 
         return $this->User;
     }
+
+    /**
+     * Checks to see if the user is logged into the application or not.
+     */
+    public function isLoggedIn(){
+
+        if(!empty($_SESSION['login_expires']))
+            return true;
+        else
+            return false;
+    }
 }

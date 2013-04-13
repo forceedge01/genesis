@@ -18,13 +18,17 @@ class AppKernal {
 
     private function fetchAllBundles(){
 
-        $bundlesDIR = BUNDLES_FOLDER;
-
+        // Include your bundles here
+        
         $bundles = array(
 
             'Welcome',
             'testBundle',
         );
+
+        // Do not edit below this line
+
+        $bundlesDIR = BUNDLES_FOLDER;
 
         foreach($bundles as $bundle){
 

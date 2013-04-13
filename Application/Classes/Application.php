@@ -93,17 +93,6 @@ class Application extends Template{
     }
 
     /**
-     * Checks to see if the user is logged into the application or not.
-     */
-    public function isLoggedIn(){
-
-        if(!empty($_SESSION['login_expires']))
-            return true;
-        else
-            return false;
-    }
-
-    /**
      *
      * @param type $roleId, provide the role id to match against.
      * @return boolean returns true on accable, redirects to APPLICATION BASE ROUTE NAME on false.<br />
@@ -223,7 +212,7 @@ class Application extends Template{
 
         return $this->$object;
     }
-    
+
     public function isLoopable($param){
 
         if(isset($param) && (is_array($param) || is_object($param)))

@@ -126,7 +126,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
          $this->tableColumns = array(\'*\');
 
-         $this->tableName = \'__CLASS__\';
+         $this->tableName = __CLASS__;
 
          if(is_numeric($id)){
 
@@ -134,7 +134,6 @@ class ' . $this->name . ' extends ApplicationEntity{
             $this->Get();
 
          }
-
       }
 
       /**
@@ -306,7 +305,6 @@ class ' . $this->name . 'Controller extends ApplicationController{
       public function indexAction(){
 
               $this->forwardToController("' . $this->name . '_List");
-
       }
 
       public function listAction(){

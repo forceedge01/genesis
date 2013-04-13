@@ -1,6 +1,6 @@
 <?php
 
-class WelcomeController extends Application {
+class WelcomeController extends ApplicationController {
 
     public function indexAction() {
 

@@ -301,7 +301,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         $initController = '<?php
 
-class ' . $this->name . 'Controller extends Application{
+class ' . $this->name . 'Controller extends ApplicationController{
 
       public function indexAction(){
 
@@ -511,46 +511,40 @@ class ' . $this->name . 'Controller extends Application{
 
         $initRoute = '<?php
 
-$_SESSION[\'Routes\'][\'' . $this->name . '\'] = array(
+Router::$Route[\'' . $this->name . '\'] = array(
 
       "Controller" => "' . $this->name . ':index",
       "Pattern" => "/' . $this->name . '/"
-
 );
 
-$_SESSION[\'Routes\'][\'' . $this->name . '_List\'] = array(
+Router::$Route[\'' . $this->name . '_List\'] = array(
 
       "Controller" => "' . $this->name . ':list",
       "Pattern" => "/' . $this->name . '/List/"
-
 );
 
-$_SESSION[\'Routes\'][\'' . $this->name . '_View\'] = array(
+Router::$Route[\'' . $this->name . '_View\'] = array(
 
       "Controller" => "' . $this->name . ':view",
       "Pattern" => "/' . $this->name . '/View/{id}/"
-
 );
 
-$_SESSION[\'Routes\'][\'' . $this->name . '_Create\'] = array(
+Router::$Route[\'' . $this->name . '_Create\'] = array(
 
       "Controller" => "' . $this->name . ':create",
       "Pattern" => "/' . $this->name . '/Create/"
-
 );
 
-$_SESSION[\'Routes\'][\'' . $this->name . '_Edit\'] = array(
+Router::$Route[\'' . $this->name . '_Edit\'] = array(
 
       "Controller" => "' . $this->name . ':edit",
       "Pattern" => "/' . $this->name . '/Edit/{id}/"
-
 );
 
-$_SESSION[\'Routes\'][\'' . $this->name . '_Delete\'] = array(
+Router::$Route[\'' . $this->name . '_Delete\'] = array(
 
       "Controller" => "' . $this->name . ':delete",
       "Pattern" => "/' . $this->name . '/Delete/{id}/"
-
 );
               ';
 

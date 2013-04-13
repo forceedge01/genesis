@@ -2,18 +2,21 @@
 
 class Application extends Template{
 
-    private
+    protected
             $htmlgenerator,
             $validationEngine,
             $auth,
             $directory,
             $zip,
             $mailer,
-            $Router;
+            $Router,
+            $Request;
     public
             $User;
 
     public function __construct() {
+
+        $this->Request = new Request();
 
         $this->Router = new Router();
 
@@ -141,123 +144,6 @@ class Application extends Template{
 
     }
 
-    /**
-     *
-     * @return boolean
-     * Returns true if the request is an ajax request
-     */
-    public function isAjax(){
-
-        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-
-            return true;
-        }
-        else{
-
-            return false;
-        }
-
-    }
-
-    /**
-     * @param String The element to check (optional)
-     * @return boolean
-     * Returns true if the request is a post request
-     */
-    public function isPost($Element = null){
-
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            if(!empty($Element)){
-
-                if(isset($_POST[$Element]))
-                    return true;
-                else
-                    return false;
-
-            }
-            else
-                return true;
-        }
-        else{
-
-            return false;
-        }
-    }
-
-    /**
-     * @param String The element to check (optional)
-     * @return boolean
-     * Returns true if the request is an get request
-     */
-    public function isGet($Element = null){
-
-        if($_SERVER['REQUEST_METHOD'] == 'GET') {
-
-            if(!empty($Element)){
-
-                if(isset($_GET[$Element]))
-                    return true;
-                else
-                    return false;
-
-            }
-            else
-                return true;
-        }
-        else{
-
-            return false;
-        }
-    }
-
-    /**
-     *
-     * @param type $Name - name of the cookie you want to setup
-     * @param type $Value - Value of the cookie your setting up
-     * @param type $time - Expiration time, has to be in seconds.
-     * @return boolean
-     * Returns true on successful cookie setup.
-     */
-    protected function setCookie($Name, $Value , $time = 2592000){
-
-        setcookie($Name, '', -(time() + 2592000));
-        if(setcookie($Name, $Value, time() + $time, '/'))
-             return true;
-        else
-            return false;
-    }
-
-
-    /**
-     *
-     * @param type $Name - name of the cookie you want to setup
-     * @return boolean
-     * Returns true on successful cookie unset.
-     */
-    protected function unsetCookie($Name){
-
-        if(setcookie($Name, '', -(time() + 2592000)))
-            return true;
-        else
-            return false;
-
-    }
-
-    protected function setSession($Name, $Value){
-
-        $_SESSION[$Name] = $Value;
-
-        return true;
-    }
-
-    protected function unsetSession($Name){
-
-        unset($_SESSION[$Name]);
-
-        return true;
-    }
-
     protected function HTMLGenerator(){
 
         if(is_object($this->htmlgenerator))
@@ -325,8 +211,24 @@ class Application extends Template{
         }
     }
 
-    public function GetCurrentUser(){
+    /**
+     *
+     * @param type $object
+     * @return object
+     */
+    public function get($object){
 
-        return $this->User;
+        if(!is_object($this->$object))
+            $this->$object = new $object();
+
+        return $this->$object;
+    }
+    
+    public function isLoopable($param){
+
+        if(isset($param) && (is_array($param) || is_object($param)))
+            return true;
+        else
+            return false;
     }
 }

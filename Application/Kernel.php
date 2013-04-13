@@ -20,8 +20,16 @@ class AppKernal {
 
         $bundlesDIR = BUNDLES_FOLDER;
 
-        $this->bundles[] = $bundlesDIR . 'Welcome';
-        $this->bundles[] = $bundlesDIR . 'testBundle';
+        $bundles = array(
+
+            'Welcome',
+            'testBundle',
+        );
+
+        foreach($bundles as $bundle){
+
+            $this->bundles[] = $bundlesDIR . $bundle;
+        }
 
     }
 
@@ -30,6 +38,7 @@ class AppKernal {
         $classDir = APPLICATION_CLASSES_FOLDER;
 
         $this->classes[] = $classDir . 'Debugger.php';
+        $this->classes[] = $classDir . 'Request.php';
         $this->classes[] = $classDir . 'Router.php';
         $this->classes[] = $classDir . 'HTMLGenerator.php';
         $this->classes[] = $classDir . 'ValidationEngine.php';
@@ -42,6 +51,7 @@ class AppKernal {
         $this->classes[] = $classDir . 'Zip.php';
         $this->classes[] = $classDir . 'Cloner.php';
         $this->classes[] = $classDir . 'Directory.php';
+        $this->classes[] = $classDir . 'Session.php';
     }
 
     public function __construct() {

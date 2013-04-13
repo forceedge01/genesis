@@ -575,7 +575,7 @@ class HTMLGenerator extends Router {
             case 'submit': {
                     $element .= '
                             <!-- SUBMIT BUTTON -->
-                            <input type = "submit" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . $params['name'] . '" value = "' . @$params['value'] . '">
+                            <input type = "submit" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . @$params['name'] . '" value = "' . @$params['value'] . '">
                             <!-- END SUBMIT BUTTON -->
                             ';
                     break;
@@ -583,7 +583,7 @@ class HTMLGenerator extends Router {
             case 'reset': {
                     $element .= '
                             <!-- RESET BUTTON -->
-                            <input type = "reset" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . $params['name'] . '" value = "' . @$params['value'] . '">
+                            <input type = "reset" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . @$params['name'] . '" value = "' . @$params['value'] . '">
                             <!-- END Reset BUTTON -->
                             ';
                     break;
@@ -1064,7 +1064,7 @@ class HTMLGenerator extends Router {
                 if(strtolower($sectionData['type']) == 'accordian')
                     $sections .= '<div class="title"><h6>' . $title . '</h6></div>';
 
-                $sections .= '<div class="section ' . $section['class'] . '" id="section' . $index . '">';
+                $sections .= '<div class="section ' . @$section['class'] . '" id="section' . $index . '">';
 
                 $sections .= '<div class="sectionHeader">';
                 $sections .= $section['header'];

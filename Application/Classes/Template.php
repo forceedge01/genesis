@@ -374,4 +374,16 @@ class Template extends Router {
         return str_replace('//', '/', $string);
     }
 
+    /**
+     *
+     * @param mixed $param
+     * @return boolean Checks if a variable is loopable
+     */
+    public function isLoopable($param){
+
+        if(isset($param) && (is_array($param) || is_object($param)))
+            return true;
+        else
+            return false;
+    }
 }

@@ -16,6 +16,8 @@ class Router extends Debugger{
     public
             $pattern;
 
+    public static $Route = array(), $LastRoute;
+
     public function __construct() {
 
         $this->url = $_SERVER['PHP_SELF'];
@@ -58,7 +60,7 @@ class Router extends Debugger{
     public function forwardRequest(){
 
         //render the right application controller to render template;
-        foreach($_SESSION['Routes'] as $key => $value){
+        foreach(self::$Route as $key => $value){
 
             $this->funcVariable = null;
 
@@ -138,7 +140,7 @@ class Router extends Debugger{
         if(!empty($route))
             $this->route = $route;
 
-        foreach($_SESSION['Routes'] as $key => $value){
+        foreach(self::$Route as $key => $value){
 
             if($key == $this->route){
 
@@ -176,7 +178,7 @@ class Router extends Debugger{
         if(!empty($route))
             $this->route = $route;
 
-        foreach($_SESSION['Routes'] as $key => $value){
+        foreach(self::$Route as $key => $value){
 
             if($key == $this->route){
 
@@ -213,7 +215,7 @@ class Router extends Debugger{
      */
     public function forwardTo($route, $urlQueryString = null){
 
-        $_SESSION['lastRoute'] = $this->pattern;
+        self::$LastRoute = $this->pattern;
 
         $route = $this->getRoute($route);
 
@@ -401,8 +403,8 @@ class Router extends Debugger{
      */
     protected function lastAccessedPage(){
 
-        if(isset($_SESSION['lastRoute']))
-            return $this->getRouteFromPattern($_SESSION['lastRoute']);
+        if(isset(self::$LastRoute))
+            return $this->getRouteFromPattern(self::$LastRoute);
         else
             return true;
     }
@@ -418,7 +420,7 @@ class Router extends Debugger{
         if(!empty($pattern))
             $this->pattern = $pattern;
 
-        foreach($_SESSION['Routes'] as $routeKey => $routes){
+        foreach(self::$Route as $routeKey => $routes){
 
                 if($routes['Pattern'] == $this->pattern){
 

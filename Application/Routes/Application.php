@@ -1,9 +1,8 @@
 <?php
 
-$_SESSION['Routes']['Application'] = array(
+Router::$Route['Application'] = array(
 
         'Controller' => 'Application:index',
         'Pattern' => '/'
 
 );
-

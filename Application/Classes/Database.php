@@ -26,11 +26,11 @@ class Database extends Template {
         $insert_id,
         $formFields,
         $aggregateTables;
-    
+
     protected
         $queryMeta;
-    
-    public 
+
+    public
         $verbose,
         $queries;
 
@@ -442,7 +442,7 @@ class Database extends Template {
                     if (!empty($this->queryResult))
                         $this->queriesResult[] = $this->queryResult;
                 }
-                
+
                 unset($this->queries);
             }
 
@@ -603,7 +603,7 @@ class Database extends Template {
             $params = $this->prepare($id);
 
             $this->query .= ' where ' . $params;
-            
+
         } else if (is_numeric($id)) {
 
             $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
@@ -653,15 +653,15 @@ class Database extends Template {
         foreach ($this->foreignKeys as $keys) {
 
             if (isset($keys->REFERENCED_TABLE_NAME)) {
-                
+
                 if($this->isLoopable($this->aggregateTables)){
-                    
+
                     foreach($this->aggregateTables as $table){
-                        
+
                         if($table == $keys->REFERENCED_TABLE_NAME){
-                            
+
                             $this->GetColumns($keys->REFERENCED_TABLE_NAME);
-                            
+
                             $this->queryJoinClause .= ' ' .
                             'LEFT JOIN ' . $keys->REFERENCED_TABLE_NAME . ' ' .
                             'ON ' . $keys->TABLE_NAME . '.' . $keys->COLUMN_NAME . ' = ' . $keys->REFERENCED_TABLE_NAME . '.' . $keys->REFERENCED_COLUMN_NAME;
@@ -669,7 +669,7 @@ class Database extends Template {
                             $this->ForeignKeys($keys->REFERENCED_TABLE_NAME);
 
                             $this->RecurseOnTableRelations();
-                            
+
                         }
                     }
                 }
@@ -684,7 +684,7 @@ class Database extends Template {
                     $this->ForeignKeys($keys->REFERENCED_TABLE_NAME);
 
                     $this->RecurseOnTableRelations();
-                
+
                 }
             }
         }
@@ -726,7 +726,7 @@ class Database extends Template {
      * @return mixed Gets foreign keys for a table
      */
     protected function ForeignKeys($table = null) {
-        
+
         $this->foreignKeys = array();
 
         if ($table == null)
@@ -862,18 +862,17 @@ class Database extends Template {
 
         return $this;
     }
-    
+
     /**
-     * 
+     *
      * @param array $Tables
      * @return \Database
      * Join specific tables only in a select call
      */
     public function AggregateOnly(array $Tables){
-        
+
         $this->aggregateTables = $Tables;
-        
+
         return $this;
     }
-
 }

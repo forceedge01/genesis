@@ -7,7 +7,7 @@ class Auth extends Application{
             $password,
             $authTable,
             $authField;
-            
+
     public
             $User;
 
@@ -44,11 +44,13 @@ class Auth extends Application{
 
             $this->User = new $userObject();
 
-            $_SESSION['email'] = $this->username;
+            $session = new Session();
 
-            $_SESSION['login_time'] = time();
+            $session->start();
 
-//            $_SESSION['login_expires'] = time() + SESSION_TIME_INTERVAL;
+            $session->set('email', $this->username);
+
+            $session->set('login_time', time());
 
             $objectMethod = AUTH_USER_POPULATE_METHOD;
 
@@ -93,5 +95,10 @@ class Auth extends Application{
             return true;
         else
             return false;
+    }
+
+    public function GetCurrentUser(){
+
+        return $this->User;
     }
 }

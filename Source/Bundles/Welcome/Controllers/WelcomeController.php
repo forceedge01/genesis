@@ -4,6 +4,8 @@ class WelcomeController extends ApplicationController {
 
     public function indexAction() {
 
+        $this->getObject('validation');
+
         $params['PageTitle'] = 'Welcome to ' . APPLICATION_NAME;
 
         $params['table'] = array(

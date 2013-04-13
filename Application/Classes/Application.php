@@ -133,91 +133,26 @@ class Application extends Template{
 
     }
 
-    protected function HTMLGenerator(){
-
-        if(is_object($this->htmlgenerator))
-            return $this->htmlgenerator;
-        else{
-
-            $this->htmlgenerator = new HTMLGenerator();
-
-            return $this->htmlgenerator;
-        }
-    }
-
-    protected function ValidationEngine(){
-
-        if(is_object($this->validationEngine))
-            return $this->validationEngine;
-        else{
-
-            $this->validationEngine = new ValidationEngine();
-            return $this->validationEngine;
-        }
-    }
-
-    protected function Mailer(){
-
-        if(is_object($this->mailer))
-            return $this->mailer;
-        else{
-
-            $this->mailer = new Mail();
-            return $this->mailer;
-        }
-    }
-
-    protected function Directory(){
-
-        if(is_object($this->directory))
-            return $this->directory;
-        else{
-
-            $this->directory = new Directory();
-            return $this->directory;
-        }
-    }
-
-    protected function Zip(){
-
-        if(is_object($this->zip))
-            return $this->zip;
-        else{
-
-            $this->zip = new Zip();
-            return $this->zip;
-        }
-    }
-
-    protected function Auth(){
-
-        if(is_object($this->auth))
-            return $this->auth;
-        else{
-
-            $this->auth = new Auth();
-            return $this->auth;
-        }
-    }
-
     /**
      *
-     * @param type $object
-     * @return object
+     * @param string $object
+     * @param mixed $args
+     * @return object $this
+     * Returns an existing object or creates a new one if it does not exist in the current scope
      */
-    public function get($object){
+    public function getObject($object, $args = null){
 
-        if(!is_object($this->$object))
-            $this->$object = new $object();
+        if(!is_object($this->$object)){
+
+            if(class_exists($object)){
+
+                $this->$object = new $object($args);
+                $this->$object->objectCreatedAt = time();
+            }
+            else
+                trigger_error ("getOjbect accepts valid class name only, $object class does not exist", E_USER_ERROR);
+        }
 
         return $this->$object;
-    }
-
-    public function isLoopable($param){
-
-        if(isset($param) && (is_array($param) || is_object($param)))
-            return true;
-        else
-            return false;
     }
 }

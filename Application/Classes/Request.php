@@ -1,6 +1,28 @@
 <?php
 
-class Request{
+class Request extends Debugger{
+
+    public
+            $post,
+            $get,
+            $method,
+            $server,
+            $time,
+            $uri,
+            $remoteIp,
+            $self;
+
+    public function __construct() {
+
+        $this->post = $_POST;
+        $this->get = $_GET;
+        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->time = $_SERVER['REQUEST_TIME'];
+        $this->uri = $_SERVER['REQUEST_URI'];
+        $this->remoteIp = $_SERVER['REMOTE_ADDR'];
+        $this->self = $_SERVER['PHP_SELF'];
+        $this->server = $_SERVER;
+    }
 
     /**
      *

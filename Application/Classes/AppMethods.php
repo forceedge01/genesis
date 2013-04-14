@@ -224,4 +224,27 @@ class AppMethods extends Debugger {
         return $result;
     }
 
+    /**
+     *
+     * @param type $bundleColonEntityName
+     * @return \bundle returns an entity object
+     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
+     */
+    public function getBundleEntity($bundleColonEntityName){
+
+        $bundle = explode(':', $bundleColonEntityName);
+
+        $path = BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php';
+
+        if(is_file(BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php'))
+            require_once BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php';
+        else{
+
+            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
+            exit;
+        }
+
+        return new $bundle[1]();
+    }
+
 }

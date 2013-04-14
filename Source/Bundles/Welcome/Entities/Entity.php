@@ -1,6 +1,6 @@
 <?php
 
-class Welcome extends Application {
+class Welcome extends ApplicationEntity {
 
     public
             $id,

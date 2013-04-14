@@ -15,9 +15,9 @@ class Bundle extends Console {
 
         if(!isset($_SERVER['SERVER_NAME'])){
 
-            echo 'Enter name of the bundle you want to create: ';
+            echo 'Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ';
 
-            $this->name = $this->readUser();
+            $this->name = str_replace('bundle', '', strtolower($this->readUser()));
 
         }
 
@@ -108,7 +108,9 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->
 
     private function createEntity(){
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/' . 'Entity.php', 'w+');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Entities');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/' . 'Entities/ ' . $this->name . 'Entity.php', 'w+');
 
         $initEntity = '<?php
 
@@ -300,7 +302,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         $initController = '<?php
 
-class ' . $this->name . 'Controller extends ApplicationController{
+class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
       public function indexAction(){
 
@@ -491,6 +493,20 @@ class ' . $this->name . 'Controller extends ApplicationController{
                   echo \'error:Delete was unsuccessful\';
             }
       }
+}
+              ';
+
+            fwrite($handle, $initController);
+
+            fclose($handle);
+
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'BundleController.php', 'w+');
+
+        $initController = '<?php
+
+// Use this class to inherit methods used in all or some of your controllers
+class ' . $this->name . 'BundleController extends ApplicationController{
+
 }
               ';
 

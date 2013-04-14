@@ -167,7 +167,7 @@ class Console {
 
                 $bundle = new Bundle('html');
 
-                $bundle->name = ($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] );
+                $bundle->name = str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] )));
 
             } else {
 

@@ -193,24 +193,11 @@ class AppKernal {
 
             if(is_dir($bundle)){
 
-                if(self::loadFilesFromDir($bundle . '/Configs') && self::loadFilesFromDir($bundle . '/Routes') && self::loadFilesFromDir($bundle . '/Controllers')){
-
-                    if(is_file($bundle . '/Entity.php'))
-                        require_once $bundle . '/Entity.php';
-
-                }
-                else
-                {
-                    $message = ' unable to load, check directory structure of bundle, kernel::loadBundles()';
-
-                    $params['Backtrace'] = debug_backtrace();
-
-                    require_once BUNDLES_FOLDER . 'Errors/Templates/ControllerViews/Bundle_Not_Found.html.php';
-
-                    trigger_error('Unable to load Bundle: '.$bundle, E_USER_ERROR);
-
-                    exit;
-                }
+                self::loadFilesFromDir($bundle . '/Configs');
+                self::loadFilesFromDir($bundle . '/Routes');
+                self::loadFilesFromDir($bundle);
+                self::loadFilesFromDir($bundle . '/Controllers');
+                self::loadFilesFromDir($bundle . '/Entities');
             }
             else{
 

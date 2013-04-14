@@ -20,13 +20,13 @@ function requireAll($directory) {
     }
 }
 
-function getOptions(){
+function getOptions() {
 
     return array(
-           'bundle:create',
-           'bundle:delete',
-           'exit'
-        );
+        'bundle:create',
+        'bundle:delete',
+        'exit'
+    );
 }
 
 requireAll(CONSOLE_LIB_FOLDER);
@@ -47,13 +47,67 @@ if (!isset($_SERVER['SERVER_NAME'])) {
 
         $args = explode('--', $line);
 
-        $args[0] = explode(':', $args[0]);
+        switchOption($args[0]);
+    }
+} else {
 
-        if ($args[0][0] == 'bundle') {
+    echo '<h3>Welcome to Genesis CRUD generator, please choose an option and proceed with the onscreen instructions.</h3>';
+
+    $options = getOptions();
+
+    $bundle = new Bundle('html');
+
+    if (isset($_POST['submitOption'])) {
+
+        $option = $_POST['option'];
+
+        switchOption($option[0]);
+    }
+
+    echo '<form method="post">';
+
+    foreach ($options as $option) {
+
+        echo '<input type="radio" name="option[]" value="' . $option . '">' . $option . '</input><br />';
+    }
+
+    echo '<h4>List of bundles installed</h4>';
+
+    $bundles = $bundle->readBundles(true);
+
+    foreach ($bundles as $bundle) {
+
+        echo '<input type="radio" name="bundleName[]" value="' . $bundle . '">' . $bundle . '</input><br />';
+    }
+
+    echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';
+
+    echo '<input type="submit" name="submitOption"></form>';
+}
+
+function switchOption($switch) {
+
+    $args = explode(':', $switch);
+
+    if ($args[0] == 'bundle') {
+
+        if (isset($_SERVER['SERVER_NAME'])) {
+
+            $bundle = new Bundle('html');
+
+            $bundle->name = ($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] );
+
+        } else {
 
             $bundle = new Bundle('console');
+        }
+    }
 
-            switch ($args[0][1]) {
+    switch (strtolower($args[0])) {
+
+        case 'bundle':
+
+            switch ($args[1]) {
 
                 case 'create':
                     $bundle->createBundle();
@@ -66,75 +120,11 @@ if (!isset($_SERVER['SERVER_NAME'])) {
                     exit(0);
                     break;
             }
-        } else {
+            break;
 
-            if ($args[0][0] == 'exit')
-                exit;
-
-            $console->unknownOption();
-        }
+        default:
+            echo 'Exiting';
+            exit;
+            break;
     }
-}
-else{
-
-    echo '<h3>Welcome to Genesis CRUD generator, please choose an option and proceed with the onscreen instructions.</h3>';
-
-        $options = getOptions();
-
-        $bundle = new Bundle('html');
-
-        if(isset($_POST['submitOption'])){
-
-            $option = $_POST['option'];
-
-            $args = explode(':', $option[0]);
-
-            if ($args[0] == 'bundle') {
-
-                $bundle->name = ($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] );
-
-                switch ($args[1]) {
-
-                    case 'create':
-                        $bundle->createBundle();
-                        break;
-                    case 'delete':
-                        $bundle->deleteBundle();
-                        break;
-                    case '0':
-                    case 'exit':
-                        exit(0);
-                        break;
-                }
-
-            } else {
-
-                if ($args[0] == 'exit')
-                    exit;
-
-                echo 'Option not recognized';
-            }
-
-        }
-
-        echo '<form method="post">';
-
-        foreach($options as $option){
-
-            echo '<input type="radio" name="option[]" value="'.$option.'">'.$option.'</input><br />';
-        }
-
-        echo '<h4>List of bundles installed</h4>';
-
-        $bundles = $bundle->readBundles(true);
-
-        foreach($bundles as $bundle){
-
-            echo '<input type="radio" name="bundleName[]" value="'.$bundle.'">'.$bundle.'</input><br />';
-        }
-
-        echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';
-
-        echo '<input type="submit" name="submitOption"></form>';
-
 }

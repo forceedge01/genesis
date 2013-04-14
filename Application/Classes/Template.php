@@ -4,7 +4,8 @@ class Template extends Router {
 
     private
             $title,
-            $element;
+            $element,
+            $bundle;
 
     /**
      *
@@ -147,7 +148,10 @@ class Template extends Router {
      */
     public function includeCSS($css, $params = null) {
 
-        $css = '<link rel="stylesheet" type="text/css" href="' . CSS_FOLDER . $css . '" ' . $params . ' />';
+        if($this->associateAssetBundle($css))
+            $css = '<link rel="stylesheet" type="text/css" href="' . $this->bundle[0] . 'CSS/' . $this->bundle[1] . '" ' . $params . ' />';
+        else
+            $css = '<link rel="stylesheet" type="text/css" href="' . CSS_FOLDER . $css . '" ' . $params . ' />';
 
         echo $css;
     }
@@ -160,7 +164,10 @@ class Template extends Router {
      */
     public function includeJS($js, $params = null) {
 
-        $js = '<script type="text/javascript" src="' . JS_FOLDER . $js . '" ' . $params . '></script>';
+        if($this->associateAssetBundle($js))
+            $js = '<script type="text/javascript" src="' . $this->bundle[0] . 'JS/' . $this->bundle[1] . '" ' . $params . '></script>';
+        else
+            $js = '<script type="text/javascript" src="' . JS_FOLDER . $js . '" ' . $params . '></script>';
 
         echo $js;
     }
@@ -173,7 +180,10 @@ class Template extends Router {
      */
     public function includeImage($image, $params = null) {
 
-        $image = '<img src="' . IMAGES_FOLDER . $image . '" ' . $params . ' />';
+        if($this->associateAssetBundle($image))
+            $image = '<img src="' . $this->bundle[0] . 'Images/' . $this->bundle[1] . '" ' . $params . ' />';
+        else
+            $image = '<img src="' . IMAGES_FOLDER . $image . '" ' . $params . ' />';
 
         echo $image;
     }
@@ -380,5 +390,20 @@ class Template extends Router {
         $style .= '"';
 
         return $style;
+    }
+
+    private function associateAssetBundle($param){
+
+        $chunks = explode(':', $param);
+
+        if(isset($chunks[1])){
+
+            $this->bundle[0] = ASSETS_FOLDER . 'Bundles/' . $chunks[0] . '/';
+            $this->bundle[1] = $chunks[1];
+
+            return true;
+        }
+        else
+            return false;
     }
 }

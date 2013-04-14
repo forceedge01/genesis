@@ -23,7 +23,7 @@ class Bundle extends Console {
 
         if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
-            $this->createConfig()->createRoutes()->createController()->createEntity()->createViews();
+            $this->createConfig()->createRoutes()->createController()->createEntity()->createViews()->CreateAssets();
         }
 
         echo 'Bundle ' . $this->name . ' has been created successfully!';
@@ -567,6 +567,35 @@ Router::$Route[\'' . $this->name . '_Delete\'] = array(
             fclose($handle);
 
             return $this;
+    }
+
+    private function CreateAssets(){
+
+        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name);
+        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/Images');
+        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/JS');
+        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/CSS');
+
+        $handle = fopen(ASSETS_FOLDER . 'Bundles/' . $this->name . '/JS/' . $this->name . '.js', 'w+');
+
+        $initRoute = '/* Javascript for '.$this->name.' Bundle*/
+';
+
+            fwrite($handle, $initRoute);
+
+            fclose($handle);
+
+        $handle = fopen(ASSETS_FOLDER . 'Bundles/' . $this->name . '/CSS/' . $this->name . '.css', 'w+');
+
+        $initRoute = '/* Stylesheet for '.$this->name.' Bundle*/
+
+root{
+
+}';
+
+            fwrite($handle, $initRoute);
+
+            fclose($handle);
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Router extends Debugger{
+class Router extends AppMethods{
 
     private
             $url,

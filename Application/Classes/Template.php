@@ -3,7 +3,8 @@
 class Template extends Router {
 
     private
-            $title;
+            $title,
+            $element;
 
     /**
      *
@@ -365,25 +366,19 @@ class Template extends Router {
 
     /**
      *
-     * @param type $string
-     * @return string <br>
-     * Returns string with stripped double slashes
+     * @param type $params
+     * @return string A styled string for elements
      */
-    public function stripDoubleSlashes($string){
+    public function applyStyle($params = array()){
 
-        return str_replace('//', '/', $string);
-    }
+        $style = ' style="';
 
-    /**
-     *
-     * @param mixed $param
-     * @return boolean Checks if a variable is loopable
-     */
-    public function isLoopable($param){
+        foreach($params as $key => $param){
 
-        if(isset($param) && (is_array($param) || is_object($param)))
-            return true;
-        else
-            return false;
+            $style .= "$key: $param; ";
+        }
+        $style .= '"';
+
+        return $style;
     }
 }

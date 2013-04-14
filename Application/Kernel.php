@@ -4,7 +4,7 @@ require_once __DIR__ . '/Configs/AppDirs.php';
 
 class AppKernal {
 
-    private
+    private static
             $classes = array(),
             $configs = array(),
             $controllers = array(),
@@ -12,14 +12,14 @@ class AppKernal {
             $entities = array(),
             $bundles = array();
 
-    public
+    public static
             $phpVersion,
             $msyqlVersion;
 
-    private function fetchAllBundles(){
+    private static function fetchAllBundles(){
 
         // Include your bundles here
-        
+
         $bundles = array(
 
             'Welcome',
@@ -32,52 +32,60 @@ class AppKernal {
 
         foreach($bundles as $bundle){
 
-            $this->bundles[] = $bundlesDIR . $bundle;
+            self::$bundles[] = $bundlesDIR . $bundle;
         }
 
     }
 
-    private function fetchAllClasses(){
+    private static function fetchAllClasses(){
 
         $classDir = APPLICATION_CLASSES_FOLDER;
 
-        $this->classes[] = $classDir . 'Debugger.php';
-        $this->classes[] = $classDir . 'Request.php';
-        $this->classes[] = $classDir . 'Router.php';
-        $this->classes[] = $classDir . 'HTMLGenerator.php';
-        $this->classes[] = $classDir . 'ValidationEngine.php';
-        $this->classes[] = $classDir . 'Template.php';
-        $this->classes[] = $classDir . 'phpmailer.php';
-        $this->classes[] = $classDir . 'Mailer.php';
-        $this->classes[] = $classDir . 'Application.php';
-        $this->classes[] = $classDir . 'Database.php';
-        $this->classes[] = $classDir . 'Auth.php';
-        $this->classes[] = $classDir . 'Zip.php';
-        $this->classes[] = $classDir . 'Cloner.php';
-        $this->classes[] = $classDir . 'Directory.php';
-        $this->classes[] = $classDir . 'Session.php';
+        self::$classes[] = $classDir . 'Debugger.php';
+        self::$classes[] = $classDir . 'AppMethods.php';
+        self::$classes[] = $classDir . 'Request.php';
+        self::$classes[] = $classDir . 'Router.php';
+        self::$classes[] = $classDir . 'HTMLGenerator.php';
+        self::$classes[] = $classDir . 'ValidationEngine.php';
+        self::$classes[] = $classDir . 'Template.php';
+        self::$classes[] = $classDir . 'phpmailer.php';
+        self::$classes[] = $classDir . 'Mailer.php';
+        self::$classes[] = $classDir . 'Application.php';
+        self::$classes[] = $classDir . 'Database.php';
+        self::$classes[] = $classDir . 'Auth.php';
+        self::$classes[] = $classDir . 'Zip.php';
+        self::$classes[] = $classDir . 'Cloner.php';
+        self::$classes[] = $classDir . 'Directory.php';
+        self::$classes[] = $classDir . 'Session.php';
     }
 
-    public function __construct() {
+    public static function initialize() {
 
-        $this->checkDependencies();
+        self::checkDependencies();
 
-        session_start();
+        self::loadConfigs();
 
-        $this->loadConfigs();
+        self::loadClasses();
 
-        $this->loadClasses();
+        self::loadRoutes();
 
-        $this->loadRoutes();
+        self::loadEntities();
 
-        $this->loadEntities();
+        self::loadControllers();
 
-        $this->loadControllers();
+        self::loadBundles();
 
-        $this->loadBundles();
+        $route = new Router();
+
+        if(!$route->forwardRequest()){
+
+            echo '<h1>Pattern: ' . $route->pattern . ' Not Found!!</h1>';
+
+            exit;
+        }
     }
 
-    private function fetchAllConfigs(){
+    private static function fetchAllConfigs(){
 
         $directory = APPLICATION_CONFIGS_FOLDER;
         $files = scandir($directory);
@@ -86,12 +94,12 @@ class AppKernal {
 
             if(is_file($directory . $file)){
 
-                $this->configs[] = $directory .$file;
+                self::$configs[] = $directory .$file;
             }
         }
     }
 
-    private function fetchAllRoutes(){
+    private static function fetchAllRoutes(){
 
         $directory = APPLICATION_ROUTES_FOLDER;
         $files = scandir($directory);
@@ -100,12 +108,12 @@ class AppKernal {
 
             if(is_file($directory . $file)){
 
-                $this->routes[] = $directory .$file;
+                self::$routes[] = $directory .$file;
             }
         }
     }
 
-    private function fetchAllControllers(){
+    private static function fetchAllControllers(){
 
         $directory = APPLICATION_CONTROLLERS_FOLDER;
         $files = scandir($directory);
@@ -114,12 +122,12 @@ class AppKernal {
 
             if(is_file($directory . $file)){
 
-                $this->controllers[] = $directory .$file;
+                self::$controllers[] = $directory .$file;
             }
         }
     }
 
-    private function fetchAllEntities(){
+    private static function fetchAllEntities(){
 
         $directory = APPLICATION_ENTITIES_FOLDER;
         $files = scandir($directory);
@@ -128,66 +136,64 @@ class AppKernal {
 
             if(is_file($directory . $file)){
 
-                $this->entities[] = $directory .$file;
+                self::$entities[] = $directory .$file;
             }
         }
     }
 
-    private function getClasses(){
-        return $this->classes;
+    private static function getClasses(){
+        return self::$classes;
     }
 
-    private function loadClasses(){
+    private static function loadClasses(){
 
-        $this->fetchAllClasses();
+        self::fetchAllClasses();
 
-        foreach($this->classes as $class)
+        foreach(self::$classes as $class)
             require_once $class;
     }
 
-    private function loadEntities(){
+    private static function loadEntities(){
 
-        $this->fetchAllEntities();
+        self::fetchAllEntities();
 
-        foreach($this->entities as $entity)
+        foreach(self::$entities as $entity)
             require_once $entity;
     }
 
-    private function loadConfigs(){
+    private static function loadConfigs(){
 
-        $this->fetchAllConfigs();
+        self::fetchAllConfigs();
 
-        foreach($this->configs as $config)
+        foreach(self::$configs as $config)
             require_once $config;
     }
 
-    private function loadControllers(){
+    private static function loadControllers(){
 
-        $this->fetchAllControllers();
+        self::fetchAllControllers();
 
-        foreach($this->controllers as $controller)
+        foreach(self::$controllers as $controller)
             require_once $controller;
     }
 
-    private function loadRoutes(){
+    private static function loadRoutes(){
 
-        unset($_SESSION['Routes']);
+        self::fetchAllRoutes();
 
-        $this->fetchAllRoutes();
-
-        foreach($this->routes as $route)
+        foreach(self::$routes as $route)
             require_once $route;
     }
 
-    private function loadBundles(){
+    private static function loadBundles(){
 
-        $this->fetchAllBundles();
+        self::fetchAllBundles();
 
-        foreach($this->bundles as $bundle){
+        foreach(self::$bundles as $bundle){
 
             if(is_dir($bundle)){
 
-                if($this->loadFilesFromDir($bundle . '/Configs') && $this->loadFilesFromDir($bundle . '/Routes') && $this->loadFilesFromDir($bundle . '/Controllers')){
+                if(self::loadFilesFromDir($bundle . '/Configs') && self::loadFilesFromDir($bundle . '/Routes') && self::loadFilesFromDir($bundle . '/Controllers')){
 
                     if(is_file($bundle . '/Entity.php'))
                         require_once $bundle . '/Entity.php';
@@ -224,7 +230,7 @@ class AppKernal {
 
     }
 
-    private function loadFilesFromDir($directory){
+    private static function loadFilesFromDir($directory){
 
         if(is_dir($directory)){
 
@@ -243,21 +249,10 @@ class AppKernal {
 
     }
 
-    private function checkDependencies(){
+    private static function checkDependencies(){
 
-        $this->phpVersion = phpversion();
+        self::$phpVersion = phpversion();
     }
 }
 
-$AppKernel = new AppKernal();
-
-$route = new Router();
-
-if(!$route->forwardRequest()){
-
-    echo '<h1>Pattern: ' . $route->pattern . ' Not Found!!</h1>';
-
-    exit;
-
-}
-
+AppKernal::initialize();

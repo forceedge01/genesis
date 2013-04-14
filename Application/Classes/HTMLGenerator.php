@@ -3,9 +3,10 @@
 class HTMLGenerator extends Router {
 
     private $formname; //used for saving and retrieving form from database
-    private $form, $errors = array(), $errorColor, $elements = array();
+    private $form, $errors = array(), $errorColor, $elements = array(), $element = array();
     private $name, $method, $action;
     private $host, $database, $username, $password, $link;
+
 
     function __construct($params = null) {
         $this->formname = $this->name = $params['name'];
@@ -1177,6 +1178,46 @@ class HTMLGenerator extends Router {
             }
 
         return $subject;
+    }
+
+    public function element($element = array()){
+
+        $this->element = $element;
+
+        return $this;
+    }
+
+    public function style($style = array()){
+
+        $this->style = $style;
+
+        return $this;
+    }
+
+    public function addClass($class){
+
+        $this->class = $class;
+
+        return $this;
+    }
+
+    public function id($id){
+
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function renderElement(){
+
+        $element = $this->element;
+        $element['style'] = $this->style;
+        $element['id'] = $this->id;
+        $element['class'] = $this->class;
+
+        $renderedElement = $this->add($element);
+
+        return $renderedElement;
     }
 
 }

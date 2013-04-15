@@ -2,6 +2,9 @@
 
 class AppMethods extends Debugger {
 
+    private
+        $variable;
+
     /**
      *
      * @param string $object
@@ -247,4 +250,132 @@ class AppMethods extends Debugger {
         return new $bundle[1]();
     }
 
+    public function variable($var) {
+
+        $this->variable = $var;
+
+        return $this;
+    }
+
+    public function contains(array $list) {
+
+        foreach ($list as $value) {
+
+            if (strstr($this->variable, $value))
+                return $value;
+        }
+
+        return false;
+    }
+
+    public function equals($value) {
+
+        if ($this->variable == $value)
+            return $this;
+
+        return false;
+    }
+
+    public function notEqualsTo($value) {
+
+        if ($this->variable != $value)
+            return $this;
+
+        return false;
+    }
+
+    public function jsonEncode() {
+
+        $this->variable = json_encode($this->variable);
+
+        return $this;
+    }
+
+    public function jsonDecode() {
+
+        $this->variable = json_decode($this->variable);
+
+        return $this;
+    }
+
+    public function typeCastTo($type) {
+
+        $type = strtolower($type);
+
+        switch ($type) {
+
+            case 'int':
+            case 'integer':
+                $this->variable = (int) $this->variable;
+                break;
+            case 'float':
+            case 'double':
+                $this->variable = (double) $this->variable;
+                break;
+            case 'string':
+            case 'char':
+            case 'text':
+                $this->variable = (string) $this->variable;
+                break;
+        }
+
+        return $this;
+    }
+
+    public function getResult() {
+
+        return $this->variable;
+    }
+
+    public function getType() {
+
+        return gettype($this->variable);
+    }
+
+    public function removeDoubleOccuranceOf(array $list) {
+
+        foreach ($list as $char) {
+
+            $this->variable = str_replace($char . $char, $char, $this->variable);
+        }
+
+        return $this;
+    }
+
+    public function trim(array $list) {
+
+        if (!empty($list))
+            foreach ($list as $trim) {
+
+                $this->variable = trim($this->variable, $trim);
+            }
+        else
+            $this->variable = trim($this->variable);
+
+        return $this;
+    }
+
+    public function removeFirstCharacter() {
+
+        $this->variable = substr($this->variable, 1);
+
+        return $this;
+    }
+
+    public function removeLastCharacter() {
+
+        $this->variable = substr($this->variable, 0, -1);
+
+        return $this;
+    }
+
+    public function replace(array $keyedList) {
+
+        foreach ($keyedList as $search => $replace) {
+
+            $this->variable = str_replace($search, $replace, $this->variable);
+        }
+
+        return $this;
+    }
 }

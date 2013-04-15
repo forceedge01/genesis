@@ -25,7 +25,11 @@ class Database extends Template {
         $numRows,
         $insert_id,
         $formFields,
-        $aggregateTables;
+        $aggregateTables,
+        $queryLimit,
+        $queryOrderBy,
+        $queryWhere,
+        $queryExtra;
 
     protected
         $queryMeta;
@@ -609,6 +613,10 @@ class Database extends Template {
             $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
         }
 
+        if($this->queryWhere)
+            foreach($this->queryWhere as $column => $condition)
+                $this->query .= $column . ' = ' . $condition;
+
         $limit = null;
         $order = null;
 
@@ -628,6 +636,12 @@ class Database extends Template {
 
             $this->query .= $order . $limit;
         }
+
+        if($this->queryOrderBy)
+            $this->query .= ' order by ' . $this->queryOrderBy;
+
+        if($this->queryLimit)
+            $this->query .= ' limit ' . $this->queryLimit;
 
         return $this;
     }
@@ -872,6 +886,53 @@ class Database extends Template {
     public function AggregateOnly(array $Tables){
 
         $this->aggregateTables = $Tables;
+
+        return $this;
+    }
+
+    public function select(array $list){
+
+        $this->queryColumns = $list;
+
+        return $this;
+    }
+
+    public function where(array $list){
+
+        $this->queryWhere = $list;
+
+        return $this;
+    }
+
+    public function groupBy(array $list){
+
+        $this->queryGroupBy = $list;
+
+        return $this;
+    }
+
+    public function orderBy($column){
+
+        $this->queryOrderBy = $column;
+
+        return $this;
+    }
+
+    public function limit($int){
+
+        $this->queryLimit = $int;
+
+        return $this;
+    }
+
+    public function extra(array $list){
+
+        $this->queryExtra = $list;
+    }
+
+    public function execute(){
+
+        $this->queryInit('*')->Query();
 
         return $this;
     }

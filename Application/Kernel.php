@@ -39,24 +39,37 @@ class AppKernal {
 
     private static function fetchAllClasses(){
 
+        $classes = array(
+
+            'Debugger.php',
+            'AppMethods.php',
+            'Request.php',
+            'Router.php',
+            'HTMLGenerator.php',
+            'ValidationEngine.php',
+            'Template.php',
+            'phpmailer.php',
+            'Mailer.php',
+            'Application.php',
+            'Database.php',
+            'Auth.php',
+            'Zip.php',
+            'Cloner.php',
+            'Directory.php',
+            'Session.php',
+            'Analytics.php',
+
+        );
+
         $classDir = APPLICATION_CLASSES_FOLDER;
 
-        self::$classes[] = $classDir . 'Debugger.php';
-        self::$classes[] = $classDir . 'AppMethods.php';
-        self::$classes[] = $classDir . 'Request.php';
-        self::$classes[] = $classDir . 'Router.php';
-        self::$classes[] = $classDir . 'HTMLGenerator.php';
-        self::$classes[] = $classDir . 'ValidationEngine.php';
-        self::$classes[] = $classDir . 'Template.php';
-        self::$classes[] = $classDir . 'phpmailer.php';
-        self::$classes[] = $classDir . 'Mailer.php';
-        self::$classes[] = $classDir . 'Application.php';
-        self::$classes[] = $classDir . 'Database.php';
-        self::$classes[] = $classDir . 'Auth.php';
-        self::$classes[] = $classDir . 'Zip.php';
-        self::$classes[] = $classDir . 'Cloner.php';
-        self::$classes[] = $classDir . 'Directory.php';
-        self::$classes[] = $classDir . 'Session.php';
+        foreach($classes as $class){
+
+            if(is_file($classDir . $class))
+                self::$classes[] = $classDir . $class;
+            else
+                echo '<h1>Class '.$class.' not found in kernel::fetchAllClasses</h1>';
+        }
     }
 
     public static function initialize() {

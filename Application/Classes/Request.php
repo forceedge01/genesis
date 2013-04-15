@@ -112,6 +112,11 @@ class Request extends Debugger{
             return false;
     }
 
+    public function getCookie($Name){
+
+        return $_COOKIE[$Name];
+    }
+
 
     /**
      *

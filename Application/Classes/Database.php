@@ -154,17 +154,30 @@ class Database extends Template {
      * @return boolean - true on success, false on failure<br />
      * <br />Insert a record into a table
      */
-    private function CreateRecord() {
+    private function CreateRecord($params = null) {
 
         $this->queryTables = array_reverse($this->queryTables);
+        
+        $queries = array();
+        
+        if($this->isLoopable($this->queryTables)){
+            
+            foreach ($this->queryTables as $key => $table) {
 
-        foreach ($this->queryTables as $key => $table) {
+                $this->Table($key);
 
-            $this->Table($key);
+                $params = $this->prepareForInsert($table);
+                
+                $this->pre($params);
 
-            $params = $this->prepareForInsert($table);
-
-            $queries[] = 'insert into ' . $key . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
+                $queries[] = 'insert into ' . $key . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
+            }
+        }
+        else{
+         
+            $params = $this->prepareForInsert($params);
+            
+            $queries[] = 'insert into ' . $this->queryTable . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
         }
 
         $this->queries = $queries;
@@ -206,16 +219,16 @@ class Database extends Template {
         $this->prepareForMultiQuery($params);
 
         if (!isset($params[str_replace('`', '', str_replace('.', '__', $this->queryTablePrimaryKey))]))
-            return $this->CreateRecord();
+            return $this->CreateRecord($params);
         else
-            return $this->UpdateRecord();
+            return $this->UpdateRecord($params);
     }
 
     /**
      *
      * Updates a record with multiquery
      */
-    protected function UpdateRecord() {
+    protected function UpdateRecord($params = null) {
 
         foreach ($this->queryTables as $key => $table) {
 
@@ -326,9 +339,9 @@ class Database extends Template {
                     $keys .= $key . ',';
 
                     if (is_int($value))
-                        $values .= $value . ',';
+                        $values .= mysql_real_escape_string ($value) . ',';
                     else
-                        $values .= "'" . $value . "',";
+                        $values .= "'" . mysql_real_escape_string ($value) . "',";
                 }
             }
         }
@@ -587,8 +600,25 @@ class Database extends Template {
     private function queryInit($id = null, array $params = array()) {
 
         $this->buildRelationsShipsQuery();
+        
+        $columns = $this->queryColumns;
+        
+        $this->queryColumns = null;
+        
+        if($this->isLoopable($columns)){
+                
+            foreach ($columns as $column){
+                
+                if(strstr($column, 'as'))
+                    $this->queryColumns .= $column . ',';
+                else
+                    $this->queryColumns .= $column . ' as "' . str_replace('.', '__', $column) . '",';
+                }
 
-        if (is_array($this->queryTableColumns)) {
+            $this->queryColumns = trim($this->queryColumns, ',');
+        }
+
+        else if (is_array($this->queryTableColumns)) {
 
             $columns = $this->queryTableColumns;
 
@@ -613,9 +643,14 @@ class Database extends Template {
             $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
         }
 
-        if($this->queryWhere)
-            foreach($this->queryWhere as $column => $condition)
-                $this->query .= $column . ' = ' . $condition;
+        if($this->queryWhere){
+            
+            $this->query .= ' where ';
+            
+            $params = $this->prepare($this->queryWhere);
+
+            $this->query .= $params;
+        }
 
         $limit = null;
         $order = null;
@@ -627,11 +662,12 @@ class Database extends Template {
                 if ($key == 'where')
                     $order = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
 
-                if ($key == 'order by')
+                else if ($key == 'order by')
                     $order = ' ' . $key . ' ' . (strpos($param, '.') == false ? $this->queryTable . '.' . $param : $param);
 
-                if ($key == 'limit')
+                else if ($key == 'limit')
                     $limit = ' ' . $key . ' ' . $param;
+                    
             }
 
             $this->query .= $order . $limit;
@@ -890,50 +926,60 @@ class Database extends Template {
         return $this;
     }
 
-    public function select(array $list){
+    public function Select(array $list){
 
         $this->queryColumns = $list;
 
         return $this;
     }
 
-    public function where(array $list){
+    public function Where(array $list){
 
         $this->queryWhere = $list;
 
         return $this;
     }
 
-    public function groupBy(array $list){
+    public function GroupBy(array $list){
 
         $this->queryGroupBy = $list;
 
         return $this;
     }
 
-    public function orderBy($column){
+    public function OrderBy($column){
 
         $this->queryOrderBy = $column;
 
         return $this;
     }
 
-    public function limit($int){
+    public function Limit($int){
 
         $this->queryLimit = $int;
 
         return $this;
     }
 
-    public function extra(array $list){
+    public function Extra(array $list){
 
         $this->queryExtra = $list;
+        
+        return $this;
     }
 
-    public function execute(){
+    public function Execute(){
 
         $this->queryInit('*')->Query();
 
         return $this;
+    }
+    
+    public function TableExists($tableName){
+        
+        if( $this->variable($tableName)->IsIn( $this->Query('show tables')->GetResultSet() ) )
+            return true;
+        else
+            return false;
     }
 }

@@ -10,6 +10,12 @@ class Analytics extends AppMethods {
         if (TRACK_VISITS) {
 
             $this->connection = new Database();
+            
+            if(!$this->connection->TableExists('Tracks')){
+                
+                echo 'Table Tracks not found in database '.DBNAME.', cannot record tracks.';
+                exit;
+            }
         }
         else
             echo 'Tracking is disabled in configs but is being instantialized in application.';
@@ -21,7 +27,7 @@ class Analytics extends AppMethods {
      * For this function to work you need to enable tracks in the analytics config<br>
      * and Create a table 'Tracks' in your database with the following definition<br><br>
      * id int(11) AUTO_INCREMENT<br>
-     * IpAddress varchar(20)<br>
+     * IpAddress varchar(30)<br>
      * page varchar (100)<br>
      * userAgent varchar (150)<br>
      * time TIMESTAMP<br>
@@ -29,48 +35,47 @@ class Analytics extends AppMethods {
      */
     public function recordTrack() {
 
-        if (TRACK_VISITS) {
+        if (IGNORE_IP_ADDRESS)
+            if ($this->variable ($_SERVER['REMOTE_ADDR'])->equals(IGNORE_IP_ADDRESS))
+                return false;
 
-            if (IGNORE_IP_ADDRESS)
-                if ($_SERVER['REMOTE_ADDR'] == IGNORE_IP_ADDRESS)
-                    return false;
+        if (!$this->variable($_SERVER['HTTP_USER_AGENT'])->IsIn($this->bots())) {
 
-            if (!$this->variable($_SERVER['HTTP_USER_AGENT'])->contains($this->bots())) {
+            $request = new Request();
 
-                $request = new Request();
+            if (!$request->getCookie('newUser')) {
 
-                if ($request->getCookie('newUser')) {
+                $this->connection->Table('Tracks')->SaveRecord(
+                        
+                        array(
+                            'ipAddress' => $_SERVER['REMOTE_ADDR'],
+                            'page' => $_SERVER['REQUEST_URI'],
+                            'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+                            'time' => date('Y-m-d H:i:s'),
+                            'unq' => '1',
+                        )
+                );
+            } else if (!TRACK_UNIQUE_VISITS_ONLY) {
 
-                    $this->connection->Table('Tracks')->SaveRecord(
-                            array(
-                                'IpAddress' => $_SERVER['REMOTE_ADDR'],
-                                'page' => $_SERVER['SCRIPT_URI'],
-                                'userAgent' => $_SERVER['HTTP_USER_AGENT'],
-                                'time' => time(),
-                                'unique' => '1',
-                            )
-                    );
-                } else if (!TRACK_UNIQUE_VISITS_ONLY) {
+                $this->connection->Table('Tracks')->SaveRecord(
+                        
+                        array(
+                            'ipAddress' => $_SERVER['REMOTE_ADDR'],
+                            'page' => $_SERVER['REQUEST_URI'],
+                            'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+                            'time' => date('Y-m-d H:i:s'),
+                            'unq' => '0',
+                        )
+                );
+            }
 
-                    $this->connection->Table('Tracks')->SaveRecord(
-                            array(
-                                'IpAddress' => $_SERVER['REMOTE_ADDR'],
-                                'page' => $_SERVER['SCRIPT_URI'],
-                                'userAgent' => $_SERVER['HTTP_USER_AGENT'],
-                                'time' => time(),
-                                'unique' => '0',
-                            )
-                    );
-                }
+            $insert_id = $this->connection->GetInsertID();
 
-                $insert_id = $this->connection->GetInsertID();
+            $request->setCookie('newUser', true);
 
-                $request->setCookie('newUser', true);
+            if ($insert_id) {
 
-                if ($insert_id) {
-
-                    return $insert_id;
-                }
+                return $insert_id;
             }
         }
 
@@ -79,47 +84,47 @@ class Analytics extends AppMethods {
 
     public function getTrack($id) {
 
-        $this->connection->Table('Tracks')->GetAll($id);
+        return $this->connection->Table('Tracks')->GetRecordBy($id)->GetResultSet();
     }
 
     public function getTracks() {
 
-        $this->connection->Table('Tracks')->GetRecords();
+        return $this->connection->Table('Tracks')->GetRecords()->GetResultSet();
     }
 
-    public function getTracksFromIp($ip) {
+    public function getTracksByIp($ip) {
 
-        $this->connection->Table('Tracks')->GetRecordBy(array('IP' => $ip));
+        return $this->connection->Table('Tracks')->GetRecordBy(array('ipAddress' => $ip))->GetResultSet();
     }
 
-    public function getTracksFromBrowserType($browser) {
+    public function getTracksByBrowser($browser) {
 
-        $this->connection->Table('Tracks')->GetRecords(array('userAgent' => $browser));
+        return $this->connection->Table('Tracks')->Where(array('userAgent' => $browser))->GetRecords()->GetResultSet();
     }
 
     public function getTrackBrowserReport() {
 
-        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'userAgent'))->groupBy(array('userAgent'))->orderBy('Hits desc')->extra(array('distinct'))->execute()->GetResultSet();
+        return $this->connection->Table('Tracks')->Select(array('count(id) as HITS', 'userAgent'))->GroupBy(array('userAgent'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
     public function getTrackIpReport() {
 
-        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'IpAddress'))->groupBy(array('IpAddress'))->orderBy('Hits desc')->extra(array('distinct'))->execute()->GetResultSet();
+        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'IpAddress'))->GroupBy(array('IpAddress'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
     public function getTrackPageReport() {
 
-        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->groupBy(array('page'))->orderBy('Hits desc')->extra(array('distinct'))->execute()->GetResultSet();
+        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->groupBy(array('page'))->orderBy('Hits desc')->extra(array('distinct'))->Execute()->GetResultSet();
     }
 
     public function getUniqueVisits() {
 
-        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->where(array('unique' => 1))->groupBy(array('page'))->orderBy('Hits desc')->extra(array('distinct'))->execute()->GetResultSet();
+        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->Where(array('unq' => 1))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->execute()->GetResultSet();
     }
 
     public function getTotalVisits() {
 
-        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->groupBy(array('page'))->orderBy('Hits desc')->extra(array('distinct'))->execute()->GetResultSet();
+        return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
     private function bots() {

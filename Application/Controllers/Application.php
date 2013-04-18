@@ -6,7 +6,9 @@ class ApplicationController extends Application{
         
         parent::__construct();
         
-        $this->prex($this->getObject('Analytics')->getTotalVisits());
+        $this->getObject('Analytics')->recordTrack();
+        
+        $this->getObject('Analytics')->getTrackReport();
     }
 
     public function indexAction(){

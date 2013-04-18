@@ -312,6 +312,13 @@ class AppMethods extends Debugger {
                 }
             }
         }
+        else{
+            
+            if (strstr($list, $this->variable)){
+
+                $flag = true;
+            }
+        }
             
         return $flag;
     }

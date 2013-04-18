@@ -1,6 +1,6 @@
 <?php
 
-class testBundleController extends Application{
+class testBundleController extends ApplicationController{
 
       public function indexAction(){
 
@@ -88,7 +88,7 @@ class testBundleController extends Application{
 
           $testBundle = new testBundle();
 
-            if($this->isPost("submit")){
+            if($this->Request->isPost("submit")){
 
               if($testBundle->Save())
                   $this->setFlash(array("Success" => "Create successful."));

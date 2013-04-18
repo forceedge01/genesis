@@ -3,18 +3,38 @@
 class Analytics extends AppMethods {
 
     private
-            $connection;
+            $connection,
+            $request;
 
     public function __construct() {
+        
+        $this->request = new Request();
 
-        if (TRACK_VISITS) {
-
+        if (ANALYTICS_TRACK_VISITS) {
+            
             $this->connection = new Database();
             
-            if(!$this->connection->TableExists('Tracks')){
-                
-                echo 'Table Tracks not found in database '.DBNAME.', cannot record tracks.';
-                exit;
+            if(!$this->request->getCookie('visitIdentifier')){
+
+                if(!$this->connection->TableExists('Tracks')){
+
+                    echo 'Table Tracks not found in database '.DBNAME.', cannot record tracks. Please create table using this definition: <br /><br />
+                        CREATE TABLE `Tracks` IF NOT EXISTS (<br />
+
+                        id INT NOT NULL AUTO_INCREMENT,<br />
+                        page VARCHAR (30),<br />
+                        userAgent VARCHAR (100),<br />
+                        time TIMESTAMP,<br />
+                        referrerPage TEXT<br />
+                        unq INT (1),<br />
+                        ref VARCHAR (30),<br />
+                        PRIMARY KEY (id)<br />
+
+                        );<br /><br />
+
+                        CREATE INDEX reference ON Tracks (ref);';
+                    exit;
+                }
             }
         }
         else
@@ -23,55 +43,73 @@ class Analytics extends AppMethods {
 
     /**
      *
-     * @return mixed bool if false, otherwise the id of the track made
-     * For this function to work you need to enable tracks in the analytics config<br>
-     * and Create a table 'Tracks' in your database with the following definition<br><br>
-     * id int(11) AUTO_INCREMENT<br>
-     * IpAddress varchar(30)<br>
-     * page varchar (100)<br>
-     * userAgent varchar (150)<br>
-     * time TIMESTAMP<br>
-     * unique int(1)
+     * @return mixed bool if false, otherwise the id of the track made.
+     * Records a track (visit) from a user.
      */
-    public function recordTrack() {
+    public function recordTrack($OptionalReferenceId = null) {
 
-        if (IGNORE_IP_ADDRESS)
-            if ($this->variable ($_SERVER['REMOTE_ADDR'])->equals(IGNORE_IP_ADDRESS))
+        if (ANALYTICS_IGNORE_IP_ADDRESS)
+            if ($this->variable ($_SERVER['REMOTE_ADDR'])->equals(ANALYTICS_IGNORE_IP_ADDRESS))
                 return false;
 
         if (!$this->variable($_SERVER['HTTP_USER_AGENT'])->IsIn($this->bots())) {
+            
+            //Record for unqiue vists
+            if (!$this->request->getCookie('visitIdentifier')) {
+                
+                if(!$this->connection->Table('Tracks')->RecordExists(array('ipAddress' => $_SERVER['REMOTE_ADDR']))){
 
-            $request = new Request();
+                    $this->connection->Table('Tracks')->SaveRecord(
 
-            if (!$request->getCookie('newUser')) {
-
-                $this->connection->Table('Tracks')->SaveRecord(
-                        
                         array(
                             'ipAddress' => $_SERVER['REMOTE_ADDR'],
-                            'page' => $_SERVER['REQUEST_URI'],
+                            'page' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
                             'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+                            'referrerPage' => mysql_real_escape_string(@$_SERVER['HTTP_REFERER']),
                             'time' => date('Y-m-d H:i:s'),
                             'unq' => '1',
+                            'ref' => $OptionalReferenceId,
                         )
-                );
-            } else if (!TRACK_UNIQUE_VISITS_ONLY) {
+                    );
+                }
+                
+                //Record for non-unique vistis
+                else if (!ANALYTICS_TRACK_UNIQUE_VISITS_ONLY) {
 
-                $this->connection->Table('Tracks')->SaveRecord(
-                        
+                    $this->connection->Table('Tracks')->SaveRecord(
+
                         array(
                             'ipAddress' => $_SERVER['REMOTE_ADDR'],
-                            'page' => $_SERVER['REQUEST_URI'],
+                            'page' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
                             'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+                            'referrerPage' => '',
                             'time' => date('Y-m-d H:i:s'),
                             'unq' => '0',
+                            'ref' => $OptionalReferenceId
                         )
+                    );
+                }
+            }
+            
+            //Record insite Track
+            else if (ANALYTICS_RECORD_INSITE_TRACKS && $this->request->isCookie ('lastVisitedURL') && $this->request->getCookie('lastVisitedURL') != $_SERVER['HTTP_REFERER'] && $this->variable($_SERVER['HTTP_HOST'])->isIn($_SERVER['HTTP_REFERER'])){
+                                
+                $this->connection->Table('Tracks')->SaveRecord(
+
+                    array(
+
+                        'id' => $this->request->getCookie('visitIdentifier'),
+                        'referrerPage' => 'CONCAT('.DBNAME.'.Tracks.referrerPage, "|'.str_replace('http://'.$_SERVER['HTTP_HOST'], '', mysql_real_escape_string($_SERVER['HTTP_REFERER'])).'=>'.mysql_real_escape_string($_SERVER['REQUEST_URI']).'" )'
+                    )
                 );
             }
 
             $insert_id = $this->connection->GetInsertID();
-
-            $request->setCookie('newUser', true);
+            
+            if($insert_id)
+                $this->request->setCookie('visitIdentifier', $insert_id);
+            
+            $this->request->setCookie('lastVisitedURL', $_SERVER['HTTP_REFERER']);
 
             if ($insert_id) {
 
@@ -125,6 +163,51 @@ class Analytics extends AppMethods {
     public function getTotalVisits() {
 
         return $this->connection->Table('Tracks')->select(array('count(id) as Hits', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
+    }
+    
+    public function getTrackReport(){
+        
+        $page = $this->connection->Table('Tracks')->select(array('id','page', 'referrerPage'))->GroupBy(array('page'))->OrderBy('id')->Execute()->GetFirstResult();
+        
+        $chunks = explode('|', $page->referrerPage);
+        
+        $siteMap = array();
+        
+        $siteMap['numberOfPagesVisited'] = count($chunks);
+        $siteMap['LeastVisitedPage']['Count'] = 10000000;
+        $siteMap['MostVisitedPage']['Count'] = 0;
+        
+        foreach($chunks as $chunk){
+            
+            $page = explode('=>', $chunk);
+            
+            if(!empty($page[0])){
+                
+                $siteMap['Pages'][$page[1]]['VisitsFrom'][$page[0]] += 1;
+            }
+        }
+        
+        foreach($siteMap['Pages'] as $key => $counts){
+            
+            foreach($counts['VisitsFrom'] as $count){
+                
+                $siteMap['Pages'][$key]['Count'] += $count;
+                
+                if($count < $siteMap['LeastVisitedPage']['Count']){
+                
+                    $siteMap['LeastVisitedPage']['Count'] = $count;
+                    $siteMap['LeastVisitedPage']['Page'] = $key;
+                }
+
+                if($count > $siteMap['MostVisitedPage']['Count']){
+
+                    $siteMap['MostVisitedPage']['Count'] = $count;
+                    $siteMap['MostVisitedPage']['Page'] = $key;
+                }
+            }
+        }
+        
+        $this->pre($siteMap);
     }
 
     private function bots() {

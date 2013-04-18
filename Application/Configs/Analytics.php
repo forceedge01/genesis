@@ -1,9 +1,11 @@
 <?php
 
-define('TRACK_VISITS', true);
+define('ANALYTICS_TRACK_VISITS', true);
 
-define('TRACK_UNIQUE_VISITS_ONLY', true);
+define('ANALYTICS_TRACK_UNIQUE_VISITS_ONLY', false);
 
-define('IGNORE_IP_ADDRESS', '::1');
+define('ANALYTICS_IGNORE_IP_ADDRESS', '::11');
 
-define('ENABLE_BOT_TRAP', true);
+define('ANALYTICS_RECORD_INSITE_TRACKS', true);
+
+define('ANALYTICS_ENABLE_BOT_TRAP', true);

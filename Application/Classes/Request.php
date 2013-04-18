@@ -113,8 +113,19 @@ class Request extends Debugger{
     }
 
     public function getCookie($Name){
-
-        return $_COOKIE[$Name];
+        
+        if(isset($_COOKIE[$Name]))
+            return $_COOKIE[$Name];
+        else
+            return false;
+    }
+    
+    public function isCookie($Name){
+        
+        if(isset($_COOKIE[$Name]))
+            return $this;
+        else
+            return false;
     }
 
 

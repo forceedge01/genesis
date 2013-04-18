@@ -91,8 +91,10 @@ class Database extends Template {
 
                 if (!empty($this->activeConnection->error)) {
 
+                    $backtrace = debug_backtrace();
+
                     if (SHOW_DATABASE_ERRORS)
-                        $this->setError('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' . $sql);
+                        $this->setError('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' . $sql . '<br /><br />BACKTRACE:<pre>'.  print_r($backtrace[1], true) . '</pre>');
 
                     if (MAIL_DATABASE_ERROR) {
 
@@ -118,15 +120,15 @@ class Database extends Template {
 
                     if (is_object($result))
                         $this->numRows = $result->num_rows;
-                    
+
                     $this->rowsAffected = $this->activeConnection->affected_rows;
-                    
+
                     if (is_numeric($this->activeConnection->insert_id) && $this->activeConnection->insert_id != 0) {
 
                         $this->insert_id = $this->activeConnection->insert_id;
-                    } 
+                    }
                     else if (@$result->num_rows > 0) {
-                        
+
                         while ($row = $result->fetch_object()) {
 
                             $this->queryResult[] = $row;
@@ -155,26 +157,24 @@ class Database extends Template {
     private function CreateRecord($params = null) {
 
         $this->queryTables = array_reverse($this->queryTables);
-        
+
         $queries = array();
-        
+
         if($this->isLoopable($this->queryTables)){
-            
+
             foreach ($this->queryTables as $key => $table) {
 
                 $this->Table($key);
 
                 $params = $this->prepareForInsert($table);
-                
-                $this->pre($params);
 
                 $queries[] = 'insert into ' . $key . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
             }
         }
         else{
-         
+
             $params = $this->prepareForInsert($params);
-            
+
             $queries[] = 'insert into ' . $this->queryTable . ' (' . $params['keys'] . ') values (' . $params['values'] . ')';
         }
 
@@ -215,7 +215,7 @@ class Database extends Template {
             $params = $_REQUEST;
 
         $this->prepareForMultiQuery($params);
-        
+
         $unquotedString = str_replace('`', '', $this->queryTablePrimaryKey);
 
         if (!isset($params[str_replace('.', '__', $unquotedString)]) && !isset($params[str_replace($this->queryTable . '.', '', $unquotedString)]))
@@ -231,7 +231,7 @@ class Database extends Template {
     protected function UpdateRecord($params = null) {
 
         if($this->isLoopable($this->queryTables)){
-            
+
             foreach ($this->queryTables as $key => $table) {
 
                 $this->Table($key);
@@ -244,16 +244,16 @@ class Database extends Template {
             }
         }
         else{
-            
+
             $pkey = $params[$this->GetRawFieldName($this->queryTablePrimaryKey)];
-            
+
             $params = $this->prepare($params, 'update');
-            
+
             $queries[] = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTablePrimaryKey . ' = ' . $pkey;
         }
 
         $this->queries = $queries;
-        
+
         if ($this->multiQuery())
             return $this;
         else
@@ -268,9 +268,9 @@ class Database extends Template {
 
         return str_replace('`', '', end(explode('.', $key)));
     }
-    
+
     protected function GetRawFieldName($key){
-        
+
         return str_replace($this->queryTable . '.', '', (str_replace('`', '', $key)));
     }
 
@@ -315,16 +315,19 @@ class Database extends Template {
                 if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)) {
 
                     $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
-                    
+
                     $mysqlFunctions = array(
+
                       'CONCAT(',
                       'SUM(',
-                      'COUNT('
+                      'COUNT(',
+                      'DISTINCT(',
+                      'MAX('
                     );
 
                     if (is_numeric($value))
                         $query .= $value . ($type == 'update' ? ',' : ' AND ');
-                    else if($this->variable($value)->IsContainedBy($mysqlFunctions))
+                    else if($this->variable($value)->has($mysqlFunctions))
                         $query .= $value . ($type == 'update' ? ',' : ' AND ');
                     else
                         $query .= "'" . $value . "' " . ($type == 'update' ? ',' : ' AND ');
@@ -619,22 +622,21 @@ class Database extends Template {
     private function queryInit($id = null, array $params = array()) {
 
         $this->buildRelationsShipsQuery();
-        
+
         $columns = $this->queryColumns;
-        
+
         $this->queryColumns = null;
-        
-        if($this->isLoopable($columns)){
-                
+
+        if($this->isLoopable($columns) && $columns[0] != '*'){
+
             foreach ($columns as $column){
-                
+
                 if(strstr($column, 'as'))
                     $this->queryColumns .= $column . ',';
                 else
                     $this->queryColumns .= $column . ' as "' . str_replace('.', '__', $column) . '",';
-                }
+            }
 
-            $this->queryColumns = trim($this->queryColumns, ',');
         }
 
         else if (is_array($this->queryTableColumns)) {
@@ -646,10 +648,18 @@ class Database extends Template {
             foreach ($columns as $column)
                 $this->queryColumns .= $column->Field . ' as "' . str_replace('.', '__', $column->Field) . '",';
 
-            $this->queryColumns = trim($this->queryColumns, ',');
         }
 
-        $this->query = 'select ' . $this->queryColumns . ' from ' . $this->queryTable . ' ' . $this->queryJoinClause;
+        $this->queryColumns = trim($this->queryColumns, ',');
+
+        $extras = '';
+
+        foreach($this->queryExtra as $extra){
+
+            $extras .= $extra;
+        }
+
+        $this->query = "select {$extras} {$this->queryColumns} from {$this->queryTable} {$this->queryJoinClause}";
 
         if (is_array($id)) {
 
@@ -663,9 +673,9 @@ class Database extends Template {
         }
 
         if($this->queryWhere){
-            
+
             $this->query .= ' where ';
-            
+
             $params = $this->prepare($this->queryWhere);
 
             $this->query .= $params;
@@ -686,7 +696,7 @@ class Database extends Template {
 
                 else if ($key == 'limit')
                     $limit = ' ' . $key . ' ' . $param;
-                    
+
             }
 
             $this->query .= $order . $limit;
@@ -983,7 +993,7 @@ class Database extends Template {
     public function Extra(array $list){
 
         $this->queryExtra = $list;
-        
+
         return $this;
     }
 
@@ -993,17 +1003,17 @@ class Database extends Template {
 
         return $this;
     }
-    
+
     public function TableExists($tableName){
-        
+
         if( $this->variable($tableName)->IsIn( $this->Query('show tables')->GetResultSet() ) )
             return true;
         else
             return false;
     }
-    
+
     public function RecordExists(array $params){
-        
+
         if($this->queryInit($params)->Query()->GetNumberOfRows() > 0)
             return true;
         else

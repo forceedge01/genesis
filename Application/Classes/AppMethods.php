@@ -258,13 +258,13 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @param loopable (array, object) $list
      * @return mixed
-     * Finds the variable in the list 
+     * Finds the variable in the list
      */
-    public function IsContainedBy($list) {
-        
+    public function has($list) {
+
         if($this->isLoopable($list))
             foreach ($list as $value) {
 
@@ -277,34 +277,34 @@ class AppMethods extends Debugger {
 
         return false;
     }
-    
+
     /**
-     * 
+     *
      * @param loopable (array, object) $list
      * @return mixed
      * Finds the variable in the list
      */
     public function IsIn($list, $flag = false) {
-        
+
         if($flag)
             return true;
-        
+
         if($this->isLoopable($list)){
-            
+
             $flag = false;
-            
+
             foreach ($list as $value) {
 
                 if($this->isLoopable($value)){
-                    
+
                     $flag = $this->IsIn ($value, $flag);
-                    
+
                     if($flag)
                         return true;
-                    
+
                 }
                 else{
-                    
+
                     if (strstr($value, $this->variable)){
 
                         $flag = true;
@@ -313,13 +313,13 @@ class AppMethods extends Debugger {
             }
         }
         else{
-            
+
             if (strstr($list, $this->variable)){
 
                 $flag = true;
             }
         }
-            
+
         return $flag;
     }
 

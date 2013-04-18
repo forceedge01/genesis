@@ -6,6 +6,8 @@ define('ANALYTICS_TRACK_UNIQUE_VISITS_ONLY', false);
 
 define('ANALYTICS_IGNORE_IP_ADDRESS', '::11');
 
+define('ANALYTICS_TRACK_TABLE', 'Tracks');
+
 define('ANALYTICS_RECORD_INSITE_TRACKS', true);
 
 define('ANALYTICS_ENABLE_BOT_TRAP', true);

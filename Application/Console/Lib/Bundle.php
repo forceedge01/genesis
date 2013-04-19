@@ -199,11 +199,11 @@ class ' . $this->name . ' extends ApplicationEntity{
 
     private function createViews(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Templates');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Views');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/' . 'Header.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Header.html.php', 'w+');
 
         $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>';
 
@@ -211,7 +211,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/' . 'Footer.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Footer.html.php', 'w+');
 
         $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>';
 
@@ -219,7 +219,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/list.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/list.html.php', 'w+');
 
         $initTemplate = '<div class="wrapper">
 
@@ -237,7 +237,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/view.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/view.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -255,7 +255,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/create.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/create.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -273,7 +273,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Templates/ControllerViews/edit.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/edit.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 

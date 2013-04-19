@@ -22,7 +22,7 @@ define('CLASSES_FOLDER', APPLICATION_FOLDER . 'Classes/');
 
 define('SOURCE_FOLDER', ROOT . 'Source/');
 
-define('TEMPLATES_FOLDER', ROOT . 'Templates/');
+define('TEMPLATES_FOLDER', APPLICATION_FOLDER . 'Views/');
 
 define('ERRORS_TEMPLATES_FOLDER', TEMPLATES_FOLDER . 'Error_Pages/');
 

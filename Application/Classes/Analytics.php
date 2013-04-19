@@ -66,7 +66,7 @@ class Analytics extends AppMethods {
                             'page' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
                             'userAgent' => mysql_real_escape_string($_SERVER['HTTP_USER_AGENT']),
                             'referer' => mysql_real_escape_string(@$_SERVER['HTTP_REFERER']),
-                            'insiteActivity' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
+                            'insiteActivity' => ':',
                             'time' => date('Y-m-d H:i:s'),
                             'unq' => '1',
                             'ref' => $OptionalReferenceId,
@@ -84,7 +84,7 @@ class Analytics extends AppMethods {
                             'page' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
                             'userAgent' => mysql_real_escape_string($_SERVER['HTTP_USER_AGENT']),
                             'referer' => mysql_real_escape_string(@$_SERVER['HTTP_REFERER']),
-                            'insiteActivity' => mysql_real_escape_string($_SERVER['REQUEST_URI']),
+                            'insiteActivity' => ':',
                             'time' => date('Y-m-d H:i:s'),
                             'unq' => '0',
                             'ref' => $OptionalReferenceId
@@ -163,6 +163,16 @@ class Analytics extends AppMethods {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
+    
+    public function getBounces(){
+        
+        return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Bounces', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Where(array('insiteActivity' => ':'))->Execute()->GetResultSet();
+    }
+    
+    public function getNumberOfBounces(){
+        
+        return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Bounces', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Where(array('insiteActivity' => ':'))->Execute()->GetNumberOfRows();
+    }
 
     public function getTrackStatistics(){
 
@@ -171,12 +181,20 @@ class Analytics extends AppMethods {
         $siteMap = array();
         
         $Visits = count($tracks);
+        
+        $tracks['Bounces'] = 0;
+        $tracks['totalPageViews'] = 0;
+        $tracks['totalUniquePageViews'] = 0;
+        $tracks['totalUniqueVisits'] = 0;        
 
         foreach($tracks as $track){
 
             $chunks = explode('->', $track->insiteActivity);
             
-            unset($chunks[0]);
+            if(isset($chunks[1]))
+                unset($chunks[0]);
+            else
+                $tracks['Bounces'] += 1;
 
             foreach($chunks as $chunk){
 

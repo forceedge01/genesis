@@ -389,11 +389,22 @@ class AppMethods extends Debugger {
         return $this->variable;
     }
 
+    /**
+     * 
+     * @return type
+     * Gets the type of the variable
+     */
     public function getType() {
 
         return gettype($this->variable);
     }
 
+    /**
+     * 
+     * @param array $list
+     * @return \AppMethods
+     * Removed double occurance of substrings provided in the array
+     */
     public function removeDoubleOccuranceOf(array $list) {
 
         foreach ($list as $char) {
@@ -417,6 +428,11 @@ class AppMethods extends Debugger {
         return $this;
     }
 
+    /**
+     * 
+     * @return \AppMethods
+     * Remove first character from the variable
+     */
     public function removeFirstCharacter() {
 
         $this->variable = substr($this->variable, 1);
@@ -424,6 +440,11 @@ class AppMethods extends Debugger {
         return $this;
     }
 
+    /**
+     * 
+     * @return \AppMethods
+     * Remove last character from the variable
+     */
     public function removeLastCharacter() {
 
         $this->variable = substr($this->variable, 0, -1);
@@ -431,6 +452,12 @@ class AppMethods extends Debugger {
         return $this;
     }
 
+    /**
+     * 
+     * @param array $keyedList
+     * @return \AppMethods
+     * Replace multiple keywords provided in a keyed array
+     */
     public function replace(array $keyedList) {
 
         foreach ($keyedList as $search => $replace) {

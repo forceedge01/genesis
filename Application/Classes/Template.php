@@ -52,14 +52,8 @@ class Template extends Router {
 
             if (is_file($templateURL)) {
 
-                $type = '_Public/';
-                if (strpos($template, '_Private') > -1) $type = '_Private/';
-                else if (strpos($template, '_Protected') > -1) $type = '_Protected/';
-
                 require_once TEMPLATES_FOLDER . 'Header.html.php';
-                require_once TEMPLATES_FOLDER . $type . 'Header.html.php';
                 require_once $templateURL;
-                require_once TEMPLATES_FOLDER . $type . 'Footer.html.php';
                 require_once TEMPLATES_FOLDER . 'Footer.html.php';
             }
             else
@@ -128,7 +122,6 @@ class Template extends Router {
             $this->templateNotFound ($templateURL);
 
             exit;
-
         }
 
         ob_start();

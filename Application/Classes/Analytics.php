@@ -101,7 +101,7 @@ class Analytics extends AppMethods {
                     array(
 
                         'id' => $this->request->getCookie('visitIdentifier'),
-                        'insiteActivity' => 'CONCAT('.DBNAME.'.Tracks.insiteActivity, "->'.mysql_real_escape_string($_SERVER['REQUEST_URI']).'" )'
+                        'insiteActivity' => 'CONCAT('.DBNAME.'.Tracks.insiteActivity, "->'.mysql_real_escape_string($_SERVER['REQUEST_URI']).'('.time().')" )'
                     )
                 );
             }
@@ -164,54 +164,103 @@ class Analytics extends AppMethods {
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
-    public function getTrackReport(){
+    public function getTrackStatistics(){
 
-        $tracks = $this->connection->Query('select id, page, referer, insiteActivity from '.ANALYTICS_TRACK_TABLE)->GetResultSet();
-
-        $this->pre($tracks);
+        $tracks = $this->connection->Query('select id, ipAddress, page, referer, insiteActivity, unq, date, userAgent, ref from '.ANALYTICS_TRACK_TABLE)->GetResultSet();
 
         $siteMap = array();
+        
+        $Visits = count($tracks);
 
         foreach($tracks as $track){
 
             $chunks = explode('->', $track->insiteActivity);
-
-            $siteMap['numberOfPagesVisited'] = count($chunks);
-            $siteMap['LeastVisitedPage']['Count'] = 10000000;
-            $siteMap['MostVisitedPage']['Count'] = 0;
+            
+            unset($chunks[0]);
 
             foreach($chunks as $chunk){
 
-                $page = explode('=>', $chunk);
+                $page = explode('(', $chunk);
 
-                if(!empty($page[0])){
-
-                    $siteMap['Pages'][$page[1]]['VisitsFrom'][$page[0]] += 1;
+                if(!empty($page[1])){
+                    
+                    $siteMap['PageViews'] += 1;
+                    $siteMap['Pages']['VisitsFrom'][$page[0]]['Count'] += 1;
+                    $siteMap['Pages']['VisitsFrom'][$page[0]]['Time'][] = array(
+                        
+                        'TimeStamp' => $this->variable($page[1])->removeLastCharacter()->getVariableResult(),
+                        'Date' => date('Y-m-d H:i:s', $this->variable($page[1])->removeLastCharacter()->getVariableResult()),
+                    );
                 }
             }
+            
+            $siteMap['UniquePageViews'] = count($siteMap['Pages']['VisitsFrom']);
 
             foreach($siteMap['Pages'] as $key => $counts){
 
                 foreach($counts['VisitsFrom'] as $count){
 
                     $siteMap['Pages'][$key]['Count'] += $count;
-
-                    if($count < $siteMap['LeastVisitedPage']['Count']){
-
-                        $siteMap['LeastVisitedPage']['Count'] = $count;
-                        $siteMap['LeastVisitedPage']['Page'] = $key;
-                    }
-
-                    if($count > $siteMap['MostVisitedPage']['Count']){
-
-                        $siteMap['MostVisitedPage']['Count'] = $count;
-                        $siteMap['MostVisitedPage']['Page'] = $key;
-                    }
                 }
             }
+            
+            $track->insiteActivity = $siteMap;
+            
+            $tracks['totalPageViews'] += $track->insiteActivity['PageViews'];
+            $tracks['totalUniquePageViews'] += $track->insiteActivity['UniquePageViews'];
+            $tracks['totalUnqiueVisits'] += $track->unq;
         }
+        
+        $tracks['totalvisits'] = $Visits;
 
-//        $this->pre($siteMap);
+        return $tracks;
+    }
+    
+    public function getTrackSiteMap(){
+        
+        $tracks = $this->connection->Query('select id, ipAddress, page, referer, insiteActivity, unq, date, userAgent, ref from '.ANALYTICS_TRACK_TABLE)->GetResultSet();
+        
+        $siteMap = array();
+        
+        foreach($tracks as $track){
+            
+            $chunks = explode('->', $track->insiteActivity);
+            $pages = array();
+            unset($chunks[0]);
+            
+            $index = 0;
+            
+            foreach($chunks as $page){
+                
+                $p = explode('(', $page);
+                
+                $pages[$index] = array(
+                    
+                    'view' => $p[0],
+                    'time' => $this->variable($p[1])->removeLastCharacter()->getVariableResult(),
+                );
+                
+                if($index > 0){
+                    
+                    $pages[($index-1)]['intervalSeconds'] = ($pages[$index]['time'] - $pages[($index-1)]['time'])/10;
+                }
+                
+                $index++;
+            }
+            
+            $siteMap[] = array(
+                
+                'ipAddress' => $track->ipAddress,
+                'Referer' => $track->referer,
+                'date' => $track->date,
+                'Unique' => $this->unq,
+                'Browser' => $track->userAgent,
+                'ref' => $track->ipAddress,                
+                'Visit' => $pages
+            );
+        }
+        
+        return $siteMap;
     }
 
     private function bots() {

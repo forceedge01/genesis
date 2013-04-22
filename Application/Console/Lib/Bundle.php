@@ -55,8 +55,15 @@ class Bundle extends Console {
             $bundleName = $this->name;
 
         if(!empty($bundleName))
-            if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
+            if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName)){
+                
+                if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName)){
+                    
+                    $this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName);
+                }
+                
                 echo 'Bundle has been deleted successfully.';
+            }
             else
                 echo 'Unable to delete bundle.';
         else
@@ -205,7 +212,10 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Header.html.php', 'w+');
 
-        $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>';
+        $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>
+
+<?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
+';
 
         fwrite($handle, $initTemplate);
 
@@ -213,7 +223,10 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Footer.html.php', 'w+');
 
-        $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>';
+        $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>
+            
+<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
+';
 
         fwrite($handle, $initTemplate);
 
@@ -571,31 +584,42 @@ Router::$Route[\'' . $this->name . '_Delete\'] = array(
 
     private function CreateAssets(){
 
-        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name);
-        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/Images');
-        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/JS');
-        mkdir(ASSETS_FOLDER . 'Bundles/' . $this->name . '/CSS');
+        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name);
+        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/Images');
+        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/JS');
+        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/CSS');
 
-        $handle = fopen(ASSETS_FOLDER . 'Bundles/' . $this->name . '/JS/' . $this->name . '.js', 'w+');
+        $handle = fopen(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/JS/' . $this->name . '.js', 'w+');
 
-        $initRoute = '/* Javascript for '.$this->name.' Bundle*/
+        $initRoute = '/* Javascript for '.$this->name.' Bundle */
+
+jQuery(document).ready(function(){
+
+    
+
+});
+
 ';
 
             fwrite($handle, $initRoute);
 
             fclose($handle);
 
-        $handle = fopen(ASSETS_FOLDER . 'Bundles/' . $this->name . '/CSS/' . $this->name . '.css', 'w+');
+        $handle = fopen(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/CSS/' . $this->name . '.css', 'w+');
 
-        $initRoute = '/* Stylesheet for '.$this->name.' Bundle*/
+        $initRoute = '/* Stylesheet for '.$this->name.' Bundle */
 
 root{
-
+    font-size: 12px;
+    font-family: verdana;
+    color: black;
 }';
 
             fwrite($handle, $initRoute);
 
             fclose($handle);
+            
+            return $this;
     }
 
 }

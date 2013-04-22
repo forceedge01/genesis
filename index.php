@@ -1,5 +1,7 @@
 <?php
 
+DEFINE('ROOT', __DIR__ . '/');
+
 require_once './Application/Kernel.php';
 
 /**

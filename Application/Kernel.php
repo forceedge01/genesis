@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/Configs/AppDirs.php';
+require_once __DIR__ . '/Resources/Configs/AppDirs.php';
 
 class AppKernal {
 
@@ -10,7 +10,8 @@ class AppKernal {
             $controllers = array(),
             $routes = array(),
             $entities = array(),
-            $bundles = array();
+            $bundles = array(),
+            $components = array();
 
     public static
             $phpVersion,
@@ -45,19 +46,11 @@ class AppKernal {
             'AppMethods.php',
             'Request.php',
             'Router.php',
-            'HTMLGenerator.php',
-            'ValidationEngine.php',
             'Template.php',
-            'phpmailer.php',
-            'Mailer.php',
             'Application.php',
             'Database.php',
             'Auth.php',
-            'Zip.php',
-            'Cloner.php',
-            'Directory.php',
             'Session.php',
-            'Analytics.php',
 
         );
 
@@ -68,7 +61,7 @@ class AppKernal {
             if(is_file($classDir . $class))
                 self::$classes[] = $classDir . $class;
             else
-                echo '<h1>Class '.$class.' not found in kernel::fetchAllClasses</h1>';
+                echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
         }
     }
 
@@ -79,6 +72,8 @@ class AppKernal {
         self::loadConfigs();
 
         self::loadClasses();
+        
+        self::loadComponents();
 
         self::loadRoutes();
 
@@ -153,9 +148,19 @@ class AppKernal {
             }
         }
     }
+    
+    private static function fetchAllComponents($dir = APPLICATION_COMPONENTS_FOLDER){
 
-    private static function getClasses(){
-        return self::$classes;
+        $directory = $dir;
+        $files = scandir($directory);
+
+        foreach($files as $file){
+            
+            if(is_file($directory . $file))
+                self::$components[] = $directory .$file;
+            else if($file != '.' && $file != '..' && is_dir($directory . $file))
+                self::fetchAllComponents ($directory . $file . '/');
+        }
     }
 
     private static function loadClasses(){
@@ -164,6 +169,14 @@ class AppKernal {
 
         foreach(self::$classes as $class)
             require_once $class;
+    }
+    
+    private static function loadComponents(){
+
+        self::fetchAllComponents();
+
+        foreach(self::$components as $component)
+            require_once $component;
     }
 
     private static function loadEntities(){

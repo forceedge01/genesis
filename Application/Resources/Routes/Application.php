@@ -2,7 +2,7 @@
 
 Router::$Route['Application'] = array(
 
-        'Controller' => 'Application:index',
-        'Pattern' => '/'
+    'Controller' => 'Application:index',
+    'Pattern' => '/',
 
 );

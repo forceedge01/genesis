@@ -11,7 +11,8 @@ class Router extends AppMethods{
             $route,
             $params,
             $pageTitle,
-            $Router;
+            $Router,
+            $ObjectArguments = array();
 
     public
             $pattern;
@@ -67,6 +68,9 @@ class Router extends AppMethods{
             $value['Pattern'] = $this->extractVariable($value['Pattern']);
 
             if($value['Pattern'] == $this->pattern){
+                
+                if(isset($value['Inject']))
+                    $this->ObjectArguments = $value['Inject'];
 
                 $this->lastRoute = $key;
 
@@ -254,6 +258,12 @@ class Router extends AppMethods{
         }
 
         $controller = new $objectName();
+        
+        if(count($this->ObjectArguments) != 0)
+            foreach($this->ObjectArguments as $variable => $object){
+
+                $controller->$variable = new $object;
+            }
 
         if(!method_exists($objectName, $objectAction)){
 

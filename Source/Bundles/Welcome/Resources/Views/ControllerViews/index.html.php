@@ -5,15 +5,11 @@
 
         <legend>
 
-            <h1 <?=$this->applyStyle(array('color' => 'blue', 'text-decoration' => 'underline'));?>>Welcome to <?=APPLICATION_NAME?></h1>
+            <h1>Welcome to <?=APPLICATION_NAME?></h1>
 
         </legend>
 
         <div class="widget index">
-
-            <!--
-            <?$this->htmlgen->Output($params['table'],'table')?>
-            -->
 
             <br />
 

@@ -31,9 +31,9 @@ class Template extends Router {
 
         if (strtolower($templateParams[0]) == 'bundle') {
 
-            $path = BUNDLES_FOLDER . $templateParams[1] . '/Templates/';
+            $path = BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/';
 
-            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . '/Templates/ControllerViews/' . $templateParams[2]);
+            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews/' . $templateParams[2]);
 
             if (is_file($templateURL)) {
 
@@ -91,9 +91,9 @@ class Template extends Router {
           'Template' => $template
         );
 
-        require_once BUNDLES_FOLDER . '/Errors/Templates/Header.html.php';
-        require_once BUNDLES_FOLDER . '/Errors/Templates/ControllerViews/Template_Not_Found.html.php';
-        require_once BUNDLES_FOLDER . '/Errors/Templates/Footer.html.php';
+        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/Header.html.php';
+        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/ControllerViews/Template_Not_Found.html.php';
+        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/Footer.html.php';
 
     }
 
@@ -111,7 +111,7 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Templates/ControllerViews' : TEMPLATES_FOLDER);
+        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews' : TEMPLATES_FOLDER);
 
         $templateURL = $dirRoot . '/' . $templateParams[2];
 

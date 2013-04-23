@@ -11,7 +11,8 @@ class AppKernal {
             $routes = array(),
             $entities = array(),
             $bundles = array(),
-            $components = array();
+            $components = array(),
+            $files = array();
 
     public static
             $phpVersion,
@@ -38,7 +39,7 @@ class AppKernal {
 
     }
 
-    private static function fetchAllClasses(){
+    private static function fetchAllClasses($classDir){
 
         $classes = array(
 
@@ -54,8 +55,6 @@ class AppKernal {
 
         );
 
-        $classDir = APPLICATION_CLASSES_FOLDER;
-
         foreach($classes as $class){
 
             if(is_file($classDir . $class))
@@ -63,23 +62,25 @@ class AppKernal {
             else
                 echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
         }
+        
+        return self::$classes;
     }
 
     public static function initialize() {
 
         self::checkDependencies();
 
-        self::loadConfigs();
+        self::load('configs', APPLICATION_CONFIGS_FOLDER);
 
-        self::loadClasses();
+        self::load('classes', APPLICATION_CLASSES_FOLDER);
         
-        self::loadComponents();
+        self::load('components', APPLICATION_COMPONENTS_FOLDER);
 
-        self::loadRoutes();
+        self::load('routes', APPLICATION_ROUTES_FOLDER);
 
-        self::loadEntities();
+        self::load('entities', APPLICATION_ENTITIES_FOLDER);
 
-        self::loadControllers();
+        self::load('controllers', APPLICATION_CONTROLLERS_FOLDER);
 
         self::loadBundles();
 
@@ -93,122 +94,33 @@ class AppKernal {
         }
     }
 
-    private static function fetchAllConfigs(){
-
-        $directory = APPLICATION_CONFIGS_FOLDER;
-        $files = scandir($directory);
-
-        foreach($files as $file){
-
-            if(is_file($directory . $file)){
-
-                self::$configs[] = $directory .$file;
-            }
-        }
-    }
-
-    private static function fetchAllRoutes(){
-
-        $directory = APPLICATION_ROUTES_FOLDER;
-        $files = scandir($directory);
-
-        foreach($files as $file){
-
-            if(is_file($directory . $file)){
-
-                self::$routes[] = $directory .$file;
-            }
-        }
-    }
-
-    private static function fetchAllControllers(){
-
-        $directory = APPLICATION_CONTROLLERS_FOLDER;
-        $files = scandir($directory);
-
-        foreach($files as $file){
-
-            if(is_file($directory . $file)){
-
-                self::$controllers[] = $directory .$file;
-            }
-        }
-    }
-
-    private static function fetchAllEntities(){
-
-        $directory = APPLICATION_ENTITIES_FOLDER;
-        $files = scandir($directory);
-
-        foreach($files as $file){
-
-            if(is_file($directory . $file)){
-
-                self::$entities[] = $directory .$file;
-            }
-        }
-    }
-    
-    private static function fetchAllComponents($dir = APPLICATION_COMPONENTS_FOLDER){
+    private static function fetchAll($dir){
 
         $directory = $dir;
         $files = scandir($directory);
 
         foreach($files as $file){
-            
-            if(is_file($directory . $file))
-                self::$components[] = $directory .$file;
+
+            if(is_file($directory . $file) && self::fileExtensionIs($directory . $file, array('php')))
+                self::$files[] = $directory .$file;
             else if($file != '.' && $file != '..' && is_dir($directory . $file))
-                self::fetchAllComponents ($directory . $file . '/');
+                self::fetchAll ($directory . $file . '/');
         }
+        
+        return self::$files;
     }
 
-    private static function loadClasses(){
+    private static function load($staticVar, $dir){
+        
+        self::$files = array();
 
-        self::fetchAllClasses();
+        if($staticVar == 'classes')
+            self::$$staticVar = self::fetchAllClasses ($dir);
+        else
+            self::$$staticVar = self::fetchAll($dir);
 
-        foreach(self::$classes as $class)
-            require_once $class;
-    }
-    
-    private static function loadComponents(){
-
-        self::fetchAllComponents();
-
-        foreach(self::$components as $component)
-            require_once $component;
-    }
-
-    private static function loadEntities(){
-
-        self::fetchAllEntities();
-
-        foreach(self::$entities as $entity)
-            require_once $entity;
-    }
-
-    private static function loadConfigs(){
-
-        self::fetchAllConfigs();
-
-        foreach(self::$configs as $config)
-            require_once $config;
-    }
-
-    private static function loadControllers(){
-
-        self::fetchAllControllers();
-
-        foreach(self::$controllers as $controller)
-            require_once $controller;
-    }
-
-    private static function loadRoutes(){
-
-        self::fetchAllRoutes();
-
-        foreach(self::$routes as $route)
-            require_once $route;
+        foreach(self::$$staticVar as $file)
+            require_once $file;
     }
 
     private static function loadBundles(){
@@ -219,11 +131,11 @@ class AppKernal {
 
             if(is_dir($bundle)){
 
-                self::loadFilesFromDir($bundle . '/Configs');
-                self::loadFilesFromDir($bundle . '/Routes');
-                self::loadFilesFromDir($bundle);
-                self::loadFilesFromDir($bundle . '/Controllers');
-                self::loadFilesFromDir($bundle . '/Entities');
+                self::loadFilesFromDir($bundle . '/Resources/Configs', array('php'));
+                self::loadFilesFromDir($bundle . '/Resources/Routes', array('php'));
+                self::loadFilesFromDir($bundle, array('php'));
+                self::loadFilesFromDir($bundle . '/Controllers', array('php'));
+                self::loadFilesFromDir($bundle . '/Entities', array('php'));
             }
             else{
 
@@ -243,7 +155,7 @@ class AppKernal {
 
     }
 
-    private static function loadFilesFromDir($directory){
+    private static function loadFilesFromDir($directory, array $extensions){
 
         if(is_dir($directory)){
 
@@ -253,7 +165,7 @@ class AppKernal {
 
                 $filepath = $directory . '/' . $file;
 
-                if(is_file($filepath))
+                if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                     require_once $filepath;
             }
         }
@@ -265,6 +177,29 @@ class AppKernal {
     private static function checkDependencies(){
 
         self::$phpVersion = phpversion();
+    }
+    
+    private static function fileExtensionIs($file, array $extensions){
+        
+        $exists = false;
+        
+        foreach($extensions as $extensions){
+            
+            if(pathinfo($file, PATHINFO_EXTENSION) == $extensions){
+                $exists = true;
+                break;
+            }
+        }
+        
+        return $exists;
+    }
+    
+    public static function show($fileType){
+        
+        foreach(self::$$fileType as $files){
+            
+            echo $files . '<br />';
+        }
     }
 }
 

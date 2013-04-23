@@ -97,10 +97,12 @@ class Bundle extends Console {
     }
 
     private function createConfig(){
+        
+        mkdir(BUNDLES_FOLDER . $this->name . '/Resources');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Configs');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Configs');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Configs/' . $this->name . '.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Configs/' . $this->name . '.php', 'w+');
 
         $initTemplate = '<?php
 
@@ -206,11 +208,11 @@ class ' . $this->name . ' extends ApplicationEntity{
 
     private function createViews(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Views');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Views');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Header.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Header.html.php', 'w+');
 
         $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>
 
@@ -221,7 +223,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/' . 'Footer.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
 
         $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>
             
@@ -232,7 +234,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
         fclose($handle);
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/list.html.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/list.html.php', 'w+');
 
         $initTemplate = '<div class="wrapper">
 
@@ -250,7 +252,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/view.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/view.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -268,7 +270,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/create.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/create.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -286,7 +288,7 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             fclose($handle);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Views/ControllerViews/edit.html.php', 'w+');
+            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/edit.html.php', 'w+');
 
             $initTemplate = '<div class="wrapper">
 
@@ -532,9 +534,9 @@ class ' . $this->name . 'BundleController extends ApplicationController{
 
     private function createRoutes(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Routes');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Routes');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Routes/' . $this->name . '.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Routes/' . $this->name . '.php', 'w+');
 
         $initRoute = '<?php
 

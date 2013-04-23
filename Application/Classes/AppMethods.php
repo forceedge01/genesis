@@ -467,4 +467,67 @@ class AppMethods extends Debugger {
 
         return $this;
     }
+    
+    public function arrayToString(array $array){
+        
+        $string = '';
+        
+        foreach($array as $ar){
+            
+            $string .= $ar;
+        }
+        
+        return $string;
+    }
+    
+    public function refactorUrl($url){
+        
+        $chunks = explode('/', $url);
+        
+        $array = $chunks;
+        
+        $deleteIndex = array();
+        
+        foreach($array as $key => $urlChunk){
+            
+            if($urlChunk == '..'){
+                
+                unset($array[$key]);
+                $deleteIndex[] = $key-1;
+            }
+            else if($urlChunk == '.'){
+                
+                unset($array[$key]);
+            }
+        }
+        
+        foreach($deleteIndex as $key){
+            
+            $array = $this->deleteIndex($array, $key);
+        }
+        
+        $index = 0;
+        foreach($array as $key=>$value){
+
+            if($index != $key){
+
+                $array[$index] = $value;
+                unset($array[$key]);
+            }
+
+            $index++;
+        }
+        
+        return implode('/', $array);
+    }
+    
+    private function deleteIndex($array, $key){
+        
+        if(isset($array[$key]))
+            unset($array[$key]);
+        else 
+            $array = $this->deleteIndex ($array , $key-1);
+        
+        return $array;
+    }   
 }

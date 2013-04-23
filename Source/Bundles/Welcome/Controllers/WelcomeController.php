@@ -65,7 +65,7 @@ class WelcomeController extends ApplicationController {
 
         $params['form'] = array(
 
-            'action' => 'Welcome_View',
+            'action' => $this->setRoute('Welcome_View'),
             'class ' => 'confirm',
 
             'inputs' => array(

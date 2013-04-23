@@ -1,0 +1,5 @@
+RewriteEngine on
+RewriteBase /
+
+ErrorDocument 404 /GENESIS/index.php/404
+ErrorDocument 500 /GENESIS/index.php/500

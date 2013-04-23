@@ -1,0 +1,1 @@
+<?=$this->setAsset('Backgrounds/error-500.jpg')?>

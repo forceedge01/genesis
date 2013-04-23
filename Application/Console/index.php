@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Resources/Configs/ConsoleDirs.php';
+require_once __DIR__ . '/../Resources/Configs/Core/ConsoleDirs.php';
 
 function getOptions() {
 

@@ -56,12 +56,12 @@ class Bundle extends Console {
 
         if(!empty($bundleName))
             if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName)){
-                
+
                 if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName)){
-                    
+
                     $this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName);
                 }
-                
+
                 echo 'Bundle has been deleted successfully.';
             }
             else
@@ -97,7 +97,7 @@ class Bundle extends Console {
     }
 
     private function createConfig(){
-        
+
         mkdir(BUNDLES_FOLDER . $this->name . '/Resources');
 
         mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Configs');
@@ -226,7 +226,7 @@ class ' . $this->name . ' extends ApplicationEntity{
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
 
         $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>
-            
+
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 ';
 
@@ -597,7 +597,7 @@ Router::$Route[\'' . $this->name . '_Delete\'] = array(
 
 jQuery(document).ready(function(){
 
-    
+
 
 });
 
@@ -620,7 +620,7 @@ root{
             fwrite($handle, $initRoute);
 
             fclose($handle);
-            
+
             return $this;
     }
 

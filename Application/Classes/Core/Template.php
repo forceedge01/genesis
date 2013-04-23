@@ -91,9 +91,9 @@ class Template extends Router {
           'Template' => $template
         );
 
-        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/Header.html.php';
-        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/ControllerViews/Template_Not_Found.html.php';
-        require_once BUNDLES_FOLDER . '/Errors/Resources/Views/Footer.html.php';
+        require_once APPLICATION_RESOURCES_FOLDER . 'Views/Header.html.php';
+        require_once APPLICATION_RESOURCES_FOLDER . '/Errors/Template_Not_Found.html.php';
+        require_once APPLICATION_RESOURCES_FOLDER . '/Views/Footer.html.php';
 
     }
 

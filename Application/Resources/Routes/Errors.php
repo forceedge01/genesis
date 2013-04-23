@@ -20,3 +20,17 @@ Router::$Route['Action_Not_Found'] = array(
     'Pattern' => '/ActionNotFound/'
 
 );
+
+Router::$Route['404'] = array(
+
+    'Controller' => 'Errors:NotFoundError404',
+    'Pattern' => '/404/'
+
+);
+
+Router::$Route['500'] = array(
+
+    'Controller' => 'Errors:ServerError500',
+    'Pattern' => '/500/'
+
+);

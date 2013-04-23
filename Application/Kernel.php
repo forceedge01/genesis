@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/Resources/Configs/AppDirs.php';
+require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
 
 class AppKernal {
 
@@ -25,7 +25,7 @@ class AppKernal {
         $bundles = array(
 
             'Welcome',
-            'testBundle',
+            'testBundle'
         );
 
         // Do not edit below this line
@@ -62,7 +62,7 @@ class AppKernal {
             else
                 echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
         }
-        
+
         return self::$classes;
     }
 
@@ -72,8 +72,8 @@ class AppKernal {
 
         self::load('configs', APPLICATION_CONFIGS_FOLDER);
 
-        self::load('classes', APPLICATION_CLASSES_FOLDER);
-        
+        self::load('classes', APPLICATION_CLASSES_FOLDER . 'Core/');
+
         self::load('components', APPLICATION_COMPONENTS_FOLDER);
 
         self::load('routes', APPLICATION_ROUTES_FOLDER);
@@ -106,12 +106,12 @@ class AppKernal {
             else if($file != '.' && $file != '..' && is_dir($directory . $file))
                 self::fetchAll ($directory . $file . '/');
         }
-        
+
         return self::$files;
     }
 
     private static function load($staticVar, $dir){
-        
+
         self::$files = array();
 
         if($staticVar == 'classes')
@@ -143,7 +143,7 @@ class AppKernal {
 
                 $message = ' not found in kernel::loadBundles()';
 
-                require_once BUNDLES_FOLDER . 'Errors/Templates/ControllerViews/Bundle_Not_Found.html.php';
+                require_once APPLICATION_RESOURCES_FOLDER . 'Views/Errors/Bundle_Not_Found.html.php';
 
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
 
@@ -178,26 +178,26 @@ class AppKernal {
 
         self::$phpVersion = phpversion();
     }
-    
+
     private static function fileExtensionIs($file, array $extensions){
-        
+
         $exists = false;
-        
+
         foreach($extensions as $extensions){
-            
+
             if(pathinfo($file, PATHINFO_EXTENSION) == $extensions){
                 $exists = true;
                 break;
             }
         }
-        
+
         return $exists;
     }
-    
+
     public static function show($fileType){
-        
+
         foreach(self::$$fileType as $files){
-            
+
             echo $files . '<br />';
         }
     }

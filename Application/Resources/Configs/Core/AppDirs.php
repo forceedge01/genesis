@@ -1,8 +1,10 @@
 <?php
 
+// Core folder paths
+
 define('HOST', 'http://localhost/GENESIS/');
 
-DEFINE('ROOT', __DIR__ . '/../../../');
+define('ROOT', __DIR__ . '/../../../../');
 
 define('APPLICATION_FOLDER', ROOT . 'Application/');
 
@@ -22,15 +24,17 @@ define('APPLICATION_ROUTES_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Routes/');
 
 define('APPLICATION_CONTROLLERS_FOLDER', APPLICATION_FOLDER . 'Controllers/');
 
-define('TEMPLATES_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Views/');
-
-define('CLASSES_FOLDER', APPLICATION_FOLDER . 'Classes/');
-
 define('SOURCE_FOLDER', ROOT . 'Source/');
 
-define('ERRORS_TEMPLATES_FOLDER', TEMPLATES_FOLDER . 'Error_Pages/');
-
 define('BUNDLES_FOLDER', SOURCE_FOLDER . 'Bundles/');
+
+
+
+// Templating and public folders
+
+define('TEMPLATES_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Views/');
+
+define('ERRORS_TEMPLATES_FOLDER', TEMPLATES_FOLDER . 'Error_Pages/');
 
 define('PUBLIC_FOLDER', HOST . 'Public/');
 

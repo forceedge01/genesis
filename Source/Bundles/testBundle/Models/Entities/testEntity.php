@@ -1,6 +1,6 @@
 <?php
 
-class testBundle extends ApplicationEntity {
+class testEntity extends ApplicationEntity {
 
     protected
             $id,

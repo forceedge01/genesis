@@ -2,13 +2,7 @@
 
 class Application extends Template{
 
-    protected
-            $htmlgenerator,
-            $validationEngine,
-            $auth,
-            $directory,
-            $zip,
-            $mailer,
+    private
             $Router,
             $Request;
     public

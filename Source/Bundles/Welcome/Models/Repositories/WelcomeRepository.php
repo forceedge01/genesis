@@ -1,9 +1,8 @@
 <?php
 
-class Welcome extends ApplicationEntity {
-
-    public
-            $id,
+class WelcomeRepository extends WelcomeEntity{
+    
+    private
             $activeConnection,
             $selectQueryString,
             $selectJoinQuery,
@@ -69,5 +68,4 @@ class Welcome extends ApplicationEntity {
             ;
         return $this->activeConnection->queryResult;
     }
-
 }

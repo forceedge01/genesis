@@ -22,7 +22,7 @@ class AppMethods extends Debugger {
                 $this->$object->objectCreatedAt = time();
             }
             else
-                trigger_error("getOjbect accepts valid class name only, $object class does not exist", E_USER_ERROR);
+                trigger_error("getOjbect accepts valid class name only, $object class does not exist in ". get_called_class(), E_USER_ERROR);
         }
 
         return $this->$object;
@@ -233,21 +233,33 @@ class AppMethods extends Debugger {
      * @return \bundle returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
-    public function getBundleEntity($bundleColonEntityName){
+    public function getRepository($bundleColonEntityName){
 
         $bundle = explode(':', $bundleColonEntityName);
 
-        $path = BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php';
-
-        if(is_file(BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php'))
-            require_once BUNDLES_FOLDER . $bundle[0] . '/Entities/'.$bundle[1].'Entity.php';
-        else{
-
-            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
-            exit;
-        }
-
-        return new $bundle[1]();
+//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Entities/'.$bundle[1].'Entity.php');
+//
+//        if(is_file($path))
+//            require_once $path;
+//        else{
+//
+//            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
+//            exit;
+//        }
+//        
+//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
+//
+//        if(is_file($path))
+//            require_once $path;
+//        else{
+//
+//            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
+//            exit;
+//        }
+        
+        $bundle[1] .= 'Repository';
+        
+        return $this->getObject($bundle[1]);
     }
 
     public function variable($var) {

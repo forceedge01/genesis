@@ -1,6 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../Resources/Configs/Core/ConsoleDirs.php';
+require_once __DIR__ . '/../Resources/Configs/Core/BundleGenerator.php';
+
+if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER && isset($_SERVER['HTTP_HOST'])){
+    
+    echo 'Access restricted.';
+    exit;
+}
 
 function getOptions() {
 

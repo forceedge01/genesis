@@ -117,19 +117,43 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->
 
     private function createEntity(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Entities');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Models');
+        
+        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Entities');
+        
+        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Repositories');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/' . 'Entities/ ' . $this->name . 'Entity.php', 'w+');
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Entities/' . $this->name . 'Entity.php', 'w+');
 
         $initEntity = '<?php
 
-class ' . $this->name . ' extends ApplicationEntity{
+
+// This Entity represents '.$this->name.' table
+    
+class ' . $this->name . 'Entity extends ApplicationEntity {
 
       protected
-                  $id,
-                  $tableColumns,
-                  $joinQuery,
-                  $tableName;
+            $id;
+}
+              ';
+
+        fwrite($handle, $initEntity);
+
+        fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Repositories/' . $this->name . 'Repository.php', 'w+');
+
+        $initEntity = '<?php
+
+
+// This Repository holds methods for '.$this->name.' table
+    
+class ' . $this->name . 'Repository extends '.$this->name.'Entity {
+
+      protected
+            $tableColumns,
+            $joinQuery,
+            $tableName;
 
       public function __construct($id = null){
 
@@ -143,7 +167,6 @@ class ' . $this->name . ' extends ApplicationEntity{
 
             $this->id = $id;
             $this->Get();
-
          }
       }
 
@@ -328,14 +351,12 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
               $params["PageTitle"] = "All ' . $this->name . '";
 
-              $' . $this->name . ' = new ' . $this->name . '();
-
               //Used by the HTMLGenerator in the list view.
               $params[\'table\'] = array(
 
                 \'class\' => \'paginate\',
                 \'title\' => \'Dataset\',
-                \'tbody\' => $' . $this->name . '->GetAll(array(\'order by\' => \'id desc\')),
+                \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
                 \'ignoreFields\' => array(),
                 \'actions\' => array(
 
@@ -376,13 +397,11 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
               $params["PageTitle"] = "View ' . $this->name . '";
 
-              $' . $this->name . ' = new ' . $this->name . '();
-
               $params["table"] = array(
 
                   \'title\' => \'View\',
                   \'class\' => \'paginate\',
-                  \'tbody\' => $' . $this->name . '->Get($id),
+                  \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Get($id),
                   \'actions\' => array(
 
                       \'Edit\' => array(
@@ -404,9 +423,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isPost("submit")){
 
-              $' . $this->name . ' = new ' . $this->name . '();
-
-              if($' . $this->name . '->Save())
+              if($this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
               else
                   $this->setError(array("Failure" => "Failed to create."));
@@ -431,7 +448,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
                         \'value\' => \'Enter your name\',
                     )
                 ),
-                \'table\' => $'.$this->name.'->GetFormFields(),
+                \'table\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetFormFields(),
 
                 \'submission\' => array(
 
@@ -452,8 +469,8 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
       }
 
       public function editAction($id){
-
-            $' . $this->name . ' = new ' . $this->name . '($id);
+      
+            $'.$this->name.' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
 
             if($this->isPost("submit")){
 
@@ -500,7 +517,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isAjax()){
 
-              $' . $this->name . ' = new ' . $this->name . '();
+              $' . $this->name . ' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
 
               if($' . $this->name . '->delete($id))
                   echo \'success:Delete was successful\';
@@ -519,7 +536,9 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
         $initController = '<?php
 
+
 // Use this class to inherit methods used in all or some of your controllers
+
 class ' . $this->name . 'BundleController extends ApplicationController{
 
 }

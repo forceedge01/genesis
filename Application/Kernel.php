@@ -25,7 +25,7 @@ class AppKernal {
         $bundles = array(
 
             'Welcome',
-            'testBundle'
+            'testBundle',
         );
 
         // Do not edit below this line
@@ -133,9 +133,9 @@ class AppKernal {
 
                 self::loadFilesFromDir($bundle . '/Resources/Configs', array('php'));
                 self::loadFilesFromDir($bundle . '/Resources/Routes', array('php'));
-                self::loadFilesFromDir($bundle, array('php'));
+                self::loadFilesFromDir($bundle, array('php'), false);
                 self::loadFilesFromDir($bundle . '/Controllers', array('php'));
-                self::loadFilesFromDir($bundle . '/Entities', array('php'));
+                self::loadFilesFromDir($bundle . '/Models', array('php'));
             }
             else{
 
@@ -155,7 +155,7 @@ class AppKernal {
 
     }
 
-    private static function loadFilesFromDir($directory, array $extensions){
+    private static function loadFilesFromDir($directory, array $extensions, $subdirectories = true){
 
         if(is_dir($directory)){
 
@@ -166,7 +166,12 @@ class AppKernal {
                 $filepath = $directory . '/' . $file;
 
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
-                    require_once $filepath;
+                    require_once $filepath;//echo $filepath.'<br />';
+                else if($subdirectories){
+                    
+                    if($file != '.' && $file != '..' && is_dir($filepath))
+                        self::loadFilesFromDir ($filepath, $extensions);
+                }
             }
         }
 

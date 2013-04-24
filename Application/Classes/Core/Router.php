@@ -41,14 +41,14 @@ class Router extends AppMethods{
 
         $this->pattern = @$pattern;
 
-        return true;
+        return $this->pattern;
 
     }
 
     /**
      * Exploder pattern to an array in $this->params;
      */
-    protected function GetParams(){
+    private function GetParams(){
 
         $this->params = explode('/', $this->pattern);
     }

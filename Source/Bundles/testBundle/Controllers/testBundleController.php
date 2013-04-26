@@ -60,7 +60,7 @@ class testBundleController extends ApplicationController{
 
               $params["PageTitle"] = "View testBundle";
 
-              $testBundle = new testBundle();
+              $testBundle = new testRepository();
 
               $params["table"] = array(
 
@@ -86,7 +86,7 @@ class testBundleController extends ApplicationController{
 
       public function createAction(){
 
-          $testBundle = new testBundle();
+          $testBundle = new testEntity();
 
             if($this->Request->isPost("submit")){
 
@@ -138,7 +138,7 @@ class testBundleController extends ApplicationController{
 
       public function editAction($id){
 
-            $testBundle = new testBundle($id);
+            $testBundle = new testEntity($id);
 
             if($this->isPost("submit")){
 

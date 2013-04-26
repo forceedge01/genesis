@@ -117,108 +117,37 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->
 
     private function createEntity(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models');
-        
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Entities');
-        
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Repositories');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Entities/' . $this->name . 'Entity.php', 'w+');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Entities');
+
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Repositories');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Entities/' . $this->name . 'Entity.php', 'w+');
 
         $initEntity = '<?php
 
 
 // This Entity represents '.$this->name.' table
-    
+
 class ' . $this->name . 'Entity extends ApplicationEntity {
 
-      protected
-            $id;
 }
               ';
 
         fwrite($handle, $initEntity);
 
         fclose($handle);
-        
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Repositories/' . $this->name . 'Repository.php', 'w+');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Repositories/' . $this->name . 'Repository.php', 'w+');
 
         $initEntity = '<?php
 
 
 // This Repository holds methods for '.$this->name.' table
-    
+
 class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
-      protected
-            $tableColumns,
-            $joinQuery,
-            $tableName;
-
-      public function __construct($id = null){
-
-         parent::__construct();
-
-         $this->tableColumns = array(\'*\');
-
-         $this->tableName = __CLASS__;
-
-         if(is_numeric($id)){
-
-            $this->id = $id;
-            $this->Get();
-         }
-      }
-
-      /**
-       *
-       * @param Array $param Params can include where clause order by clause or any other mysql clause.
-       * @return mixed Returns matching data set.
-       */
-      public function GetAll(array $params = array()){
-
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecords($params)->GetResultSet();
-
-      }
-
-      /**
-       *
-       * @param Mixed $id Can be the primary key value or an array of column and values
-       * @return mixed Returns the matching data set from the database.
-       */
-      public function Get($id = null){
-
-        if(!$id)
-            $id = $this->id;
-
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetFirstResult();
-
-      }
-
-      /**
-       *
-       * @param array $params Pass in the data for saving it to the database, if not provided<br>
-       * the submitted data in globals will be taken and matched to the table on which the operation is applied.
-       */
-      public function Save(array $params = array()){
-
-        return $this->Table($this->tableName)->SaveRecord($params)->GetAffectedRows();
-
-      }
-
-      /**
-       *
-       * @param int $id the id of the record to be deleted
-       * @return int Number of rows affected
-       */
-      public function Delete($id = null){
-
-        if(!$id)
-            $id = $this->id;
-
-        return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
-
-      }
 }
               ';
 
@@ -342,6 +271,9 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
 class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
+      public
+            $htmlgen;
+
       public function indexAction(){
 
               $this->forwardToController("' . $this->name . '_List");
@@ -356,7 +288,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'class\' => \'paginate\',
                 \'title\' => \'Dataset\',
-                \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
+                \'tbody\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
                 \'ignoreFields\' => array(),
                 \'actions\' => array(
 
@@ -401,7 +333,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                   \'title\' => \'View\',
                   \'class\' => \'paginate\',
-                  \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Get($id),
+                  \'tbody\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->Get($id),
                   \'actions\' => array(
 
                       \'Edit\' => array(
@@ -423,7 +355,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isPost("submit")){
 
-              if($this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Save())
+              if($this->GetEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
               else
                   $this->setError(array("Failure" => "Failed to create."));
@@ -448,7 +380,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
                         \'value\' => \'Enter your name\',
                     )
                 ),
-                \'table\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetFormFields(),
+                \'table\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetFormFields(),
 
                 \'submission\' => array(
 
@@ -469,12 +401,10 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
       }
 
       public function editAction($id){
-      
-            $'.$this->name.' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
 
             if($this->isPost("submit")){
 
-              if($' . $this->name . '->Save())
+              if($'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
               else
                   $this->setError(array("Failure" => "Failed to update."));
@@ -517,7 +447,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isAjax()){
 
-              $' . $this->name . ' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
+              $'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'");
 
               if($' . $this->name . '->delete($id))
                   echo \'success:Delete was successful\';

@@ -29,7 +29,8 @@ class Database extends Template {
         $queryLimit,
         $queryOrderBy,
         $queryWhere,
-        $queryExtra;
+        $queryExtra,
+        $queryCount;
 
     protected
         $queryMeta;
@@ -623,34 +624,7 @@ class Database extends Template {
 
         $this->buildRelationsShipsQuery();
 
-        $columns = $this->queryColumns;
-
-        $this->queryColumns = null;
-
-        if($this->isLoopable($columns) && $columns[0] != '*'){
-
-            foreach ($columns as $column){
-
-                if(strstr($column, 'as'))
-                    $this->queryColumns .= $column . ',';
-                else
-                    $this->queryColumns .= $column . ' as "' . str_replace('.', '__', $column) . '",';
-            }
-
-        }
-
-        else if (is_array($this->queryTableColumns)) {
-
-            $columns = $this->queryTableColumns;
-
-            $this->queryColumns = null;
-
-            foreach ($columns as $column)
-                $this->queryColumns .= $column->Field . ' as "' . str_replace('.', '__', $column->Field) . '",';
-
-        }
-
-        $this->queryColumns = trim($this->queryColumns, ',');
+        $this->createColumnList();
 
         $extras = '';
 
@@ -709,6 +683,48 @@ class Database extends Template {
             $this->query .= ' limit ' . $this->queryLimit;
 
         return $this;
+    }
+
+    private function createColumnList(){
+
+        if(empty($this->queryCount)){
+
+            $columns = $this->queryColumns;
+
+            $this->queryColumns = null;
+
+            if($this->isLoopable($columns) && $columns[0] != '*'){
+
+                foreach ($columns as $column){
+
+                    if(strstr($column, 'as'))
+                        $this->queryColumns .= $column . ',';
+                    else
+                        $this->queryColumns .= $column . ' as "' . str_replace('.', '__', $column) . '",';
+                }
+
+            }
+
+            else if (is_array($this->queryTableColumns)) {
+
+                $columns = $this->queryTableColumns;
+
+                $this->queryColumns = null;
+
+                foreach ($columns as $column)
+                    $this->queryColumns .= $column->Field . ' as "' . str_replace('.', '__', $column->Field) . '",';
+
+            }
+
+            $this->queryColumns = trim($this->queryColumns, ',');
+
+        }
+        else{
+
+            $this->queryColumns = "COUNT(`{$this->queryTable}`.`{$this->queryCount}`)";
+        }
+
+        return true;
     }
 
     /**
@@ -1018,5 +1034,15 @@ class Database extends Template {
             return true;
         else
             return false;
+    }
+
+    public function Count($column = null){
+
+        if(empty($column))
+            $column = $this->queryTablePrimaryKey;
+
+        $this->queryCount = $column;
+
+        return $this;
     }
 }

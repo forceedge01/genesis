@@ -89,7 +89,7 @@ class AppMethods extends Debugger {
      * @return type
      * Returns result for human readable string of conditional statement in an array or object
      */
-    public function find($subject, $haystack) {
+    /*public function find($subject, $haystack) {
 
         $result = array();
 
@@ -225,7 +225,7 @@ class AppMethods extends Debugger {
         }
 
         return $result;
-    }
+    }*/
 
     /**
      *
@@ -233,7 +233,7 @@ class AppMethods extends Debugger {
      * @return \bundle returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
-    public function getRepository($bundleColonEntityName){
+    public function GetRepository($bundleColonEntityName){
 
         $bundle = explode(':', $bundleColonEntityName);
 
@@ -246,7 +246,7 @@ class AppMethods extends Debugger {
 //            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
 //            exit;
 //        }
-//        
+//
 //        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
 //
 //        if(is_file($path))
@@ -256,9 +256,44 @@ class AppMethods extends Debugger {
 //            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
 //            exit;
 //        }
-        
+
         $bundle[1] .= 'Repository';
-        
+
+        return $this->getObject($bundle[1]);
+    }
+
+    /**
+     *
+     * @param type $bundleColonEntityName
+     * @return \bundle returns an entity object
+     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
+     */
+    public function GetEntity($bundleColonEntityName){
+
+        $bundle = explode(':', $bundleColonEntityName);
+
+//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Entities/'.$bundle[1].'Entity.php');
+//
+//        if(is_file($path))
+//            require_once $path;
+//        else{
+//
+//            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
+//            exit;
+//        }
+//
+//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
+//
+//        if(is_file($path))
+//            require_once $path;
+//        else{
+//
+//            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
+//            exit;
+//        }
+
+        $bundle[1] .= 'Entity';
+
         return $this->getObject($bundle[1]);
     }
 
@@ -402,7 +437,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return type
      * Gets the type of the variable
      */
@@ -412,7 +447,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @param array $list
      * @return \AppMethods
      * Removed double occurance of substrings provided in the array
@@ -441,7 +476,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return \AppMethods
      * Remove first character from the variable
      */
@@ -453,7 +488,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return \AppMethods
      * Remove last character from the variable
      */
@@ -465,7 +500,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @param array $keyedList
      * @return \AppMethods
      * Replace multiple keywords provided in a keyed array
@@ -479,45 +514,45 @@ class AppMethods extends Debugger {
 
         return $this;
     }
-    
+
     public function arrayToString(array $array){
-        
+
         $string = '';
-        
+
         foreach($array as $ar){
-            
+
             $string .= $ar;
         }
-        
+
         return $string;
     }
-    
+
     public function refactorUrl($url){
-        
+
         $chunks = explode('/', $url);
-        
+
         $array = $chunks;
-        
+
         $deleteIndex = array();
-        
+
         foreach($array as $key => $urlChunk){
-            
+
             if($urlChunk == '..'){
-                
+
                 unset($array[$key]);
                 $deleteIndex[] = $key-1;
             }
             else if($urlChunk == '.'){
-                
+
                 unset($array[$key]);
             }
         }
-        
+
         foreach($deleteIndex as $key){
-            
+
             $array = $this->deleteIndex($array, $key);
         }
-        
+
         $index = 0;
         foreach($array as $key=>$value){
 
@@ -529,17 +564,17 @@ class AppMethods extends Debugger {
 
             $index++;
         }
-        
+
         return implode('/', $array);
     }
-    
+
     private function deleteIndex($array, $key){
-        
+
         if(isset($array[$key]))
             unset($array[$key]);
-        else 
+        else
             $array = $this->deleteIndex ($array , $key-1);
-        
+
         return $array;
-    }   
+    }
 }

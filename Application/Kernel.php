@@ -9,7 +9,7 @@ class AppKernal {
             $configs = array(),
             $controllers = array(),
             $routes = array(),
-            $entities = array(),
+            $model = array(),
             $bundles = array(),
             $components = array(),
             $files = array();
@@ -78,7 +78,7 @@ class AppKernal {
 
         self::load('routes', APPLICATION_ROUTES_FOLDER);
 
-        self::load('entities', APPLICATION_ENTITIES_FOLDER);
+        self::load('model', APPLICATION_MODELS_FOLDER);
 
         self::load('controllers', APPLICATION_CONTROLLERS_FOLDER);
 
@@ -88,7 +88,7 @@ class AppKernal {
 
         if(!$route->forwardRequest()){
 
-            echo '<h1>Pattern: ' . $route->pattern . ' Not Found!!</h1>';
+            echo '<h1>Pattern: ' . $route->GetPattern() . ' Not Found!!</h1>';
 
             exit;
         }
@@ -131,11 +131,11 @@ class AppKernal {
 
             if(is_dir($bundle)){
 
-                self::loadFilesFromDir($bundle . '/Resources/Configs', array('php'));
-                self::loadFilesFromDir($bundle . '/Resources/Routes', array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_CONFIGS, array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_ROUTES, array('php'));
                 self::loadFilesFromDir($bundle, array('php'), false);
-                self::loadFilesFromDir($bundle . '/Controllers', array('php'));
-                self::loadFilesFromDir($bundle . '/Models', array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
             }
             else{
 
@@ -168,7 +168,7 @@ class AppKernal {
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                     require_once $filepath;//echo $filepath.'<br />';
                 else if($subdirectories){
-                    
+
                     if($file != '.' && $file != '..' && is_dir($filepath))
                         self::loadFilesFromDir ($filepath, $extensions);
                 }

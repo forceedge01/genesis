@@ -12,9 +12,7 @@ class Router extends AppMethods{
             $params,
             $pageTitle,
             $Router,
-            $ObjectArguments = array();
-
-    public
+            $ObjectArguments = array(),
             $pattern;
 
     public static $Route = array(), $LastRoute;
@@ -23,9 +21,12 @@ class Router extends AppMethods{
 
         $this->url = $_SERVER['PHP_SELF'];
 
-        $this->getPattern();
+        $this->SetPattern()->SetParams();
+    }
 
-        $this->GetParams();
+    public function GetPattern(){
+
+        return $this->pattern;
     }
 
     /**
@@ -33,7 +34,7 @@ class Router extends AppMethods{
      * @return boolean - true on success, false on failure<br />
      * <br />Get pattern appended to index.php in url
      */
-    protected function getPattern(){
+    protected function SetPattern(){
 
         $pattern = @$_SERVER['PATH_INFO'] . '/';
 
@@ -41,14 +42,14 @@ class Router extends AppMethods{
 
         $this->pattern = @$pattern;
 
-        return $this->pattern;
+        return $this;
 
     }
 
     /**
      * Exploder pattern to an array in $this->params;
      */
-    private function GetParams(){
+    private function SetParams(){
 
         $this->params = explode('/', $this->pattern);
     }
@@ -68,7 +69,7 @@ class Router extends AppMethods{
             $value['Pattern'] = $this->extractVariable($value['Pattern']);
 
             if($value['Pattern'] == $this->pattern){
-                
+
                 if(isset($value['Inject']))
                     $this->ObjectArguments = $value['Inject'];
 
@@ -258,7 +259,7 @@ class Router extends AppMethods{
         }
 
         $controller = new $objectName();
-        
+
         if(count($this->ObjectArguments) != 0)
             foreach($this->ObjectArguments as $variable => $object){
 

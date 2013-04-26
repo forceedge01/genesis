@@ -2,6 +2,9 @@
 
 class WelcomeController extends ApplicationController {
 
+    public
+            $htmlgen;
+
     public function indexAction() {
 
         $params['PageTitle'] = 'Welcome to ' . APPLICATION_NAME;

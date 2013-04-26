@@ -31,17 +31,17 @@ class Template extends Router {
 
         if (strtolower($templateParams[0]) == 'bundle') {
 
-            $path = BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/';
+            $path = BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS . '/';
 
-            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews/' . $templateParams[2]);
+            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS .'/ControllerViews/' . $templateParams[2]);
 
             if (is_file($templateURL)) {
 
-                if (is_file($path . 'Header.html.php')) require_once $path . 'Header.html.php';
+                if (is_file($path . BUNDLE_VIEW_HEADER_FILE)) require_once $path . BUNDLE_VIEW_HEADER_FILE;
 
                 require_once $templateURL;
 
-                if (is_file($path . 'Footer.html.php')) require_once $path . 'Footer.html.php';
+                if (is_file($path . BUNDLE_VIEW_FOOTER_FILE)) require_once $path . BUNDLE_VIEW_FOOTER_FILE;
             }
             else
                 $error = 'TNF';
@@ -52,9 +52,9 @@ class Template extends Router {
 
             if (is_file($templateURL)) {
 
-                require_once TEMPLATES_FOLDER . 'Header.html.php';
+                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_HEADER_FILE;
                 require_once $templateURL;
-                require_once TEMPLATES_FOLDER . 'Footer.html.php';
+                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_FOOTER_FILE;
             }
             else
                 $error = 'TNF';
@@ -111,7 +111,7 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews' : TEMPLATES_FOLDER);
+        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS .'/ControllerViews' : TEMPLATES_FOLDER);
 
         $templateURL = $dirRoot . '/' . $templateParams[2];
 

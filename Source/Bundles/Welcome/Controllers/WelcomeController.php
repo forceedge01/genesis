@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\Controllers;
+namespace Application\Bundles\Welcome\Controllers;
 
 
 
@@ -145,7 +145,7 @@ class WelcomeController extends ApplicationController {
 
         $this->htmlgen = $this->getObject('HTMLGenerator');
 
-        $this->Render('Bundle:Welcome:index.html.php', $params);
+        $this->Render('Welcome:index.html.php', $params);
     }
 
 }

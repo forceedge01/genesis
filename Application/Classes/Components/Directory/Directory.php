@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components\Directory;
+namespace Application\Components;
 
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components\Zip;
+namespace Application\Components;
 
 
 

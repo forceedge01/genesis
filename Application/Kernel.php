@@ -30,6 +30,7 @@ class AppKernal {
 
             'Welcome',
             'testBundle',
+            'neogenesis'
         );
 
         // Do not edit below this line
@@ -210,12 +211,9 @@ class AppKernal {
         return $exists;
     }
 
-    public static function show($fileType){
+    public static function get($fileType){
 
-        foreach(self::$$fileType as $files){
-
-            echo $files . '<br />';
-        }
+        return self::$$fileType;
     }
 }
 

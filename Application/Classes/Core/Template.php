@@ -33,13 +33,13 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        if (strtolower($templateParams[0]) == 'bundle') {
+        if ($templateParams[0] != null) {
 
-            $path = BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS . '/';
-
-            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS .'/ControllerViews/' . $templateParams[2]);
+            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' . $templateParams[1]));
 
             if (is_file($templateURL)) {
+
+                $path = BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS ;
 
                 if (is_file($path . BUNDLE_VIEW_HEADER_FILE)) require_once $path . BUNDLE_VIEW_HEADER_FILE;
 
@@ -52,7 +52,7 @@ class Template extends Router {
         }
         else {
 
-            $templateURL = $this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[0] . '/' . $templateParams[1] . '/' . $templateParams[2]);
+            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[1] ));
 
             if (is_file($templateURL)) {
 
@@ -71,7 +71,7 @@ class Template extends Router {
 
         if(ENABLE_HTML_VALIDATION && !empty($html)){
 
-            $validation = new \Application\Components\ValidationEngine\ValidationEngine();
+            $validation = new \Application\Components\ValidationEngine();
             $validation->validateHTML ($html);
         }
 
@@ -96,7 +96,7 @@ class Template extends Router {
         );
 
         require_once APPLICATION_RESOURCES_FOLDER . 'Views/Header.html.php';
-        require_once APPLICATION_RESOURCES_FOLDER . '/Errors/Template_Not_Found.html.php';
+        require_once APPLICATION_RESOURCES_FOLDER . '/Views/Errors/Template_Not_Found.html.php';
         require_once APPLICATION_RESOURCES_FOLDER . '/Views/Footer.html.php';
 
     }
@@ -115,11 +115,9 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . BUNDLE_VIEWS .'/ControllerViews' : TEMPLATES_FOLDER);
+        $dirRoot = ($templateParams[0] != null ? BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' : TEMPLATES_FOLDER);
 
-        $templateURL = $dirRoot . '/' . $templateParams[2];
-
-        $templateURL = $this->stripDoubleSlashes($templateURL);
+        $templateURL = $this->refactorUrl($this->stripDoubleSlashes($dirRoot . '/' . $templateParams[1]));
 
         if(!is_file($templateURL)){
 

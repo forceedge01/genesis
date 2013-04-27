@@ -3,6 +3,7 @@
 namespace Application\Console\Libraries;
 
 
+use Application\Console\Console;
 
 class Bundle extends Console {
 
@@ -160,7 +161,7 @@ use \\Application\\Core\\Repositories\\ApplicationRepository;
 
 // This Repository holds methods for '.$this->name.' table
 
-class ' . $this->name . 'Repository extends '.$this->name.'Entity {
+class ' . $this->name . 'Repository extends ApplicationRepository {
 
 }
               ';
@@ -180,7 +181,7 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Header.html.php', 'w+');
 
-        $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>
+        $initTemplate = '<?=$this->RenderTemplate(":Header.html.php", $params)?>
 
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
 ';
@@ -191,7 +192,7 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
 
-        $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>
+        $initTemplate = ' <?=$this->RenderTemplate(":Footer.html.php", $params)?>
 
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 ';
@@ -345,7 +346,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
               //This will be used in the template to generate the above declared table.
               $this->htmlgen = new HTMLGenerator();
 
-              $this->Render("Bundle:' . $this->name . ':list.html.php", $params);
+              $this->Render("' . $this->name . ':list.html.php", $params);
 
       }
 
@@ -371,7 +372,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
               $this->htmlgen = new HTMLGenerator();
 
-              $this->Render("Bundle:' . $this->name . ':view.html.php", $params);
+              $this->Render("' . $this->name . ':view.html.php", $params);
 
       }
 
@@ -420,7 +421,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
             //This will be used in the template to generate the above declared form.
             $this->htmlgen = new HTMLGenerator();
 
-            $this->Render("Bundle:' . $this->name . ':create.html.php", $params);
+            $this->Render("' . $this->name . ':create.html.php", $params);
 
       }
 
@@ -441,7 +442,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'title\' => \'Edit\',
                 \'action\' => $this->setRoute(\''.$this->name.'_Edit\', array(\'id\' => $id)),
-                \'table\' => $this->GetEntity('.$this->name.':'.$this->name.')->Get($id),
+                \'table\' => $this->GetEntity(\''.$this->name.':'.$this->name.'\')->Get($id),
                 \'submission\' => array(
 
                     \'submit\' => array(
@@ -457,7 +458,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             $this->htmlgen = new HTMLGenerator();
 
-            $this->Render("Bundle:' . $this->name . ':edit.html.php", $params);
+            $this->Render("' . $this->name . ':edit.html.php", $params);
 
       }
 
@@ -497,8 +498,8 @@ namespace Application\\Bundles\\'.$this->name.'\\Controllers;
 use \\Application\\Core\\Controllers\\ApplicationController;
 
 
-// Use this class to inherit methods used in all or some of your controllers
-// ' . $this->name . ' bundle created at: ' . date('y-M-d') . '
+// Use this class to inherit methods used in all or some of your ' . $this->name . ' bundle controllers
+// ' . $this->name . ' bundle created at: ' . date('l, d F, Y') . '
 
 class ' . $this->name . 'BundleController extends ApplicationController{
 
@@ -526,37 +527,37 @@ use \\Application\\Core\\Router;
 
 Router::$Route[\'' . $this->name . '\'] = array(
 
-      "Controller" => "' . $this->name . ':index",
+      "Controller" => "' . $this->name . ':' . $this->name . ':index",
       "Pattern" => "/' . $this->name . '/"
 );
 
 Router::$Route[\'' . $this->name . '_List\'] = array(
 
-      "Controller" => "' . $this->name . ':list",
+      "Controller" => "' . $this->name . ':' . $this->name . ':list",
       "Pattern" => "/' . $this->name . '/List/"
 );
 
 Router::$Route[\'' . $this->name . '_View\'] = array(
 
-      "Controller" => "' . $this->name . ':view",
+      "Controller" => "' . $this->name . ':' . $this->name . ':view",
       "Pattern" => "/' . $this->name . '/View/{id}/"
 );
 
 Router::$Route[\'' . $this->name . '_Create\'] = array(
 
-      "Controller" => "' . $this->name . ':create",
+      "Controller" => "' . $this->name . ':' . $this->name . ':create",
       "Pattern" => "/' . $this->name . '/Create/"
 );
 
 Router::$Route[\'' . $this->name . '_Edit\'] = array(
 
-      "Controller" => "' . $this->name . ':edit",
+      "Controller" => "' . $this->name . ':' . $this->name . ':edit",
       "Pattern" => "/' . $this->name . '/Edit/{id}/"
 );
 
 Router::$Route[\'' . $this->name . '_Delete\'] = array(
 
-      "Controller" => "' . $this->name . ':delete",
+      "Controller" => "' . $this->name . ':' . $this->name . ':delete",
       "Pattern" => "/' . $this->name . '/Delete/{id}/"
 );
               ';

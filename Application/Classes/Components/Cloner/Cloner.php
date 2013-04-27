@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components\Cloner;
+namespace Application\Components;
 
 
 

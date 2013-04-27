@@ -252,9 +252,9 @@ class Router extends AppMethods{
         if(!empty($variable))
             $this->funcVariable = $variable;
 
-        
-
         if(!class_exists($objectName)){
+
+            echo 'Error: '.$objectName;
 
             $error = array(
 

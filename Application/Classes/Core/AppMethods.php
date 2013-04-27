@@ -2,6 +2,8 @@
 
 namespace Application\Core;
 
+
+
 class AppMethods extends Debugger {
 
     private
@@ -16,11 +18,13 @@ class AppMethods extends Debugger {
      */
     public function getObject($object, $args = null) {
 
+        $fullClassPath = '\\Application\\Components\\'.$object;
+
         if (!isset($this->$object) && !is_object($this->$object)) {
 
-            if (class_exists($object)) {
+            if (class_exists($fullClassPath)) {
 
-                $this->$object = new $object($args);
+                $this->$object = new $fullClassPath($args);
                 $this->$object->objectCreatedAt = time();
             }
             else

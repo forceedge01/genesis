@@ -1,1 +1,1 @@
- <?=$this->RenderTemplate("::Footer.html.php")?>
+ <?=$this->RenderTemplate(":Footer.html.php")?>

@@ -48,15 +48,15 @@ define('JS_FOLDER', ASSETS_FOLDER . 'JS/');
 
 // Bundle structure
 
-define('BUNDLE_CONFIGS', '/Resources/Configs');
+define('BUNDLE_CONFIGS', '/Resources/Configs/');
 
-define('BUNDLE_DATABASE_FILES', '/Model');
+define('BUNDLE_DATABASE_FILES', '/Model/');
 
-define('BUNDLE_CONTROLLERS', '/Controllers');
+define('BUNDLE_CONTROLLERS', '/Controllers/');
 
-define('BUNDLE_ROUTES', '/Resources/Routes');
+define('BUNDLE_ROUTES', '/Resources/Routes/');
 
-define('BUNDLE_VIEWS', '/Resources/Views');
+define('BUNDLE_VIEWS', '/Resources/Views/');
 
 define('BUNDLE_VIEW_HEADER_FILE', 'Header.html.php');
 

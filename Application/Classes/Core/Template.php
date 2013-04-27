@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class Template extends Router {
 
     private
@@ -67,7 +71,7 @@ class Template extends Router {
 
         if(ENABLE_HTML_VALIDATION && !empty($html)){
 
-            $validation = new ValidationEngine();
+            $validation = new \Application\Components\ValidationEngine\ValidationEngine();
             $validation->validateHTML ($html);
         }
 

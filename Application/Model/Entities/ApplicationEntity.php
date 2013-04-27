@@ -1,5 +1,10 @@
 <?php
 
+namespace Application\Core\Entities;
+
+
+use Application\Core\Database;
+
 class ApplicationEntity extends Database{
 
     protected
@@ -10,7 +15,23 @@ class ApplicationEntity extends Database{
 
         parent::__construct($params);
 
-        $this->tableName = str_replace('Entity','', get_called_class());
+        $this->tableName = str_replace('Entity','', $this->GetClassFromNameSpacedClass(get_called_class()));
+
+        if(is_numeric($params))
+            $this->Get($params);
+    }
+
+    /**
+     *
+     * @param Mixed $id Can be the primary key value or an array of column and values
+     * @return mixed Returns the matching data set from the database.
+     */
+    public function Get($id = null) {
+
+        if (!$id)
+            $id = $this->id;
+
+        return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
     }
 
     /**

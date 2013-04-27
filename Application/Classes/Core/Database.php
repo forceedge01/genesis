@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Core;
+
 class Database extends Template {
 
     private
@@ -56,7 +58,7 @@ class Database extends Template {
 
         try {
 
-            $this->activeConnection = new mysqli($this->host, $this->username, $this->password, $this->name);
+            $this->activeConnection = new \mysqli($this->host, $this->username, $this->password, $this->name);
         } catch (Exception $e) {
 
             $site = new SiteController();
@@ -922,11 +924,13 @@ class Database extends Template {
 
     public function GetFormFields() {
 
-        $this->Table(get_called_class());
+        $table = $this->GetTableNameFromNameSpacedClass(get_called_class());
+
+        $this->Table($table);
 
         $foreignkeys = $this->ForeignKeys()->GetResultSet();
 
-        $this->formFields[get_called_class()] = $this->GetTableColumns();
+        $this->formFields[$table] = $this->GetTableColumns();
         ;
 
         if ($foreignkeys)

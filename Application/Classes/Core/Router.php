@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class Router extends AppMethods{
 
     private
@@ -77,8 +81,13 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                $objectName = $controllerAction[0] . 'Controller';
-                $objectAction = $controllerAction[1] . 'Action';
+                if($controllerAction[0] == null)
+                    $namespace = '\\Application\\Core\\Controllers\\';
+                else
+                    $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+
+                $objectName = $namespace.$controllerAction[1] . 'Controller';
+                $objectAction = $controllerAction[2] . 'Action';
 
                 $this->callAction($objectName, $objectAction, $this->funcVariable);
 
@@ -242,6 +251,8 @@ class Router extends AppMethods{
 
         if(!empty($variable))
             $this->funcVariable = $variable;
+
+        
 
         if(!class_exists($objectName)){
 

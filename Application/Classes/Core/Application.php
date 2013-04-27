@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class Application extends Template{
 
     private
@@ -95,5 +99,15 @@ class Application extends Template{
             return false;
         }
 
+    }
+
+    public function GetRequest(){
+
+        return $this->Request;
+    }
+
+    public function GetRouter(){
+
+        return $this->Router;
     }
 }

@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
 
 class AppKernal {
@@ -9,7 +13,7 @@ class AppKernal {
             $configs = array(),
             $controllers = array(),
             $routes = array(),
-            $model = array(),
+            $models = array(),
             $bundles = array(),
             $components = array(),
             $files = array();
@@ -78,7 +82,7 @@ class AppKernal {
 
         self::load('routes', APPLICATION_ROUTES_FOLDER);
 
-        self::load('model', APPLICATION_MODELS_FOLDER);
+        self::load('models', APPLICATION_MODELS_FOLDER);
 
         self::load('controllers', APPLICATION_CONTROLLERS_FOLDER);
 
@@ -181,7 +185,14 @@ class AppKernal {
 
     private static function checkDependencies(){
 
-        self::$phpVersion = phpversion();
+        $version = '5.3.0';
+
+        if(version_compare(phpversion(), $version, '>='))
+                self::$phpVersion = phpversion();
+        else{
+            echo 'You need to update your php version, GENESIS needs atleast php '.$version;
+            exit;
+        }
     }
 
     private static function fileExtensionIs($file, array $extensions){

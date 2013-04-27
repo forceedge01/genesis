@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Bundles\Controllers;
+
+
+
+use Application\Core\Controllers\ApplicationController;
+
 class WelcomeController extends ApplicationController {
 
     public

@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Console;
+
+
+
 class Console {
 
     public function init(){
@@ -27,7 +31,7 @@ class Console {
 
             $options = getOptions();
 
-            $bundle = new Bundle('html');
+            $bundle = new Libraries\Bundle('html');
 
             if (isset($_POST['submitOption'])) {
 
@@ -165,13 +169,13 @@ class Console {
 
             if (isset($_SERVER['SERVER_NAME'])) {
 
-                $bundle = new Bundle('html');
+                $bundle = new Libraries\Bundle('html');
 
                 $bundle->name = str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] )));
 
             } else {
 
-                $bundle = new Bundle('console');
+                $bundle = new Libraries\Bundle('console');
             }
         }
 

@@ -1,5 +1,9 @@
 <?php
 
+use \Application\Core\Router;
+
+
+
 Router::$Route['Welcome'] = array(
 
       "Controller" => "Welcome:index",

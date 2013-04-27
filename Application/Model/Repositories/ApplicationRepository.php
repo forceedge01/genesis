@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Core\Repositories;
+
+
+
+use Application\Core\Database;
+
 class ApplicationRepository extends Database {
 
     protected
@@ -11,7 +17,7 @@ class ApplicationRepository extends Database {
 
         parent::__construct($params);
 
-        $this->tableName = str_replace('Repository','', get_called_class());
+        $this->tableName = str_replace('Repository','', $this->GetClassFromNameSpacedClass(get_called_class()));
     }
 
     /**
@@ -77,19 +83,6 @@ class ApplicationRepository extends Database {
     public function GetAll(array $params = array()) {
 
         return $this->Table($this->tableName, $this->tableColumns)->GetRecords($params)->GetResultSet();
-    }
-
-    /**
-     *
-     * @param Mixed $id Can be the primary key value or an array of column and values
-     * @return mixed Returns the matching data set from the database.
-     */
-    public function Get($id = null) {
-
-        if (!$id)
-            $id = $this->id;
-
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
     }
 
     /**

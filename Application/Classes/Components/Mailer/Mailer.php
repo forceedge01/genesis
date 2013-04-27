@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Components\Mailer;
+
+
+
 class Mail{
 
     private

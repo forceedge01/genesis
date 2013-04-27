@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Console\Libraries;
+
+
+
 class Bundle extends Console {
 
     public
@@ -127,6 +131,11 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->
 
         $initEntity = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Entities;
+
+
+
+use \\Application\\Core\\Entities\\ApplicationEntity;
 
 // This Entity represents '.$this->name.' table
 
@@ -143,6 +152,11 @@ class ' . $this->name . 'Entity extends ApplicationEntity {
 
         $initEntity = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Repositories;
+
+
+
+use \\Application\\Core\\Repositories\\ApplicationRepository;
 
 // This Repository holds methods for '.$this->name.' table
 
@@ -269,6 +283,16 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $initController = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Controllers;
+
+
+
+use \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity;
+use \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository;
+
+use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
+
+
 class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
       public
@@ -288,7 +312,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'class\' => \'paginate\',
                 \'title\' => \'Dataset\',
-                \'tbody\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
+                \'tbody\' => $this->GetRepository("' . $this->name . ':'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
                 \'ignoreFields\' => array(),
                 \'actions\' => array(
 
@@ -333,7 +357,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                   \'title\' => \'View\',
                   \'class\' => \'paginate\',
-                  \'tbody\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->Get($id),
+                  \'tbody\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->Get($id),
                   \'actions\' => array(
 
                       \'Edit\' => array(
@@ -353,7 +377,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
       public function createAction(){
 
-            if($this->isPost("submit")){
+            if($this->GetRequest->isPost("submit")){
 
               if($this->GetEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
@@ -380,7 +404,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
                         \'value\' => \'Enter your name\',
                     )
                 ),
-                \'table\' => $this->GetRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetFormFields(),
+                \'table\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->GetFormFields(),
 
                 \'submission\' => array(
 
@@ -402,7 +426,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
       public function editAction($id){
 
-            if($this->isPost("submit")){
+            if($this->GetRequest()->isPost("submit")){
 
               if($'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
@@ -417,7 +441,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'title\' => \'Edit\',
                 \'action\' => $this->setRoute(\''.$this->name.'_Edit\', array(\'id\' => $id)),
-                \'table\' => $'.$this->name.'->Get($id),
+                \'table\' => $this->GetEntity('.$this->name.':'.$this->name.')->Get($id),
                 \'submission\' => array(
 
                     \'submit\' => array(
@@ -429,7 +453,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             );
 
-            $params["PageTitle"] = "Edit testBundle";
+            $params["PageTitle"] = "Edit '.$this->name.'";
 
             $this->htmlgen = new HTMLGenerator();
 
@@ -447,7 +471,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isAjax()){
 
-              $'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'");
+              $'.$this->name.' = $this->getEntity("' . $this->name . ':'.$this->name.'");
 
               if($' . $this->name . '->delete($id))
                   echo \'success:Delete was successful\';
@@ -466,8 +490,15 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
         $initController = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Controllers;
+
+
+
+use \\Application\\Core\\Controllers\\ApplicationController;
+
 
 // Use this class to inherit methods used in all or some of your controllers
+// ' . $this->name . ' bundle created at: ' . date('y-M-d') . '
 
 class ' . $this->name . 'BundleController extends ApplicationController{
 
@@ -488,6 +519,10 @@ class ' . $this->name . 'BundleController extends ApplicationController{
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Routes/' . $this->name . '.php', 'w+');
 
         $initRoute = '<?php
+
+use \\Application\\Core\\Router;
+
+
 
 Router::$Route[\'' . $this->name . '\'] = array(
 

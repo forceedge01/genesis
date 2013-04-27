@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Core;
+
 class AppMethods extends Debugger {
 
     private
@@ -237,29 +239,14 @@ class AppMethods extends Debugger {
 
         $bundle = explode(':', $bundleColonEntityName);
 
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Entities/'.$bundle[1].'Entity.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
-//
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
+        if($bundle[0] == null)
+            $namespace = '\\Application\\Core\\Repositories\\';
+        else
+            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
 
-        return $this->getObject($bundle[1]);
+        return $this->getObject($namespace.$bundle[1]);
     }
 
     /**
@@ -272,29 +259,14 @@ class AppMethods extends Debugger {
 
         $bundle = explode(':', $bundleColonEntityName);
 
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Entities/'.$bundle[1].'Entity.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
-//
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
+        if($bundle[0] == null)
+            $namespace = '\\Application\\Core\\Entities\\';
+        else
+            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Entities\\';
 
         $bundle[1] .= 'Entity';
 
-        return $this->getObject($bundle[1]);
+        return $this->getObject($namespace.$bundle[1]);
     }
 
     public function variable($var) {
@@ -576,5 +548,19 @@ class AppMethods extends Debugger {
             $array = $this->deleteIndex ($array , $key-1);
 
         return $array;
+    }
+
+    public function GetClassFromNameSpacedClass($namespacedClass){
+
+        $position = (strrpos($namespacedClass, '\\'))+1;
+
+        return substr($namespacedClass, $position);
+    }
+
+    public function GetTableNameFromNameSpacedClass($namespacedClass){
+
+        $namespaced = $this->GetClassFromNameSpacedClass($namespacedClass);
+
+        return str_replace('Repository', '', str_replace('Entity', '', $namespaced));
     }
 }

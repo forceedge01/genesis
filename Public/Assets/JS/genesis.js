@@ -1,45 +1,51 @@
 
 $(document).ready(function() {
+    
+    $('.confirmation').gear('confirm',{
+        
+        loadingDiv: 'div#loading',
+        messageDiv: 'div#JSEvent'
+    });
 
     //-------------------------------------------------------------------------------------------------//Confirm action for all forms-------------------------------------------------------------------------------------------------//
-    $('.confirmAction').click(function() {
-
-        var answer = confirm($(this).next().val());
-
-        var $this = $(this);
-
-        if (answer) {
-
-            $('div#loading').show();
-
-            $.post($(this).prev().val(), $('form').serializeArray(), function(data) {
-
-                var chunk = data.split(':');
-                var Assignclass = null;
-
-                if (chunk[0] == 'error')
-                    Assignclass = 'alert error';
-                else if (chunk[0] == 'success')
-                    Assignclass = 'alert message';
-                else
-                    alert('Unhandled Exception:' + chunk[0] + chunk[1]);
-
-                $('#JSEvent').removeClass();
-
-                $('#JSEvent').addClass(Assignclass).html(chunk[1]);
-
-                if (chunk[0] == 'success') {
-
-                    if ($($this).hasClass('remove'))
-                        $($this).parent().parent().parent().remove();
-                }
-
-                $('div#loading').hide();
-
-            });
-        }
-
-    });
+//    $('.confirmAction').click(function() {
+//
+//        var answer = confirm($(this).next().val());
+//
+//        var $this = $(this);
+//
+//        if (answer) {
+//
+//            $('div#loading').show();
+//
+//            $.post($(this).prev().val(), $('form').serializeArray(), function(data) {
+//
+//                var chunk = data.split(':');
+//                var Assignclass = null;
+//
+//                if (chunk[0] == 'error')
+//                    Assignclass = 'alert error';
+//                else if (chunk[0] == 'success')
+//                    Assignclass = 'alert message';
+//                else
+//                    alert('Unhandled Exception:' + chunk[0] + chunk[1]);
+//
+//                $('#JSEvent').removeClass();
+//
+//                $('#JSEvent').addClass(Assignclass).html(chunk[1]);
+//
+//                if (chunk[0] == 'success') {
+//
+//                    if ($($this).hasClass('remove'))
+//                        $($this).parent().parent().parent().remove();
+//                }
+//
+//                $('div#loading').hide();
+//
+//            });
+//        }
+//
+//    });
 
     //-------------------------------------------------------------------------------------------------//build menu item-------------------------------------------------------------------------------------------------//
     $('#Menu,#menuList').on('click', function() {
@@ -49,41 +55,11 @@ $(document).ready(function() {
     });
 
     //-------------------------------------------------------------------------------------------------//enable tips for inputs-------------------------------------------------------------------------------------------------//
-    $('input[type=text]').on('focus', function() {
-        $(this).next('.tip').show();
-    }).on('blur', function() {
-        $(this).next('.tip').hide();
-    });
+    $('input[type=text]').gear('tip');
 
 
     //one create domain button is clicked, the button is disabled untill the process is finished.-------------------------------------------------------------------------------------------------//
-    $('body').on('submit', 'form', function(e) {
-
-        $('input[type=submit]').parent().parent().fadeOut(200);
-
-        $('div#loading').show();
-
-        if ($(this).hasClass('confirm')) {
-
-            var answer = confirm($(this).attr('message'));
-
-            if (answer) {
-
-                return true
-
-            }
-            else {
-
-                $('div#loading').hide();
-                $('input[type=submit]').parent().parent().fadeIn(200);
-
-                return false
-
-            }
-
-        }
-
-    });
+    $.gear('form');
 
     $('div').delegate('.alert', 'click', function() {
 

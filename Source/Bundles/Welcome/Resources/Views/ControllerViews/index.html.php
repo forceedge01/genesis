@@ -10,6 +10,10 @@
         </legend>
 
         <div class="widget index">
+            
+            <input type="hidden" value="http://abc.com/abc?asdfh">
+            <span id ="confirmation">Confirm</span>
+            <input type="hidden" value="This is a sample message">
 
             <br />
 

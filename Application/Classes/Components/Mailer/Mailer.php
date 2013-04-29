@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Components;
+
+
+
 class Mail{
 
     private
@@ -19,7 +23,7 @@ class Mail{
      */
     private function phpmailer_init() {
 
-        $this->phpmailer = new PHPMailer(true);
+        $this->phpmailer = new Mailer\PHPMailer(true);
 
         $options = $this->options;
         // Don't configure for SMTP if no host is provided.

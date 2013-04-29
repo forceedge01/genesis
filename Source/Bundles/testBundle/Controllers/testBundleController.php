@@ -1,5 +1,17 @@
 <?php
 
+namespace Application\Bundles\TestBundle\Controllers;
+
+
+
+use \Application\Core\Controllers\ApplicationController;
+
+use \Application\Bundles\TestBundle\Entities\testBundleEntity;
+use \Application\Bundles\TestBundle\Repositories\testBundleRepository;
+
+use \Application\Components\HTMLGenerator\HTMLGenerator;
+
+
 class testBundleController extends ApplicationController{
 
       public function indexAction(){
@@ -12,14 +24,12 @@ class testBundleController extends ApplicationController{
 
               $params["PageTitle"] = "All testBundle";
 
-              $testBundle = new testBundle();
-
               //Used by the HTMLGenerator in the list view.
               $params['table'] = array(
 
                 'class' => 'paginate',
                 'title' => 'Dataset',
-                'tbody' => $testBundle->GetAll(array('order by' => 'id desc')),
+                'tbody' => $this->GetRepository('TestBundle:testBundle')->GetAll(array('order by' => 'id desc')),
                 'ignoreFields' => array('Users__password'),
                 'actions' => array(
 
@@ -60,7 +70,7 @@ class testBundleController extends ApplicationController{
 
               $params["PageTitle"] = "View testBundle";
 
-              $testBundle = new testBundle();
+              $testBundle = new testBundleEntity();
 
               $params["table"] = array(
 
@@ -86,9 +96,9 @@ class testBundleController extends ApplicationController{
 
       public function createAction(){
 
-          $testBundle = new testBundle();
+          $testBundle = new testBundleEntity();
 
-            if($this->Request->isPost("submit")){
+            if($this->GetRequest()->isPost("submit")){
 
               if($testBundle->Save())
                   $this->setFlash(array("Success" => "Create successful."));
@@ -138,9 +148,9 @@ class testBundleController extends ApplicationController{
 
       public function editAction($id){
 
-            $testBundle = new testBundle($id);
+            $testBundle = new testBundleEntity($id);
 
-            if($this->isPost("submit")){
+            if($this->GetRequest()->isPost("submit")){
 
               if($testBundle->Save())
                   $this->setFlash(array("Success" => "Update successful."));
@@ -183,7 +193,7 @@ class testBundleController extends ApplicationController{
        */
       public function deleteAction($id){
 
-            if($this->isAjax()){
+            if($this->GetRequest()->isAjax()){
 
               $testBundle = new testBundle();
 

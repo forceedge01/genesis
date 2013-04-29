@@ -16,7 +16,7 @@ define('APPLICATION_COMPONENTS_FOLDER', APPLICATION_CLASSES_FOLDER . 'Components
 
 define('APPLICATION_RESOURCES_FOLDER', APPLICATION_FOLDER . 'Resources/');
 
-define('APPLICATION_ENTITIES_FOLDER', APPLICATION_FOLDER . 'Entities/');
+define('APPLICATION_MODELS_FOLDER', APPLICATION_FOLDER . 'Model/');
 
 define('APPLICATION_CONFIGS_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Configs/');
 
@@ -45,3 +45,19 @@ define('IMAGES_FOLDER', ASSETS_FOLDER . 'Images/');
 define('CSS_FOLDER', ASSETS_FOLDER . 'CSS/');
 
 define('JS_FOLDER', ASSETS_FOLDER . 'JS/');
+
+// Bundle structure
+
+define('BUNDLE_CONFIGS', '/Resources/Configs/');
+
+define('BUNDLE_DATABASE_FILES', '/Model/');
+
+define('BUNDLE_CONTROLLERS', '/Controllers/');
+
+define('BUNDLE_ROUTES', '/Resources/Routes/');
+
+define('BUNDLE_VIEWS', '/Resources/Views/');
+
+define('BUNDLE_VIEW_HEADER_FILE', 'Header.html.php');
+
+define('BUNDLE_VIEW_FOOTER_FILE', 'Footer.html.php');

@@ -1,2 +1,2 @@
-<?=$this->RenderTemplate("::Header.html.php", $params)?>
+<?=$this->RenderTemplate(":Header.html.php", $params)?>
 

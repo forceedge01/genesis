@@ -1,5 +1,10 @@
 <?php
 
+namespace Application\Console\Libraries;
+
+
+use Application\Console\Console;
+
 class Bundle extends Console {
 
     public
@@ -117,108 +122,47 @@ DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->
 
     private function createEntity(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models');
-        
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Entities');
-        
-        mkdir(BUNDLES_FOLDER . $this->name . '/Models/Repositories');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Entities/' . $this->name . 'Entity.php', 'w+');
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Entities');
+
+        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Repositories');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Entities/' . $this->name . 'Entity.php', 'w+');
 
         $initEntity = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Entities;
+
+
+
+use \\Application\\Core\\Entities\\ApplicationEntity;
 
 // This Entity represents '.$this->name.' table
-    
+
 class ' . $this->name . 'Entity extends ApplicationEntity {
 
-      protected
-            $id;
 }
               ';
 
         fwrite($handle, $initEntity);
 
         fclose($handle);
-        
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Models/Repositories/' . $this->name . 'Repository.php', 'w+');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Repositories/' . $this->name . 'Repository.php', 'w+');
 
         $initEntity = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Repositories;
+
+
+
+use \\Application\\Core\\Repositories\\ApplicationRepository;
 
 // This Repository holds methods for '.$this->name.' table
-    
-class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
-      protected
-            $tableColumns,
-            $joinQuery,
-            $tableName;
+class ' . $this->name . 'Repository extends ApplicationRepository {
 
-      public function __construct($id = null){
-
-         parent::__construct();
-
-         $this->tableColumns = array(\'*\');
-
-         $this->tableName = __CLASS__;
-
-         if(is_numeric($id)){
-
-            $this->id = $id;
-            $this->Get();
-         }
-      }
-
-      /**
-       *
-       * @param Array $param Params can include where clause order by clause or any other mysql clause.
-       * @return mixed Returns matching data set.
-       */
-      public function GetAll(array $params = array()){
-
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecords($params)->GetResultSet();
-
-      }
-
-      /**
-       *
-       * @param Mixed $id Can be the primary key value or an array of column and values
-       * @return mixed Returns the matching data set from the database.
-       */
-      public function Get($id = null){
-
-        if(!$id)
-            $id = $this->id;
-
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetFirstResult();
-
-      }
-
-      /**
-       *
-       * @param array $params Pass in the data for saving it to the database, if not provided<br>
-       * the submitted data in globals will be taken and matched to the table on which the operation is applied.
-       */
-      public function Save(array $params = array()){
-
-        return $this->Table($this->tableName)->SaveRecord($params)->GetAffectedRows();
-
-      }
-
-      /**
-       *
-       * @param int $id the id of the record to be deleted
-       * @return int Number of rows affected
-       */
-      public function Delete($id = null){
-
-        if(!$id)
-            $id = $this->id;
-
-        return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
-
-      }
 }
               ';
 
@@ -237,7 +181,7 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Header.html.php', 'w+');
 
-        $initTemplate = '<?=$this->RenderTemplate("Templates::Header.html.php", $params)?>
+        $initTemplate = '<?=$this->RenderTemplate(":Header.html.php", $params)?>
 
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
 ';
@@ -248,7 +192,7 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
 
-        $initTemplate = ' <?=$this->RenderTemplate("Templates::Footer.html.php", $params)?>
+        $initTemplate = ' <?=$this->RenderTemplate(":Footer.html.php", $params)?>
 
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 ';
@@ -340,7 +284,20 @@ class ' . $this->name . 'Repository extends '.$this->name.'Entity {
 
         $initController = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Controllers;
+
+
+
+use \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity;
+use \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository;
+
+use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
+
+
 class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
+
+      public
+            $htmlgen;
 
       public function indexAction(){
 
@@ -356,7 +313,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'class\' => \'paginate\',
                 \'title\' => \'Dataset\',
-                \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
+                \'tbody\' => $this->GetRepository("' . $this->name . ':'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
                 \'ignoreFields\' => array(),
                 \'actions\' => array(
 
@@ -389,7 +346,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
               //This will be used in the template to generate the above declared table.
               $this->htmlgen = new HTMLGenerator();
 
-              $this->Render("Bundle:' . $this->name . ':list.html.php", $params);
+              $this->Render("' . $this->name . ':list.html.php", $params);
 
       }
 
@@ -401,7 +358,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                   \'title\' => \'View\',
                   \'class\' => \'paginate\',
-                  \'tbody\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Get($id),
+                  \'tbody\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->Get($id),
                   \'actions\' => array(
 
                       \'Edit\' => array(
@@ -415,15 +372,15 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
               $this->htmlgen = new HTMLGenerator();
 
-              $this->Render("Bundle:' . $this->name . ':view.html.php", $params);
+              $this->Render("' . $this->name . ':view.html.php", $params);
 
       }
 
       public function createAction(){
 
-            if($this->isPost("submit")){
+            if($this->GetRequest->isPost("submit")){
 
-              if($this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->Save())
+              if($this->GetEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
               else
                   $this->setError(array("Failure" => "Failed to create."));
@@ -448,7 +405,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
                         \'value\' => \'Enter your name\',
                     )
                 ),
-                \'table\' => $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'")->GetFormFields(),
+                \'table\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->GetFormFields(),
 
                 \'submission\' => array(
 
@@ -464,17 +421,15 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
             //This will be used in the template to generate the above declared form.
             $this->htmlgen = new HTMLGenerator();
 
-            $this->Render("Bundle:' . $this->name . ':create.html.php", $params);
+            $this->Render("' . $this->name . ':create.html.php", $params);
 
       }
 
       public function editAction($id){
-      
-            $'.$this->name.' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
 
-            if($this->isPost("submit")){
+            if($this->GetRequest()->isPost("submit")){
 
-              if($' . $this->name . '->Save())
+              if($'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
               else
                   $this->setError(array("Failure" => "Failed to update."));
@@ -487,7 +442,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
                 \'title\' => \'Edit\',
                 \'action\' => $this->setRoute(\''.$this->name.'_Edit\', array(\'id\' => $id)),
-                \'table\' => $'.$this->name.'->Get($id),
+                \'table\' => $this->GetEntity(\''.$this->name.':'.$this->name.'\')->Get($id),
                 \'submission\' => array(
 
                     \'submit\' => array(
@@ -499,11 +454,11 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             );
 
-            $params["PageTitle"] = "Edit testBundle";
+            $params["PageTitle"] = "Edit '.$this->name.'";
 
             $this->htmlgen = new HTMLGenerator();
 
-            $this->Render("Bundle:' . $this->name . ':edit.html.php", $params);
+            $this->Render("' . $this->name . ':edit.html.php", $params);
 
       }
 
@@ -517,7 +472,7 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
             if($this->isAjax()){
 
-              $' . $this->name . ' = $this->getRepository("' . $this->name . 'Bundle:'.$this->name.'");
+              $'.$this->name.' = $this->getEntity("' . $this->name . ':'.$this->name.'");
 
               if($' . $this->name . '->delete($id))
                   echo \'success:Delete was successful\';
@@ -536,8 +491,15 @@ class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
         $initController = '<?php
 
+namespace Application\\Bundles\\'.$this->name.'\\Controllers;
 
-// Use this class to inherit methods used in all or some of your controllers
+
+
+use \\Application\\Core\\Controllers\\ApplicationController;
+
+
+// Use this class to inherit methods used in all or some of your ' . $this->name . ' bundle controllers
+// ' . $this->name . ' bundle created at: ' . date('l, d F, Y') . '
 
 class ' . $this->name . 'BundleController extends ApplicationController{
 
@@ -559,39 +521,43 @@ class ' . $this->name . 'BundleController extends ApplicationController{
 
         $initRoute = '<?php
 
+use \\Application\\Core\\Router;
+
+
+
 Router::$Route[\'' . $this->name . '\'] = array(
 
-      "Controller" => "' . $this->name . ':index",
+      "Controller" => "' . $this->name . ':' . $this->name . ':index",
       "Pattern" => "/' . $this->name . '/"
 );
 
 Router::$Route[\'' . $this->name . '_List\'] = array(
 
-      "Controller" => "' . $this->name . ':list",
+      "Controller" => "' . $this->name . ':' . $this->name . ':list",
       "Pattern" => "/' . $this->name . '/List/"
 );
 
 Router::$Route[\'' . $this->name . '_View\'] = array(
 
-      "Controller" => "' . $this->name . ':view",
+      "Controller" => "' . $this->name . ':' . $this->name . ':view",
       "Pattern" => "/' . $this->name . '/View/{id}/"
 );
 
 Router::$Route[\'' . $this->name . '_Create\'] = array(
 
-      "Controller" => "' . $this->name . ':create",
+      "Controller" => "' . $this->name . ':' . $this->name . ':create",
       "Pattern" => "/' . $this->name . '/Create/"
 );
 
 Router::$Route[\'' . $this->name . '_Edit\'] = array(
 
-      "Controller" => "' . $this->name . ':edit",
+      "Controller" => "' . $this->name . ':' . $this->name . ':edit",
       "Pattern" => "/' . $this->name . '/Edit/{id}/"
 );
 
 Router::$Route[\'' . $this->name . '_Delete\'] = array(
 
-      "Controller" => "' . $this->name . ':delete",
+      "Controller" => "' . $this->name . ':' . $this->name . ':delete",
       "Pattern" => "/' . $this->name . '/Delete/{id}/"
 );
               ';

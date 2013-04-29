@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Components;
+
+
+
+use Application\Core\Debugger;
+
 class ValidationEngine extends Debugger{
 
     private

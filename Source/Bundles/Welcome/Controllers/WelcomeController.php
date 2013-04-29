@@ -1,6 +1,15 @@
 <?php
 
+namespace Application\Bundles\Welcome\Controllers;
+
+
+
+use Application\Core\Controllers\ApplicationController;
+
 class WelcomeController extends ApplicationController {
+
+    public
+            $htmlgen;
 
     public function indexAction() {
 
@@ -136,7 +145,7 @@ class WelcomeController extends ApplicationController {
 
         $this->htmlgen = $this->getObject('HTMLGenerator');
 
-        $this->Render('Bundle:Welcome:index.html.php', $params);
+        $this->Render('Welcome:index.html.php', $params);
     }
 
 }

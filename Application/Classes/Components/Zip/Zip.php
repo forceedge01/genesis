@@ -1,6 +1,10 @@
 <?php
 
-class Zip extends ZipArchive {
+namespace Application\Components;
+
+
+
+class Zip extends \ZipArchive {
 
     private
             $files = array(),
@@ -181,54 +185,54 @@ class Zip extends ZipArchive {
     }
 
     function zip_info_generator($zip = null) {
-        
+
         if(empty($zip))
             $zip = $this->zip;
         else
             $zip = zip_open($zip);
-        
+
         $folder_count = 0;
         $file_count = 0;
         $unzipped_size = 0;
-        
+
         $ext_array = array();
         $ext_count = array();
-        
+
         if ($zip) {
-            
+
             while ($zip_entry = zip_read($zip)) {
-                
+
                 if (strrpos(zip_entry_name($zip_entry), '/')+1 == strlen(zip_entry_name($zip_entry))) {
-                    
+
                     $folder_count++;
-                    
+
                 } else {
-                    
+
                     $file_count++;
-                    
+
                 }
-                
+
                 $path_parts = pathinfo(zip_entry_name($zip_entry));
                 $ext = strtolower(trim(isset($path_parts['extension']) ? $path_parts['extension'] : ''));
-                
+
                 if ($ext != '') {
-                    
+
                     $ext_count[$ext]['count'] = isset($ext_count[$ext]['count']) ? $ext_count[$ext]['count'] : 0;
                     $ext_count[$ext]['count']++;
-                    
+
                 }
-                
+
                 $unzipped_size = $unzipped_size + zip_entry_filesize($zip_entry);
             }
-            
+
         }
-        
+
         $zipped_size = $this->get_file_size_unit(filesize(TEST_CANDIDATE_DIR . STREETTEAM_ZIP_NAME));
-        
+
         $unzipped_size = $this->get_file_size_unit($unzipped_size);
-        
+
         $zip_info = array(
-            
+
             "folders" => $folder_count,
             "files" => $file_count,
             "total" => $folder_count+$file_count,
@@ -236,28 +240,28 @@ class Zip extends ZipArchive {
             "unzipped_size" => $unzipped_size,
             "file_types" => $ext_count
         );
-        
+
         zip_close($zip);
-        
+
         return $zip_info;
     }
 
     function get_file_size_unit($file_size) {
-        
+
         if ($file_size / 1024 < 1) {
-            
+
             return $file_size . "Bytes";
-            
-        } 
-        else if ($file_size / 1024 >= 1 && $file_size / (1024 * 1024) < 1) 
+
+        }
+        else if ($file_size / 1024 >= 1 && $file_size / (1024 * 1024) < 1)
         {
-            
+
             return ($file_size / 1024) . "KB";
-            
-        } 
-        else 
+
+        }
+        else
         {
-            
+
             return $file_size / (1024 * 1024) . "MB";
         }
     }

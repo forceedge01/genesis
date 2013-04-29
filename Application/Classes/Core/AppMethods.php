@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class AppMethods extends Debugger {
 
     private
@@ -14,11 +18,13 @@ class AppMethods extends Debugger {
      */
     public function getObject($object, $args = null) {
 
+        $fullClassPath = '\\Application\\Components\\'.$object;
+
         if (!isset($this->$object) && !is_object($this->$object)) {
 
-            if (class_exists($object)) {
+            if (class_exists($fullClassPath)) {
 
-                $this->$object = new $object($args);
+                $this->$object = new $fullClassPath($args);
                 $this->$object->objectCreatedAt = time();
             }
             else
@@ -89,7 +95,7 @@ class AppMethods extends Debugger {
      * @return type
      * Returns result for human readable string of conditional statement in an array or object
      */
-    public function find($subject, $haystack) {
+    /*public function find($subject, $haystack) {
 
         $result = array();
 
@@ -225,6 +231,26 @@ class AppMethods extends Debugger {
         }
 
         return $result;
+    }*/
+
+    /**
+     *
+     * @param type $bundleColonEntityName
+     * @return \bundle returns an entity object
+     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
+     */
+    public function GetRepository($bundleColonEntityName){
+
+        $bundle = explode(':', $bundleColonEntityName);
+
+        if($bundle[0] == null)
+            $namespace = '\\Application\\Core\\Repositories\\';
+        else
+            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Repositories\\';
+
+        $bundle[1] .= 'Repository';
+
+        return $this->getObject($namespace.$bundle[1]);
     }
 
     /**
@@ -233,33 +259,18 @@ class AppMethods extends Debugger {
      * @return \bundle returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
-    public function getRepository($bundleColonEntityName){
+    public function GetEntity($bundleColonEntityName){
 
         $bundle = explode(':', $bundleColonEntityName);
 
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Entities/'.$bundle[1].'Entity.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Entity ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
-//        
-//        $path = $this->refactorUrl(BUNDLES_FOLDER . $bundle[0] . '/Models/Repositories/'.$bundle[1].'Repository.php');
-//
-//        if(is_file($path))
-//            require_once $path;
-//        else{
-//
-//            echo 'Repository ' . $bundle[1] . ' not found at ' . $path;
-//            exit;
-//        }
-        
-        $bundle[1] .= 'Repository';
-        
-        return $this->getObject($bundle[1]);
+        if($bundle[0] == null)
+            $namespace = '\\Application\\Core\\Entities\\';
+        else
+            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Entities\\';
+
+        $bundle[1] .= 'Entity';
+
+        return $this->getObject($namespace.$bundle[1]);
     }
 
     public function variable($var) {
@@ -402,7 +413,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return type
      * Gets the type of the variable
      */
@@ -412,7 +423,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @param array $list
      * @return \AppMethods
      * Removed double occurance of substrings provided in the array
@@ -441,7 +452,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return \AppMethods
      * Remove first character from the variable
      */
@@ -453,7 +464,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @return \AppMethods
      * Remove last character from the variable
      */
@@ -465,7 +476,7 @@ class AppMethods extends Debugger {
     }
 
     /**
-     * 
+     *
      * @param array $keyedList
      * @return \AppMethods
      * Replace multiple keywords provided in a keyed array
@@ -479,45 +490,45 @@ class AppMethods extends Debugger {
 
         return $this;
     }
-    
+
     public function arrayToString(array $array){
-        
+
         $string = '';
-        
+
         foreach($array as $ar){
-            
+
             $string .= $ar;
         }
-        
+
         return $string;
     }
-    
+
     public function refactorUrl($url){
-        
+
         $chunks = explode('/', $url);
-        
+
         $array = $chunks;
-        
+
         $deleteIndex = array();
-        
+
         foreach($array as $key => $urlChunk){
-            
+
             if($urlChunk == '..'){
-                
+
                 unset($array[$key]);
                 $deleteIndex[] = $key-1;
             }
             else if($urlChunk == '.'){
-                
+
                 unset($array[$key]);
             }
         }
-        
+
         foreach($deleteIndex as $key){
-            
+
             $array = $this->deleteIndex($array, $key);
         }
-        
+
         $index = 0;
         foreach($array as $key=>$value){
 
@@ -529,17 +540,31 @@ class AppMethods extends Debugger {
 
             $index++;
         }
-        
+
         return implode('/', $array);
     }
-    
+
     private function deleteIndex($array, $key){
-        
+
         if(isset($array[$key]))
             unset($array[$key]);
-        else 
+        else
             $array = $this->deleteIndex ($array , $key-1);
-        
+
         return $array;
-    }   
+    }
+
+    public function GetClassFromNameSpacedClass($namespacedClass){
+
+        $position = (strrpos($namespacedClass, '\\'))+1;
+
+        return substr($namespacedClass, $position);
+    }
+
+    public function GetTableNameFromNameSpacedClass($namespacedClass){
+
+        $namespaced = $this->GetClassFromNameSpacedClass($namespacedClass);
+
+        return str_replace('Repository', '', str_replace('Entity', '', $namespaced));
+    }
 }

@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../Resources/Configs/Core/BundleGenerator.php';
 
 if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER && isset($_SERVER['HTTP_HOST'])){
-    
+
     echo 'Access restricted.';
     exit;
 }
@@ -37,6 +37,6 @@ function requireAll($directory) {
 
 requireAll(CONSOLE_LIB_FOLDER);
 
-$console = new Console();
+$console = new Application\Console\Console();
 
 $console->init();

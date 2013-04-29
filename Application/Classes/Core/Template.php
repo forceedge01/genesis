@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class Template extends Router {
 
     private
@@ -29,32 +33,32 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        if (strtolower($templateParams[0]) == 'bundle') {
+        if ($templateParams[0] != null) {
 
-            $path = BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/';
-
-            $templateURL = $this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews/' . $templateParams[2]);
+            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' . $templateParams[1]));
 
             if (is_file($templateURL)) {
 
-                if (is_file($path . 'Header.html.php')) require_once $path . 'Header.html.php';
+                $path = BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS ;
+
+                if (is_file($path . BUNDLE_VIEW_HEADER_FILE)) require_once $path . BUNDLE_VIEW_HEADER_FILE;
 
                 require_once $templateURL;
 
-                if (is_file($path . 'Footer.html.php')) require_once $path . 'Footer.html.php';
+                if (is_file($path . BUNDLE_VIEW_FOOTER_FILE)) require_once $path . BUNDLE_VIEW_FOOTER_FILE;
             }
             else
                 $error = 'TNF';
         }
         else {
 
-            $templateURL = $this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[0] . '/' . $templateParams[1] . '/' . $templateParams[2]);
+            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[1] ));
 
             if (is_file($templateURL)) {
 
-                require_once TEMPLATES_FOLDER . 'Header.html.php';
+                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_HEADER_FILE;
                 require_once $templateURL;
-                require_once TEMPLATES_FOLDER . 'Footer.html.php';
+                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_FOOTER_FILE;
             }
             else
                 $error = 'TNF';
@@ -67,7 +71,7 @@ class Template extends Router {
 
         if(ENABLE_HTML_VALIDATION && !empty($html)){
 
-            $validation = new ValidationEngine();
+            $validation = new \Application\Components\ValidationEngine();
             $validation->validateHTML ($html);
         }
 
@@ -92,7 +96,7 @@ class Template extends Router {
         );
 
         require_once APPLICATION_RESOURCES_FOLDER . 'Views/Header.html.php';
-        require_once APPLICATION_RESOURCES_FOLDER . '/Errors/Template_Not_Found.html.php';
+        require_once APPLICATION_RESOURCES_FOLDER . '/Views/Errors/Template_Not_Found.html.php';
         require_once APPLICATION_RESOURCES_FOLDER . '/Views/Footer.html.php';
 
     }
@@ -111,11 +115,9 @@ class Template extends Router {
 
         $templateParams = explode(':', $template);
 
-        $dirRoot = (strtolower($templateParams[0]) == 'bundle' ? BUNDLES_FOLDER . $templateParams[1] . '/Resources/Views/ControllerViews' : TEMPLATES_FOLDER);
+        $dirRoot = ($templateParams[0] != null ? BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' : TEMPLATES_FOLDER);
 
-        $templateURL = $dirRoot . '/' . $templateParams[2];
-
-        $templateURL = $this->stripDoubleSlashes($templateURL);
+        $templateURL = $this->refactorUrl($this->stripDoubleSlashes($dirRoot . '/' . $templateParams[1]));
 
         if(!is_file($templateURL)){
 

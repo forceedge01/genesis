@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Core\Controllers;
+
+
+
+use \Application\Core\Application;
+
 class ErrorsController extends Application{
 
     public function RouteNotFoundAction($route, $pattern, $backtrace){

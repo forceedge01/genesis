@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Components;
+
+
+
+use Application\Core\Router;
+
 class HTMLGenerator extends Router {
 
     private $formname; //used for saving and retrieving form from database

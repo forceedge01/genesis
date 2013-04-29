@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
 
 class AppKernal {
@@ -9,7 +13,7 @@ class AppKernal {
             $configs = array(),
             $controllers = array(),
             $routes = array(),
-            $entities = array(),
+            $models = array(),
             $bundles = array(),
             $components = array(),
             $files = array();
@@ -26,6 +30,7 @@ class AppKernal {
 
             'Welcome',
             'testBundle',
+            'neogenesis'
         );
 
         // Do not edit below this line
@@ -78,7 +83,7 @@ class AppKernal {
 
         self::load('routes', APPLICATION_ROUTES_FOLDER);
 
-        self::load('entities', APPLICATION_ENTITIES_FOLDER);
+        self::load('models', APPLICATION_MODELS_FOLDER);
 
         self::load('controllers', APPLICATION_CONTROLLERS_FOLDER);
 
@@ -88,7 +93,7 @@ class AppKernal {
 
         if(!$route->forwardRequest()){
 
-            echo '<h1>Pattern: ' . $route->pattern . ' Not Found!!</h1>';
+            echo '<h1>Pattern: ' . $route->GetPattern() . ' Not Found!!</h1>';
 
             exit;
         }
@@ -131,11 +136,11 @@ class AppKernal {
 
             if(is_dir($bundle)){
 
-                self::loadFilesFromDir($bundle . '/Resources/Configs', array('php'));
-                self::loadFilesFromDir($bundle . '/Resources/Routes', array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_CONFIGS, array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_ROUTES, array('php'));
                 self::loadFilesFromDir($bundle, array('php'), false);
-                self::loadFilesFromDir($bundle . '/Controllers', array('php'));
-                self::loadFilesFromDir($bundle . '/Models', array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
+                self::loadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
             }
             else{
 
@@ -168,7 +173,7 @@ class AppKernal {
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                     require_once $filepath;//echo $filepath.'<br />';
                 else if($subdirectories){
-                    
+
                     if($file != '.' && $file != '..' && is_dir($filepath))
                         self::loadFilesFromDir ($filepath, $extensions);
                 }
@@ -181,7 +186,14 @@ class AppKernal {
 
     private static function checkDependencies(){
 
-        self::$phpVersion = phpversion();
+        $version = '5.3.0';
+
+        if(version_compare(phpversion(), $version, '>='))
+                self::$phpVersion = phpversion();
+        else{
+            echo 'You need to update your php version, GENESIS needs atleast php '.$version;
+            exit;
+        }
     }
 
     private static function fileExtensionIs($file, array $extensions){
@@ -199,12 +211,9 @@ class AppKernal {
         return $exists;
     }
 
-    public static function show($fileType){
+    public static function get($fileType){
 
-        foreach(self::$$fileType as $files){
-
-            echo $files . '<br />';
-        }
+        return self::$$fileType;
     }
 }
 

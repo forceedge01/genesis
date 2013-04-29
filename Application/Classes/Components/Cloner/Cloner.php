@@ -1,5 +1,11 @@
 <?php
 
+namespace Application\Components;
+
+
+
+use Application\Core\Database;
+
 class Cloner extends Database {
 
     public
@@ -23,7 +29,7 @@ class Cloner extends Database {
         if (ALLOW_ONLY_FANDIST_SUBDOMAINS) {
 
             if (strpos($this->domain, '.fandistribution.com') > 0) {
-                
+
             } else {
 
                 $this->setError(array('Failure' => 'You can only create .fandistribution.com subdomains.'));
@@ -58,9 +64,9 @@ class Cloner extends Database {
     public function CloneSite($scenario = 'live') {
 
         if ($scenario == 'test') {
-            
+
             $this->domain = 'testCandidate';
-            
+
             if(is_dir(SITES_FOLDER . $this->domain))
                 @$this->removeClone('testCandidate');
 
@@ -148,18 +154,18 @@ class Cloner extends Database {
     private function CopyMaterial() {
 
         try {
-            
+
             $path = null;
 
             if($this->domain == 'testCandidate'){
-                
+
                 $path = TEST_CANDIDATE_DIR;
-                
+
                 $this->setFlash('Creating Test Candidate from: ' . $path . STREETTEAM_ZIP_NAME);
             }
             else
                 $path = SITE_MATERIAL_FOLDER;
-            
+
             if ($this->verbose)
                 error_log('copying over site material .zip ...');
             copy($path . STREETTEAM_ZIP_NAME, SITES_FOLDER . $this->domain . '/' . STREETTEAM_ZIP_NAME);
@@ -181,7 +187,7 @@ class Cloner extends Database {
      * <br />Create an empty directory for the domain.
      */
     private function CreateDirectory() {
-        
+
         if ($this->verbose)
             error_log('creating directory ' . $this->domain . '...');
         if (mkdir(SITES_FOLDER . $this->domain))
@@ -265,7 +271,7 @@ class Cloner extends Database {
 
         if ($this->verbose)
             error_log('Connecting to the database....');
-        
+
         $db = new Database();
 
         $db->verbose = $this->verbose;
@@ -298,21 +304,21 @@ class Cloner extends Database {
     public function removeClone($id) {
 
         try {
-            
+
             $db = new Database();
 
             $error = false;
-            
+
             if(is_numeric($id)){
 
                 $sql = "select site from Sites where id = $id";
 
             }
             else{
-                
+
                 $sql = "select site from Sites where site = '$id'";
             }
-            
+
             $db->Query($sql);
 
             $domain = $db->GetFirstResult()->site;
@@ -335,7 +341,7 @@ class Cloner extends Database {
                         $db->queries[] = "show tables";
 
                         $db->multiQuery();
-                        
+
                         $results = $db->GetFirstResult();
 
                         foreach ($results as $result) {
@@ -346,7 +352,7 @@ class Cloner extends Database {
                         }
 
                         $db->queries[] = 'drop database `' . $domain . 'Multisites`';
-                        
+
                         $db->queries[] = "REVOKE all ON `" . $domain . "Multisites`.* FROM '" . NEW_WP_DB_USER . "'@'" . NEW_WP_DB_HOST . "'";
 
                         $db->queries[] = 'use `' . DBNAME . '`';
@@ -425,7 +431,7 @@ class Cloner extends Database {
 
             return true;
         } catch (Exception $e) {
-            
+
             $this->RollBack();
 
             $site = new SiteController();
@@ -506,9 +512,9 @@ class Cloner extends Database {
 
             if ($this->verbose)
                 error_log('Init Import into MySQL...<br /><br />');
-            
+
             $this->importSQL();
-            
+
         } catch (Exception $e) {
 
             $this->RollBack();
@@ -526,7 +532,7 @@ class Cloner extends Database {
 
             if ($this->verbose)
                 error_log('Switching to new site Database...<br /><br />');
-            
+
             $sql = "use `{$this->domain}Multisites`";
 
             $this->Query($sql);
@@ -540,7 +546,7 @@ class Cloner extends Database {
 
             if ($this->verbose)
                 error_log('Importing SQL data...<br /><br />');
-            
+
             foreach ($queries as $query) {
 
                 $this->Query($query);

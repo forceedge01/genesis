@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Core;
+
+
+
 class Auth extends Application{
 
     protected

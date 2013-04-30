@@ -143,7 +143,7 @@ class WelcomeController extends ApplicationController {
 
         );
 
-        $this->htmlgen = $this->getObject('HTMLGenerator');
+        $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
         $this->Render('Welcome:index.html.php', $params);
     }

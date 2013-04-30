@@ -52,7 +52,7 @@ class Analytics extends AppMethods {
      * @return mixed bool if false, otherwise the id of the track made.
      * Records a track (visit) from a user.
      */
-    public function recordTrack($OptionalReferenceId = null) {
+    public function RecordTrack($OptionalReferenceId = null) {
 
         if (ANALYTICS_IGNORE_IP_ADDRESS)
             if ($this->variable ($_SERVER['REMOTE_ADDR'])->equals(ANALYTICS_IGNORE_IP_ADDRESS))
@@ -125,37 +125,37 @@ class Analytics extends AppMethods {
         return false;
     }
 
-    public function getTrack($id) {
+    public function GetTrack($id) {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->GetRecordBy($id)->GetResultSet();
     }
 
-    public function getTracks() {
+    public function GetTracks() {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->GetRecords()->GetResultSet();
     }
 
-    public function getTracksByIp($ip) {
+    public function GetTracksByIp($ip) {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->GetRecordBy(array('ipAddress' => $ip))->GetResultSet();
     }
 
-    public function getTracksByBrowser($browser) {
+    public function GetTracksByBrowser($browser) {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->Where(array('userAgent' => $browser))->GetRecords()->GetResultSet();
     }
 
-    public function getTrackBrowserReport() {
+    public function GetTrackBrowserReport() {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->Select(array('count(id) as HITS', 'userAgent'))->GroupBy(array('userAgent'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
-    public function getTrackIpReport() {
+    public function GetTrackIpReport() {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'IpAddress'))->GroupBy(array('IpAddress'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
 
-    public function getTrackPageReport() {
+    public function GetTrackPageReport() {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'page'))->groupBy(array('page'))->orderBy('Hits desc')->extra(array('distinct'))->Execute()->GetResultSet();
     }
@@ -165,7 +165,7 @@ class Analytics extends AppMethods {
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'page'))->Where(array('unq' => 1))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->execute()->GetResultSet();
     }
 
-    public function getTotalVisits() {
+    public function GetTotalVisits() {
 
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Hits', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Extra(array('distinct'))->Execute()->GetResultSet();
     }
@@ -180,7 +180,7 @@ class Analytics extends AppMethods {
         return $this->connection->Table(ANALYTICS_TRACK_TABLE)->select(array('count(id) as Bounces', 'page'))->GroupBy(array('page'))->OrderBy('Hits desc')->Where(array('insiteActivity' => ':'))->Execute()->GetNumberOfRows();
     }
 
-    public function getTrackStatistics(){
+    public function GetTrackStatistics(){
 
         $tracks = $this->connection->Query('select id, ipAddress, page, referer, insiteActivity, unq, date, userAgent, ref from '.ANALYTICS_TRACK_TABLE)->GetResultSet();
 
@@ -240,7 +240,7 @@ class Analytics extends AppMethods {
         return $tracks;
     }
 
-    public function getTrackSiteMap(){
+    public function GetTrackSiteMap(){
 
         $tracks = $this->connection->Query('select id, ipAddress, page, referer, insiteActivity, unq, date, userAgent, ref from '.ANALYTICS_TRACK_TABLE)->GetResultSet();
 

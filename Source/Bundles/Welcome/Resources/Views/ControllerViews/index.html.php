@@ -11,9 +11,23 @@
 
         <div class="widget index">
             
-            <input type="hidden" value="http://abc.com/abc?asdfh">
-            <span id ="confirmation">Confirm</span>
-            <input type="hidden" value="This is a sample message">
+            <ul id ="gearMenu">
+                <li>1st menu</li>    
+                <ol>
+
+                    <li>1nd menu item 1</li>
+                    <li>1nd menu item 1</li>
+
+                </ol>
+                <li>2nd menu</li>
+                <ol>
+
+                    <li>2nd menu item 1</li>
+                    <li>2nd menu item 1</li>
+                    <li>2nd menu item 1</li>
+
+                </ol>
+            </ul>
 
             <br />
 

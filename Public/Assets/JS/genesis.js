@@ -6,6 +6,14 @@ $(document).ready(function() {
         loadingDiv: 'div#loading',
         messageDiv: 'div#JSEvent'
     });
+    
+    $('#gearMenu').gear('menu', {
+        
+        hoverSound: 'http://localhost/genesis/public/Assets/Media/gear/Sounds/hoverSound.wav',
+        clickSound: 'http://localhost/genesis/public/Assets/Media/gear/Sounds/clickSound.wav',
+        backgroundColor: 'black',
+        orientation: 'horizontal'
+    });
 
     //-------------------------------------------------------------------------------------------------//Confirm action for all forms-------------------------------------------------------------------------------------------------//
 //    $('.confirmAction').click(function() {
@@ -59,7 +67,7 @@ $(document).ready(function() {
 
 
     //one create domain button is clicked, the button is disabled untill the process is finished.-------------------------------------------------------------------------------------------------//
-    $.gear('form');
+//    $.gear('form');
 
     $('div').delegate('.alert', 'click', function() {
 

@@ -6,7 +6,7 @@
         
         init: function( options ){
             
-            alert(options.newww);
+            
         },
         
         form: function( options ){
@@ -98,10 +98,84 @@
             });
         },
         
-        menu: function(){
+        blink: function(options){
             
-                $(this).slideToggle('fast');
-            },
+            for(var $i=50; $i<options.time; $i = $i+100){
+        
+                setTimeout(function(){
+                    resetCss($(this))
+                    }, $i);
+                setTimeout(function(){
+                    changeCss($(this))
+                    }, $i+50);
+            }
+        },
+        
+        menu: function(options){
+            
+            // Set gear class
+            $(this).addClass('gearMenu');
+            
+            // Set css for container
+            $(this).css('background', 'url(' + options.background + ')');
+            
+            if(options.orientation == 'horizontal')
+                $(this).children('li').css('float', 'left');
+            
+            $(this).css('background-color', options.backgroundColor);
+            $(this).css('background-color', options.backgroundColor);
+            
+            $('body').append('<audio id="gearHoverSound"><source src="'+options.hoverSound+'" ></source></audio>');
+            $('body').append('<audio id="gearClickSound"><source src="'+options.clickSound+'" ></source></audio>');
+            
+            $(this).children('ol').prepend('<li id="gearMenuBack">Back</li>');
+
+            $(this).children('li').each(function(){
+                
+                $(this).click(function(){
+                    
+                    $this = $(this);
+                
+                    $('audio#gearClickSound')[0].play();
+                   
+                    setTimeout(function(){
+                       
+                        $($this).hide();
+                        $($this).siblings('li').hide();
+                        $($this).next('ol').show(400);
+                       
+                    }, 400);
+                });
+            });
+            
+            $('ul#gearMenu').delegate('li','mouseenter',function(){
+
+                $('audio#gearHoverSound')[0].play();
+            });
+            
+            $('ul#gearMenu').delegate('li','click',function(){
+
+                blink(this, 400);
+                
+                $('audio#gearClickSound')[0].play();
+            });
+            
+            $('ul#gearMenu').delegate('#gearMenuBack','click',function(){
+                
+                $(this).parent('ol').hide();
+                $(this).parent('ol').siblings('li').show(400);
+            });
+            
+            // Set minimum height for not spazzing effects
+            var height = 0;
+            
+            if($(this).height() == 0)
+                height = 50;
+            else
+                height = $(this).height();
+            $(this).css('min-height', height);
+            
+        },
 
         tip: function(){
 
@@ -115,8 +189,9 @@
         paginate: function (options){
             
             //---------------- change value to set pagination limit, Global to all --------------------//
+            // rowsPerPage
 
-            var $paginate = 2;
+            var $paginate = options.rowsPerPage;
 
             //----------------------------end of custom value---------------------------//
 
@@ -124,7 +199,9 @@
             var $index = 1;
             var $visibleRows = [];
 
-            this.each(function() {
+            //            $(this).(function() {
+
+            $(this).addClass('paginate');
 
             if($(this).children('tbody').length < 1)
                 alert('Pagination cannot be rendered without a tbody element in table.');
@@ -153,32 +230,32 @@
             var $colspan = $cols / $rows;
 
             $(this).append('<tfoot>' +
-                    '<tr class="pagination">' +
-                    '<td colspan="' + $colspan + '">' +
-                    '<span>Showing ' + $paginate + ' Records per page, Total: ' + ($index - 1) + ' Current Page:  <span id="currentPage">' + $currentpage + '</span></span>' +
-                    '<span id="navButtons">' +
-                    ' <input type="text" id="searchTable" value="Search...">' +
-                    ' <input type="button" value="Prev" class="prevResults">' +
-                    ' <input type="button" value="Next" class="nextResults">' +
-                    '</span>' +
-                    '</td>' +
-                    '</tr>' +
-                    '</tfoot>');
+                '<tr class="pagination">' +
+                '<td colspan="' + $colspan + '">' +
+                '<span>Showing ' + $paginate + ' Records per page, Total: ' + ($index - 1) + ' Current Page:  <span id="currentPage">' + $currentpage + '</span></span>' +
+                '<span id="navButtons">' +
+                ' <input type="text" id="searchTable" value="Search...">' +
+                ' <input type="button" value="Prev" class="prevResults">' +
+                ' <input type="button" value="Next" class="nextResults">' +
+                '</span>' +
+                '</td>' +
+                '</tr>' +
+                '</tfoot>');
 
             $('tfoot .prevResults').attr('disabled', 'disabled');
 
             if ($paginate >= $index - 1)
                 $('tfoot .nextResults').attr('disabled', 'disabled');
-            });
+            //            });
 
             //-------------------------------------------------------------------------------------------------//Search in table function//----------------------------------------------------------------------------------------------//
-            $('table').delegate('#searchTable', 'focus', function(e) {
+            $(this).delegate('#searchTable', 'focus', function(e) {
 
                 if ($(this).val() == $(this).prop('defaultValue'))
                     $(this).val('');
             });
 
-            $('table').delegate('#searchTable', 'blur', function(e) {
+            $(this).delegate('#searchTable', 'blur', function(e) {
 
                 if ($(this).val() == ''){
                     $(this).val($(this).prop('defaultValue'));
@@ -186,7 +263,7 @@
             });
 
             $searchTag = '';
-            $('table').delegate('#searchTable', 'keyup', function() {
+            $(this).delegate('#searchTable', 'keyup', function() {
 
                 $searchTag = $(this).val();
 
@@ -364,18 +441,41 @@
         // Method calling logic
         if ( methods[method] ) {
             
-          return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
           
         } else if ( typeof method === 'object' || ! method ) {
             
-          return methods.init.apply( this, arguments );
+            return methods.init.apply( this, arguments );
           
         } else {
             
-          $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+            $.error( 'Method ' +  method + ' does not exist on jQuery' );
           
-          return false;
+            return false;
         }
         
     };
 })(jQuery);
+
+function changeCss($this)
+{
+    $($this).css('visibility','visible');
+}
+
+function resetCss($this)
+{
+    $($this).css('visibility','hidden');
+}
+
+function blink($this, $time){
+    
+    for(var $i=50; $i<$time; $i = $i+100){
+        
+        setTimeout(function(){
+            resetCss($this)
+            }, $i);
+        setTimeout(function(){
+            changeCss($this)
+            }, $i+50);
+    }
+}

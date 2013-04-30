@@ -16,7 +16,7 @@ class AppMethods extends Debugger {
      * @return object $this
      * Returns an existing object or creates a new one if it does not exist in the current scope
      */
-    public function getObject($object, $args = null) {
+    public function GetComponent($object, $args = null) {
 
         $fullClassPath = '\\Application\\Components\\'.$object;
 
@@ -25,7 +25,6 @@ class AppMethods extends Debugger {
             if (class_exists($fullClassPath)) {
 
                 $this->$object = new $fullClassPath($args);
-                $this->$object->objectCreatedAt = time();
             }
             else
                 trigger_error("getOjbect accepts valid class name only, $object class does not exist in ". get_called_class(), E_USER_ERROR);
@@ -40,7 +39,7 @@ class AppMethods extends Debugger {
      * @return string returns the hashed string.
      * <br /><br />It will generate a password hash based on the algorithm defined in the Auth config file.
      */
-    public function hashPassword($password) {
+    public function HashPassword($password) {
 
         return hash(AUTH_PASSWORD_ENCRYPTION_ALGORITHM, $password);
     }
@@ -50,7 +49,7 @@ class AppMethods extends Debugger {
      * @param int $length: length of the string to generate.
      * @return a random string generated equals the length specified
      */
-    public function generateRandomString($length = 10) {
+    public function GenerateRandomString($length = 10) {
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -70,7 +69,7 @@ class AppMethods extends Debugger {
      * @return string <br>
      * Returns string with stripped double slashes
      */
-    public function stripDoubleSlashes($string) {
+    public function StripDoubleSlashes($string) {
 
         return str_replace('//', '/', $string);
     }
@@ -80,7 +79,7 @@ class AppMethods extends Debugger {
      * @param mixed $param
      * @return boolean Checks if a variable is loopable
      */
-    public function isLoopable($param) {
+    public function IsLoopable($param) {
 
         if (isset($param) && ((is_array($param) || is_object($param)) && count($param) != 0 ))
             return true;
@@ -286,7 +285,7 @@ class AppMethods extends Debugger {
      * @return mixed
      * Finds the variable in the list
      */
-    public function has($list) {
+    public function Has($list) {
 
         if($this->isLoopable($list))
             foreach ($list as $value) {
@@ -346,7 +345,7 @@ class AppMethods extends Debugger {
         return $flag;
     }
 
-    public function equals($value) {
+    public function Equals($value) {
 
         if ($this->variable == $value)
             return $this;
@@ -354,7 +353,7 @@ class AppMethods extends Debugger {
         return false;
     }
 
-    public function notEqualsTo($value) {
+    public function NotEqualsTo($value) {
 
         if($this->isLoopable($list))
             foreach ($list as $value) {
@@ -369,21 +368,21 @@ class AppMethods extends Debugger {
         return false;
     }
 
-    public function jsonEncode() {
+    public function JsonEncode() {
 
         $this->variable = json_encode($this->variable);
 
         return $this;
     }
 
-    public function jsonDecode() {
+    public function JsonDecode() {
 
         $this->variable = json_decode($this->variable);
 
         return $this;
     }
 
-    public function typeCastTo($type) {
+    public function TypeCastTo($type) {
 
         $type = strtolower($type);
 
@@ -407,7 +406,7 @@ class AppMethods extends Debugger {
         return $this;
     }
 
-    public function getVariableResult() {
+    public function GetVariableResult() {
 
         return $this->variable;
     }
@@ -417,7 +416,7 @@ class AppMethods extends Debugger {
      * @return type
      * Gets the type of the variable
      */
-    public function getType() {
+    public function GetType() {
 
         return gettype($this->variable);
     }
@@ -428,7 +427,7 @@ class AppMethods extends Debugger {
      * @return \AppMethods
      * Removed double occurance of substrings provided in the array
      */
-    public function removeDoubleOccuranceOf(array $list) {
+    public function RemoveDoubleOccuranceOf(array $list) {
 
         foreach ($list as $char) {
 
@@ -438,7 +437,7 @@ class AppMethods extends Debugger {
         return $this;
     }
 
-    public function trim(array $list) {
+    public function Trim(array $list) {
 
         if (!empty($list))
             foreach ($list as $trim) {
@@ -456,7 +455,7 @@ class AppMethods extends Debugger {
      * @return \AppMethods
      * Remove first character from the variable
      */
-    public function removeFirstCharacter() {
+    public function RemoveFirstCharacter() {
 
         $this->variable = substr($this->variable, 1);
 
@@ -468,7 +467,7 @@ class AppMethods extends Debugger {
      * @return \AppMethods
      * Remove last character from the variable
      */
-    public function removeLastCharacter() {
+    public function RemoveLastCharacter() {
 
         $this->variable = substr($this->variable, 0, -1);
 
@@ -481,7 +480,7 @@ class AppMethods extends Debugger {
      * @return \AppMethods
      * Replace multiple keywords provided in a keyed array
      */
-    public function replace(array $keyedList) {
+    public function Replace(array $keyedList) {
 
         foreach ($keyedList as $search => $replace) {
 
@@ -491,19 +490,19 @@ class AppMethods extends Debugger {
         return $this;
     }
 
-    public function arrayToString(array $array){
+    public function ArrayToString(array $array, $separator = null){
 
         $string = '';
 
         foreach($array as $ar){
 
-            $string .= $ar;
+            $string .= $ar.$separator;
         }
 
         return $string;
     }
 
-    public function refactorUrl($url){
+    public function RefactorUrl($url){
 
         $chunks = explode('/', $url);
 

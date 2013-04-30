@@ -1,0 +1,39 @@
+/* 
+    Document   : gear
+    Created on : Apr 30, 2013, 3:28:27 PM
+    Author     : Sammy Guergachi <sguergachi at gmail.com>
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+.gearMenu{
+    
+    list-style: none;
+    display: block;
+    padding: 14px;
+    font-family: Impact, Charcoal, sans-serif;
+    font-weight: bold;
+    background: black;
+    letter-spacing: 1px;
+}
+
+.gearMenu li{
+    
+    list-style: none;
+    padding: 14px;
+    color: lightgray;
+}
+
+.gearMenu li:hover{
+    
+    color: white;
+}
+
+.gearMenu ol{
+    
+    display: none;
+}

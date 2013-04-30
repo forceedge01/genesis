@@ -4,7 +4,7 @@ define('ANALYTICS_TRACK_VISITS', true);
 
 define('ANALYTICS_TRACK_UNIQUE_VISITS_ONLY', false);
 
-define('ANALYTICS_IGNORE_IP_ADDRESS', '::11');
+define('ANALYTICS_IGNORE_IP_ADDRESS', '::1');
 
 define('ANALYTICS_TRACK_TABLE', 'Tracks');
 

@@ -41,18 +41,70 @@
             alert('accordian');
         },
         
-        sections: function(){
+        sections: function( options ){
             
-            alert('sections');
+            var $currentSection = 1;
+            var $index = 0;
+
+            $('.Sections .section').each(function() {
+
+                if($index >0)
+                    $(this).hide(0);
+
+                $index += 1;
+
+            });
+
+            $('.Sections .prev').attr('disabled', 'disabled');
+
+            //-------------------------------------------------------------------------------------------------//Next Sections//-------------------------------------------------------------------------------------------------//
+            $('body').delegate('.Sections .next', 'click', function() {
+
+                $('div #section' + $currentSection).hide(0);
+
+                $currentSection += 1;
+
+                $('div #section' + $currentSection).fadeIn(200);
+
+                $(this).parents('.Sections').find('.SectionsButtons .prev').removeAttr('disabled');
+
+                if ($currentSection >= $index) {
+
+                    $(this).attr('disabled', 'disabled');
+                }
+
+                $(this).parents('.Sections').find('.SectionStats span#Section').html($currentSection);
+
+            });
+
+            //-------------------------------------------------------------------------------------------------//Previous Sections//-------------------------------------------------------------------------------------------------//
+            $('body').delegate('.Sections .prev', 'click', function() {
+
+                $('div #section' + $currentSection).hide(0);
+
+                $currentSection -= 1;
+
+                $('div #section' + $currentSection).fadeIn(200);
+
+                $(this).parents('.Sections').find('.SectionsButtons .next').removeAttr('disabled');
+
+                if ($currentSection === 1) {
+
+                    $(this).attr('disabled', 'disabled');
+                }
+
+                $(this).parents('.Sections').find('.SectionStats span#Section').html($currentSection);
+
+            });
         },
         
         menu: function(){
             
-            $(this).slideToggle('fast');
-        },
-        
+                $(this).slideToggle('fast');
+            },
+
         tip: function(){
-            
+
             $(this).on('focus', function() {
                 $(this).next('.tip').show();
             }).on('blur', function() {
@@ -60,9 +112,183 @@
             });
         },
         
-        paginate: function (){
+        paginate: function (options){
             
-            alert('paginate');
+            //---------------- change value to set pagination limit, Global to all --------------------//
+
+            var $paginate = 2;
+
+            //----------------------------end of custom value---------------------------//
+
+            var $currentpage = 1;
+            var $index = 1;
+            var $visibleRows = [];
+
+            this.each(function() {
+
+            if($(this).children('tbody').length < 1)
+                alert('Pagination cannot be rendered without a tbody element in table.');
+
+            var $cols = ($('tbody tr td').length);
+
+            $('tbody tr').each(function(item) {
+
+                $(this).attr('rowId', $index);
+
+                if ($index > $paginate) {
+
+                    $(this).hide();
+                } else
+                    $(this).attr('visible', '1');
+
+                $index++;
+
+            });
+
+            var $rows = ($('tbody tr').length);
+
+            if ($rows == 0)
+                $rows = 1;
+
+            var $colspan = $cols / $rows;
+
+            $(this).append('<tfoot>' +
+                    '<tr class="pagination">' +
+                    '<td colspan="' + $colspan + '">' +
+                    '<span>Showing ' + $paginate + ' Records per page, Total: ' + ($index - 1) + ' Current Page:  <span id="currentPage">' + $currentpage + '</span></span>' +
+                    '<span id="navButtons">' +
+                    ' <input type="text" id="searchTable" value="Search...">' +
+                    ' <input type="button" value="Prev" class="prevResults">' +
+                    ' <input type="button" value="Next" class="nextResults">' +
+                    '</span>' +
+                    '</td>' +
+                    '</tr>' +
+                    '</tfoot>');
+
+            $('tfoot .prevResults').attr('disabled', 'disabled');
+
+            if ($paginate >= $index - 1)
+                $('tfoot .nextResults').attr('disabled', 'disabled');
+            });
+
+            //-------------------------------------------------------------------------------------------------//Search in table function//----------------------------------------------------------------------------------------------//
+            $('table').delegate('#searchTable', 'focus', function(e) {
+
+                if ($(this).val() == $(this).prop('defaultValue'))
+                    $(this).val('');
+            });
+
+            $('table').delegate('#searchTable', 'blur', function(e) {
+
+                if ($(this).val() == ''){
+                    $(this).val($(this).prop('defaultValue'));
+                }
+            });
+
+            $searchTag = '';
+            $('table').delegate('#searchTable', 'keyup', function() {
+
+                $searchTag = $(this).val();
+
+                $('.paginate tbody tr').each(function() {
+
+                    $(this).removeClass('searchResult').css('display', 'none');
+
+                });
+
+                if ($searchTag !== '') {
+
+                    $('.paginate tbody tr td').each(function() {
+
+                        var $string = $(this).text();
+
+                        var $regex = new RegExp("^(" + $searchTag + ")(.|( ))*$", 'i');
+
+                        if ($regex.test($string)) {
+
+                            if(!$(this).parents('tr').hasClass('searchResult'))
+                                $(this).parents('tr').addClass('searchResult').css('display', 'table-row');
+
+                        }
+
+                    });
+                }
+                else {
+
+                    $('.paginate tbody tr.searchResult').removeClass('searchResult');
+
+                    $('.paginate tbody tr[visible="1"]').show(0);
+                }
+
+            });
+
+            //-------------------------------------------------------------------------------------------------//Next Button Function//-------------------------------------------------------------------------------------------------//
+            $('tfoot').delegate('.nextResults', 'click', function() {
+
+                $currentpage += 1;
+
+                $startIndex = ($currentpage * $paginate) - $paginate + 1;
+
+                $endIndex = $startIndex + $paginate;
+
+                $hideStartIndex = $startIndex - $paginate;
+
+                $hideEndIndex = $endIndex - $paginate;
+
+                for ($hideStartIndex; $hideStartIndex < $hideEndIndex; $hideStartIndex++) {
+                    $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').hide(0);
+                    $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').removeAttr('visible');
+                }
+
+                for ($startIndex; $startIndex < $endIndex; $startIndex++) {
+
+                    $(this).parents('table').find('tr[rowid="' + $startIndex + '"]').fadeIn(300);
+                    $(this).parents('table').find('tr[rowid="' + ($startIndex) + '"]').attr('visible', '1');
+                }
+
+                $('#currentPage').html($currentpage);
+
+                $('.prevResults').removeAttr('disabled');
+
+                if ($endIndex >= $index)
+                    $(this).attr('disabled', 'disabled');
+
+            });
+
+            //-------------------------------------------------------------------------------------------------//Prev Button function//-------------------------------------------------------------------------------------------------//
+
+            $('tfoot').delegate('.prevResults', 'click', function() {
+
+                $currentpage -= 1;
+
+                $startIndex = ($currentpage * $paginate) - $paginate + 1;
+
+                $endIndex = $startIndex + $paginate;
+
+                $hideStartIndex = $startIndex + $paginate;
+
+                $hideEndIndex = $endIndex + $paginate;
+
+                for ($hideStartIndex; $hideStartIndex < $hideEndIndex; $hideStartIndex++) {
+
+                    $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').hide(0);
+                    $(this).parents('table').find('tr[rowid="' + ($hideStartIndex) + '"]').removeAttr('visible');
+                }
+
+                for ($startIndex; $startIndex < $endIndex; $startIndex++) {
+
+                    $(this).parents('table').find('tr[rowid="' + $startIndex + '"]').fadeIn(300);
+                    $(this).parents('table').find('tr[rowid="' + ($startIndex) + '"]').attr('visible', '1');
+                }
+
+                $('#currentPage').html($currentpage);
+
+                $('.nextResults').removeAttr('disabled');
+
+                if ($startIndex == 1 + $paginate)
+                    $(this).attr('disabled', 'disabled');
+
+            });
         },
         
         confirm: function ( options ){

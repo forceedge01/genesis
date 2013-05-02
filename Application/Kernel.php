@@ -211,8 +211,20 @@ class AppKernal {
         return $exists;
     }
 
-    public static function get($fileType){
+    public static function get($fileType = null){
 
+        if(emtpy($fileType))
+            return array(
+                self::$bundles,
+                self::$classes,
+                self::$components,
+                self::$configs,
+                self::$controllers,
+                self::$files,
+                self::$models,
+                self::$routes
+            );
+        
         return self::$$fileType;
     }
 }

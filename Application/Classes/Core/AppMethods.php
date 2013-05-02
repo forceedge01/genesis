@@ -32,6 +32,23 @@ class AppMethods extends Debugger {
 
         return $this->$object;
     }
+    
+    public function GetObject($object, $args = null) {
+
+        $fullClassPath = '\\Application\\Core\\'.$object;
+
+        if (!isset($this->$object) && !is_object($this->$object)) {
+
+            if (class_exists($fullClassPath)) {
+
+                $this->$object = new $fullClassPath($args);
+            }
+            else
+                return $this->GetComponent ($object, $args);
+        }
+
+        return $this->$object;
+    }
 
     /**
      *
@@ -285,9 +302,9 @@ class AppMethods extends Debugger {
      * @return mixed
      * Finds the variable in the list
      */
-    public function Has($list) {
+    public function Has(array $list) {
 
-        if($this->isLoopable($list))
+        if($this->isLoopable($list)){
             foreach ($list as $value) {
 
                 if($this->isLoopable($value))
@@ -296,6 +313,10 @@ class AppMethods extends Debugger {
                     if (strstr($this->variable, $value))
                         return $this;
             }
+        }
+        else{
+            return strstr($this->variable, $list);
+        }
 
         return false;
     }

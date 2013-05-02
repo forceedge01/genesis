@@ -12,7 +12,7 @@ $(document).ready(function() {
         hoverSound: 'http://localhost/genesis/public/Assets/Media/gear/Sounds/hoverSound.wav',
         clickSound: 'http://localhost/genesis/public/Assets/Media/gear/Sounds/clickSound.wav',
         backgroundColor: 'black',
-        orientation: 'horizontal'
+        orientation: 'vertical'
     });
 
     //-------------------------------------------------------------------------------------------------//Confirm action for all forms-------------------------------------------------------------------------------------------------//

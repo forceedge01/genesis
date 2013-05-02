@@ -21,19 +21,49 @@ root {
     letter-spacing: 1px;
 }
 
+.gearMenuHorizontal{
+    
+    list-style: none;
+    display: block;
+    padding: 14px;
+    font-family: Impact, Charcoal, sans-serif;
+    font-weight: bold;
+    background: black;
+    letter-spacing: 1px;
+}
+
+.gearMenuHorizontal li{
+    
+    list-style: none;
+    padding: 14px;
+    color: lightgray;
+    cursor: pointer;
+    float: left;
+}
+
 .gearMenu li{
     
     list-style: none;
     padding: 14px;
     color: lightgray;
+    cursor: pointer;
 }
 
-.gearMenu li:hover{
+.gearMenu li:hover, .gearMenuHorizontal li:hover{
     
     color: white;
 }
 
-.gearMenu ol{
+.gearMenu ol, .gearMenuHorizontal ol{
     
+    display: none;
+}
+
+.gearMenu ol div, .gearMenuHorizontal ol div{
+    
+    color: white;
+    border: 1px solid white;
+    padding: 15px;
+    margin: 15px;
     display: none;
 }

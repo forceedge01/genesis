@@ -14,11 +14,11 @@ class Analytics extends AppMethods {
 
     public function __construct() {
 
-        $this->request = new Request();
+        $this->request = new \Application\Core\Request();
 
         if (ANALYTICS_TRACK_VISITS) {
 
-            $this->connection = new Database();
+            $this->connection = new \Application\Core\Database();
 
             if(!$this->request->getCookie('visitIdentifier')){
 

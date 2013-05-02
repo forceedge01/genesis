@@ -8,7 +8,6 @@ class Template extends Router {
 
     private
             $title,
-            $element,
             $bundle;
 
     /**
@@ -20,52 +19,45 @@ class Template extends Router {
     public function __construct() {
         ;
     }
+    
+    private function GetTemplate($template){
+        
+        $templateParams = explode(':', $template);
+            
+        if ($templateParams[0] != null) {
+
+            return array(
+                'template' => $this->refactorUrl($this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' . $templateParams[1])),
+                'path' => $this->refactorUrl(BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS)
+            );
+        }
+        else{
+
+            return array(
+                'template' => $this->refactorUrl($this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[1] )),
+                'path' => $this->refactorUrl(TEMPLATES_FOLDER)
+            );
+        }
+    }
 
     public function Render($template, array $params = array()) {
-
-        $error = null;
 
         $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
 
         extract($params);
-
+        
+        $templateUrl = $this->GetTemplate($template);
+        
         ob_start();
-
-        $templateParams = explode(':', $template);
-
-        if ($templateParams[0] != null) {
-
-            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' . $templateParams[1]));
-
-            if (is_file($templateURL)) {
-
-                $path = BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS ;
-
-                if (is_file($path . BUNDLE_VIEW_HEADER_FILE)) require_once $path . BUNDLE_VIEW_HEADER_FILE;
-
-                require_once $templateURL;
-
-                if (is_file($path . BUNDLE_VIEW_FOOTER_FILE)) require_once $path . BUNDLE_VIEW_FOOTER_FILE;
-            }
-            else
-                $error = 'TNF';
+        
+        if(is_file($templateUrl['template'])){
+            
+            require_once $templateUrl['path'].BUNDLE_VIEW_HEADER_FILE;
+            require_once $templateUrl['template'];
+            require_once $templateUrl['path'].BUNDLE_VIEW_FOOTER_FILE;
         }
-        else {
-
-            $templateURL = $this->refactorUrl($this->stripDoubleSlashes(TEMPLATES_FOLDER . $templateParams[1] ));
-
-            if (is_file($templateURL)) {
-
-                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_HEADER_FILE;
-                require_once $templateURL;
-                require_once TEMPLATES_FOLDER . BUNDLE_VIEW_FOOTER_FILE;
-            }
-            else
-                $error = 'TNF';
-        }
-
-        if ($error == 'TNF')
-            $this->templateNotFound($templateURL);
+        else
+            $this->templateNotFound($templateUrl['template']);
 
         $html = ob_get_clean();
 
@@ -113,22 +105,18 @@ class Template extends Router {
 
         extract($params);
 
-        $templateParams = explode(':', $template);
+        $template = $this->GetTemplate($template);
 
-        $dirRoot = ($templateParams[0] != null ? BUNDLES_FOLDER . $templateParams[0] . BUNDLE_VIEWS .'ControllerViews/' : TEMPLATES_FOLDER);
+        if(!is_file($template['template'])){
 
-        $templateURL = $this->refactorUrl($this->stripDoubleSlashes($dirRoot . '/' . $templateParams[1]));
-
-        if(!is_file($templateURL)){
-
-            $this->templateNotFound ($templateURL);
+            $this->templateNotFound ($template['template']);
 
             exit;
         }
 
         ob_start();
 
-        require_once $templateURL;
+        require_once $template['template'];
 
         $html = ob_get_clean();
 

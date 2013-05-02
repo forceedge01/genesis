@@ -11,18 +11,24 @@ class Debugger{
      * @param void $var - variable you want to dump to screen
      * Will dump the variable on screen in readable format.
      */
-    public function pre($var){
+    public function pre(){
 
+        $args = func_get_args();
+        
         echo '<pre>';
 
-        print_r($var);
+        foreach($args as $var)
+            print_r($var);
 
         echo '</pre>';
     }
 
-    public function prex($var){
+    public function prex(){
+        
+        $args = func_get_args();
 
-        $this->pre($var);
+        foreach($args as $var)
+            $this->pre($var);
 
         exit;
     }
@@ -33,6 +39,10 @@ class Debugger{
     public function debug(){
 
         $this->pre($this);
+        
+        echo '<br />Libs loaded';
+        
+        print_r(AppKernal::get());
 
         echo '<br />Debug data: <br /><br />';
 

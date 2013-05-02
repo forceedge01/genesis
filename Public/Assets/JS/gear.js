@@ -114,19 +114,23 @@
         menu: function(options){
             
             // Set gear class
-            $(this).addClass('gearMenu');
+            if(options.orientation == 'horizontal')
+                $(this).addClass('gearMenuHorizontal');
+            else
+                $(this).addClass('gearMenu');
             
             // Set css for container
-            $(this).css('background', 'url(' + options.background + ')');
+            if(options.background)
+                $(this).css('background', 'url(' + options.background + ')');
             
-            if(options.orientation == 'horizontal')
-                $(this).children('li').css('float', 'left');
+            if(options.backgroundColor)
+                $(this).css('background-color', options.backgroundColor);
             
-            $(this).css('background-color', options.backgroundColor);
-            $(this).css('background-color', options.backgroundColor);
+            if(options.hoverSound)
+                $('body').append('<audio id="gearHoverSound"><source src="'+options.hoverSound+'" ></source></audio>');
             
-            $('body').append('<audio id="gearHoverSound"><source src="'+options.hoverSound+'" ></source></audio>');
-            $('body').append('<audio id="gearClickSound"><source src="'+options.clickSound+'" ></source></audio>');
+            if(options.clickSound)
+                $('body').append('<audio id="gearClickSound"><source src="'+options.clickSound+'" ></source></audio>');
             
             $(this).children('ol').prepend('<li id="gearMenuBack">Back</li>');
 
@@ -153,11 +157,44 @@
                 $('audio#gearHoverSound')[0].play();
             });
             
-            $('ul#gearMenu').delegate('li','click',function(){
+            $('ul#gearMenu').delegate('li','click',function(event){
 
                 blink(this, 400);
                 
                 $('audio#gearClickSound')[0].play();
+                
+                if($(this).next('div'))
+                    setTimeout(function(){
+                       
+                       $(event.target).next('div').slideToggle(400);
+                       
+                    }, 400);
+                    
+                    $init = 400;
+                    
+        
+                    
+                        $(event.target).next('div').children('div').each(function(){
+                            
+                            setTimeout(function(){
+
+                                $(this).show(300);
+
+    //                       $this = this;
+    //
+    //                       setTimeout(function(){
+    //                           
+                              $($this).show(300);
+                              $('audio#gearClickSound')[0].play();
+    //                          
+
+//                        $init += 400;
+
+                            }, 400);
+
+                        }).show(400);
+                    
+                    
             });
             
             $('ul#gearMenu').delegate('#gearMenuBack','click',function(){

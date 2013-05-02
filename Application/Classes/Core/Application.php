@@ -51,6 +51,7 @@ class Application extends Template{
             if(class_exists($userObject))
                 $this->User = new $userObject();
             else{
+                
                 echo HOW_TO_CREATE_A_BUNDLE;
                 exit;
             }

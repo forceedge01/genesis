@@ -81,15 +81,19 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                if($controllerAction[0] == null)
-                    $namespace = '\\Application\\Core\\Controllers\\';
-                else
-                    $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
-
-                $objectName = $namespace.$controllerAction[1] . 'Controller';
+                $objectName = function() use ($controllerAction){
+                  
+                    if($controllerAction[0] == null)
+                        $namespace = '\\Application\\Core\\Controllers\\';
+                    else
+                        $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+                    
+                    return $namespace.$controllerAction[1] . 'Controller';
+                };
+                
                 $objectAction = $controllerAction[2] . 'Action';
 
-                $this->callAction($objectName, $objectAction, $this->funcVariable);
+                $this->callAction($objectName(), $objectAction, $this->funcVariable);
 
             }
 
@@ -319,11 +323,19 @@ class Router extends AppMethods{
 
         $controllerAction = explode(':', $controller);
 
-        $objectName = $controllerAction[0] . 'Controller';
+        $objectName = function() use ($controllerAction){
+            
+            if($controllerAction[0] == null)
+                $namespace = '\\Application\\Core\\Controllers\\';
+            else
+                $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+            
+            return $namespace.$controllerAction[1] . 'Controller';
+        };
+        
+        $objectAction = $controllerAction[2] . 'Action';
 
-        $objectAction = $controllerAction[1] . 'Action';
-
-        $this->callAction($objectName, $objectAction, $variable);
+        $this->callAction($objectName(), $objectAction, $variable);
 
     }
 
@@ -369,16 +381,19 @@ class Router extends AppMethods{
      */
     private function reconstructPattern($params){
 
-        $pattern = null;
+        $pattern = function($params){
+            
+            $qualified = null;
+          
+            foreach($params as $param){
 
-        foreach($params as $param){
+                $qualified .= $param . '/';
+            }
+            
+            return str_replace('//', '/', $qualified);
+        };
 
-            $pattern .= $param . '/';
-        }
-
-        $pattern = str_replace('//', '/', $pattern);
-
-        return $pattern;
+        return $pattern($params);
     }
 
     /**

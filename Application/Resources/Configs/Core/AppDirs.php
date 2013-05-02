@@ -1,5 +1,7 @@
 <?php
 
+
+
 // Core folder paths
 
 define('HOST', 'http://localhost/GENESIS/');

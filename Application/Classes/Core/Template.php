@@ -393,4 +393,47 @@ class Template extends Router {
         else
             return false;
     }
+    
+    public function Cycle($index, $even = 'even', $odd = 'odd'){
+        
+        if($this->IsEven($index)) return $even;
+        return $odd;
+    }
+    
+    public function GenerateNumberOptions($start, $end, $leap = 1, $selected = null){
+        
+        if($start > $end)
+            for($i = $start; $start >= $end; $i -= $leap){
+                
+                $options .= $this->GenerateOption($i, $i, $selected);
+        }
+        else if($start < $end)
+            for($i = $start; $start <= $end; $i += $leap){
+                
+                $options .= $this->GenerateOption($i, $i, $selected);
+            }
+            
+        return $options;
+    }
+    
+    public function GenerateOption($value, $label, $selected = null){
+        
+        $option .= "<option value='$value' ";
+        if($this->Variable($selected)->Equals($value)) $option .= 'selected="selected" ';
+        $option .= " >$label</option>";
+        
+        return $option;
+    }
+    
+    public function IsEven($value){
+        
+        if($value % 2 == 0) return $this;
+        return false;
+    }
+    
+    public function IsOdd($value){
+        
+        if($value % 2 != 0) return $this;
+        return false;
+    }
 }

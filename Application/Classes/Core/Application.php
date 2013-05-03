@@ -14,9 +14,8 @@ class Application extends Template{
 
     public function __construct() {
 
-        $this->Request = new Request();
-
-        $this->Router = new Router();
+        $this->Request = $this->GetObject('Request');
+        $this->Router = $this->GetObject('Router');
 
         if(SESSION_ENABLED){
 
@@ -24,23 +23,19 @@ class Application extends Template{
 
                 if(time() > $_SESSION['login_expires']){
 
-                    session_destroy();
+                    $this->GetObject('Session')->Destroy();
 
-                    $this->setError(array('Logged Out' => 'Your session has expired, please login again.'));
-
-                    $this->forwardTo(AUTH_LOGIN_ROUTE);
+                    $this->setError(array('Logged Out' => 'Your session has expired, please login again.'))->forwardTo(AUTH_LOGIN_ROUTE);
                 }
 
             }
             else{
 
                 if(((@$_SESSION['login_expires'] == false)) &&
-                        ($this->checkExceptionRoutes()) &&
-                                    (!isset($_SESSION['routeError'])) ){
+                    ($this->checkExceptionRoutes()) &&
+                        (!isset($_SESSION['routeError'])) ){
 
-                    $this->setError(array('Access Denied' => 'You need to login to access this page.'));
-
-                    $this->forwardTo (AUTH_LOGIN_ROUTE);
+                    $this->setError(array('Access Denied' => 'You need to login to access this page.'))->forwardTo(AUTH_LOGIN_ROUTE);
                 }
 
             }
@@ -58,7 +53,6 @@ class Application extends Template{
 
             $this->User->$objectMethod(@$_SESSION['email']);
         }
-
     }
 
     /**
@@ -76,8 +70,7 @@ class Application extends Template{
         }
         else {
 
-            $this->setError('You need more previliges to access this page.');
-            $this->forwardTo(APPLICATION_BASE_ROUTE_NAME);
+            $this->setError('You need more previliges to access this page.')->forwardTo(APPLICATION_BASE_ROUTE_NAME);
         }
 
     }

@@ -241,6 +241,8 @@ class Template extends Router {
         }
         else
             $_SESSION['FlashMessages'][] = $message;
+        
+        return $this;
     }
 
     /**
@@ -258,6 +260,8 @@ class Template extends Router {
         }
         else
             $_SESSION['Errors'][] = $message;
+        
+        return $this;
     }
 
     /**

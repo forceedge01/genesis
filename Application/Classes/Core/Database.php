@@ -59,13 +59,8 @@ class Database extends Template {
         try {
 
             $this->activeConnection = new \mysqli($this->host, $this->username, $this->password, $this->name);
+            
         } catch (Exception $e) {
-
-            $site = new SiteController();
-
-            if ($this->verbose)
-                trigger_error('Error: Removing directory from sites...');
-            $site->removeDirectory(SITES_FOLDER . $this->domain);
 
             trigger_error('Error connecting to mysql Database on INIT: ' . $e->GetMessage());
         }
@@ -90,7 +85,7 @@ class Database extends Template {
 
                 $this->lastQuery = $sql;
 
-                $result = $this->activeConnection->query($sql);
+                $result = $this->variable($this->activeConnection->query($sql));
 
                 if (!empty($this->activeConnection->error)) {
 
@@ -121,8 +116,8 @@ class Database extends Template {
                     trigger_error($this->activeConnection->error . 'SQL: ' . $sql);
                 } else {
 
-                    if (is_object($result))
-                        $this->numRows = $result->num_rows;
+                    if ($result->IsObject())
+                        $this->numRows = $result->GetObjectProperty('num_rows');
 
                     $this->rowsAffected = $this->activeConnection->affected_rows;
 
@@ -130,14 +125,14 @@ class Database extends Template {
 
                         $this->insert_id = $this->activeConnection->insert_id;
                     }
-                    else if (@$result->num_rows > 0) {
+                    else if (@$result->GetObjectProperty('num_rows') > 0) {
 
-                        while ($row = $result->fetch_object()) {
+                        while ($row = $result->CallMethod('fetch_object')) {
 
                             $this->queryResult[] = $row;
                         }
 
-                        $result->close();
+                        $result->CallMethod('close');
                     }
 
                     $this->queryMeta = $this->activeConnection->stat;
@@ -219,10 +214,11 @@ class Database extends Template {
 
         $this->prepareForMultiQuery($params);
 
-        $unquotedString = str_replace('`', '', $this->queryTablePrimaryKey);
+        $unquotedString = $this->Variable($this->queryTablePrimaryKey)->Replace(['`' => '']);
 
-        if (!isset($params[str_replace('.', '__', $unquotedString)]) && !isset($params[str_replace($this->queryTable . '.', '', $unquotedString)]))
+        if (!isset($params[$unquotedString->Replace(['.' => '__'])]) && !isset($params[$unquotedString->Replace(['.' => ''])]))
             return $this->CreateRecord($params);
+        
         else
             return $this->UpdateRecord($params);
     }
@@ -268,13 +264,13 @@ class Database extends Template {
      * Removed table name and backticks formatting from a field
      */
     protected function GetUnformattedFieldOrKey($key) {
-
-        return str_replace('`', '', end(explode('.', $key)));
+        
+        return $this->Variable($key)->Explode('.')->ReplaceInEach(['`' => ''])->GetVariableResult();
     }
 
     protected function GetRawFieldName($key){
-
-        return str_replace($this->queryTable . '.', '', (str_replace('`', '', $key)));
+        
+        return $this->Variable($key)->Replace(['`' => '', '.' => ''])->GetVariableResult();
     }
 
     /**
@@ -286,10 +282,12 @@ class Database extends Template {
     private function prepareForMultiQuery(array $params = array()) {
 
         foreach ($params as $key => $value) {
+            
+            $variable = $this->Variable($key);
 
-            if (strpos($key, '__') > 0) {
+            if ($variable->Has(['__'])) {
 
-                $tableData = explode('__', $key);
+                $tableData = $variable->Explode('__')->GetVariableResult();
 
                 if (count($tableData) > 0) {
 

@@ -55,7 +55,7 @@ class Auth extends Application{
 
             $this->GetObject('Session')->set('email', $this->username);
 
-            $$this->GetObject('Session')->set('login_time', time());
+            $this->GetObject('Session')->set('login_time', time());
 
             $objectMethod = AUTH_USER_POPULATE_METHOD;
 

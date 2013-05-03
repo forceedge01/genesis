@@ -16,10 +16,10 @@ class Router extends AppMethods{
             $params,
             $pageTitle,
             $Router,
-            $ObjectArguments = array(),
+            $ObjectArguments = [],
             $pattern;
 
-    public static $Route = array(), $LastRoute;
+    public static $Route = [], $LastRoute;
 
     public function __construct() {
 
@@ -81,19 +81,11 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                $objectName = function() use ($controllerAction){
-                  
-                    if($controllerAction[0] == null)
-                        $namespace = '\\Application\\Core\\Controllers\\';
-                    else
-                        $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
-                    
-                    return $namespace.$controllerAction[1] . 'Controller';
-                };
+                $objectName = $this->GetControllerNamespace($controllerAction);
                 
                 $objectAction = $controllerAction[2] . 'Action';
 
-                $this->callAction($objectName(), $objectAction, $this->funcVariable);
+                $this->callAction($objectName, $objectAction, $this->funcVariable);
 
             }
 
@@ -101,6 +93,16 @@ class Router extends AppMethods{
 
         return false;
 
+    }
+    
+    private function GetControllerNamespace($controllerAction){
+        
+        if($controllerAction[0] == null)
+            $namespace = '\\Application\\Core\\Controllers\\';
+        else
+            $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+
+        return $namespace.$controllerAction[1] . 'Controller';
     }
 
     /**
@@ -222,7 +224,6 @@ class Router extends AppMethods{
         );
 
         $this->forwardToController('Error_Route_Not_Found', $error);
-
     }
 
     /**
@@ -323,19 +324,11 @@ class Router extends AppMethods{
 
         $controllerAction = explode(':', $controller);
 
-        $objectName = function() use ($controllerAction){
-            
-            if($controllerAction[0] == null)
-                $namespace = '\\Application\\Core\\Controllers\\';
-            else
-                $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
-            
-            return $namespace.$controllerAction[1] . 'Controller';
-        };
+        $objectName = $this->GetControllerNamespace($controllerAction);
         
         $objectAction = $controllerAction[2] . 'Action';
 
-        $this->callAction($objectName(), $objectAction, $variable);
+        $this->callAction($objectName, $objectAction, $variable);
 
     }
 

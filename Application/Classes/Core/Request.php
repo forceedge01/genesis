@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Request extends Debugger{
+class Request extends AppMethods{
 
     public
             $post,
@@ -33,9 +33,9 @@ class Request extends Debugger{
      * @return boolean
      * Returns true if the request is an ajax request
      */
-    public function isAjax(){
+    public function IsAjax(){
 
-        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        if($this->variable($_SERVER['HTTP_X_REQUESTED_WITH'])->IsNotEmpty()->ToLower()->Equals('xmlhttprequest')) {
 
             return $this;
         }
@@ -51,13 +51,13 @@ class Request extends Debugger{
      * @return boolean
      * Returns true if the request is a post request
      */
-    public function isPost($Element = null){
+    public function IsPost($key = null){
 
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if($this->variable($_SERVER['REQUEST_METHOD'])->Equals('POST')) {
 
-            if(!empty($Element)){
+            if(!empty($key)){
 
-                if(isset($_POST[$Element]))
+                if(isset($_POST[$key]))
                     return $this;
                 else
                     return false;
@@ -77,13 +77,13 @@ class Request extends Debugger{
      * @return boolean
      * Returns true if the request is an get request
      */
-    public function isGet($Element = null){
+    public function IsGet($key = null){
 
-        if($_SERVER['REQUEST_METHOD'] == 'GET') {
+        if($this->variable($_SERVER['REQUEST_METHOD'])->Equals('GET')) {
 
-            if(!empty($Element)){
+            if(!empty($key)){
 
-                if(isset($_GET[$Element]))
+                if(isset($_GET[$key]))
                     return $this;
                 else
                     return false;
@@ -106,7 +106,7 @@ class Request extends Debugger{
      * @return boolean
      * Returns true on successful cookie setup.
      */
-    public function setCookie($Name, $Value , $time = 2592000){
+    public function SetCookie($Name, $Value , $time = 2592000){
 
         setcookie($Name, '', -(time() + 2592000));
 
@@ -116,7 +116,7 @@ class Request extends Debugger{
             return false;
     }
 
-    public function getCookie($Name){
+    public function GetCookie($Name){
 
         if(isset($_COOKIE[$Name]))
             return $_COOKIE[$Name];
@@ -124,7 +124,7 @@ class Request extends Debugger{
             return false;
     }
 
-    public function isCookie($Name){
+    public function IsCookie($Name){
 
         if(isset($_COOKIE[$Name]))
             return $this;
@@ -139,7 +139,7 @@ class Request extends Debugger{
      * @return boolean
      * Returns true on successful cookie unset.
      */
-    public function unsetCookie($Name){
+    public function UnsetCookie($Name){
 
         if(setcookie($Name, '', -(time() + 2592000)))
             return $this;
@@ -148,14 +148,14 @@ class Request extends Debugger{
 
     }
 
-    public function setSession($Name, $Value){
+    public function SetSession($Name, $Value){
 
         $_SESSION[$Name] = $Value;
 
         return $this;
     }
 
-    public function unsetSession($Name){
+    public function UnsetSession($Name){
 
         unset($_SESSION[$Name]);
 
@@ -167,7 +167,7 @@ class Request extends Debugger{
      * @param $string or $array $key
      * @return boolean
      */
-    public function has($keys){
+    public function Has($keys){
 
         if(is_array($keys)){
 
@@ -191,12 +191,20 @@ class Request extends Debugger{
     /**
      *
      * @param $string or $array $key
-     * @return boolean
+     * @return form value, post or get does not matter
      */
-    public function get($key){
+    public function Get($key){
 
         if(isset($_REQUEST[$key]))
-            return $this;
+            return $_REQUEST[$key];
+        else
+            return false;
+    }
+    
+    public function GetServerInfo($key){
+        
+        if(isset($_SERVER[$key]))
+            return $_SERVER[$key];
         else
             return false;
     }

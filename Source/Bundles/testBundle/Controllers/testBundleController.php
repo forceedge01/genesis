@@ -60,9 +60,9 @@ class testBundleController extends ApplicationController{
               );
 
               //This will be used in the template to generate the above declared table.
-              $this->htmlgen = new HTMLGenerator();
+              $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-              $this->Render("Bundle:testBundle:list.html.php", $params);
+              $this->Render("testBundle:list.html.php", $params);
 
       }
 
@@ -88,9 +88,9 @@ class testBundleController extends ApplicationController{
                   ),
               );
 
-              $this->htmlgen = new HTMLGenerator();
+              $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-              $this->Render("Bundle:testBundle:view.html.php", $params);
+              $this->Render("testBundle:view.html.php", $params);
 
       }
 
@@ -140,9 +140,9 @@ class testBundleController extends ApplicationController{
             );
 
             //This will be used in the template to generate the above declared form.
-            $this->htmlgen = new HTMLGenerator();
+            $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-            $this->Render("Bundle:testBundle:create.html.php", $params);
+            $this->Render("testBundle:create.html.php", $params);
 
       }
 
@@ -179,9 +179,9 @@ class testBundleController extends ApplicationController{
 
             $params["PageTitle"] = "Edit testBundle";
 
-            $this->htmlgen = new HTMLGenerator();
+            $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-            $this->Render("Bundle:testBundle:edit.html.php", $params);
+            $this->Render("testBundle:edit.html.php", $params);
 
       }
 

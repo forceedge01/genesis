@@ -32,8 +32,8 @@ class AppMethods extends Debugger {
 
         return $this->$object;
     }
-    
-    public function GetObject($object, $args = null) {
+
+    public function GetCoreObject($object, $args = null){
 
         $fullClassPath = '\\Application\\Core\\'.$object;
 
@@ -45,6 +45,21 @@ class AppMethods extends Debugger {
             }
             else
                 return $this->GetComponent ($object, $args);
+        }
+
+        return $this->$object;
+    }
+
+    public function GetObject($object, $args = null) {
+
+        if (!isset($this->$object) && !is_object($this->$object)) {
+
+            if (class_exists($object)) {
+
+                $this->$object = new $object($args);
+            }
+            else
+                echo ' Class '.$object.' not found ' . get_called_class();
         }
 
         return $this->$object;
@@ -380,7 +395,7 @@ class AppMethods extends Debugger {
             foreach ($list as $value) {
 
                 if($this->isLoopable($value)) $this->contains ($value);
-                
+
                 else if ($this->variable != $value) return $value;
             }
 
@@ -455,9 +470,9 @@ class AppMethods extends Debugger {
 
     public function Trim(array $list) {
 
-        if (!empty($list)) 
+        if (!empty($list))
             foreach ($list as $trim) $this->variable = trim($this->variable, $trim);
-        
+
         else $this->variable = trim($this->variable);
 
         return $this;
@@ -568,248 +583,248 @@ class AppMethods extends Debugger {
 
         return str_replace('Repository', '', str_replace('Entity', '', $namespaced));
     }
-    
+
     public function ReturnFalse(){
-        
+
         return false;
     }
-    
+
     public function ReturnTrue(){
-        
+
         return true;
     }
-    
+
     public function IsEmpty(){
-        
+
         if(empty($this->variable))
             return $this;
         else
             return false;
     }
-    
+
     public function IsNotEmpty(){
-        
+
         if(!empty($this->variable)) return $this;
         else return false;
     }
-    
+
     public function ToLower(){
-        
+
         $this->variable = strtolower($this->variable);
         return $this;
     }
-    
+
     public function ToUpper(){
-        
+
         $this->variable = strtoupper($this->variable);
         return $this;
     }
-    
+
     public function TriggerError($errorMessage, $level = E_WARNING){
-        
+
         trigger_error($errorMessage, $level);
         return $this;
     }
-    
+
     public function IsNumber(){
-        
+
         if(is_numeric($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsString(){
-        
+
         if(is_string($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsArray(){
-        
+
         if(is_array($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsObject(){
-        
+
         if(is_object($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsBool(){
-        
+
         if(is_bool($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsCallable(){
-        
+
         if(is_callable($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsDir(){
-        
+
         if(is_dir($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsFloat(){
-        
+
         if(is_float($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsFile(){
-        
+
         if(is_file($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsNotANumber(){
-        
+
         if(is_nan($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsFileReadable(){
-        
+
         if(is_readable($this->variable)) return $this;
         else return false;
     }
-    
+
     public function IsFileWritable(){
-        
+
         if(is_writable($this->variable)) return $this;
         else return false;
     }
-    
+
     public function GetObjectProperty($property){
-        
+
         return $this->variable->$property;
     }
-    
+
     public function GetArrayIndex($key){
-        
+
         return $this->variable[$key];
     }
-    
+
     public function CallMethod($method){
-        
+
         return $this->variable->$method();
     }
-    
+
     public function IsGreaterThan($number){
-        
+
         if($this->variable > $number) return $this;
         else return false;
     }
-    
+
     public function IsSmallerThan($number){
-        
+
         if($this->variable < $number) return $this;
         else return false;
     }
-    
+
     public function IsGreaterOrEqualTo($number){
-        
+
         if($this->variable >= $number) return $this;
         else return false;
     }
-    
+
     public function IsSmallerOrEqualTo($number){
-        
+
         if($this->variable <= $number) return $this;
         else return false;
     }
-    
+
     public function GoToObjectProperty($property){
-        
+
         $this->variable = $this->variable->$property;
         return $this;
     }
-    
+
     public function GoToArrayIndex($index){
-        
+
         $this->variable = $this->variable[$index];
         return $this;
     }
-    
+
     public function Explode($delimiter){
-        
+
         $this->variable = explode($delimiter, $this->variable);
         return $this;
     }
-    
+
     public function Implode($glue){
-        
+
         $this->variable = implode($glue, $this->variable);
         return $this;
     }
-    
+
     public function ReplaceInEach(array $keyedList){
-        
+
         $list = [];
-        
+
         foreach($this->variable as $key => $val)
             foreach($keyedList as $search => $replace)
                 $list[$key] = str_replace($search, $replace, $val);
-        
+
         $this->variable = $list;
-        
+
         return $this;
     }
-    
+
     public function Assign($value){
-        
+
         $this->variable = $value;
         return $this;
     }
-    
+
     public function ArithmaticAdd($value){
-        
+
         $this->variable += $value;
         return $this;
     }
-    
+
     public function ArithmaticSubtract($value){
-        
+
         $this->variable -= $value;
         return $this;
     }
-    
+
     public function ArithmaticDivide($value){
-        
+
         $this->variable /= $value;
         return $this;
     }
-    
+
     public function ArithmaticMultiply($value){
-        
+
         $this->variable *= $value;
         return $this;
     }
-    
+
     public function ArithmaticIsModOf($value){
-        
+
         if($this->variable % $value == 0) return $this;
-        
+
         else return false;
     }
-    
+
     public function Concat(array $string){
-        
+
         foreach($string as $val)
             $this->variable .= $val;
         return $this;
     }
-    
+
     public function RemoveOccuranceOf(array $string){
-        
+
         foreach($string as $value){
-            
+
             $list[$value] = '';
         }
-        
+
         $this->Replace($list);
         return $this;
     }

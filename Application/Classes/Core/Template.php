@@ -19,11 +19,11 @@ class Template extends Router {
     public function __construct() {
         ;
     }
-    
+
     private function GetTemplate($template){
-        
+
         $templateParams = explode(':', $template);
-            
+
         if ($templateParams[0] != null) {
 
             return array(
@@ -45,13 +45,13 @@ class Template extends Router {
         $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
 
         extract($params);
-        
+
         $templateUrl = $this->GetTemplate($template);
-        
+
         ob_start();
-        
+
         if(is_file($templateUrl['template'])){
-            
+
             require_once $templateUrl['path'].BUNDLE_VIEW_HEADER_FILE;
             require_once $templateUrl['template'];
             require_once $templateUrl['path'].BUNDLE_VIEW_FOOTER_FILE;
@@ -63,8 +63,7 @@ class Template extends Router {
 
         if(ENABLE_HTML_VALIDATION && !empty($html)){
 
-            $validation = new \Application\Components\ValidationEngine();
-            $validation->validateHTML ($html);
+            $this->GetComponent('ValidationEngine')->validateHTML ($html);
         }
 
         echo $html;
@@ -241,7 +240,7 @@ class Template extends Router {
         }
         else
             $_SESSION['FlashMessages'][] = $message;
-        
+
         return $this;
     }
 
@@ -260,7 +259,7 @@ class Template extends Router {
         }
         else
             $_SESSION['Errors'][] = $message;
-        
+
         return $this;
     }
 
@@ -393,46 +392,46 @@ class Template extends Router {
         else
             return false;
     }
-    
+
     public function Cycle($index, $even = 'even', $odd = 'odd'){
-        
+
         if($this->IsEven($index)) return $even;
         return $odd;
     }
-    
+
     public function GenerateNumberOptions($start, $end, $leap = 1, $selected = null){
-        
+
         if($start > $end)
             for($i = $start; $start >= $end; $i -= $leap){
-                
+
                 $options .= $this->GenerateOption($i, $i, $selected);
         }
         else if($start < $end)
             for($i = $start; $start <= $end; $i += $leap){
-                
+
                 $options .= $this->GenerateOption($i, $i, $selected);
             }
-            
+
         return $options;
     }
-    
+
     public function GenerateOption($value, $label, $selected = null){
-        
+
         $option .= "<option value='$value' ";
         if($this->Variable($selected)->Equals($value)) $option .= 'selected="selected" ';
         $option .= " >$label</option>";
-        
+
         return $option;
     }
-    
+
     public function IsEven($value){
-        
+
         if($value % 2 == 0) return $this;
         return false;
     }
-    
+
     public function IsOdd($value){
-        
+
         if($value % 2 != 0) return $this;
         return false;
     }

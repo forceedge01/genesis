@@ -14,8 +14,8 @@ class Application extends Template{
 
     public function __construct() {
 
-        $this->Request = $this->GetObject('Request');
-        $this->Router = $this->GetObject('Router');
+        $this->Request = $this->GetCoreObject('Request');
+        $this->Router = $this->GetCoreObject('Router');
 
         if(SESSION_ENABLED){
 
@@ -46,7 +46,7 @@ class Application extends Template{
             if(class_exists($userObject))
                 $this->User = new $userObject();
             else{
-                
+
                 echo HOW_TO_CREATE_A_BUNDLE;
                 exit;
             }

@@ -94,45 +94,61 @@ class HTMLGenerator extends Router {
 
     public function generateForm($input) {
 
-        $form = null;
-//
-        $form .= '<div class="widget">
+        $formHeader = function() use ($input){
+
+            $form = '<div class="widget">
             <div class="title"><h6>' . @($input['title'] ? $input['title'] : 'Default title' ) . '</h6></div>
             <form method="' . @(($input['method']) ? $input['method'] : 'POST' ) . '" message="' . @$input['message'] . '" action="' . @$input['action'] . '" enctype="' . @$input['enctype'] . '" class="' . @(($input['class']) ? $input['class'] : 'form' ) . '" id="' . @$input['id'] . '">
             <fieldset>';
 
-        if (isset($input['table']))
-            $form .= $this->DBForm($input['table']);
+            return $form;
+        };
 
-        foreach ($input['inputs'] as $key => $element) {
+        $formBody = function($form = null) use ($input){
 
-            if ($key != 'hidden')
-                $form .= '<div class="formRow">';
+            if (isset($input['table']))
+                $form .= $this->DBForm($input['table']);
 
-            $element['type'] = $key;
+            foreach ($input['inputs'] as $key => $element) {
 
-            if ($key != 'hidden')
-                $form .= '<label for="' . @$element['id'] . '">' . @$element['label'] . '</label>
-                    <div class="formRight">';
+                if ($key != 'hidden')
+                    $form .= '<div class="formRow">';
 
-            $form .= $this->generateInput($element);
+                $element['type'] = $key;
 
-            if ($key != 'hidden')
-                $form .= '</div></div>';
-        }
+                if ($key != 'hidden')
+                    $form .= '<label for="' . @$element['id'] . '">' . @$element['label'] . '</label>
+                        <div class="formRight">';
 
-        $form .= '</fieldset><div class="wizButtons"><div class="wNavButtons">';
+                $form .= $this->generateInput($element);
 
-        foreach ($input['submission'] as $key => $submit) {
+                if ($key != 'hidden')
+                    $form .= '</div></div>';
+            }
 
-            $submit['type'] = $key;
+            $form .= '</fieldset>';
 
-            $form .= $this->generateInput($submit);
-        }
+            return $form;
+        };
 
-        $form .= '</div></div></form></div>';
+        $formFooter = function() use ($input){
 
-        return $form;
+            $form = '<div class="wizButtons"><div class="wNavButtons">';
+
+            foreach ($input['submission'] as $key => $submit) {
+
+                $submit['type'] = $key;
+
+                $form .= $this->generateInput($submit);
+            }
+
+            $form .= '</div></div></form></div>';
+
+            return $form;
+
+        };
+
+        return $formHeader() . $formBody() . $formFooter();
     }
 
     protected function DBForm($inputs) {
@@ -170,6 +186,7 @@ class HTMLGenerator extends Router {
 
                 $html .= '</div></div>';
             }
+
         } else {
 
             foreach ($inputs as $key => $value) {
@@ -244,6 +261,7 @@ class HTMLGenerator extends Router {
         $element = null;
 
         switch ($params['type']) {
+
             case 'text': {
                     $element .= '
                             <!-- input -->
@@ -256,6 +274,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'textarea': {
                     $element .= '
                             <!-- textarea -->
@@ -268,6 +287,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'imageUpload': {
                     $element .= '
                             <!-- input -->
@@ -282,6 +302,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'select': {
                     $elements = explode(',', @$params['value']);
                     $element .= '
@@ -331,6 +352,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'image': {
                     $element .= '
                             <img align = "' . @$params['align'] . '" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" src = "' . @$params['src'] . '" title = "' . @$params['title'] . '" alt = "' . @$params['alt'] . '" />
@@ -338,6 +360,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'linkedImage': {
                     $element .= '
                             <!-- linkedImage -->
@@ -346,6 +369,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'href':
             case 'link': {
                     $element .= '
@@ -355,6 +379,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'radio': {
                     $elements = explode(',', @$params['value']);
                     if (is_numeric($elements[0])) {
@@ -395,6 +420,7 @@ class HTMLGenerator extends Router {
 
                     break;
                 }
+
             case 'checkbox': {
                     $elements = explode(',', @$params['value']);
                     if (is_numeric($elements[0])) {
@@ -434,6 +460,7 @@ class HTMLGenerator extends Router {
                     }
                     break;
                 }
+
             case 'slider': {
                     $elements = explode(',', @$params['value']);
                     $element .= '
@@ -468,6 +495,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'datepicker': {
                     $element .= '
                             <!-- datepicker with class date -->
@@ -492,6 +520,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'selectdate': {
                     $selected = explode(',', @$params['selected']);
                     $element .= '
@@ -537,6 +566,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'hidden': {
                     $element .= '
                             <!-- hidden element -->
@@ -545,6 +575,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'button': {
                     $element .= '
                             <!-- button -->
@@ -553,6 +584,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'postcode': {
                     $element .= '
                             <!-- postcode -->
@@ -569,6 +601,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'submit': {
                     $element .= '
                             <!-- SUBMIT BUTTON -->
@@ -577,6 +610,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'reset': {
                     $element .= '
                             <!-- RESET BUTTON -->
@@ -585,6 +619,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'file': {
                     $element .= '
                             <!-- FILE UPLOAD -->
@@ -593,6 +628,7 @@ class HTMLGenerator extends Router {
                             ';
                     break;
                 }
+
             case 'iframe': {
                     $element .= '
                             <!-- START IFRAME -->
@@ -600,6 +636,7 @@ class HTMLGenerator extends Router {
                             <!-- END IFRAME CODE -->
                             ';
                 }
+
             default: {
                     $this->form .= @$params['content'];
                 }
@@ -644,27 +681,34 @@ class HTMLGenerator extends Router {
         if (!empty($this->errors))
             foreach ($this->errors as $errorName => $error)
                 echo '<font color="' . $this->errorColor . '">', $errorName, ': ', $error, '</font><br />';
-        $render = $this->filterForRender();
-        echo $render;
-        echo '</form>';
+
+        echo $this->filterForRender() . '</form>';
     }
 
     private function filterForRender($var = null) {
+
         $var = ($var == null) ? $this->form : $var;
-        $filtered = str_replace('$#name', $this->name, $var);
-        $filtered = str_replace('$#method', $this->method, $filtered);
-        $filtered = str_replace('$#action', $this->action, $filtered);
-        return $filtered;
+
+        return $this->Variable($var)->Replace([
+
+            '$#name' => $this->name,
+            '$#method' => $this->method,
+            '$#action' => $this->action
+
+        ])->GetVariableResult();
     }
 
     function setErrorColor($color) {
+
         $this->errorColor = $color;
     }
 
     private function rand_string($length) {
+
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $str = null;
         $size = strlen($chars);
+
         for ($i = 0; $i < $length; $i++) {
             $str .= $chars[rand(0, $size - 1)];
         }
@@ -710,7 +754,9 @@ class HTMLGenerator extends Router {
                 $content .= '<div class="tableHeadingSection" id="' . $key . '">' . $key . '</div>';
 
                 $content .= $this->outputIndexItems($key, $value);
+
             } else {
+                
                 if (is_numeric($key))
                     echo '<li class="indexHeading"><a href="#' . $value . '">' . $value . '</a></li>';
                 else {
@@ -729,9 +775,7 @@ class HTMLGenerator extends Router {
         if ($contentDescriptiveOutput)
             echo $content;
 
-        $table = ob_get_clean();
-
-        return $table;
+        return ob_get_clean();
     }
 
     /**

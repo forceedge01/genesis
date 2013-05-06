@@ -5,6 +5,7 @@ namespace Application\Bundles\WelcomeBundle\Entities;
 
 use Application\Core\Entities\ApplicationEntity;
 
-class WelcomeEntity extends ApplicationEntity {
+
+final class WelcomeEntity extends ApplicationEntity {
 
 }

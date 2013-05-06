@@ -6,7 +6,9 @@ namespace Application\Core\Repositories;
 
 use Application\Core\Database;
 
-class ApplicationRepository extends Database {
+use Application\Interfaces\Repositories\Repository;
+
+class ApplicationRepository extends Database implements Repository {
 
     protected
             $id,
@@ -17,7 +19,7 @@ class ApplicationRepository extends Database {
 
         parent::__construct($params);
 
-        $this->tableName = str_replace('Repository','', $this->GetClassFromNameSpacedClass(get_called_class()));
+        $this->tableName = str_replace('Repository', '', $this->GetClassFromNameSpacedClass(get_called_class()));
     }
 
     /**
@@ -48,7 +50,7 @@ class ApplicationRepository extends Database {
      * @return object
      * Find record by array of params
      */
-    public function findOneBy($params){
+    public function findOneBy(array $params){
 
         $entity = $this->Table($this->tableName)->GetRecordBy($params)->GetResultSet();
 
@@ -70,7 +72,7 @@ class ApplicationRepository extends Database {
      * @return object
      * Find all records, optional parameters for filtering data
      */
-    public function findAll($params = array()){
+    public function findAll(array $params = array()){
 
         return $this->Table($this->tableName)->GetRecords($params)->GetResultSet();
     }
@@ -103,9 +105,9 @@ class ApplicationRepository extends Database {
      * @return object
      * Gets table for further query processing
      */
-    public function GetTableForRepository($repository){
+    private function GetTableForRepository($repository){
 
-        return $this->Table(str_replace('Repository', '', $repository));
+        return $this->Table($this->tableName);
     }
 
 }

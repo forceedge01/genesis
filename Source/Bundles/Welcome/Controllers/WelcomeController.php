@@ -6,7 +6,10 @@ namespace Application\Bundles\Welcome\Controllers;
 
 use Application\Core\Controllers\ApplicationController;
 
-class WelcomeController extends ApplicationController {
+
+final class WelcomeController extends ApplicationController {
+
+    use \Application\Traits\AppMethods;
 
     public
             $htmlgen;

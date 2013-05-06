@@ -9,14 +9,16 @@ require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
 class AppKernal {
 
     private static
-            $classes = array(),
-            $configs = array(),
-            $controllers = array(),
-            $routes = array(),
-            $models = array(),
-            $bundles = array(),
-            $components = array(),
-            $files = array();
+            $classes = [],
+            $configs = [],
+            $controllers = [],
+            $routes = [],
+            $models = [],
+            $bundles = [],
+            $components = [],
+            $files = [],
+            $traits = [],
+            $interfaces = [];
 
     public static
             $phpVersion,
@@ -62,8 +64,10 @@ class AppKernal {
 
         foreach($classes as $class){
 
-            if(is_file($classDir . $class))
+            if(is_file($classDir . $class)){
+
                 self::$classes[] = $classDir . $class;
+            }
             else
                 echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
         }
@@ -76,6 +80,10 @@ class AppKernal {
         self::checkDependencies();
 
         self::load('configs', APPLICATION_CONFIGS_FOLDER);
+
+        self::load('interfaces', APPLICATION_CLASSES_FOLDER . 'Interfaces/');
+
+        self::load('traits', APPLICATION_CLASSES_FOLDER . 'Traits/');
 
         self::load('classes', APPLICATION_CLASSES_FOLDER . 'Core/');
 
@@ -215,16 +223,18 @@ class AppKernal {
 
         if(emtpy($fileType))
             return array(
-                self::$bundles,
-                self::$classes,
-                self::$components,
-                self::$configs,
-                self::$controllers,
-                self::$files,
-                self::$models,
-                self::$routes
+                'Interfaces' => self::$interfaces,
+                'Traits' => self::$traits,
+                'Bundles' => self::$bundles,
+                'Classes' => self::$classes,
+                'Components' => self::$components,
+                'Configs' => self::$configs,
+                'Controllers' => self::$controllers,
+                'Files' => self::$files,
+                'Models' => self::$models,
+                'Routes' => self::$routes
             );
-        
+
         return self::$$fileType;
     }
 }

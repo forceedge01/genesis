@@ -6,7 +6,10 @@ namespace Application\Core\Controllers;
 
 use \Application\Core\Application;
 
-class ErrorsController extends Application{
+use Application\Interfaces\Controllers\Error;
+
+
+class ErrorsController extends Application implements Error{
 
     public function RouteNotFoundAction($route, $pattern, $backtrace){
 

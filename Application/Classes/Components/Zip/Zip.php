@@ -2,7 +2,9 @@
 
 namespace Application\Components;
 
-
+/**
+ * Author: Wahab Qureshi.
+ */
 
 class Zip extends \ZipArchive {
 

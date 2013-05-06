@@ -5,6 +5,7 @@ namespace Application\Bundles\WelcomeBundle\Repositories;
 
 use Application\Core\Repositories\ApplicationRepository;
 
-class WelcomeRepository extends ApplicationRepository{
+
+final class WelcomeRepository extends ApplicationRepository{
 
 }

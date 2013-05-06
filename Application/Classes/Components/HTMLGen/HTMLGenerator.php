@@ -2,6 +2,10 @@
 
 namespace Application\Components;
 
+/**
+ * Author: Wahab Qureshi.
+ */
+
 use Application\Core\Router;
 
 class HTMLGenerator extends Router {
@@ -756,7 +760,7 @@ class HTMLGenerator extends Router {
                 $content .= $this->outputIndexItems($key, $value);
 
             } else {
-                
+
                 if (is_numeric($key))
                     echo '<li class="indexHeading"><a href="#' . $value . '">' . $value . '</a></li>';
                 else {

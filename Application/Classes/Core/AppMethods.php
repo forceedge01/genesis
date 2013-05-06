@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class AppMethods extends Debugger {
+class AppMethods extends Debugger{
 
     private
         $variable;
@@ -24,7 +24,7 @@ class AppMethods extends Debugger {
 
             if (class_exists($fullClassPath)) {
 
-                $this->$object = new $fullClassPath($args);
+                @$this->$object = new $fullClassPath($args);
             }
             else
                 trigger_error("getOjbect accepts valid class name only, $object class does not exist in ". get_called_class(), E_USER_ERROR);
@@ -41,7 +41,7 @@ class AppMethods extends Debugger {
 
             if (class_exists($fullClassPath)) {
 
-                $this->$object = new $fullClassPath($args);
+                @$this->$object = new $fullClassPath($args);
             }
             else
                 return $this->GetComponent ($object, $args);
@@ -56,7 +56,7 @@ class AppMethods extends Debugger {
 
             if (class_exists($object)) {
 
-                $this->$object = new $object($args);
+                @$this->$object = new $object($args);
             }
             else
                 echo ' Class '.$object.' not found ' . get_called_class();

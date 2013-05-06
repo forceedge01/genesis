@@ -59,7 +59,7 @@ class Database extends Template {
         try {
 
             $this->activeConnection = new \mysqli($this->host, $this->username, $this->password, $this->name);
-            
+
         } catch (Exception $e) {
 
             trigger_error('Error connecting to mysql Database on INIT: ' . $e->GetMessage());
@@ -218,7 +218,7 @@ class Database extends Template {
 
         if (!isset($params[$unquotedString->Replace(['.' => '__'])]) && !isset($params[$unquotedString->Replace(['.' => ''])]))
             return $this->CreateRecord($params);
-        
+
         else
             return $this->UpdateRecord($params);
     }
@@ -264,12 +264,12 @@ class Database extends Template {
      * Removed table name and backticks formatting from a field
      */
     protected function GetUnformattedFieldOrKey($key) {
-        
+
         return $this->Variable($key)->Explode('.')->ReplaceInEach(['`' => ''])->GetVariableResult();
     }
 
     protected function GetRawFieldName($key){
-        
+
         return $this->Variable($key)->Replace(['`' => '', '.' => ''])->GetVariableResult();
     }
 
@@ -282,7 +282,7 @@ class Database extends Template {
     private function prepareForMultiQuery(array $params = array()) {
 
         foreach ($params as $key => $value) {
-            
+
             $variable = $this->Variable($key);
 
             if ($variable->Has(['__'])) {

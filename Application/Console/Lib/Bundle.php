@@ -140,7 +140,7 @@ use \\Application\\Core\\Entities\\ApplicationEntity;
 
 // This Entity represents '.$this->name.' table
 
-class ' . $this->name . 'Entity extends ApplicationEntity {
+final class ' . $this->name . 'Entity extends ApplicationEntity {
 
 }
               ';
@@ -161,7 +161,7 @@ use \\Application\\Core\\Repositories\\ApplicationRepository;
 
 // This Repository holds methods for '.$this->name.' table
 
-class ' . $this->name . 'Repository extends ApplicationRepository {
+final class ' . $this->name . 'Repository extends ApplicationRepository {
 
 }
               ';
@@ -294,7 +294,7 @@ use \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Reposi
 use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
 
 
-class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
+final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
 
       public
             $htmlgen;

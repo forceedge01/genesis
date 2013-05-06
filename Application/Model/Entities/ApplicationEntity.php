@@ -5,7 +5,9 @@ namespace Application\Core\Entities;
 
 use Application\Core\Database;
 
-class ApplicationEntity extends Database{
+use Application\Interfaces\Entities\Entity;
+
+class ApplicationEntity extends Database implements Entity{
 
     protected
             $id,

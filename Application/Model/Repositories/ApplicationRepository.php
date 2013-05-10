@@ -94,9 +94,9 @@ class ApplicationRepository extends Database implements Repository {
      * Returns count of table records, if column not set, primary key will be used to count records.
      *
      */
-    public function GetCount($column){
+    public function GetCount($column, $predicament){
 
-        return $this->Table($this->tableName, $this->tableColumns)->Count($column)->GetResultSet();
+        return $this->Table($this->tableName, $this->tableColumns)->Count($column, $predicament) ->Execute()->GetResultSet();
     }
 
     /**

@@ -147,6 +147,7 @@ class AppKernal {
                 self::loadFilesFromDir($bundle . BUNDLE_CONFIGS, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_ROUTES, array('php'));
                 self::loadFilesFromDir($bundle, array('php'), false);
+                self::loadFilesFromDir($bundle . BUNDLE_INTERFACES, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
             }

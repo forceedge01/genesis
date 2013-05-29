@@ -24,7 +24,7 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this->Render('::Errors/Route_Not_Found.html.php', $params);
+        $this->Render(':Errors/Route_Not_Found.html.php', $params);
     }
 
     public function ActionNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -42,7 +42,7 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this->Render('::Errors/Action_Not_Found.html.php', $params);
+        $this->Render(':Errors/Action_Not_Found.html.php', $params);
     }
 
     public function ClassNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -60,16 +60,16 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this->Render('::Errors/Class_Not_Found.html.php', $params);
+        $this->Render(':Errors/Class_Not_Found.html.php', $params);
     }
 
     public function NotFoundError404Action(){
 
-        $this->Render('::Errors/error404.html.php', array('pageTitle' => 'Error 404: Page not found'));
+        $this->Render(':Errors/error404.html.php', array('pageTitle' => 'Error 404: Page not found'));
     }
 
     public function ServerError500Action(){
 
-        $this->Render('::Errors/error500.html.php', array('pageTitle' => 'Error 500: Internal server error'));
+        $this->Render(':Errors/error500.html.php', array('pageTitle' => 'Error 500: Internal server error'));
     }
 }

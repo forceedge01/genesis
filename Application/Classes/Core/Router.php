@@ -65,6 +65,8 @@ class Router extends AppMethods{
      */
     public function forwardRequest(){
 
+        $value = array();
+
         //render the right application controller to render template;
         foreach(self::$Route as $key => $value){
 
@@ -82,21 +84,58 @@ class Router extends AppMethods{
                 $controllerAction = explode(':', $value['Controller']);
 
                 $objectName = $this->GetControllerNamespace($controllerAction);
-                
+
                 $objectAction = $controllerAction[2] . 'Action';
 
                 $this->callAction($objectName, $objectAction, $this->funcVariable);
-
             }
-
         }
 
         return false;
+    }
+
+    /**
+     *
+     * @param type $route
+     * @return string extract variables in the url
+     */
+    private function extractVariable($route){
+
+        if(strpos($route,'{'))
+        {
+            $routeParams = explode('/', $route);
+
+            $pattern = '(\\{.*?\\})';
+
+            $index = 0;
+
+            foreach($routeParams as $param){
+
+                if(preg_match($pattern, $param, $variables)){
+
+                    if(isset($this->params[$index])){
+
+                        $param = $this->params[$index];
+
+                        $this->funcVariable[] = $this->params[$index];
+
+                    }
+                }
+
+                $routeParams[$index] = $param;
+
+                $index++;
+            }
+
+            $route = $this->reconstructPattern($routeParams);
+        }
+
+        return $route;
 
     }
-    
+
     private function GetControllerNamespace($controllerAction){
-        
+
         if($controllerAction[0] == null)
             $namespace = '\\Application\\Core\\Controllers\\';
         else
@@ -160,20 +199,16 @@ class Router extends AppMethods{
         if(!empty($route))
             $this->route = $route;
 
-        foreach(self::$Route as $key => $value){
+        if(isset(self::$Route[$this->route])){
 
-            if($key == $this->route){
+            $URL = self::$Route[$this->route]['Pattern'];
 
-                $URL = $value['Pattern'];
+            $this->lastRoute = $URL;
+            $this->routePattern = $URL;
 
-                $this->lastRoute = $URL;
-                $this->routePattern = $URL;
+            unset($_SESSION['routeError']);
 
-                unset($_SESSION['routeError']);
-
-                return $this->lastRoute;
-            }
-
+            return $this->lastRoute;
         }
 
         $error = array(
@@ -181,11 +216,9 @@ class Router extends AppMethods{
             'Route' => $this->route,
             'Pattern' => $this->pattern,
             'Backtrace' => debug_backtrace()
-
         );
 
         $this->forwardToController('Error_Route_Not_Found', $error);
-
     }
 
     /**
@@ -198,20 +231,17 @@ class Router extends AppMethods{
         if(!empty($route))
             $this->route = $route;
 
-        foreach(self::$Route as $key => $value){
+        if(isset(self::$Route[$this->route])){
 
-            if($key == $this->route){
+            $URL = self::$Route[$this->route]['Pattern'];
+            $controller = self::$Route[$this->route]['Controller'];
 
-                $URL = $value['Pattern'];
-                $controller = $value['Controller'];
+            $this->lastRoute = $URL;
+            $this->routePattern = $URL;
 
-                $this->lastRoute = $URL;
-                $this->routePattern = $URL;
+            unset($_SESSION['routeError']);
 
-                unset($_SESSION['routeError']);
-
-                return $controller;
-            }
+            return $controller;
 
         }
 
@@ -325,45 +355,10 @@ class Router extends AppMethods{
         $controllerAction = explode(':', $controller);
 
         $objectName = $this->GetControllerNamespace($controllerAction);
-        
+
         $objectAction = $controllerAction[2] . 'Action';
 
         $this->callAction($objectName, $objectAction, $variable);
-
-    }
-
-    /**
-     *
-     * @param type $route
-     * @return string extract variables in the url
-     */
-    private function extractVariable($route){
-
-        $routeParams = explode('/', $route);
-
-        $pattern = '(\\{.*?\\})';
-
-        $index = 0;
-
-        foreach($routeParams as $param){
-
-            if(preg_match($pattern, $param, $variables)){
-
-                if(isset($this->params[$index])){
-
-                    $param = $this->params[$index];
-
-                    $this->funcVariable[] = $this->params[$index];
-
-                }
-            }
-
-            $routeParams[$index] = $param;
-
-            $index++;
-        }
-
-        return $this->reconstructPattern($routeParams);
 
     }
 
@@ -375,14 +370,14 @@ class Router extends AppMethods{
     private function reconstructPattern($params){
 
         $pattern = function($params){
-            
+
             $qualified = null;
-          
+
             foreach($params as $param){
 
                 $qualified .= $param . '/';
             }
-            
+
             return str_replace('//', '/', $qualified);
         };
 
@@ -462,7 +457,6 @@ class Router extends AppMethods{
 
                     return $this->route;
                 }
-
         }
 
         $error = array(

@@ -40,18 +40,21 @@ class Application extends Template{
 
             }
 
-            $userObject = AUTH_USER_ENTITY;
-            $objectMethod = AUTH_USER_POPULATE_METHOD;
+            if(AUTH_USER_ENTITY)
+            {
+                $userObject = AUTH_USER_ENTITY;
+                $objectMethod = AUTH_USER_POPULATE_METHOD;
 
-            if(class_exists($userObject))
-                $this->User = new $userObject();
-            else{
+                if(class_exists($userObject))
+                    $this->User = new $userObject();
+                else{
 
-                echo HOW_TO_CREATE_A_BUNDLE;
-                exit;
+                    echo HOW_TO_CREATE_A_BUNDLE;
+                    exit;
+                }
+
+                $this->User->$objectMethod(@$_SESSION['email']);
             }
-
-            $this->User->$objectMethod(@$_SESSION['email']);
         }
     }
 

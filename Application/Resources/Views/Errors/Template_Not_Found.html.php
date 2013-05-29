@@ -1,6 +1,6 @@
 <div class="errorPage">
 
-    <h1>Template:: <span><?=$template?></span> <?=$message?></h1>
+    <h1>Template:: <span><?=$template?></span> <?=$message?> Not Found</h1>
 
     <p>Error Originated from:</p>
 

@@ -8,6 +8,7 @@ use Application\Core\Database;
 
 use Application\Interfaces\Repositories\Repository;
 
+
 class ApplicationRepository extends Database implements Repository {
 
     protected

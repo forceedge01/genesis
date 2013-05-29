@@ -28,7 +28,7 @@ class Bundle extends Console {
 
         if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
-            $this->createConfig()->createRoutes()->createController()->createEntity()->createViews()->CreateAssets();
+            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createViews()->CreateAssets();
         }
 
         echo 'Bundle ' . $this->name . ' has been created successfully!';
@@ -159,9 +159,11 @@ namespace Application\\Bundles\\'.$this->name.'\\Repositories;
 
 use \\Application\\Core\\Repositories\\ApplicationRepository;
 
-// This Repository holds methods for '.$this->name.' table
+use \\Application\\Bundles\\'.$this->name.'\\Interfaces\\'.$this->name.'RepositoryInterface;
 
-final class ' . $this->name . 'Repository extends ApplicationRepository {
+// This Repository holds methods to query '.$this->name.' table
+
+final class ' . $this->name . 'Repository extends ApplicationRepository implements '.$this->name.'RepositoryInterface{
 
 }
               ';
@@ -276,6 +278,117 @@ final class ' . $this->name . 'Repository extends ApplicationRepository {
             return $this;
     }
 
+    private function createInterface(){
+
+        mkdir(BUNDLES_FOLDER . $this->name . '/Interfaces');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'ControllerInterface.php', 'w+');
+
+        $initControllerInterface = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+
+
+/**
+ *
+ * @group groupName
+ * @author John Doe <john.doe@example.com>
+ *
+ */
+interface '.$this->name.'ControllerInterface {
+
+    /**
+     *
+     * @group groupName
+     * @author <Above>
+     *
+     * @param type $name Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function indexAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @param type $name Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function viewAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @param type $name Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function editAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @param type $name Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function createAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @param type $name Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function deleteAction();
+}
+
+';
+
+        fwrite($handle, $initControllerInterface);
+
+        fclose($handle);
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'RepositoryInterface.php', 'w+');
+
+        $initControllerInterface = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+
+
+
+/**
+ *
+ * @group groupName
+ * @author Abc <Abc@example.com>
+ *
+ */
+interface '.$this->name.'Repositoryinterface {
+
+}
+        ';
+
+        fclose($handle);
+
+        return $this;
+    }
+
     private function createController(){
 
         mkdir(BUNDLES_FOLDER . $this->name . '/Controllers');
@@ -293,8 +406,10 @@ use \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Reposi
 
 use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
 
+use Application\\Bundles\\' . $this->name . '\\Interfaces\\' . $this->name . 'ControllerInterface;
 
-final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController{
+
+final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController implements ' . $this->name . 'ControllerInterface{
 
       public
             $htmlgen;
@@ -581,8 +696,6 @@ Router::$Route[\'' . $this->name . '_Delete\'] = array(
         $initRoute = '/* Javascript for '.$this->name.' Bundle */
 
 jQuery(document).ready(function(){
-
-
 
 });
 

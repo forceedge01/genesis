@@ -54,6 +54,8 @@ define('BUNDLE_CONFIGS', '/Resources/Configs/');
 
 define('BUNDLE_DATABASE_FILES', '/Model/');
 
+define('BUNDLE_INTERFACES', '/Interfaces/');
+
 define('BUNDLE_CONTROLLERS', '/Controllers/');
 
 define('BUNDLE_ROUTES', '/Resources/Routes/');

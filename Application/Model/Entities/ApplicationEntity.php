@@ -7,6 +7,7 @@ use Application\Core\Database;
 
 use Application\Interfaces\Entities\Entity;
 
+
 class ApplicationEntity extends Database implements Entity{
 
     protected

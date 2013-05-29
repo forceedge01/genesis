@@ -10,9 +10,9 @@
         </legend>
 
         <div class="widget index">
-            
+
             <ul id ="gearMenu">
-                <li>1st menu</li>    
+                <li>1st menu</li>
                 <ol>
 
                     <li>1nd menu item 1</li>

@@ -32,7 +32,9 @@ class Database extends Template {
         $queryOrderBy,
         $queryWhere,
         $queryExtra,
-        $queryCount;
+        $queryCount,
+        $queryParameters = [],
+        $queryJoins = [];
 
     protected
         $queryMeta;
@@ -64,6 +66,11 @@ class Database extends Template {
 
             trigger_error('Error connecting to mysql Database on INIT: ' . $e->GetMessage());
         }
+    }
+    
+    protected function GetConnection ( )
+    {    
+        return $this -> activeConnection;
     }
 
     /**
@@ -307,39 +314,46 @@ class Database extends Template {
      */
     private function prepare(array $params = array(), $type = null) {
 
-        $query = null;
+        $query = function ( ) use  ( $params, $type){
+          
+            foreach ($params as $key => $value) {
 
-        foreach ($params as $key => $value) {
+                foreach ($this->queryTableColumns as $column) {
 
-            foreach ($this->queryTableColumns as $column) {
+                    if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)) {
 
-                if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)) {
+                        $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
-                    $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
+                        $mysqlFunctions = array(
 
-                    $mysqlFunctions = array(
+                          'CONCAT(',
+                          'SUM(',
+                          'COUNT(',
+                          'DISTINCT(',
+                          'MAX(',
+                          'DATE',
+                          'DATE_FORMAT(',
+                          'CURRENT_DATE(',
+                          'CURRENT_TIME(',
+                          'TIMESTAMP('                            
+                        );
 
-                      'CONCAT(',
-                      'SUM(',
-                      'COUNT(',
-                      'DISTINCT(',
-                      'MAX('
-                    );
-
-                    if (is_numeric($value))
-                        $query .= $value . ($type == 'update' ? ',' : ' AND ');
-                    else if($this->variable($value)->has($mysqlFunctions))
-                        $query .= $value . ($type == 'update' ? ',' : ' AND ');
-                    else
-                        $query .= "'" . $value . "' " . ($type == 'update' ? ',' : ' AND ');
+                        if (is_numeric($value))
+                            $query .= $this ->filterParam ($value )  . ($type == 'update' ? ',' : ' AND ');
+                        else if($this->variable($value)->has($mysqlFunctions))
+                            $query .= $this ->filterParam ($value )  . ($type == 'update' ? ',' : ' AND ');
+                        else
+                            $query .= "'" . $this ->filterParam ($value )  . "' " . ($type == 'update' ? ',' : ' AND ');
+                    }
                 }
             }
-        }
 
-        $query = trim($query, ' AND ');
-        $query = trim($query, ',');
+            $query = trim($query, ' AND ');
+            return trim($query, ',');
+            
+        };
 
-        return $query;
+        return $query ( );
     }
 
     /**
@@ -362,9 +376,9 @@ class Database extends Template {
                     $keys .= $key . ',';
 
                     if (is_int($value))
-                        $values .= mysql_real_escape_string ($value) . ',';
+                        $values .= $this ->filterParam ($value) . ',';
                     else
-                        $values .= "'" . mysql_real_escape_string ($value) . "',";
+                        $values .= "'" . $this ->filterParam ($value) . "',";
                 }
             }
         }
@@ -635,19 +649,20 @@ class Database extends Template {
 
         $this->query = "select {$extras} {$this->queryColumns} from {$this->queryTable} {$this->queryJoinClause}";
 
-        if (is_array($id)) {
-
+        if (is_array($id)) 
+        {
             $params = $this->prepare($id);
 
             $this->query .= ' where ' . $params;
 
-        } else if (is_numeric($id)) {
-
+        } 
+        else if (is_numeric($id)) 
+        {
             $this->query .= ' where ' . $this->queryTablePrimaryKey . ' = ' . $id;
         }
 
-        if($this->queryWhere){
-
+        if($this->queryWhere)
+        {
             $this->query .= ' where ';
 
             $params = $this->prepare($this->queryWhere);
@@ -681,7 +696,16 @@ class Database extends Template {
 
         if($this->queryLimit)
             $this->query .= ' limit ' . $this->queryLimit;
+        
+        
+        $this -> placeParameters ( );
 
+        return $this;
+    }
+    
+    private function placeParameters ( )
+    {
+        $this -> query = $this ->Variable ($this -> query) ->Replace ($this -> queryParameters) ->GetVariableResult ();
         return $this;
     }
 
@@ -732,7 +756,7 @@ class Database extends Template {
      */
     private function buildRelationsShipsQuery() {
 
-        if (isset($this->foreignKeys) && count($this->foreignKeys != 0)) {
+        if (!isset ( $this -> queryJoins) and isset($this->foreignKeys) and count($this->foreignKeys != 0) and $this -> aggregateTables != false) {
 
             $this->queryJoinClause = null;
 
@@ -972,6 +996,12 @@ class Database extends Template {
 
         return $this;
     }
+    
+    public function AggregateNone ( )
+    {
+        $this -> aggregateTables = false;
+        return $this;
+    }
 
     public function Select(array $list){
 
@@ -1038,13 +1068,40 @@ class Database extends Template {
             return false;
     }
 
-    public function Count($column = null){
+    public function Count($column = null, $predicament = null){
 
         if(empty($column))
             $column = $this->queryTablePrimaryKey;
+        
+        $this -> queryWhere = $predicament;
 
         $this->queryCount = $column;
 
+        return $this;
+    }
+    
+    public function SetParameter ($key, $value){
+        
+        $this -> queryParameters[':'.$key] = $this ->filterParam( $value ) ;
+        return $this;
+    }
+    
+    public function SetParameters (array $keyedValues){
+        
+        foreach ( $keyedValues as $key => $value )
+            $this ->SetParameter ($key, $value);
+        
+        return $this;
+    }
+    
+    protected function filterParam ( $value )
+    {
+        return mysql_real_escape_string ( $value ) ;
+    }
+    
+    public function LeftJoin ( $table, $alias, $predicament )
+    {
+        $this -> queryJoins[] = $table .' AS '.$alias.' ON '.$predicament;
         return $this;
     }
 }

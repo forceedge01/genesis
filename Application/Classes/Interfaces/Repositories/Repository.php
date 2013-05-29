@@ -14,5 +14,5 @@ interface Repository{
 
     function GetAll(array $params);
 
-    function GetCount($column);
+    function GetCount($column, $predicament);
 }

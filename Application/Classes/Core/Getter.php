@@ -3,8 +3,9 @@
 namespace Application\Core;
 
 
+use \Application\Interfaces\Getter as GetterInterface;
 
-class Getter extends AppMethods implements Getter{
+class Getter extends AppMethods implements GetterInterface{
 
     /**
      *
@@ -61,7 +62,7 @@ class Getter extends AppMethods implements Getter{
 
         return $this->$object;
     }
-    
+
     /**
      *
      * @param type $bundleColonEntityName
@@ -101,118 +102,118 @@ class Getter extends AppMethods implements Getter{
 
         return $this->getObject($namespace.$bundle[1]);
     }
-    
+
     /**
-     * 
+     *
      * @return Request
      */
     public function GetRequestManager ()
     {
         return $this ->GetCoreObject('Request');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\Variable
      */
     public function GetVariableManager ( )
     {
         return $this ->GetComponent('Variable');
     }
-    
+
     /**
-     * 
+     *
      * @return Database
      */
     public function GetDatabaseManager ( )
     {
         return $this ->GetCoreObject('Database');
     }
-    
+
     /**
-     * 
+     *
      * @return Router
      */
     public function GetRouterManager ( )
     {
         return $this ->GetCoreObject('Router');
     }
-    
+
     /**
-     * 
+     *
      * @return Session
      */
     public function GetSessionManager ( )
     {
         return $this ->GetCoreObject('Session');
     }
-    
+
     /**
-     * 
+     *
      * @return Auth
      */
     public function GetAuthManager ( )
     {
         return $this ->GetCoreObject('Auth');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\HTMLGenerator
      */
     public function GetHTMLGenerator ( )
     {
         return $this ->GetComponent('Variable');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\Analytics
      */
     public function GetAnalyticsManager ( )
     {
         return $this ->GetComponent('Analytics');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\ValidationEngine
      */
     public function GetValidationEngine ( )
     {
         return $this ->GetComponent('ValidationEngine');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\Mail
      */
     public function GetMailer ( )
     {
         return $this ->GetComponent('Mail');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\Zip
      */
     public function GetZipManager ( )
     {
         return $this ->GetComponent('Zip');
     }
-    
+
     /**
-     * 
+     *
      * @return \Application\Components\Dir
      */
     public function GetDirectoryManager ( )
     {
         return $this ->GetComponent('Dir');
     }
-    
+
     public function GetManager ( )
     {
         return $this;
     }
-            
+
 }

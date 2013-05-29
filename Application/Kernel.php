@@ -51,8 +51,8 @@ class AppKernal {
         $classes = array(
 
             'Debugger.php',
-            'Getter.php',
             'AppMethods.php',
+            'Getter.php',
             'Request.php',
             'Router.php',
             'Template.php',

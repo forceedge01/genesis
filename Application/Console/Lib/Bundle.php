@@ -299,7 +299,6 @@ interface '.$this->name.'ControllerInterface {
 
     /**
      *
-     * @group groupName
      * @author <Above>
      *
      * @param type $name Description

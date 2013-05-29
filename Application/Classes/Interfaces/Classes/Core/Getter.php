@@ -5,22 +5,22 @@ namespace Application\Interfaces;
 
 
 interface Getter{
-    
-    public function GetComponent( );
-    
-    public function GetObject( );
-    
-    public function GetCoreObject( );
-    
+
+    public function GetComponent( $object, $args );
+
+    public function GetObject($object, $args );
+
+    public function GetCoreObject( $object, $args );
+
     public function GetRequestManager( );
-    
-    public function GetEntity( );
-    
-    public function GetRepository( );
-    
+
+    public function GetEntity($bundleColonEntityName );
+
+    public function GetRepository( $bundleColonEntityName);
+
     public function GetDatabaseManager ( );
-    
+
     public function GetSessionManager ( );
-    
+
     public function GetRouterManager ( );
 }

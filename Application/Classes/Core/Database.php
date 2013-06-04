@@ -215,10 +215,12 @@ class Database extends Template {
      * @return boolean - true on success, false on failure<br />
      * <br />Update a table record(s)
      */
-    public function SaveRecord(array $params = array()) {
+    protected function SaveRecord(array $params = array()) {
+        
         if (count($params) == 0)
             $params = $_REQUEST;
 
+        
         $this->prepareForMultiQuery($params);
 
         $unquotedString = $this->Variable($this->queryTablePrimaryKey)->Replace(['`' => '']);
@@ -246,7 +248,7 @@ class Database extends Template {
 
                 $pkey = $this->GetUnformattedFieldOrKey($this->queryTablePrimaryKey);
 
-                $queries[] = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' where ' . $this->queryTablePrimaryKey . ' = ' . $table[$pkey];
+                $queries[] = 'UPDATE ' . $this->queryTable . ' SET ' . $params . ' WHERE ' . $this->queryTablePrimaryKey . ' = ' . $table[$pkey];
             }
         }
         else{
@@ -987,19 +989,35 @@ class Database extends Template {
     /**
      *
      * @param array $Tables
-     * @return \Database
+     * @return \Application\Core\Database
      * Join specific tables only in a select call
      */
-    public function AggregateOnly(array $Tables){
+    protected function AggregateOnly(array $Tables){
 
         $this->aggregateTables = $Tables;
 
         return $this;
     }
     
-    public function AggregateNone ( )
+    /**
+     * 
+     * @return \Application\Core\Database
+     */
+    protected function AggregateNone ( )
     {
         $this -> aggregateTables = false;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @param array $tables
+     * @desc Sets the tables on which the queries are to be run with associations
+     */
+    protected function QueryOnly(array $tables)
+    {
+        $this -> queryTables = $tables;
+        
         return $this;
     }
 

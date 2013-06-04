@@ -62,7 +62,7 @@ final class testingController extends testingBundleController implements testing
               );
 
               //This will be used in the template to generate the above declared table.
-              $this->htmlgen = new HTMLGenerator();
+              $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
 
               $this->Render("testing:list.html.php", $params);
 
@@ -147,7 +147,7 @@ final class testingController extends testingBundleController implements testing
 
             if($this->GetRequest()->isPost("submit")){
 
-              if($testing = $this->getEntity("testingBundle:testing")->Save())
+              if($this->getEntity("testingBundle:testing")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
               else
                   $this->setError(array("Failure" => "Failed to update."));

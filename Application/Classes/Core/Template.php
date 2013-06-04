@@ -40,6 +40,11 @@ class Template extends Router {
         }
     }
 
+    /**
+     * 
+     * @param type $template
+     * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
+     */
     public function Render($template, array $params = array()) {
 
         $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
@@ -424,12 +429,24 @@ class Template extends Router {
         return $option;
     }
 
+    /**
+     * 
+     * @param type $value
+     * @return \Application\Core\Template|boolean
+     * @desc Checks if the value is even
+     */
     public function IsEven($value){
 
         if($value % 2 == 0) return $this;
         return false;
     }
 
+    /**
+     * 
+     * @param type $value
+     * @return \Application\Core\Template|boolean
+     * @desc Checks if the value is odd
+     */
     public function IsOdd($value){
 
         if($value % 2 != 0) return $this;

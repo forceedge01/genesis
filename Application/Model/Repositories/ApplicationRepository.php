@@ -31,7 +31,10 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function find($id){
 
-        $entity = $this->Table($this->tableName)->GetRecordBy($id)->GetResultSet();
+        $entity = $this
+                ->Table($this->tableName)
+                ->GetRecordBy($id)
+                    ->GetResultSet();
 
         $entityName = $this->tableName . 'Entity';
 
@@ -53,7 +56,10 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function findOneBy(array $params){
 
-        $entity = $this->Table($this->tableName)->GetRecordBy($params)->GetResultSet();
+        $entity = $this
+                ->Table($this->tableName)
+                ->GetRecordBy($params)
+                    ->GetResultSet();
 
         $entityName = $this->entity . 'Entity';
 
@@ -75,7 +81,10 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function findAll(array $params = array()){
 
-        return $this->Table($this->tableName)->GetRecords($params)->GetResultSet();
+        return $this
+                ->Table($this->tableName)
+                ->GetRecords($params)
+                    ->GetResultSet();
     }
 
     /**
@@ -85,7 +94,10 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function GetAll(array $params = array()) {
 
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecords($params)->GetResultSet();
+        return $this
+                ->Table($this->tableName, $this->tableColumns)
+                ->GetRecords($params)
+                    ->GetResultSet();
     }
 
     /**
@@ -97,7 +109,11 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function GetCount($column, $predicament){
 
-        return $this->Table($this->tableName, $this->tableColumns)->Count($column, $predicament) ->Execute()->GetResultSet();
+        return $this
+                ->Table($this->tableName, $this->tableColumns)
+                ->Count($column, $predicament) 
+                ->Execute()
+                    ->GetResultSet();
     }
 
     /**

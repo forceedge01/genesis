@@ -52,9 +52,9 @@ class ApplicationEntity extends Database implements Entity{
      * @param array $params Pass in the data for saving it to the database, if not provided<br>
      * the submitted data in globals will be taken and matched to the table on which the operation is applied.
      */
-    public function Save(array $params = array()) {
+    public function Save(array $params = array(), array $tables = array()) {
 
-        return $this->Table($this->tableName)->SaveRecord($params)->GetAffectedRows();
+        return $this->Table($this->tableName)->QueryOnly($tables)->SaveRecord($params)->GetAffectedRows();
     }
 
     /**

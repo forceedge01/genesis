@@ -458,7 +458,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
               );
 
               //This will be used in the template to generate the above declared table.
-              $this->htmlgen = new HTMLGenerator();
+              $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\');
 
               $this->Render("' . $this->name . ':list.html.php", $params);
 
@@ -484,7 +484,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
                   ),
               );
 
-              $this->htmlgen = new HTMLGenerator();
+              $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
 
               $this->Render("' . $this->name . ':view.html.php", $params);
 
@@ -533,7 +533,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
             );
 
             //This will be used in the template to generate the above declared form.
-            $this->htmlgen = new HTMLGenerator();
+            $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
 
             $this->Render("' . $this->name . ':create.html.php", $params);
 
@@ -570,7 +570,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
 
             $params["PageTitle"] = "Edit '.$this->name.'";
 
-            $this->htmlgen = new HTMLGenerator();
+            $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
 
             $this->Render("' . $this->name . ':edit.html.php", $params);
 

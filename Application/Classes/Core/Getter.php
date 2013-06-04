@@ -66,7 +66,7 @@ class Getter extends AppMethods implements GetterInterface{
     /**
      *
      * @param type $bundleColonEntityName
-     * @return \bundle returns an entity object
+     * @return \Application\Core\Repositories\ApplicationRepository returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
     public function GetRepository($bundleColonEntityName){
@@ -86,7 +86,7 @@ class Getter extends AppMethods implements GetterInterface{
     /**
      *
      * @param type $bundleColonEntityName
-     * @return \bundle returns an entity object
+     * @return \Application\Core\Entities\ApplicationEntity returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
     public function GetEntity($bundleColonEntityName){

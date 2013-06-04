@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
     
-    $('.confirmation').gear('confirm',{
+    $('.confirmAction').gear('confirm',{
         
         loadingDiv: 'div#loading',
         messageDiv: 'div#JSEvent'

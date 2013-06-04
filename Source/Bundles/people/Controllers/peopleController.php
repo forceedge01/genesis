@@ -39,14 +39,14 @@ final class peopleController extends peopleBundleController implements peopleCon
 
                         'route' => 'people_Edit',
                         'routeParam' => 'id',
-                        'dataParam' => 'people__id',
+                        'dataParam' => 'Users__id',
                     ),
 
                     'View' => array(
 
                         'route' => 'people_View',
                         'routeParam' => 'id',
-                        'dataParam' => 'people__id',
+                        'dataParam' => 'Users__id',
                     ),
 
                     'Delete' => array(
@@ -55,7 +55,7 @@ final class peopleController extends peopleBundleController implements peopleCon
                         'class' => 'remove',
                         'route' => 'people_Delete',
                         'routeParam' => 'id',
-                        'dataParam' => 'people__id',
+                        'dataParam' => 'Users__id',
                     ),
                 )
 

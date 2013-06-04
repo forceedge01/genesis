@@ -29,23 +29,20 @@ class ApplicationRepository extends Database implements Repository {
      * @return object
      * Find one record
      */
-    public function find($id){
+    public function find($id, array $tables = array()){
 
         $entity = $this
-                ->Table($this->tableName)
+                ->Table($this->tableName);
+                
+        if(count($tables))
+            return $entity
+                ->AggregateOnly($tables)
                 ->GetRecordBy($id)
                     ->GetResultSet();
-
-        $entityName = $this->tableName . 'Entity';
-
-        ${$this->entity} = new $entityName();
-
-        foreach($entity as $key => $value){
-
-            ${$this->entity}->{$key} = $value;
-        }
-
-        return ${$this->entity};
+        
+        return $entity
+                ->GetRecordBy($id)
+                    ->GetResultSet();
     }
 
     /**
@@ -56,21 +53,10 @@ class ApplicationRepository extends Database implements Repository {
      */
     public function findOneBy(array $params){
 
-        $entity = $this
+        return $this
                 ->Table($this->tableName)
                 ->GetRecordBy($params)
                     ->GetResultSet();
-
-        $entityName = $this->entity . 'Entity';
-
-        ${$this->entity} = new $entityName();
-
-        foreach($entity as $key => $value){
-
-            ${$this->entity}->{$key} = $value;
-        }
-
-        return ${$this->entity};
     }
 
     /**
@@ -79,12 +65,20 @@ class ApplicationRepository extends Database implements Repository {
      * @return object
      * Find all records, optional parameters for filtering data
      */
-    public function findAll(array $params = array()){
+    public function findAll(array $params = array(), $tables = array()){
 
-        return $this
-                ->Table($this->tableName)
+        $entity = $this
+                ->Table($this->tableName, $this->tableColumns);
+        
+        if(count($tables))
+            return $entity 
+                ->AggregateOnly($tables)
                 ->GetRecords($params)
-                    ->GetResultSet();
+                    ->GetResultSet() ;
+        
+        return $entity
+                ->GetRecords($params)
+                    ->GetResultSet() ;
     }
 
     /**
@@ -92,12 +86,20 @@ class ApplicationRepository extends Database implements Repository {
      * @param Array $param Params can include where clause order by clause or any other mysql clause.
      * @return mixed Returns matching data set.
      */
-    public function GetAll(array $params = array()) {
+    public function GetAll(array $params = array(), array $tables = array()) {
 
-        return $this
-                ->Table($this->tableName, $this->tableColumns)
+        $entity = $this
+                ->Table($this->tableName, $this->tableColumns);
+        
+        if(count($tables))
+            return $entity 
+                ->AggregateOnly($tables)
                 ->GetRecords($params)
-                    ->GetResultSet();
+                    ->GetResultSet() ;
+        
+        return $entity
+                ->GetRecords($params)
+                    ->GetResultSet() ;
     }
 
     /**

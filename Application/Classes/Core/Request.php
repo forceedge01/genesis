@@ -167,7 +167,7 @@ class Request extends AppMethods{
      * @param $string or $array $key
      * @return boolean
      */
-    public function Has($keys){
+    public function HasKeys($keys){
 
         if(is_array($keys)){
 

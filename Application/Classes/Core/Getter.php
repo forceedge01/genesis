@@ -18,7 +18,7 @@ class Getter extends AppMethods implements GetterInterface{
 
         $fullClassPath = '\\Application\\Components\\'.$object;
 
-        if (!isset($this->$object) && !is_object($this->$object)) {
+        if (!isset($this->$object)) {
 
             if (class_exists($fullClassPath)) {
 
@@ -35,7 +35,7 @@ class Getter extends AppMethods implements GetterInterface{
 
         $fullClassPath = '\\Application\\Core\\'.$object;
 
-        if (!isset($this->$object) && !is_object($this->$object)) {
+        if (!isset($this->$object)) {
 
             if (class_exists($fullClassPath)) {
 
@@ -48,19 +48,19 @@ class Getter extends AppMethods implements GetterInterface{
         return $this->$object;
     }
 
-    public function GetObject($object, $args = null) {
+    public function GetObject($object, $variable, $args = null) {
 
-        if (!isset($this->$object) && !is_object($this->$object)) {
+        if (!isset($this->$variable)) {
 
             if (class_exists($object)) {
 
-                @$this->$object = new $object($args);
+                @$this->$variable = new $object($args);
             }
             else
                 echo ' Class '.$object.' not found ' . get_called_class();
         }
 
-        return $this->$object;
+        return $this->$variable;
     }
 
     /**
@@ -80,7 +80,7 @@ class Getter extends AppMethods implements GetterInterface{
 
         $bundle[1] .= 'Repository';
 
-        return $this->getObject($namespace.$bundle[1]);
+        return $this->getObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -100,7 +100,7 @@ class Getter extends AppMethods implements GetterInterface{
 
         $bundle[1] .= 'Entity';
 
-        return $this->getObject($namespace.$bundle[1]);
+        return $this->getObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**

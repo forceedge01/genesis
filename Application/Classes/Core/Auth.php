@@ -51,11 +51,11 @@ class Auth extends Application{
             else
                 $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
             
-            $this->GetObject('Session')->start();
+            $this->GetCoreObject('Session')->start();
 
-            $this->GetObject('Session')->set('email', $this->username);
+            $this->GetCoreObject('Session')->set('email', $this->username);
 
-            $this->GetObject('Session')->set('login_time', time());
+            $this->GetCoreObject('Session')->set('login_time', time());
 
             $objectMethod = AUTH_USER_POPULATE_METHOD;
 

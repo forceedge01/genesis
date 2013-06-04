@@ -1,0 +1,3 @@
+<?php
+
+DEFINE('BUNDLE_PEOPLE_PATH', BUNDLES_FOLDER . 'people');

@@ -23,7 +23,7 @@ class Application extends Template{
 
                 if(time() > $_SESSION['login_expires']){
 
-                    $this->GetObject('Session')->Destroy();
+                    $this->GetCoreObject('Session')->Destroy();
 
                     $this->setError(array('Logged Out' => 'Your session has expired, please login again.'))->forwardTo(AUTH_LOGIN_ROUTE);
                 }

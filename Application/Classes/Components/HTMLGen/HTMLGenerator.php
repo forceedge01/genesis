@@ -1026,6 +1026,8 @@ class HTMLGenerator extends Router {
     public function RenderTable($array) {
 
         $rows = function() use ($array) {
+            
+            $rows = null;
 
             $rows .= $this->renderTableHead($array);
 
@@ -1083,24 +1085,25 @@ class HTMLGenerator extends Router {
                 $rows .= '</tr></thead>';
             } else {
 
-                foreach ($array['tbody'] as $arr) {
+                if(is_array($array['tbody']))
+                    foreach ($array['tbody'] as $arr) {
 
-                    foreach ($arr as $key => $val) {
+                        foreach ($arr as $key => $val) {
 
-                        if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) {
+                            if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) {
 
-                            foreach ($array['ignoreFields'] as $ignore) {
+                                foreach ($array['ignoreFields'] as $ignore) {
 
-                                if ($key != $ignore)
-                                    $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
+                                    if ($key != $ignore)
+                                        $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
+                                }
                             }
+                            else
+                                $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
                         }
-                        else
-                            $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
-                    }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             return $rows;

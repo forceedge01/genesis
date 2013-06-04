@@ -8,4 +8,4 @@ define('DBUSERNAME', 'root');
 
 define('DBPASSWORD', 'root');
 
-define('DBNAME', 'WPBuilder');
+define('DBNAME', 'People');

@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class AppMethods extends Debugger{
+class AppMethods extends Variable{
 
     /**
      *
@@ -77,7 +77,7 @@ class AppMethods extends Debugger{
 
         $bundle[1] .= 'Repository';
 
-        return $this->getObject($namespace.$bundle[1]);
+        return $this->getObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -97,148 +97,7 @@ class AppMethods extends Debugger{
 
         $bundle[1] .= 'Entity';
 
-        return $this->getObject($namespace.$bundle[1]);
-    }
-
-    public function Variable($var) {
-
-        $this->variable = $var;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param loopable (array, object) $list
-     * @return mixed
-     * Finds the variable in the list
-     */
-    public function Has(array $list) {
-
-        if($this->isLoopable($list)){
-            foreach ($list as $value) {
-
-                if($this->isLoopable($value))
-                    $this->IsContainedBy ($value);
-                else
-                    if (strstr($this->variable, $value))
-                        return $this;
-            }
-        }
-        else{
-            return strstr($this->variable, $list);
-        }
-
-        return false;
-    }
-
-    /**
-     *
-     * @param loopable (array, object) $list
-     * @return mixed
-     * Finds the variable in the list
-     */
-    public function IsIn($list, $flag = false) {
-
-        if($flag)
-            return true;
-
-        if($this->isLoopable($list)){
-
-            $flag = false;
-
-            foreach ($list as $value) {
-
-                if($this->isLoopable($value)){
-
-                    $flag = $this->IsIn ($value, $flag);
-
-                    if($flag)
-                        return true;
-
-                }
-                else{
-
-                    if (strstr($value, $this->variable)){
-
-                        $flag = true;
-                    }
-                }
-            }
-        }
-        else{
-
-            if (strstr($list, $this->variable)){
-
-                $flag = true;
-            }
-        }
-
-        return $flag;
-    }
-
-    public function Equals($value) {
-
-        if ($this->variable == $value)
-            return $this;
-
-        return false;
-    }
-
-    public function NotEqualsTo($list) {
-
-        if($this->isLoopable($list))
-            foreach ($list as $value) {
-
-                if($this->isLoopable($value)) $this->contains ($value);
-
-                else if ($this->variable != $value) return $value;
-            }
-
-        return false;
-    }
-
-    public function JsonEncode() {
-
-        $this->variable = json_encode($this->variable);
-
-        return $this;
-    }
-
-    public function JsonDecode() {
-
-        $this->variable = json_decode($this->variable);
-
-        return $this;
-    }
-
-    public function TypeCastTo($type) {
-
-        $type = strtolower($type);
-
-        switch ($type) {
-
-            case 'int':
-            case 'integer':
-                $this->variable = (int) $this->variable;
-                break;
-            case 'float':
-            case 'double':
-                $this->variable = (double) $this->variable;
-                break;
-            case 'string':
-            case 'char':
-            case 'text':
-                $this->variable = (string) $this->variable;
-                break;
-        }
-
-        return $this;
-    }
-
-    public function GetVariableResult() {
-
-        return $this->variable;
+        return $this->getObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -251,49 +110,12 @@ class AppMethods extends Debugger{
         return gettype($this->variable);
     }
 
-    /**
-     *
-     * @param array $list
-     * @return \AppMethods
-     * Removed double occurance of substrings provided in the array
-     */
-    public function RemoveDoubleOccuranceOf(array $list) {
-
-        foreach ($list as $char) $this->variable = str_replace($char . $char, $char, $this->variable);
-
-        return $this;
-    }
-
     public function Trim(array $list) {
 
         if (!empty($list))
             foreach ($list as $trim) $this->variable = trim($this->variable, $trim);
 
         else $this->variable = trim($this->variable);
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return \AppMethods
-     * Remove first character from the variable
-     */
-    public function RemoveFirstCharacter() {
-
-        $this->variable = substr($this->variable, 1);
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return \AppMethods
-     * Remove last character from the variable
-     */
-    public function RemoveLastCharacter() {
-
-        $this->variable = substr($this->variable, 0, -1);
 
         return $this;
     }

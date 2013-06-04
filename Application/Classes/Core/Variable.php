@@ -1,12 +1,10 @@
 <?php
 
-namespace Application\Components;
+namespace Application\Core;
 
 /**
  * Author: Wahab Qureshi.
  */
-
-use Application\Core\Debugger;
 
 class Variable extends Debugger {
     

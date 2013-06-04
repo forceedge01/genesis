@@ -32,7 +32,8 @@ class AppKernal {
 
             'Welcome',
             'testBundle',
-            'neogenesis'
+            'neogenesis',
+            'people'
         );
 
         // Do not edit below this line
@@ -51,6 +52,7 @@ class AppKernal {
         $classes = array(
 
             'Debugger.php',
+            'Variable.php',
             'AppMethods.php',
             'Getter.php',
             'Request.php',

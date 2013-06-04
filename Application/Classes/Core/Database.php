@@ -17,7 +17,7 @@ class Database extends Template {
         $queryTablePrimaryKey,
         $queryTableColumns,
         $queryJoinClause,
-        $foreignKeys,
+        $foreignKeys = [],
         $rowsAffected,
         $queryTables,
         $queriesResult,
@@ -57,6 +57,7 @@ class Database extends Template {
         $this->name = DBNAME;
         $this->port = @$params['port'];
         $this->socket = @$params['socket'];
+        $this -> aggregateTables = true;
 
         try {
 
@@ -123,7 +124,7 @@ class Database extends Template {
                     trigger_error($this->activeConnection->error . 'SQL: ' . $sql);
                 } else {
 
-                    if ($result->IsObject())
+                    if ($result->isObject())
                         $this->numRows = $result->GetObjectProperty('num_rows');
 
                     $this->rowsAffected = $this->activeConnection->affected_rows;
@@ -322,7 +323,8 @@ class Database extends Template {
 
                 foreach ($this->queryTableColumns as $column) {
 
-                    if ($this->queryTable . '.' . $key == $column->Field && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)) {
+                    // && $this->queryTable . '.' . $key != str_replace('`', '', $this->queryTablePrimaryKey)
+                    if ($this->queryTable . '.' . $key == $column->Field) {
 
                         $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
@@ -644,9 +646,13 @@ class Database extends Template {
 
         $extras = '';
 
-        foreach($this->queryExtra as $extra){
+        if(is_array($this -> queryExtra))
+        {
+            foreach($this->queryExtra as $extra)
+            {
 
-            $extras .= $extra;
+                $extras .= $extra;
+            }
         }
 
         $this->query = "select {$extras} {$this->queryColumns} from {$this->queryTable} {$this->queryJoinClause}";
@@ -758,7 +764,9 @@ class Database extends Template {
      */
     private function buildRelationsShipsQuery() {
 
-        if (!isset ( $this -> queryJoins) and isset($this->foreignKeys) and count($this->foreignKeys != 0) and $this -> aggregateTables != false) {
+        //!isset ( $this -> queryJoins) and isset($this->foreignKeys) and 
+        
+        if (count($this->foreignKeys > 0) and $this -> aggregateTables != false) {
 
             $this->queryJoinClause = null;
 
@@ -862,6 +870,8 @@ class Database extends Template {
             information_schema.key_column_usage
         where
             referenced_table_name is not null
+        AND
+            TABLE_SCHEMA = '".DBNAME."'
         AND
             table_name = '$table'");
 

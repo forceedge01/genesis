@@ -185,7 +185,9 @@ final class ' . $this->name . 'Repository extends ApplicationRepository implemen
 
         $initTemplate = '<?=$this->RenderTemplate(":Header.html.php", $params)?>
 
+<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
+
 ';
 
         fwrite($handle, $initTemplate);
@@ -319,7 +321,7 @@ interface '.$this->name.'ControllerInterface {
      * @example path description
      *
      */
-    public function viewAction();
+    public function viewAction($id);
 
     /**
      *
@@ -331,7 +333,7 @@ interface '.$this->name.'ControllerInterface {
      * @example path description
      *
      */
-    public function editAction();
+    public function editAction($id);
 
     /**
      *
@@ -355,7 +357,7 @@ interface '.$this->name.'ControllerInterface {
      * @example path description
      *
      */
-    public function deleteAction();
+    public function deleteAction($id);
 }
 
 ';
@@ -382,6 +384,8 @@ interface '.$this->name.'Repositoryinterface {
 
 }
         ';
+        
+        fwrite($handle, $initControllerInterface);
 
         fclose($handle);
 

@@ -6,10 +6,6 @@
 
     <?=$this->RenderTemplate('Templates::_Protected/MenuItems.html.php')?>
 
-<?php else: ?>
-
-
-
 <?php endif; ?>
     </body>
 </html>

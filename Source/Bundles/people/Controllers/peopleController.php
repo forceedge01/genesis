@@ -31,7 +31,7 @@ final class peopleController extends peopleBundleController implements peopleCon
 
                 'class' => 'paginate',
                 'title' => 'Dataset',
-                'tbody' => $this->GetRepository("people:Users")->findOneBy(array('id' => 3)),
+                'tbody' => $this->GetRepository("people:Users")->find(3),
                 'ignoreFields' => array(),
                 'actions' => array(
 
@@ -98,7 +98,7 @@ final class peopleController extends peopleBundleController implements peopleCon
 
             if($this->GetRequest() ->isPost("submit")){
 
-              if($this->GetEntity("peopleBundle:people")->Save())
+              if($this->GetEntity("people:Users")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
               else
                   $this->setError(array("Failure" => "Failed to create."));
@@ -198,5 +198,9 @@ final class peopleController extends peopleBundleController implements peopleCon
                   echo 'error:Delete was unsuccessful';
             }
       }
+
+      public function add2($var1, $var2)
+      {
+          return $var1+$var2;
+      }
 }
-              

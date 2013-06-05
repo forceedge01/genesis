@@ -41,7 +41,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $template
      * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
      */
@@ -74,8 +74,6 @@ class Template extends Router {
         echo $html;
 
         unset($html);
-
-        exit;
     }
 
     /**
@@ -430,7 +428,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @return \Application\Core\Template|boolean
      * @desc Checks if the value is even
@@ -442,7 +440,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @return \Application\Core\Template|boolean
      * @desc Checks if the value is odd

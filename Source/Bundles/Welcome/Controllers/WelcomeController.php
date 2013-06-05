@@ -11,8 +11,6 @@ use Application\Bundles\Welcome\Interfaces\WelcomeControllerInterface;
 
 final class WelcomeController extends ApplicationController implements WelcomeControllerInterface {
 
-    use \Application\Traits\AppMethods;
-
     public
             $htmlgen;
 

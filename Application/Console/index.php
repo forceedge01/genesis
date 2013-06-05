@@ -13,6 +13,7 @@ function getOptions() {
     return array(
         'bundle:create',
         'bundle:delete',
+        'test:all',
         'exit'
     );
 }
@@ -21,18 +22,25 @@ function requireAll($directory) {
 
     $files = scandir($directory);
 
-    $files = array_reverse($files);
+    if(is_array($files))
+    {
+        foreach ($files as $file) {
 
-    foreach ($files as $file) {
+            if ($file != '.' && $file != '..' && $file != 'index.php') {
 
-        if ($file != '.' && $file != '..' && $file != 'index.php') {
-
-            if (is_file(CONSOLE_LIB_FOLDER . '/' . $file))
-                require_once CONSOLE_LIB_FOLDER . '/' . $file;
-            else
-                requireAll(CONSOLE_LIB_FOLDER . '/' . $file);
+                if (is_file($directory . '/' . $file))
+                {
+                    require_once $directory . '/' . $file;
+                }
+                else
+                {
+                    requireAll($directory . '/' . $file);
+                }
+            }
         }
     }
+    else
+        echo 'Failed retrieving files from '.$files;
 }
 
 requireAll(CONSOLE_LIB_FOLDER);

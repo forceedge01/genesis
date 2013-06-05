@@ -62,6 +62,8 @@ define('BUNDLE_ROUTES', '/Resources/Routes/');
 
 define('BUNDLE_VIEWS', '/Resources/Views/');
 
+define('BUNDLE_TESTS', '/Tests/');
+
 define('BUNDLE_VIEW_HEADER_FILE', 'Header.html.php');
 
 define('BUNDLE_VIEW_FOOTER_FILE', 'Footer.html.php');

@@ -16,10 +16,10 @@ class Router extends Getter{
             $params,
             $pageTitle,
             $Router,
-            $ObjectArguments = [],
+            $ObjectArguments = array(),
             $pattern;
 
-    public static $Route = [], $LastRoute;
+    public static $Route = array(), $LastRoute;
 
     public function __construct() {
 

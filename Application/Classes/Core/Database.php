@@ -17,7 +17,7 @@ class Database extends Template {
         $queryTablePrimaryKey,
         $queryTableColumns,
         $queryJoinClause,
-        $foreignKeys = [],
+        $foreignKeys = array(),
         $rowsAffected,
         $queryTables,
         $queriesResult,
@@ -33,8 +33,8 @@ class Database extends Template {
         $queryWhere,
         $queryExtra,
         $queryCount,
-        $queryParameters = [],
-        $queryJoins = [];
+        $queryParameters = array(),
+        $queryJoins = array();
 
     protected
         $queryMeta;
@@ -224,9 +224,9 @@ class Database extends Template {
         
         $this->prepareForMultiQuery($params);
 
-        $unquotedString = $this->Variable($this->queryTablePrimaryKey)->Replace(['`' => '']);
+        $unquotedString = $this->Variable($this->queryTablePrimaryKey)->Replace( array('`' => '') );
 
-        if (!isset($params[$unquotedString->Replace(['.' => '__'])]) && !isset($params[$unquotedString->Replace(['.' => ''])]))
+        if (!isset($params[$unquotedString->Replace( array('.' => '__') )]) && !isset($params[$unquotedString->Replace( array('.' => '') )]))
             return $this->CreateRecord($params);
 
         else
@@ -275,12 +275,12 @@ class Database extends Template {
      */
     protected function GetUnformattedFieldOrKey($key) {
 
-        return $this->Variable($key)->Explode('.')->ReplaceInEach(['`' => ''])->GetVariableResult();
+        return $this->Variable($key)->Explode('.')->ReplaceInEach( array('`' => '')) ->GetVariableResult();
     }
 
     protected function GetRawFieldName($key){
 
-        return $this->Variable($key)->Replace(['`' => '', '.' => ''])->GetVariableResult();
+        return $this->Variable($key)->Replace( array('`' => '', '.' => '') )->GetVariableResult();
     }
 
     /**
@@ -295,7 +295,7 @@ class Database extends Template {
 
             $variable = $this->Variable($key);
 
-            if ($variable->Has(['__'])) {
+            if ($variable->Has( array('__') )) {
 
                 $tableData = $variable->Explode('__')->GetVariableResult();
 

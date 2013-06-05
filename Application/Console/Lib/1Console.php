@@ -197,6 +197,18 @@ class Console {
                         break;
                 }
                 break;
+            
+            case 'test':
+                
+                switch($args[1])
+                {
+                    case 'all':
+                        
+                        case 1:
+                            $test = new Test();
+                            $test ->LoadTestFiles() ->RunTests();
+                            break;
+                }
 
             default:
                 echo 'Exiting';

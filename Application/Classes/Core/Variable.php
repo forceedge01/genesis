@@ -425,7 +425,7 @@ class Variable extends Debugger {
 
     public function ReplaceInEach(array $keyedList){
 
-        $list = [];
+        $list = array();
 
         foreach($this->variable as $key => $val)
             foreach($keyedList as $search => $replace)

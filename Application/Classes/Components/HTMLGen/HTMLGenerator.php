@@ -693,13 +693,13 @@ class HTMLGenerator extends Router {
 
         $var = ($var == null) ? $this->form : $var;
 
-        return $this->Variable($var)->Replace([
+        return $this->Variable($var)->Replace(array(
 
             '$#name' => $this->name,
             '$#method' => $this->method,
             '$#action' => $this->action
 
-        ])->GetVariableResult();
+        ))->GetVariableResult();
     }
 
     function setErrorColor($color) {
@@ -827,8 +827,8 @@ class HTMLGenerator extends Router {
      */
     public function formatCodeToHTML($index) {
 
-        return $this->Variable($index)->Replace([
-
+        return $this->Variable($index)->Replace(array(
+            
             '<php' => '&#60;php',
             '<' => '&#60;',
             '&#60;br />' => '<br />',
@@ -841,7 +841,7 @@ class HTMLGenerator extends Router {
             '&#60;div' => '<div',
             '&#60;/div' => '</div',
 
-            ])->GetVariableResult();
+          ))->GetVariableResult();
 
 //        $index = str_replace('<php', '&#60;php', $index);
 //        $index = str_replace('<', '&#60;', $index);

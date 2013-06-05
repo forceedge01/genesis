@@ -9,16 +9,16 @@ require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
 class AppKernal {
 
     private static
-            $classes = [],
-            $configs = [],
-            $controllers = [],
-            $routes = [],
-            $models = [],
-            $bundles = [],
-            $components = [],
-            $files = [],
-            $traits = [],
-            $interfaces = [];
+            $classes = array() ,
+            $configs = array() ,
+            $controllers = array() ,
+            $routes = array() ,
+            $models = array() ,
+            $bundles = array() ,
+            $components = array() ,
+            $files = array() ,
+            $traits = array() ,
+            $interfaces = array() ;
 
     public static
             $phpVersion,
@@ -170,6 +170,24 @@ class AppKernal {
         }
 
     }
+    
+    public static function loadTestFiles()
+    {
+        $testBundles = array();
+        
+        self::fetchAllBundles();
+
+        foreach(self::$bundles as $bundle){
+
+            if(is_dir($bundle)){
+
+                $testBundles[] = $bundle;
+                self::loadFilesFromDir($bundle . BUNDLE_TESTS, array('php'));
+            }
+        }
+        
+        return $testBundles;
+    }
 
     private static function loadFilesFromDir($directory, array $extensions, $subdirectories = true){
 
@@ -182,11 +200,16 @@ class AppKernal {
                 $filepath = $directory . '/' . $file;
 
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
+                {
+                    
                     require_once $filepath;//echo $filepath.'<br />';
-                else if($subdirectories){
-
+                }
+                else if($subdirectories)
+                {
                     if($file != '.' && $file != '..' && is_dir($filepath))
+                    {
                         self::loadFilesFromDir ($filepath, $extensions);
+                    }
                 }
             }
         }

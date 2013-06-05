@@ -31,7 +31,6 @@ class AppKernal {
         $bundles = array(
 
             'Welcome',
-            'testBundle',
             'neogenesis',
             'people'
         );

@@ -1,1 +1,0 @@
- <?=$this->RenderTemplate(":Footer.html.php", $params)?>

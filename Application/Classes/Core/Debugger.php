@@ -146,15 +146,6 @@ class Debugger {
         }
     }
 
-    public function SetErrorArgs($message, $file, $line, $errorNumber = 0) {
-        $this->message = $message;
-        $this->file = $file;
-        $this->line = $line;
-        $this->errorNumber = $errorNumber;
-
-        return $this;
-    }
-
     public function ThrowException() {
 
         $message = new \Exception($this->message);
@@ -239,4 +230,13 @@ class Debugger {
         exit;
     }
 
+    public function SetErrorArgs($message, $file, $line, $errorNumber = 0) {
+        
+        $this->message = $message;
+        $this->file = $file;
+        $this->line = $line;
+        $this->errorNumber = $errorNumber;
+
+        return $this;
+    }
 }

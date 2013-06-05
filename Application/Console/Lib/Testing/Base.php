@@ -14,8 +14,6 @@ class BaseTestingRoutine extends Console{
     public function __construct() 
     {
         $this -> passed = $this -> failed = $this -> assertions = 0;
-        
-        require_once ROOT . 'index.php';
     }
     
     public function __destruct() {

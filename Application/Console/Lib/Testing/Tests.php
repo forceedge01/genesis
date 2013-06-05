@@ -9,6 +9,12 @@ class Test extends BaseTestingRoutine{
     private
             $testBundles;
     
+    public function __construct() {
+        parent::__construct();
+        
+        $this ->LoadTestFiles();
+    }
+    
     public function RunTests()
     {
         foreach ($this -> testBundles as $bundle)

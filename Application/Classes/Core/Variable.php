@@ -253,12 +253,6 @@ class Variable extends Debugger {
         return $this;
     }
 
-    public function TriggerError($errorMessage, $level = E_WARNING){
-
-        trigger_error($errorMessage, $level);
-        return $this;
-    }
-
     public function IsNumber(){
 
         if(is_numeric($this->variable)) return $this;

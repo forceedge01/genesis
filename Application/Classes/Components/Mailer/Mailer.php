@@ -59,6 +59,14 @@ class Mail{
      *
      * @param array $params - $params for sending email<br />
      * Sends an email to the address specified in params
+     * $param = array(
+     *  'to' => '',
+     *  'subject' => '',
+     *  'from' => '',
+     *  'from_name' => '', default APPLICATION_NAME
+     *  'message' => '',
+     *  'html' => boolean, default false
+     * );
      */
     public function send($params){
 

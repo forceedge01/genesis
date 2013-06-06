@@ -13,6 +13,8 @@ class TestpeopleEntity extends BaseTestingRoutine
         $test = new \Application\Bundles\people\Controllers\peopleController();
         
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($test ->indexAction(), 'integer', 'type');
+        $this ->AssertTrue($test ->indexAction(), 'equals', array(
+            
+        ));
     }
 }

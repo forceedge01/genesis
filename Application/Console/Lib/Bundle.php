@@ -3,6 +3,7 @@
 namespace Application\Console\Libraries;
 
 
+
 use Application\Console\Console;
 
 class Bundle extends Console {
@@ -28,7 +29,7 @@ class Bundle extends Console {
 
         if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
-            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createViews()->CreateAssets();
+            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createViews() -> createTests() ->CreateAssets();
         }
 
         echo 'Bundle ' . $this->name . ' has been created successfully!';
@@ -723,6 +724,109 @@ root{
             fclose($handle);
 
             return $this;
+    }
+    
+    private function createTests(){
+
+        mkdir(BUNDLES_FOLDER . $this->name . '/Tests');
+        
+        mkdir(BUNDLES_FOLDER . $this->name . '/Tests/Config');
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Config/' . $this->name . '.Test.Config.php', 'w+');
+
+        $initTemplate = '<?php';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
+
+        mkdir(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios');
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Controller.Test.php', 'w+');
+
+        $initTemplate = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Tests;
+
+
+
+use Application\\Console\\BaseTestingRoutine;
+
+class Test'.$this -> name.'Controller extends BaseTestingRoutine
+{
+    public
+        $testCandidate;
+        
+    public function testIndexAction()
+    {
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+        
+        //Checks if the returned value of this function is an integer
+        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+    }
+}';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Entity.Test.php', 'w+');
+
+        $initTemplate = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Tests;
+
+
+
+use Application\\Console\\BaseTestingRoutine;
+
+class Test'.$this -> name.'Entity extends BaseTestingRoutine
+{
+    public
+        $testCandidate;
+
+    public function testExampleMethod()
+    {
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
+        
+        //Checks if the returned value of this function is an integer
+        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+    }
+}';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Repository.Test.php', 'w+');
+
+        $initTemplate = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Tests;
+
+
+
+use Application\\Console\\BaseTestingRoutine;
+
+class Test'.$this -> name.'Repository extends BaseTestingRoutine
+{
+    public
+        $testCandidate;
+        
+    public function testExampleMethod()
+    {
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
+        
+        //Checks if the returned value of this function is an integer
+        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+    }
+}';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
+
+        return $this;
     }
 
 }

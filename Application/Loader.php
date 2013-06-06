@@ -186,6 +186,7 @@ class Loader{
             'AppMethods.php',
             'Getter.php',
             'Request.php',
+            'Response.php',
             'Router.php',
             'Template.php',
             'Application.php',

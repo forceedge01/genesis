@@ -86,7 +86,7 @@ class BaseTestingRoutine extends Console{
             }
         }
         else
-        {
+        {   
             if(strtolower($params['case']) == 'integer')
             {
                 if(is_int($param))
@@ -112,6 +112,17 @@ class BaseTestingRoutine extends Console{
             else if(strtolower($params['case']) == 'string')
             {
                 if(is_string($param) AND !empty($param))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($params['case']) == 'json')
+            {
+                if(json_decode($param))
                 {
                     $pass = 1;
                 }
@@ -223,7 +234,7 @@ class BaseTestingRoutine extends Console{
             $param = ob_get_clean();
 
         if($params['expected'])
-        {
+        {            
             if(strtolower($params['case']) == 'contains')
             {
                 if(strpos($param, $params['expected']) === false)
@@ -248,7 +259,7 @@ class BaseTestingRoutine extends Console{
             }
         }
         else
-        {
+        {            
             if(strtolower($params['case']) == 'integer')
             {
                 if(!is_int($param))
@@ -274,6 +285,17 @@ class BaseTestingRoutine extends Console{
             else if(strtolower($params['case']) == 'string')
             {
                 if(!is_string($param))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($params['case']) == 'json')
+            {
+                if(!json_decode($param))
                 {
                     $pass = 1;
                 }
@@ -391,6 +413,8 @@ class BaseTestingRoutine extends Console{
     
     public function AssertContains($data, $expected)
     {
+        self::$assertions +=1;
+        
         if(strpos($data, $expected) >=0 and $data != false)
         {
             echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertContains();') ;
@@ -405,6 +429,8 @@ class BaseTestingRoutine extends Console{
     
     public function AssertEquals($data, $expected)
     {
+        self::$assertions +=1;
+        
         if($data === $expected)
         {
             echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
@@ -419,6 +445,8 @@ class BaseTestingRoutine extends Console{
 
     public function AssertURL($url, $data = null)
     {
+        self::$assertions +=1;
+        
         echo $this ->linebreak(2) . $this -> blue('Verifying URL at '.$url) ;
         
         if($this ->setupCURL($url, $data))
@@ -492,5 +520,134 @@ class BaseTestingRoutine extends Console{
 
         echo $this ->linebreak(2);
         echo 'Passed: ',$this ->green(self::$passed) , ', Failed: ',$this -> red(self::$failed) , ', Assertions: ', $this -> blue(self::$assertions) ,'.', $this ->linebreak(2);
+    }
+    
+    public function AssertType($data, $type)
+    {
+        self::$assertions +=1;
+
+        $with = ' with AssertType();';
+        $passed = $this->green('Test type '.$type.' passed'.$with).$this->linebreak(1);
+        $failed = $this->red('Test type '.$type.' failed in class '. get_called_class().$with).$this->linebreak(1);
+        
+        $this ->updateResult($this ->CheckType($data, $type), $passed, $failed);
+    }
+    
+    public function CheckType($data, $type)
+    {
+        
+            if(strtolower($type) == 'integer')
+            {
+                if(is_int($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'number')
+            {
+                if(is_numeric($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'string')
+            {
+                if(is_string($data) AND !empty($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'json')
+            {
+                if(json_decode($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'array')
+            {
+                if(is_array($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'object')
+            {
+                if(is_object($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'boolean')
+            {
+                echo $data;
+                if(is_bool($data) || $data == false)
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'char')
+            {
+                if(sizeof($data) == 1)
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'float')
+            {
+                if(is_float($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($type) == 'notNull')
+            {
+                if(!is_null($data))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
+                }
+            }
+            
+            return $pass;
     }
 }

@@ -6,9 +6,10 @@ namespace Application\Core;
 
 class Application extends Template{
 
-    private
+    private 
             $Router,
-            $Request;
+            $Request,
+            $Response;
     public
             $User;
 
@@ -16,6 +17,7 @@ class Application extends Template{
 
         $this->Request = $this->GetCoreObject('Request');
         $this->Router = $this->GetCoreObject('Router');
+        $this -> Response = $this ->GetCoreObject('Response');
 
         if(SESSION_ENABLED){
 
@@ -95,16 +97,32 @@ class Application extends Template{
 
             return false;
         }
-
     }
 
-    public function GetRequest(){
+    /**
+     * 
+     * @return \Application\Core\Request Object
+     */
+    public function Request(){
 
         return $this->Request;
     }
 
-    public function GetRouter(){
+    /**
+     * 
+     * @return \Application\Core\Router Object
+     */
+    public function Route(){
 
         return $this->Router;
+    }
+    
+    /**
+     * 
+     * @return \Application\Core\Response Object
+     */
+    public function Response(){
+
+        return $this->Response;
     }
 }

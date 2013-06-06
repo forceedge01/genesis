@@ -24,7 +24,7 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
         
-        header('HTTP/1.0 401 No Route Found', true, 404);
+        $this ->GetResponseManager() ->SetNotFound();
 
         $this->Render(':Errors/Route_Not_Found.html.php', $params);
     }
@@ -43,6 +43,8 @@ class ErrorsController extends Application implements Error{
             'Route' => $route,
             'Backtrace' => $backtrace
         );
+        
+        $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors/Action_Not_Found.html.php', $params);
     }
@@ -61,6 +63,8 @@ class ErrorsController extends Application implements Error{
             'Route' => $route,
             'Backtrace' => $backtrace
         );
+        
+        $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors/Class_Not_Found.html.php', $params);
     }

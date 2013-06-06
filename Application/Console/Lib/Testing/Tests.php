@@ -83,7 +83,7 @@ class Test extends BaseTestingRoutine{
         
         echo $this ->linebreak(2).'<=========================================================>';
 
-        echo $this ->linebreak(1).'Running test method: ',$object , '()' , $this->linebreak(1);
+        echo $this ->linebreak(1).'Running test method: ',$this -> blue($object) , '() in file ' . $this -> blue($f ->getFileName()) , $this->linebreak(1);
         
         echo '<=========================================================>';
 

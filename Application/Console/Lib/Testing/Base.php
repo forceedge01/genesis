@@ -13,7 +13,8 @@ class BaseTestingRoutine extends Console{
 
     public function __construct()
     {
-        self::$passed = self::$failed = self::$assertions = 0;
+        if(self::$passed == '')
+            self::$passed = self::$failed = self::$assertions = 0;
     }
 
 
@@ -65,26 +66,22 @@ class BaseTestingRoutine extends Console{
             {
                 if(is_int(strpos($param, $params['expected'])) and strpos($param, $params['expected'])>=0) 
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'equals')
             {
-                if($param === $params['expected'])
+                if($param == $params['expected'])
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
         }
@@ -92,137 +89,119 @@ class BaseTestingRoutine extends Console{
         {
             if(strtolower($params['case']) == 'integer')
             {
-                if(is_numeric($param))
+                if(is_int($param))
                 {
-                    echo $param;
-
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($params['case']) == 'number')
+            {
+                if(is_numeric($param))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'string')
             {
-                if(is_string($param))
+                if(is_string($param) AND !empty($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'array')
             {
                 if(is_array($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'object')
             {
                 if(is_object($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
-            else if(strtolower($params['case']) == 'bool')
+            else if(strtolower($params['case']) == 'boolean')
             {
-                if(is_bool($param))
+                echo $param;
+                if(is_bool($param) || $param == false)
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'char')
             {
                 if(sizeof($param) == 1)
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'float')
             {
                 if(is_float($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'notNull')
             {
                 if(!is_null($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if($param)
             {
-                self::$passed += 1;
-                echo $passed;
+                $pass = 1;
             }
             else
             {
-                self::$failed += 1;
-                echo $failed;
+                $pass = 0;
             }
         }
+        
+        $this ->updateResult($pass, $passed, $failed);
         
         unset($object);
 
         return $this;
-    }
-    
-    public function AssertMultipleTrue($object, $method, array $params)
-    {
-        foreach($params as $array)
-            $this ->AssertTrue ($object, $method, $array);
-    }
-    
-    public function AssertMultipleFalse($object, $method, array $params)
-    {
-        foreach($params as $array)
-            $this ->AssertFalse ($object, $method, $array);
     }
 
     public function AssertFalse($object, $method, array $params)
@@ -249,26 +228,22 @@ class BaseTestingRoutine extends Console{
             {
                 if(strpos($param, $params['expected']) === false)
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'equals')
             {
                 if($param != $params['expected'])
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
         }
@@ -276,134 +251,246 @@ class BaseTestingRoutine extends Console{
         {
             if(strtolower($params['case']) == 'integer')
             {
-                if(!is_numeric($param))
+                if(!is_int($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
+                }
+            }
+            else if(strtolower($params['case']) == 'number')
+            {
+                if(!is_numeric($param))
+                {
+                    $pass = 1;
+                }
+                else
+                {
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'string')
             {
                 if(!is_string($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'array')
             {
                 if(!is_array($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'object')
             {
                 if(!is_object($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
-            else if(strtolower($params['case']) == 'bool')
+            else if(strtolower($params['case']) == 'boolean')
             {
-                if(!is_bool($param))
+                if(!is_bool($param) || !is_null($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'char')
             {
                 if(!sizeof($param) == 1)
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'float')
             {
                 if(!is_float($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(strtolower($params['case']) == 'notNull')
             {
                 if(is_null($param))
                 {
-                    self::$passed += 1;
-                    echo $passed;
+                    $pass = 1;
                 }
                 else
                 {
-                    self::$failed += 1;
-                    echo $failed;
+                    $pass = 0;
                 }
             }
             else if(!$param)
             {
-                self::$passed += 1;
-                echo $passed;
+                $pass = 1;
             }
             else
             {
-                self::$failed += 1;
-                echo $failed;
+                $pass = 0;
             }
         }
+        
+        $this ->updateResult($pass, $passed, $failed);
 
         return $this;
     }
-
-    public function VerifyURL($url)
+    
+    public function AssertMultipleTrue($object, $method, array $params)
     {
-        $ch = curl_init($url);
-        $response = curl_exec($ch);
+        foreach($params as $array)
+            $this ->AssertTrue ($object, $method, $array);
+    }
+    
+    public function AssertMultipleFalse($object, $method, array $params)
+    {
+        foreach($params as $array)
+            $this ->AssertFalse ($object, $method, $array);
+    }
+    
+    private function updateResult($bool, $passed, $failed)
+    {
+        if($bool)
+        {
+            self::$passed += 1;
+            echo $passed;
+        }
+        else
+        {
+            self::$failed += 1;
+            echo $failed;
+        }
+    }
+    
+    public function AssertContains($data, $expected)
+    {
+        if(strpos($data, $expected) >=0 and $data != false)
+        {
+            echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertContains();') ;
+            self::$passed += 1;
+        }
+        else
+        {
+            echo $this ->linebreak(1) . $this -> red('Data: ' . print_r($expected) . ' failed contains with AssertContains();') ;
+            self::$failed += 1;
+        }
+    }
+    
+    public function AssertEquals($data, $expected)
+    {
+        if($data === $expected)
+        {
+            echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
+            self::$passed += 1;
+        }
+        else
+        {
+            echo $this ->linebreak(1) . $this -> red('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
+            self::$failed += 1;
+        }
+    }
 
-        return $response;
+    public function AssertURL($url, $data = null)
+    {
+        echo $this ->linebreak(2) . $this -> blue('Verifying URL at '.$url) ;
+        
+        if($this ->setupCURL($url, $data))
+        {
+            echo $this ->linebreak(1) . $this -> green('URL: '.$url.' verified with AssertURL();') ;
+            self::$passed += 1;
+        }
+        else
+        {
+            echo $this ->linebreak(1) . $this -> red('URL: unable to verify URL: '.$url.' with AssertURL();') ;
+            self::$failed += 1;
+        }
+    }
+    
+    public function crawlURL($url, $data = null)
+    {
+        echo $this ->linebreak(2) . $this -> blue('Initiating URL crawl at '.$url) ;
+        
+        return $this ->setupCURL($url, urlencode($data)) ;
+    }
+    
+    private function setupCURL($url, $data = null)
+    {
+        $tuCurl = curl_init();
+        curl_setopt($tuCurl, CURLOPT_URL, $url);
+        curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($tuCurl, CURLOPT_HEADER, false);
+        curl_setopt($tuCurl, CURLOPT_HTTP200ALIASES, array(200, 301, 302));
+//        curl_setopt($tuCurl, CURLOPT_PORT , 443);
+//        curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+//        curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//        curl_setopt($tuCurl, CURLOPT_SSLCERT, getcwd() . "/client.pem");
+//        curl_setopt($tuCurl, CURLOPT_SSLKEY, getcwd() . "/keyout.pem");
+//        curl_setopt($tuCurl, CURLOPT_CAINFO, getcwd() . "/ca.pem");
+        
+        if($data)
+        {
+            curl_setopt($tuCurl, CURLOPT_POST, 1);
+            curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $data);
+        }
+//        curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, 1);
+//        curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Content-Type: text/xml","SOAPAction: \"/soap/action/query\"", "Content-length: ".strlen($data)));
+
+        $tuData = curl_exec($tuCurl);
+        
+        $httpCode = curl_getinfo($tuCurl, CURLINFO_HTTP_CODE);
+        
+        if($httpCode == 404) {
+            
+            curl_close($tuCurl);
+            return false;
+        }
+        
+        else if(!curl_errno($tuCurl))
+        {
+          $info = curl_getinfo($tuCurl);
+          echo $this ->linebreak(1).$this ->green('Took ' . $info['total_time'] . ' seconds to send a request to ' . $info['url']) ;
+        } 
+        else 
+        {
+          echo 'Curl error: ' . curl_error($tuCurl);
+        }
+        
+        curl_close($tuCurl);
+        
+        return $tuData;
     }
     
     public function ShowResults() {
 
         echo $this ->linebreak(2);
-        echo 'Passed: ',self::$passed, '. Failed: ',self::$failed, '. Assertions: ',self::$assertions, $this ->linebreak(2);
+        echo 'Passed: ',$this ->green(self::$passed) , ', Failed: ',$this -> red(self::$failed) , ', Assertions: ', $this -> blue(self::$assertions) ,'.', $this ->linebreak(2);
     }
 }

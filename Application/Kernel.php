@@ -22,6 +22,8 @@ class AppKernal extends Loader{
         $route = new Router();
 
         if(!$route->forwardRequest()){
+            
+            header( 'HTTP/1.1 404 BAD REQUEST', true, 404 );
 
             echo '<h1>Pattern: ' . $route->GetPattern() . ' Not Found!!</h1>';
 

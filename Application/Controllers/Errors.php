@@ -23,6 +23,8 @@ class ErrorsController extends Application implements Error{
             'Pattern' => $pattern,
             'Backtrace' => $backtrace
         );
+        
+        header('HTTP/1.0 401 No Route Found', true, 404);
 
         $this->Render(':Errors/Route_Not_Found.html.php', $params);
     }

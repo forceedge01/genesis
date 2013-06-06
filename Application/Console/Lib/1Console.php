@@ -10,7 +10,7 @@ class Console {
 
         if (!isset($_SERVER['SERVER_NAME'])) {
 
-            echo 'Welcome to Genesis console generator, please choose an option and proceed with the onscreen instructions.';
+            echo $this ->blue('Welcome to Genesis console generator, please choose an option and proceed with the onscreen instructions.') ;
             $this->linebreak(1);
 
             while (true) {
@@ -234,6 +234,11 @@ class Console {
     public function blackOnRed($string)
     {
         return "\033[41;30m".$string."\033[40;37m";
+    }
+    
+    public function blue($string)
+    {
+        return "\033[34m".$string."\033[37m";
     }
 
 }

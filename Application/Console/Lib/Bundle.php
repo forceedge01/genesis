@@ -757,10 +757,13 @@ class Test'.$this -> name.'Controller extends BaseTestingRoutine
     public
         $testCandidate;
         
+    public function __construct() {
+        parent::__construct();
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+    }
+        
     public function testIndexAction()
     {
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
-        
         //Checks if the returned value of this function is an integer
         $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
     }
@@ -784,11 +787,14 @@ class Test'.$this -> name.'Entity extends BaseTestingRoutine
 {
     public
         $testCandidate;
+        
+    public function __construct() {
+        parent::__construct();
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+    }
 
     public function testExampleMethod()
-    {
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
-        
+    {        
         //Checks if the returned value of this function is an integer
         $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
     }
@@ -812,11 +818,14 @@ class Test'.$this -> name.'Repository extends BaseTestingRoutine
 {
     public
         $testCandidate;
-        
+     
+    public function __construct() {
+        parent::__construct();
+        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+    }
+    
     public function testExampleMethod()
     {
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
-        
         //Checks if the returned value of this function is an integer
         $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
     }

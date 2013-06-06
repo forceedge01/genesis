@@ -15,6 +15,12 @@ class Console {
 
             while (true) {
 
+                if(isset($_SERVER['argv'][1]))
+                {
+                    $this->switchOption(str_replace('--', '', $_SERVER['argv'][1]));
+                    exit;
+                }
+
                 $this->showAllOptions(getOptions());
 
                 echo 'Enter choice: ';
@@ -197,24 +203,37 @@ class Console {
                         break;
                 }
                 break;
-            
+
             case 'test':
-                
                 switch($args[1])
                 {
                     case 'all':
-                        
-                        case 1:
-                            $test = new Test();
-                            $test ->LoadTestFiles() ->RunTests();
-                            break;
+                        $test = new Test();
+                        $test ->RunTests();
+                        break;
                 }
+                break;
 
             default:
                 echo 'Exiting';
                 exit;
                 break;
         }
+    }
+
+    public function green($string)
+    {
+        return "\033[32m".$string."\033[37m";
+    }
+
+    public function red($string)
+    {
+        return "\033[31m".$string."\033[37m";
+    }
+
+    public function blackOnRed($string)
+    {
+        return "\033[41;30m".$string."\033[40;37m";
     }
 
 }

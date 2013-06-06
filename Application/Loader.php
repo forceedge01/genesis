@@ -5,7 +5,7 @@ namespace Application\Core;
 
 
 class Loader{
-    
+
     protected static
             $classes = array() ,
             $configs = array() ,
@@ -16,7 +16,8 @@ class Loader{
             $components = array() ,
             $traits = array() ,
             $interfaces = array(),
-            $files = array();
+            $files = array(),
+            $loadedFiles = array();
 
 
     protected static function load($staticVar, $dir){
@@ -65,11 +66,17 @@ class Loader{
 
     }
     
-    protected static function loadTestFiles()
+    public static function loadClassesAndComponentsTestFiles()
+    {
+        self::$loadedFiles = array();
+        self::loadFilesFromDir(APPLICATION_TESTS_FOLDER, array('php')) ;
+        
+        return self::$loadedFiles;
+    }
+
+    public static function loadBundleTestFiles()
     {
         $testBundles = array();
-        
-        self::fetchAllBundles();
 
         foreach(self::$bundles as $bundle){
 
@@ -79,12 +86,12 @@ class Loader{
                 self::loadFilesFromDir($bundle . BUNDLE_TESTS, array('php'));
             }
         }
-        
+
         return $testBundles;
     }
 
     protected static function loadFilesFromDir($directory, array $extensions, $subdirectories = true){
-
+        
         if(is_dir($directory)){
 
             $files = scandir($directory);
@@ -95,8 +102,8 @@ class Loader{
 
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                 {
-                    
-                    require_once $filepath;//echo $filepath.'<br />';
+                    self::$loadedFiles[] = $filepath;
+                    require_once $filepath;
                 }
                 else if($subdirectories)
                 {
@@ -111,7 +118,7 @@ class Loader{
         return true;
 
     }
-    
+
     protected static function fileExtensionIs($file, array $extensions){
 
         $exists = false;
@@ -126,8 +133,8 @@ class Loader{
 
         return $exists;
     }
-    
-    protected static function loadFramework()
+
+    public static function loadFramework()
     {
         self::load('configs', APPLICATION_CONFIGS_FOLDER);
 
@@ -147,7 +154,7 @@ class Loader{
 
         self::loadBundles();
     }
-    
+
     private static function fetchAllBundles(){
 
         // Include your bundles here
@@ -200,7 +207,7 @@ class Loader{
 
         return self::$classes;
     }
-    
+
     private static function fetchAll($dir){
 
         $directory = $dir;

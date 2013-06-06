@@ -41,7 +41,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $template
      * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
      */
@@ -57,9 +57,9 @@ class Template extends Router {
 
         if(is_file($templateUrl['template'])){
 
-            require_once $templateUrl['path'].BUNDLE_VIEW_HEADER_FILE;
-            require_once $templateUrl['template'];
-            require_once $templateUrl['path'].BUNDLE_VIEW_FOOTER_FILE;
+            require $templateUrl['path'].BUNDLE_VIEW_HEADER_FILE;
+            require $templateUrl['template'];
+            require $templateUrl['path'].BUNDLE_VIEW_FOOTER_FILE;
         }
         else
             $this->templateNotFound($templateUrl['template']);
@@ -74,8 +74,6 @@ class Template extends Router {
         echo $html;
 
         unset($html);
-
-        exit;
     }
 
     /**
@@ -120,7 +118,7 @@ class Template extends Router {
 
         ob_start();
 
-        require_once $template['template'];
+        require $template['template'];
 
         $html = ob_get_clean();
 
@@ -430,7 +428,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @return \Application\Core\Template|boolean
      * @desc Checks if the value is even
@@ -442,7 +440,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @return \Application\Core\Template|boolean
      * @desc Checks if the value is odd

@@ -147,6 +147,11 @@ class Request extends AppMethods{
             return false;
 
     }
+    
+    public function RemoveCookie($Name)
+    {
+        $this ->UnsetCookie($Name);
+    }
 
     public function SetSession($Name, $Value){
 

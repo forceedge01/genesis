@@ -6,9 +6,9 @@ namespace Application\Components;
  * Author: Wahab Qureshi.
  */
 
-use Application\Core\AppMethods;
+use Application\Core\Getter;
 
-class Analytics extends AppMethods {
+class Analytics extends Getter {
 
     private
             $connection,
@@ -55,6 +55,8 @@ class Analytics extends AppMethods {
      * Records a track (visit) from a user.
      */
     public function RecordTrack($OptionalReferenceId = null) {
+        
+        $this -> setTimedCookie();
 
         if (ANALYTICS_IGNORE_IP_ADDRESS)
             if ($this->variable ($_SERVER['REMOTE_ADDR'])->equals(ANALYTICS_IGNORE_IP_ADDRESS))
@@ -125,6 +127,33 @@ class Analytics extends AppMethods {
         }
 
         return false;
+    }
+    
+    private function setTimedCookie()
+    {
+        $session = $this ->GetSessionManager();
+        
+        if(!$session->GetCookie('VisitAt'))
+        {
+            $session ->SetCookie('VisitAt', time());
+        }
+        else if(ANALYTICS_RESET_INTERVAL)
+        {
+            $this->resetTime();
+        }
+    }
+    
+    private function resetTime()
+    {
+        $session = $this ->GetSessionManager();
+        
+        $timeCheck = ANALYTICS_RESET_INTERVAL + $session ->GetCookie('VisistAt');
+        
+        if($timeCheck > time())
+        {
+            $session ->SetCookie('VisitAt', time());
+            $session ->RemoveCookie('visitIdentifier');
+        }
     }
 
     public function GetTrack($id) {

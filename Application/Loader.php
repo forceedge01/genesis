@@ -19,6 +19,58 @@ class Loader{
             $files = array(),
             $loadedFiles = array();
 
+    private static function fetchAllBundles(){
+
+        // Include your bundles here
+
+        $bundles = array(
+
+            'Welcome',
+            'neogenesis',
+            'people'
+        );
+
+        // Do not edit below this line
+
+        $bundlesDIR = BUNDLES_FOLDER;
+
+        foreach($bundles as $bundle){
+
+            self::$bundles[] = $bundlesDIR . $bundle;
+        }
+    }
+
+    private static function fetchAllClasses($classDir){
+
+        $classes = array(
+
+            'Debugger.php',
+            'Variable.php',
+            'AppMethods.php',
+            'Getter.php',
+            'Request.php',
+            'Response.php',
+            'Router.php',
+            'Template.php',
+            'Application.php',
+            'Database.php',
+            'Auth.php',
+            'Session.php',
+
+        );
+
+        foreach($classes as $class){
+
+            if(is_file($classDir . $class)){
+
+                self::$classes[] = $classDir . $class;
+            }
+            else
+                echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
+        }
+
+        return self::$classes;
+    }
 
     protected static function load($staticVar, $dir){
 
@@ -54,7 +106,7 @@ class Loader{
 
                 $message = ' not found in kernel::loadBundles()';
 
-                require_once APPLICATION_RESOURCES_FOLDER . 'Views/Errors/Bundle_Not_Found.html.php';
+                require APPLICATION_RESOURCES_FOLDER . 'Views/Errors/Bundle_Not_Found.html.php';
 
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
 
@@ -64,30 +116,6 @@ class Loader{
 
         }
 
-    }
-    
-    public static function loadClassesAndComponentsTestFiles()
-    {
-        self::$loadedFiles = array();
-        self::loadFilesFromDir(APPLICATION_TESTS_FOLDER, array('php')) ;
-        
-        return self::$loadedFiles;
-    }
-
-    public static function loadBundleTestFiles()
-    {
-        $testBundles = array();
-
-        foreach(self::$bundles as $bundle){
-
-            if(is_dir($bundle)){
-
-                $testBundles[] = $bundle;
-                self::loadFilesFromDir($bundle . BUNDLE_TESTS, array('php'));
-            }
-        }
-
-        return $testBundles;
     }
 
     protected static function loadFilesFromDir($directory, array $extensions, $subdirectories = true){
@@ -103,7 +131,7 @@ class Loader{
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                 {
                     self::$loadedFiles[] = $filepath;
-                    require_once $filepath;
+                    require $filepath;
                 }
                 else if($subdirectories)
                 {
@@ -155,60 +183,6 @@ class Loader{
         self::loadBundles();
     }
 
-    private static function fetchAllBundles(){
-
-        // Include your bundles here
-
-        $bundles = array(
-
-            'Welcome',
-            'neogenesis',
-            'people'
-        );
-
-        // Do not edit below this line
-
-        $bundlesDIR = BUNDLES_FOLDER;
-
-        foreach($bundles as $bundle){
-
-            self::$bundles[] = $bundlesDIR . $bundle;
-        }
-
-    }
-
-    private static function fetchAllClasses($classDir){
-
-        $classes = array(
-
-            'Debugger.php',
-            'Variable.php',
-            'AppMethods.php',
-            'Getter.php',
-            'Request.php',
-            'Response.php',
-            'Router.php',
-            'Template.php',
-            'Application.php',
-            'Database.php',
-            'Auth.php',
-            'Session.php',
-
-        );
-
-        foreach($classes as $class){
-
-            if(is_file($classDir . $class)){
-
-                self::$classes[] = $classDir . $class;
-            }
-            else
-                echo '<h1>Class '.$classDir.$class.' not found in kernel::fetchAllClasses</h1>';
-        }
-
-        return self::$classes;
-    }
-
     private static function fetchAll($dir){
 
         $directory = $dir;
@@ -223,5 +197,29 @@ class Loader{
         }
 
         return self::$files;
+    }
+    
+    public static function loadClassesAndComponentsTestFiles()
+    {
+        self::$loadedFiles = array();
+        self::loadFilesFromDir(APPLICATION_TESTS_FOLDER, array('php')) ;
+        
+        return self::$loadedFiles;
+    }
+
+    public static function loadBundleTestFiles()
+    {
+        $testBundles = array();
+
+        foreach(self::$bundles as $bundle){
+
+            if(is_dir($bundle)){
+
+                $testBundles[] = $bundle;
+                self::loadFilesFromDir($bundle . BUNDLE_TESTS, array('php'));
+            }
+        }
+
+        return $testBundles;
     }
 }

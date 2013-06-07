@@ -17,7 +17,7 @@ class Application extends Template{
 
         $this->Request = $this->GetCoreObject('Request');
         $this->Router = $this->GetCoreObject('Router');
-        $this -> Response = $this ->GetCoreObject('Response');
+        $this->Response = $this ->GetCoreObject('Response');
 
         if(SESSION_ENABLED){
 

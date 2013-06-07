@@ -89,9 +89,9 @@ class Test extends BaseTestingRoutine{
 
         foreach($methods as $method)
         {
-            echo $this->linebreak(2),'<-------------------------------------------------------->';
-            echo $this ->linebreak(1),'-> ', $method, '();';
-            echo $this ->linebreak(1),'<-------------------------------------------------------->';
+            echo $this->linebreak(2),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';
+            echo $this ->linebreak(1),' -> ', $method, '();';
+            echo $this ->linebreak(1),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';
             $obj -> $method();
         }
     }

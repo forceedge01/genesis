@@ -9,7 +9,8 @@ class BaseTestingRoutine extends Console{
     protected static
             $passed,
             $failed,
-            $assertions;
+            $assertions,
+            $method;
 
     public function __construct()
     {
@@ -17,6 +18,11 @@ class BaseTestingRoutine extends Console{
             self::$passed = self::$failed = self::$assertions = 0;
     }
 
+    private function checkMethodExistance($object, $method)
+    {
+        self::$method = $method;
+        return method_exists($object, $method);
+    }
 
     /**
      *
@@ -41,8 +47,16 @@ class BaseTestingRoutine extends Console{
         self::$assertions +=1;
 
         $with = ' with AssertTrue();';
+        
+        if(!$this -> checkMethodExistance($object, $method))
+        {
+            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class($object) . ' was not found, test failed' . $with );
+            self::$failed += 1;
+            return false;
+        }            
+
         $passed = $this->green('Test on '. @$params['expected']. ' type '.$params['case'].' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().$with).$this->linebreak(1);
+        $failed = $this->red('Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().' run on '.get_class($object).'() -> '.$method.'();'.$with).$this->linebreak(1);
 
         ob_start();
 
@@ -218,8 +232,16 @@ class BaseTestingRoutine extends Console{
     public function AssertFalse($object, $method, array $params)
     {
         self::$assertions +=1;
-
+        
         $with = ' with AssertFalse();';
+        
+        if(!$this -> checkMethodExistance($object, $method))
+        {
+            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class($object) . ' was not found, test failed' . $with );
+            self::$failed += 1;
+            return false;
+        }      
+        
         $passed = $this->green('Test on '. @$params['expected']. ' type '.$params['case'].' passed'.$with).$this->linebreak(1);
         $failed = $this->red('Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().$with).$this->linebreak(1);
 

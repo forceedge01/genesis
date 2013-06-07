@@ -33,11 +33,18 @@ class TestpeopleController extends BaseTestingRoutine
             array(
                 'case' => 'contains',
                 'expected' => 'people',
-            ),
+            )
         ));
+        
+        $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
 
-        $this ->AssertTrue($this->object , 'listAction', array(
-            'case' => 'string',
+        $this ->AssertTrue($this->object , 'add2', array(
+            'parameters' => array(
+                1,
+                2
+            ),
+            'case' => 'equals',
+            'expected' => 3,
         ));
     }
 

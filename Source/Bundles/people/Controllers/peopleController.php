@@ -24,47 +24,47 @@ final class peopleController extends peopleBundleController implements peopleCon
 
       public function listAction(){
 
-              $params["PageTitle"] = "All people";
+            $params["PageTitle"] = "All people";
 
-              //Used by the HTMLGenerator in the list view.
-              $params['table'] = array(
+            //Used by the HTMLGenerator in the list view.
+            $params['table'] = array(
 
-                'class' => 'paginate',
-                'title' => 'Dataset',
-                'tbody' => $this->GetRepository("people:Users")->find(3),
-                'ignoreFields' => array(),
-                'actions' => array(
+              'class' => 'paginate',
+              'title' => 'Example Title',
+              'tbody' => $this->GetRepository("people:Users")->findAll(),
+              'ignoreFields' => array('Users__id', 'Address__id', 'city__id'),
+              'actions' => array(
 
-                    'Edit' => array(
+                  'Edit' => array(
 
-                        'route' => 'people_Edit',
-                        'routeParam' => 'id',
-                        'dataParam' => 'Users__id',
-                    ),
+                      'route' => 'people_Edit',
+                      'routeParam' => 'id',
+                      'dataParam' => 'Users__id',
+                  ),
 
-                    'View' => array(
+                  'View' => array(
 
-                        'route' => 'people_View',
-                        'routeParam' => 'id',
-                        'dataParam' => 'Users__id',
-                    ),
+                      'route' => 'people_View',
+                      'routeParam' => 'id',
+                      'dataParam' => 'Users__id',
+                  ),
 
-                    'Delete' => array(
+                  'Delete' => array(
 
-                        'message' => 'Are you sure you want to delete this record?',
-                        'class' => 'remove',
-                        'route' => 'people_Delete',
-                        'routeParam' => 'id',
-                        'dataParam' => 'Users__id',
-                    ),
-                )
+                      'message' => 'Are you sure you want to delete this record?',
+                      'class' => 'remove',
+                      'route' => 'people_Delete',
+                      'routeParam' => 'id',
+                      'dataParam' => 'Users__id',
+                  ),
+              )
 
-              );
+            );
 
-              //This will be used in the template to generate the above declared table.
-              $this->htmlgen = $this ->GetComponent('HTMLGenerator');
+            //This will be used in the template to generate the above declared table.
+            $this->htmlgen = $this ->GetComponent('HTMLGenerator');
 
-              $this->Render("people:list.html.php", $params);
+            $this->Render("people:list.html.php", $params);
 
       }
 
@@ -188,7 +188,7 @@ final class peopleController extends peopleBundleController implements peopleCon
        */
       public function deleteAction($id){
 
-            if($this->Request -> isAjax()){
+            if($this->Request() -> isAjax()){
 
               $people = $this->getEntity("people:Users");
 
@@ -197,10 +197,5 @@ final class peopleController extends peopleBundleController implements peopleCon
               else
                   echo 'error:Delete was unsuccessful';
             }
-      }
-
-      public function add2($var1, $var2)
-      {
-          return $var1+$var2;
       }
 }

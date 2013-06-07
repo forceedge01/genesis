@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../Resources/Configs/Core/BundleGenerator.php';
+require __DIR__ . '/../Resources/Configs/Core/BundleGenerator.php';
+
+require __DIR__ . '/Console.php';
 
 if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER && isset($_SERVER['HTTP_HOST'])){
 
@@ -29,7 +31,7 @@ function requireAll($directory) {
             if ($file != '.' && $file != '..' && $file != 'index.php') {
 
                 if (is_file($directory . '/' . $file))
-                {
+                {             
                     require_once $directory . '/' . $file;
                 }
                 else

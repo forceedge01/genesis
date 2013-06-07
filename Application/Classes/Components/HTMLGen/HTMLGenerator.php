@@ -5,7 +5,6 @@ namespace Application\Components;
 /**
  * Author: Wahab Qureshi.
  */
-
 use Application\Core\Router;
 
 class HTMLGenerator extends Router {
@@ -98,59 +97,58 @@ class HTMLGenerator extends Router {
 
     public function generateForm($input) {
 
-        $formHeader = function() use ($input){
+        $formHeader = function() use ($input) {
 
-            $form = '<div class="widget">
+                    $form = '<div class="widget">
             <div class="title"><h6>' . @($input['title'] ? $input['title'] : 'Default title' ) . '</h6></div>
             <form method="' . @(($input['method']) ? $input['method'] : 'POST' ) . '" message="' . @$input['message'] . '" action="' . @$input['action'] . '" enctype="' . @$input['enctype'] . '" class="' . @(($input['class']) ? $input['class'] : 'form' ) . '" id="' . @$input['id'] . '">
             <fieldset>';
 
-            return $form;
-        };
+                    return $form;
+                };
 
-        $formBody = function($form = null) use ($input){
+        $formBody = function($form = null) use ($input) {
 
-            if (isset($input['table']))
-                $form .= $this->DBForm($input['table']);
+                    if (isset($input['table']))
+                        $form .= $this->DBForm($input['table']);
 
-            foreach ($input['inputs'] as $key => $element) {
+                    foreach ($input['inputs'] as $key => $element) {
 
-                if ($key != 'hidden')
-                    $form .= '<div class="formRow">';
+                        if ($key != 'hidden')
+                            $form .= '<div class="formRow">';
 
-                $element['type'] = $key;
+                        $element['type'] = $key;
 
-                if ($key != 'hidden')
-                    $form .= '<label for="' . @$element['id'] . '">' . @$element['label'] . '</label>
+                        if ($key != 'hidden')
+                            $form .= '<label for="' . @$element['id'] . '">' . @$element['label'] . '</label>
                         <div class="formRight">';
 
-                $form .= $this->generateInput($element);
+                        $form .= $this->generateInput($element);
 
-                if ($key != 'hidden')
-                    $form .= '</div></div>';
-            }
+                        if ($key != 'hidden')
+                            $form .= '</div></div>';
+                    }
 
-            $form .= '</fieldset>';
+                    $form .= '</fieldset>';
 
-            return $form;
-        };
+                    return $form;
+                };
 
-        $formFooter = function() use ($input){
+        $formFooter = function() use ($input) {
 
-            $form = '<div class="wizButtons"><div class="wNavButtons">';
+                    $form = '<div class="wizButtons"><div class="wNavButtons">';
 
-            foreach ($input['submission'] as $key => $submit) {
+                    foreach ($input['submission'] as $key => $submit) {
 
-                $submit['type'] = $key;
+                        $submit['type'] = $key;
 
-                $form .= $this->generateInput($submit);
-            }
+                        $form .= $this->generateInput($submit);
+                    }
 
-            $form .= '</div></div></form></div>';
+                    $form .= '</div></div></form></div>';
 
-            return $form;
-
-        };
+                    return $form;
+                };
 
         return $formHeader() . $formBody() . $formFooter();
     }
@@ -190,7 +188,6 @@ class HTMLGenerator extends Router {
 
                 $html .= '</div></div>';
             }
-
         } else {
 
             foreach ($inputs as $key => $value) {
@@ -651,11 +648,11 @@ class HTMLGenerator extends Router {
     }
 
     function submit() {
-
+        
     }
 
     function validate() {
-
+        
     }
 
     public function dump($var = null) {
@@ -694,12 +691,10 @@ class HTMLGenerator extends Router {
         $var = ($var == null) ? $this->form : $var;
 
         return $this->Variable($var)->Replace(array(
-
-            '$#name' => $this->name,
-            '$#method' => $this->method,
-            '$#action' => $this->action
-
-        ))->GetVariableResult();
+                    '$#name' => $this->name,
+                    '$#method' => $this->method,
+                    '$#action' => $this->action
+                ))->GetVariableResult();
     }
 
     function setErrorColor($color) {
@@ -758,7 +753,6 @@ class HTMLGenerator extends Router {
                 $content .= '<div class="tableHeadingSection" id="' . $key . '">' . $key . '</div>';
 
                 $content .= $this->outputIndexItems($key, $value);
-
             } else {
 
                 if (is_numeric($key))
@@ -828,20 +822,18 @@ class HTMLGenerator extends Router {
     public function formatCodeToHTML($index) {
 
         return $this->Variable($index)->Replace(array(
-            
-            '<php' => '&#60;php',
-            '<' => '&#60;',
-            '&#60;br />' => '<br />',
-            '&#60;p>' => '<p>',
-            '&#60;/p>' => '</p>',
-            '&#60;/ol>' => '</ol>',
-            '&#60;/li>' => '</li>',
-            '&#60;li>' => '<li>',
-            '&#60;ol>' => '<ol>',
-            '&#60;div' => '<div',
-            '&#60;/div' => '</div',
-
-          ))->GetVariableResult();
+                    '<php' => '&#60;php',
+                    '<' => '&#60;',
+                    '&#60;br />' => '<br />',
+                    '&#60;p>' => '<p>',
+                    '&#60;/p>' => '</p>',
+                    '&#60;/ol>' => '</ol>',
+                    '&#60;/li>' => '</li>',
+                    '&#60;li>' => '<li>',
+                    '&#60;ol>' => '<ol>',
+                    '&#60;div' => '<div',
+                    '&#60;/div' => '</div',
+                ))->GetVariableResult();
 
 //        $index = str_replace('<php', '&#60;php', $index);
 //        $index = str_replace('<', '&#60;', $index);
@@ -854,7 +846,6 @@ class HTMLGenerator extends Router {
 //        $index = str_replace('&#60;ol', '<ol', $index);
 //        $index = str_replace('&#60;div', '<div', $index);
 //        $index = str_replace('&#60;/div', '</div', $index);
-
 //        return $index;
     }
 
@@ -953,64 +944,107 @@ class HTMLGenerator extends Router {
         $index = 1;
 
         $rows = null;
+        
+        $objectCopy = null;
 
-        if (count($array['tbody']) != 0) {
-
+        if (count($array['tbody']) != 0) 
+        {
             $rows = '<tbody>';
 
-            foreach ($array['tbody'] as $arr) {
-
-                if ($index % 2 == 0)
-                    $rows .= '<tr id="record_' . $index . '" class="even">';
-                else
-                    $rows .= '<tr id="record_' . $index . '" class="odd">';
-
-                if (is_array($arr) || is_object($arr)) {
-
-                    foreach ($arr as $key => $item) {
-
-                        if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) {
-
-                            foreach ($array['ignoreFields'] as $ignore) {
-
-                                if ($key != $ignore)
-                                    $rows .= '<td>' . $item . '</td>';
-                            }
-                        }
-                        else
-                            $rows .= '<td>' . $item . '</td>';
-                    }
-
-                    if (isset($array['actions'])) {
-
-                        $rows .= '<td class="actions">
-
-                        <div class="settings"></div>
-
-                                <div class="settingsMenu">';
-
-                        foreach ($array['actions'] as $key => $action) {
-
-                            if (isset($action['message'])) {
-
-                                $rows .= '<input type="hidden" value="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($arr) ? $arr->$action['dataParam'] : $arr[$action['dataParam']] ))) : $action['url'] ) . '">';
-
-                                $rows .= ' <span class="confirmAction ' . @$action['class'] . '" id="' . $key . '_' . $index . '">' . $key . '</span> ';
-
-                                $rows .= '<input type="hidden" value="' . $action['message'] . '">';
-                            } else {
-
-                                $rows .= ' <a id="' . $key . '_' . $index . '" target="' . @$action['target'] . '" class="' . @$action['class'] . '" href="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($arr) ? $arr->$action['dataParam'] : $arr[$action['dataParam']] ))) : @$action['url'] ) . '">' . $key . '</a> ';
-                            }
-
-                            $rows .= '<br />';
-                        }
-
-                        $rows .= '</div></td>';
-                    }
+            foreach ($array['tbody'] as $arr) 
+            {   
+                if(is_object($arr))
+                {
+                    $objectCopy = clone $arr;
                 }
                 else
+                {
+                    $objectCopy = $arr;
+                }
+                
+                if ($index % 2 == 0)
+                {
+                    $rows .= '<tr id="record_' . $index . '" class="even">';
+                }
+                else
+                {
+                    $rows .= '<tr id="record_' . $index . '" class="odd">';
+                }
+
+                if (is_array($arr) || is_object($arr)) 
+                {
+                    
+                    // Rendering functions
+                    
+                    $body = function($rows = null) use ($arr, $array){
+                      
+                        if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) 
+                        {                        
+                            foreach ($array['ignoreFields'] as $ignore) 
+                            {
+                                if(is_object($arr))
+                                {
+                                    unset($arr -> $ignore);
+                                }
+                                else
+                                {
+                                    unset($arr[$ignore]);
+                                }
+                            }
+                        }
+
+                        foreach ($arr as $item) 
+                        {
+                            $rows .= '<td>' . $item . '</td>';
+                        }
+                        
+                        return $rows;
+                    };
+                    
+                    $actions = function($rows = null) use ($objectCopy, $array, $index) {
+                      
+                        if (isset($array['actions'])) 
+                        {
+                            $rows .= '<td class="actions"><div class="settings"></div><div class="settingsMenu">';
+
+                            foreach ($array['actions'] as $key => $action) 
+                            {
+                                if (isset($action['message'])) 
+                                {                                    
+                                    $rows .= '<input type="hidden" value="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($objectCopy) ? $objectCopy->$action['dataParam'] : $objectCopy[$action['dataParam']] ))) : $action['url'] ) . '">';
+
+                                    $rows .= ' <span class="confirmAction ' . @$action['class'] . '" id="' . $key . '_' . $index . '">' . $key . '</span> ';
+
+                                    $rows .= '<input type="hidden" value="' . $action['message'] . '">';
+                                } 
+                                else 
+                                {
+                                    $rows .= ' <a id="' . $key . '_' . $index . '" target="' . @$action['target'] . '" class="' . @$action['class'] . '" href="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($objectCopy) ? $objectCopy->$action['dataParam'] : $objectCopy[$action['dataParam']] ))) : @$action['url'] ) . '">' . $key . '</a> ';
+                                }
+
+                                $rows .= '<br />';
+                            }
+                        }  
+                        
+                        $rows .= '</div></td>';
+                        
+                        return $rows;
+                    };
+                    
+                    // End of Rendering functions
+                    
+                    
+                    // Execution of functions
+                    
+                    $rows .= $body();
+                    $rows .= $actions() ;
+                    
+                    // End of Execution
+                }
+                else
+                {
                     $rows .= '<td>' . $arr . '</td>';
+                }
 
                 $rows .= '</tr>';
 
@@ -1026,17 +1060,17 @@ class HTMLGenerator extends Router {
     public function RenderTable($array) {
 
         $rows = function() use ($array) {
-            
-            $rows = null;
 
-            $rows .= $this->renderTableHead($array);
+                    $rows = null;
 
-            $rows .= $this->RenderRows($array);
+                    $rows .= $this->renderTableHead($array);
 
-            $rows .= $this->renderTableFooter($array);
+                    $rows .= $this->RenderRows($array);
 
-            return $rows;
-        };
+                    $rows .= $this->renderTableFooter($array);
+
+                    return $rows;
+                };
 
         return $rows();
     }
@@ -1045,18 +1079,20 @@ class HTMLGenerator extends Router {
 
         $rows = function($row = null) use ($array) {
 
-            $row .= '<tfoot><tr>';
+                    $row .= '<tfoot><tr>';
 
-            if (isset($array['tfoot']))
-                foreach ($array['tfoot'] as $arr) {
+                    if (isset($array['tfoot']))
+                    {
+                        foreach ($array['tfoot'] as $arr) 
+                        {
+                            $row .= '<td>' . $arr . '</td>';
+                        }
+                    }
 
-                    $row .= '<td>' . $arr . '</td>';
-                }
+                    $row .= '</tr></tfoot></table>';
 
-            $row .= '</tr></tfoot></table>';
-
-            return $row;
-        };
+                    return $row;
+                };
 
         return $rows();
     }
@@ -1065,62 +1101,83 @@ class HTMLGenerator extends Router {
 
         $heading = function ($rows = null) use ($array) {
 
-            if (isset($array['title']))
-                $rows = '<div class="title"><h6>' . $array['title'] . '</h6></div>';
+                    if (isset($array['title']))
+                    {
+                        $rows = '<div class="title"><h6>' . $array['title'] . '</h6></div>';
+                    }
 
-            $rows .= '<table class="' . @$array['class'] . '" id="' . @$array['id'] . '"><thead><tr>';
+                    $rows .= '<table class="' . @$array['class'] . '" id="' . @$array['id'] . '"><thead><tr>';
 
-            return $rows;
-        };
+                    return $rows;
+                };
 
-        $tableTitles = function ($rows = null) use ($array) {
+        $tableTitles = function ($rows = null, $objectCopy = null) use ($array) {
 
-            if (isset($array['thead']) && $this->isLoopable($array['thead'])) {
+                    if (isset($array['thead']) && $this->isLoopable($array['thead'])) 
+                    {
 
-            foreach ($array['thead'] as $arr) {
+                        foreach ($array['thead'] as $arr) {
 
-                $rows .= '<th>' . $arr . '</th>';
-            }
-
-                $rows .= '</tr></thead>';
-            } else {
-
-                if(is_array($array['tbody']))
-                    foreach ($array['tbody'] as $arr) {
-
-                        foreach ($arr as $key => $val) {
-
-                            if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) {
-
-                                foreach ($array['ignoreFields'] as $ignore) {
-
-                                    if ($key != $ignore)
-                                        $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
-                                }
-                            }
-                            else
-                                $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
+                            $rows .= '<th>' . $arr . '</th>';
                         }
 
-                        break;
+                        $rows .= '</tr></thead>';
+                    } 
+                    else 
+                    {
+
+                        if (is_array($array['tbody'])) 
+                        {
+
+                            foreach ($array['tbody'] as $arr) 
+                            {
+
+                                if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) 
+                                {
+                                    
+                                    if(is_object($arr))
+                                        $objectCopy = clone $arr;
+                                    else
+                                        $objectCopy = $arr;
+
+                                    foreach ($array['ignoreFields'] as $ignore) 
+                                    {
+                                        
+                                        if(is_object($objectCopy))
+                                        {
+                                            unset($objectCopy -> $ignore);
+                                        }
+                                        else
+                                        {
+                                            unset($objectCopy[$ignore]);
+                                        }
+                                    }
+
+                                    foreach ($objectCopy as $key => $val)
+                                    {
+                                        $rows .= '<th>' . str_replace('_', ' ', $this->FirstCharacterToUpperCase($key)) . '</th>';
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
                     }
-            }
 
-            return $rows;
-
-        };
+                    return $rows;
+                };
 
         $tableActions = function($rows = null) use ($array) {
 
-            if (isset($array['actions'])) {
+                    if (isset($array['actions'])) {
 
-                $rows .= '<th>Actions</th>';
-            }
+                        $rows .= '<th>Actions</th>';
+                    }
 
-            $rows .= '</tr></thead>';
+                    $rows .= '</tr></thead>';
 
-            return $rows;
-        };
+                    return $rows;
+                };
 
         return $heading() . $tableTitles() . $tableActions();
     }
@@ -1135,39 +1192,39 @@ class HTMLGenerator extends Router {
      */
     public function RenderSections(array $sectionData) {
 
-        $sectionHeader = function($title, $section, $index, $sections = null) use ($sectionData){
+        $sectionHeader = function($title, $section, $index, $sections = null) use ($sectionData) {
 
-            if (strtolower($sectionData['type']) == 'accordian') $sections .= '<div class="title"><h6>' . $title . '</h6></div>';
+                    if (strtolower($sectionData['type']) == 'accordian')
+                        $sections .= '<div class="title"><h6>' . $title . '</h6></div>';
 
-            $sections .= '<div class="section ' . @$section['class'] . '" id="section' . $index . '">';
+                    $sections .= '<div class="section ' . @$section['class'] . '" id="section' . $index . '">';
 
-            $sections .= '<div class="sectionHeader">';
-            $sections .= $section['header'];
-            $sections .= '</div>';
+                    $sections .= '<div class="sectionHeader">';
+                    $sections .= $section['header'];
+                    $sections .= '</div>';
 
-            return $sections;
+                    return $sections;
+                };
 
-        };
+        $sectionBody = function($section, $sections = null) {
 
-        $sectionBody = function($section, $sections = null){
+                    $sections .= '<div class="sectionBody">';
+                    $sections .= $section['body'];
+                    $sections .= '</div>';
 
-            $sections .= '<div class="sectionBody">';
-            $sections .= $section['body'];
-            $sections .= '</div>';
+                    return $sections;
+                };
 
-            return $sections;
-        };
+        $sectionFooter = function ($section, $sections = null) {
 
-        $sectionFooter = function ($section, $sections = null){
+                    $sections .= '<div class="sectionFooter">';
+                    $sections .= $section['footer'];
+                    $sections .= '</div>';
 
-            $sections .= '<div class="sectionFooter">';
-            $sections .= $section['footer'];
-            $sections .= '</div>';
+                    $sections .= '</div>';
 
-            $sections .= '</div>';
-
-            return $sections;
-        };
+                    return $sections;
+                };
 
         if (is_array($sectionData)) {
 
@@ -1188,11 +1245,10 @@ class HTMLGenerator extends Router {
                 $index += 1;
             }
 
-            $sectionStats = function(){
+            $sectionStats = function() {
 
-                return '<div class="SectionsFooter"><div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div></div>';
-
-            };
+                        return '<div class="SectionsFooter"><div class="SectionStats">Page: <span id="Section">1</span></div><div class="SectionsButtons"><input type="button" value="Previous" class="prev"><input type="button" value="Next" class="next"></div></div>';
+                    };
 
             $sections .= $sectionStats() . '</div>';
 

@@ -11,6 +11,10 @@ class Test extends BaseTestingRoutine{
             $testClassesAndComponents;
 
     public function __construct() {
+        
+        // Script start
+        self::$rustart = getrusage();
+        
         parent::__construct();
 
         $this ->LoadTestFiles();

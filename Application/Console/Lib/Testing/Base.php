@@ -10,12 +10,18 @@ class BaseTestingRoutine extends Console{
             $passed,
             $failed,
             $assertions,
-            $method;
+            $method,
+            $rustart;
 
     public function __construct()
-    {
+    {        
         if(self::$passed == '')
             self::$passed = self::$failed = self::$assertions = 0;
+    }
+    
+    protected function rutime($ru, $rus, $index) 
+    {
+        return ($ru["ru_$index.tv_sec"]*1000 + intval($ru["ru_$index.tv_usec"]/1000)) - ($rus["ru_$index.tv_sec"]*1000 + intval($rus["ru_$index.tv_usec"]/1000));
     }
 
     private function checkMethodExistance($object, $method)
@@ -539,9 +545,21 @@ class BaseTestingRoutine extends Console{
     }
     
     public function ShowResults() {
+        
+        $ru = getrusage();
 
         echo $this ->linebreak(2);
         echo 'Passed: ',$this ->green(self::$passed) , ', Failed: ',$this -> red(self::$failed) , ', Assertions: ', $this -> blue(self::$assertions) ,'.', $this ->linebreak(2);
+        
+        echo $this -> blue("This process used " 
+            . $this -> rutime($ru, self::$rustart, "utime") 
+            . " ms for its computations, ") ;
+        
+        echo $this -> blue("it spent " 
+            . $this -> rutime($ru, self::$rustart, "stime") 
+            . " ms in system calls.") ;
+        
+        echo $this ->linebreak(2);
     }
     
     public function AssertType($data, $type)

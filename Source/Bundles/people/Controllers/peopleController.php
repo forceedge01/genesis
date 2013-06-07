@@ -96,7 +96,7 @@ final class peopleController extends peopleBundleController implements peopleCon
 
       public function createAction(){
 
-            if($this->GetRequest() ->isPost("submit")){
+            if($this->Request() ->isPost("submit")){
 
               if($this->GetEntity("people:Users")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
@@ -145,7 +145,7 @@ final class peopleController extends peopleBundleController implements peopleCon
 
       public function editAction($id){
 
-            if($this->GetRequest()->isPost("submit")){
+            if($this->Request()->isPost("submit")){
 
               if($people = $this->getEntity("peopleBundle:people")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
@@ -188,7 +188,7 @@ final class peopleController extends peopleBundleController implements peopleCon
        */
       public function deleteAction($id){
 
-            if($this->isAjax()){
+            if($this->Request -> isAjax()){
 
               $people = $this->getEntity("people:Users");
 

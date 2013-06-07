@@ -497,7 +497,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
 
       public function createAction(){
 
-            if($this->GetRequest->isPost("submit")){
+            if($this->Request() ->isPost("submit")){
 
               if($this->GetEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Create successful."));
@@ -546,7 +546,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
 
       public function editAction($id){
 
-            if($this->GetRequest()->isPost("submit")){
+            if($this->Request() ()->isPost("submit")){
 
               if($'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
                   $this->setFlash(array("Success" => "Update successful."));
@@ -589,7 +589,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
        */
       public function deleteAction($id){
 
-            if($this->isAjax()){
+            if($this->Request()->isAjax()){
 
               $'.$this->name.' = $this->getEntity("' . $this->name . ':'.$this->name.'");
 

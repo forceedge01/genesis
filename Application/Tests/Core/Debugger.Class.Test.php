@@ -7,15 +7,15 @@ namespace Application\Core\Tests;
 use Application\Console\BaseTestingRoutine;
 
 class DebuggerTest extends BaseTestingRoutine {
-    
+
     public
             $testCandidate;
-    
+
     public function __construct() {
         parent::__construct();
         $this -> testCandidate = new \Application\Core\Debugger();
     }
-    
+
     public function testPre()
     {
         $this ->AssertMultipleTrue($this -> testCandidate, 'pre', array(
@@ -37,7 +37,7 @@ class DebuggerTest extends BaseTestingRoutine {
                 'case' => 'string'
             ),
         ));
-        
+
         $this ->AssertURL('http://localhost/GENESIS/index.php/people');
     }
 }

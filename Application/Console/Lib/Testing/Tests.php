@@ -11,10 +11,11 @@ class Test extends BaseTestingRoutine{
             $testClassesAndComponents;
 
     public function __construct() {
-        
-        // Script start
+
+        self::$start_microtime = microtime(true);
+
         self::$rustart = getrusage();
-        
+
         parent::__construct();
 
         $this ->LoadTestFiles();
@@ -23,13 +24,13 @@ class Test extends BaseTestingRoutine{
     public function RunTests()
     {
         error_reporting(E_ERROR);
-        
+
         foreach($this -> testClassesAndComponents as $classOrComponent)
         {
             $chunk = explode('.', $classOrComponent);
             $core = 'Application\\Core\\Tests\\'.$chunk[0].'Test';
             $component = 'Application\\Component\\Tests\\'.$chunk[0].'Test';
-            
+
             if(class_exists($core))
             {
                 $this ->CallMethods($core);
@@ -63,7 +64,7 @@ class Test extends BaseTestingRoutine{
                 $this->CallMethods($object);
             }
         }
-        
+
         $this ->ShowResults();
 
         error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
@@ -84,11 +85,11 @@ class Test extends BaseTestingRoutine{
         }
 
         $obj = new $object();
-        
+
         echo $this ->linebreak(2).'<=========================================================>';
 
         echo $this ->linebreak(1).'Running test method: ',$this -> blue($object) , '() in file ' . $this -> blue($f ->getFileName()) , $this->linebreak(1);
-        
+
         echo '<=========================================================>';
 
         foreach($methods as $method)
@@ -105,9 +106,9 @@ class Test extends BaseTestingRoutine{
         require_once ROOT . '/Application/Loader.php';
 
         \Application\Core\Loader::loadFramework();
-        
+
         $testClassesAndComponents = \Application\Core\Loader::loadClassesAndComponentsTestFiles();
-        
+
         foreach($testClassesAndComponents as $classOrComponent)
         {
             $chunks = explode('/', $classOrComponent);

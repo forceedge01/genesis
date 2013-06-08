@@ -18,9 +18,7 @@ class TestpeopleController extends BaseTestingRoutine
     }
 
     public function testIndexAction()
-    {   
-        //Checks if the returned value of this function is an integer
-
+    {
         $this->AssertMultipleTrue($this->object, 'listAction', array(
             array(
                 'case' => 'contains',
@@ -35,22 +33,12 @@ class TestpeopleController extends BaseTestingRoutine
                 'expected' => 'people',
             )
         ));
-        
-        $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
 
-        $this ->AssertTrue($this->object , 'add2', array(
-            'parameters' => array(
-                1,
-                2
-            ),
-            'case' => 'equals',
-            'expected' => 3,
-        ));
+        $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
     }
 
     public function testAnotherIndexAction()
     {
-
         $this->AssertFalse($this->object, 'listAction', array('case' => 'integer'));
     }
 }

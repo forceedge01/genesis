@@ -16,10 +16,8 @@ class BaseTestingRoutine extends Console{
 
     public function __construct()
     {
-        if(self::$passed == '')
+        if(self::$passed == null)
             self::$passed = self::$failed = self::$assertions = 0;
-
-        $this->multi_handle = curl_multi_init();
     }
 
     protected function rutime($ru, $rus, $index)

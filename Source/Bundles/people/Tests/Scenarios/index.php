@@ -11,13 +11,13 @@ class TestpeopleController extends BaseTestingRoutine
     public
             $object;
 
-    public function __construct() {
-
+    public function __construct()
+    {
         parent::__construct();
         $this->object = new \Application\Bundles\people\Controllers\peopleController();
     }
 
-    public function testIndexAction()
+    public function testClassIndexAction()
     {
         $this->AssertMultipleTrue($this->object, 'listAction', array(
             array(
@@ -33,12 +33,15 @@ class TestpeopleController extends BaseTestingRoutine
                 'expected' => 'people',
             )
         ));
-
-        $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
     }
 
-    public function testAnotherIndexAction()
+    public function testMethodAnotherIndexAction()
     {
         $this->AssertFalse($this->object, 'listAction', array('case' => 'integer'));
+    }
+
+    public function testRoute()
+    {
+        $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
     }
 }

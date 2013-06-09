@@ -171,53 +171,86 @@ class Console {
 
         $args = explode(':', $switch);
 
-        if ($args[0] == 'bundle') {
-
-            if (isset($_SERVER['SERVER_NAME'])) {
-
-                $bundle = new Libraries\Bundle('html');
-
-                $bundle->name = str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] )));
-
-            } else {
-
-                $bundle = new Libraries\Bundle('console');
-            }
-        }
-
-        switch (strtolower($args[0])) {
-
+        switch (strtolower($args[0]))
+        {
             case 'bundle':
+            {
+                if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER AND isset($_SERVER['HTTP_HOST']))
+                {
+                    echo 'Access restricted.';
+                    exit;
+                }
 
-                switch ($args[1]) {
+                if (isset($_SERVER['SERVER_NAME']))
+                {
+                    $bundle = new Libraries\Bundle('html');
+                    $bundle->name = str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] )));
+                }
+                else
+                {
+                    $bundle = new Libraries\Bundle('console');
+                }
 
+                switch ($args[1])
+                {
                     case 'create':
+                    {
                         $bundle->createBundle();
                         break;
+                    }
                     case 'delete':
+                    {
                         $bundle->deleteBundle();
                         break;
+                    }
                     case '0':
                     case 'exit':
+                    {
                         exit(0);
                         break;
+                    }
                 }
                 break;
+            }
 
             case 'test':
+            {
                 switch($args[1])
                 {
+                    case 'routes':
+                    {
+                        $test = New Test('route');
+                        $test->RunTests();
+                    }
+
+                    case 'classes':
+                    {
+                        $test = New Test('class');
+                        $test->RunTests();
+                    }
+
+                    case 'methods':
+                    {
+                        $test = New Test('method');
+                        $test->RunTests();
+                    }
+
                     case 'all':
+                    {
                         $test = new Test();
                         $test ->RunTests();
                         break;
+                    }
                 }
                 break;
+            }
 
             default:
+            {
                 echo 'Exiting';
                 exit;
                 break;
+            }
         }
     }
 
@@ -235,7 +268,7 @@ class Console {
     {
         return "\033[41;30m".$string."\033[40;37m";
     }
-    
+
     public function blue($string)
     {
         return "\033[34m".$string."\033[37m";

@@ -8,9 +8,12 @@ class Test extends BaseTestingRoutine{
 
     private
             $testBundles,
-            $testClassesAndComponents;
+            $testClassesAndComponents,
+            $type;
 
-    public function __construct() {
+    public function __construct($type = null) {
+
+        $this->type = $type;
 
         self::$start_microtime = microtime(true);
 
@@ -78,9 +81,19 @@ class Test extends BaseTestingRoutine{
 
         foreach ($f->getMethods() as $m)
         {
-            if ($m->class == $object AND strpos(strtolower($m->name), 'test') !== false)
+            if(empty($this->type))
             {
-                $methods[] = $m->name;
+                if ($m->class == $object AND strpos(strtolower($m->name), 'test') !== false)
+                {
+                    $methods[] = $m->name;
+                }
+            }
+            else
+            {
+                if ($m->class == $object AND strpos(strtolower($m->name), 'test'.$this->type) !== false)
+                {
+                    $methods[] = $m->name;
+                }
             }
         }
 

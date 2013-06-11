@@ -13,6 +13,7 @@ function getOptions() {
         'test:classes',
         'test:methods',
         'test:all',
+        'automate:testing',
         'exit'
     );
 }

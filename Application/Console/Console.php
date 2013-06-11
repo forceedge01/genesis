@@ -170,6 +170,8 @@ class Console {
     function switchOption($switch) {
 
         $args = explode(':', $switch);
+        
+        print_r($args);
 
         switch (strtolower($args[0]))
         {
@@ -244,6 +246,18 @@ class Console {
                 }
                 break;
             }
+            
+            case 'automate':
+            {
+                switch($args[1])
+                {
+                    case 'testing':
+                    {
+                        $watcher = new Watcher($args[2], 'test:all');
+                        $watcher ->automate();
+                    }
+                }
+            }   
 
             default:
             {

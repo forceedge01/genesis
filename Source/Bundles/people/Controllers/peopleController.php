@@ -27,6 +27,8 @@ final class peopleController extends peopleBundleController implements peopleCon
             $params["PageTitle"] = "All people";
 
             //Used by the HTMLGenerator in the list view.
+            
+            
             $params['table'] = array(
 
               'class' => 'paginate',

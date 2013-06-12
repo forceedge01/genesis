@@ -240,10 +240,8 @@ class Console {
 
                     case 'all':
                     {
-                        if(is_object($this -> object))
-                            unset($this -> object);
-                        
-                        $this -> object = new Test();
+                        if(!is_object($this -> object))
+                            $this -> object = new Test();
                         
                         $this -> object ->RunTests();
                         

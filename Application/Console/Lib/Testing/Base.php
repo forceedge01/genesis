@@ -12,12 +12,13 @@ class BaseTestingRoutine extends Console{
             $assertions,
             $method,
             $rustart,
-            $start_microtime;
+            $start_microtime,
+            $tests;
 
     public function __construct()
     {
         if(self::$passed == null)
-            self::$passed = self::$failed = self::$assertions = 0;
+            self::$passed = self::$failed = self::$assertions = self::$tests = 0;
     }
 
     protected function rutime($ru, $rus, $index)
@@ -282,7 +283,7 @@ class BaseTestingRoutine extends Console{
         $ru = getrusage();
 
         echo $this ->linebreak(2);
-        echo 'Passed: ',$this ->green(self::$passed) , ', Failed: ',$this -> red(self::$failed) , ', Assertions: ', $this -> blue(self::$assertions) ,'.', $this ->linebreak(2);
+        echo 'Tests: ', $this -> blue(self::$tests) , ', Passed: ',$this ->green(self::$passed) , ', Failed: ',$this -> red(self::$failed) , ', Assertions: ', $this -> blue(self::$assertions) ,'.', $this ->linebreak(2);
 
         echo $this -> blue("This process used "
             . $this -> rutime($ru, self::$rustart, "utime")
@@ -292,7 +293,7 @@ class BaseTestingRoutine extends Console{
             . $this -> rutime($ru, self::$rustart, "stime")
             . " ms in system calls.") ;
 
-        echo $this->linebreak(2) . $this->blue('This code execution took ' . (microtime(true) - self::$start_microtime)*1000 . ' ms to complete.');
+        echo $this->linebreak(1) . $this->blue('Execution took ' . round((microtime(true) - self::$start_microtime)*1000, 4) . ' ms to complete, memory usage: '.  round((memory_get_usage()/1024)/1024, 4) . ' MBytes');
 
         echo $this ->linebreak(2);
     }

@@ -16,11 +16,10 @@ class Test extends BaseTestingRoutine{
         $this->type = $type;
 
         self::$start_microtime = microtime(true);
-
         self::$rustart = getrusage();
 
         parent::__construct();
-
+        
         $this ->LoadTestFiles();
     }
     
@@ -32,10 +31,11 @@ class Test extends BaseTestingRoutine{
         self::$passed = 0;
         self::$rustart = 0;
         self::$start_microtime = 0;
+        self::$tests = 0;
     }
 
     public function RunTests()
-    {
+    {        
         error_reporting(E_ERROR);
 
         foreach($this -> testClassesAndComponents as $classOrComponent)
@@ -117,6 +117,8 @@ class Test extends BaseTestingRoutine{
 
         foreach($methods as $method)
         {
+            self::$tests += 1;
+            
             echo $this->linebreak(2),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';
             echo $this ->linebreak(1),' -> ', $method, '();';
             echo $this ->linebreak(1),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';

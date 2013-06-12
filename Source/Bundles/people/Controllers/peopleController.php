@@ -23,8 +23,6 @@ final class peopleController extends peopleBundleController implements peopleCon
       }
 
       public function listAction(){
-          
-          return 1;
 
             $params["PageTitle"] = "All people";
 

@@ -51,6 +51,7 @@ class Loader{
             'Request.php',
             'Response.php',
             'Router.php',
+            'Cache.php',
             'Template.php',
             'Application.php',
             'Database.php',

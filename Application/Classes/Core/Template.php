@@ -72,6 +72,8 @@ class Template extends Router {
         }
 
         echo $html;
+        
+        Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $html);
 
         unset($html);
     }

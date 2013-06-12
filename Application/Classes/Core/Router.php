@@ -56,6 +56,7 @@ class Router extends Getter{
     private function SetParams(){
 
         $this->params = explode('/', $this->pattern);
+        return $this;
     }
 
     /**
@@ -64,6 +65,8 @@ class Router extends Getter{
      * <br />Forwards the request to the appropriate controller once the params are read.
      */
     public function forwardRequest(){
+        
+        Cache::CheckForCachedFile($this->GetPattern());
 
         $value = array();
 

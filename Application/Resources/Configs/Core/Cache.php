@@ -1,0 +1,7 @@
+<?php
+
+DEFINE('CACHE_FOLDER', ROOT . 'Public/Cache/');
+
+DEFINE('CACHE_EXPIRE', 60*60);
+
+DEFINE('CACHE_ENABLE', true);

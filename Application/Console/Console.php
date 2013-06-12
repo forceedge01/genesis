@@ -285,7 +285,12 @@ class Console {
 
     public function blackOnRed($string)
     {
-        return "\033[41;30m".$string."\033[40;37m";
+        return "\033[41m".$string."\033[0m";
+    }
+    
+    public function greenOnRed($string)
+    {
+        return "\033[42m".$string."\033[0m";
     }
 
     public function blue($string)

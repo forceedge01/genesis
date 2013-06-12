@@ -13,25 +13,10 @@ class Test extends BaseTestingRoutine{
 
     public function __construct($type = null) {
 
-        $this->type = $type;
-
-        self::$start_microtime = microtime(true);
-        self::$rustart = getrusage();
-
         parent::__construct();
         
+        $this->type = $type;
         $this ->LoadTestFiles();
-    }
-    
-    public function ClearResults()
-    {
-        self::$assertions = 0;
-        self::$failed = 0;
-        self::$method = '';
-        self::$passed = 0;
-        self::$rustart = 0;
-        self::$start_microtime = 0;
-        self::$tests = 0;
     }
 
     public function RunTests()
@@ -84,7 +69,7 @@ class Test extends BaseTestingRoutine{
     }
 
     private function CallMethods($object)
-    {
+    {   
         $f = new \ReflectionClass($object);
 
         $methods = array();

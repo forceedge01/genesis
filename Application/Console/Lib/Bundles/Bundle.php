@@ -753,19 +753,15 @@ namespace Application\\Bundles\\'.$this->name.'\\Tests;
 use Application\\Console\\BaseTestingRoutine;
 
 class Test'.$this -> name.'Controller extends BaseTestingRoutine
-{
-    public
-        $testCandidate;
-        
-    public function __construct() {
-        parent::__construct();
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
-    }
-        
+{        
     public function testIndexAction()
     {
+        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+            
+        $method = \'IndexAction\';
+        
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+        $this ->AssertTrue($method, array(\'case\' => \'string\'));
     }
 }';
 
@@ -785,18 +781,14 @@ use Application\\Console\\BaseTestingRoutine;
 
 class Test'.$this -> name.'Entity extends BaseTestingRoutine
 {
-    public
-        $testCandidate;
-        
-    public function __construct() {
-        parent::__construct();
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
-    }
-
     public function testExampleMethod()
-    {        
+    {   
+        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
+        
+        $method = \'\';
+
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+        $this ->AssertTrue($method, array(\'case\' => \'string\'));
     }
 }';
 
@@ -816,18 +808,14 @@ use Application\\Console\\BaseTestingRoutine;
 
 class Test'.$this -> name.'Repository extends BaseTestingRoutine
 {
-    public
-        $testCandidate;
-     
-    public function __construct() {
-        parent::__construct();
-        $this -> testCandidate = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
-    }
-    
     public function testExampleMethod()
     {
+        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
+        
+        $method = \'\';
+
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($this -> testCandidate ->indexAction(), \'integer\', \'type\');
+        $this ->AssertTrue($method, array(\'case\' => \'array\'));
     }
 }';
 

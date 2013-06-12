@@ -8,17 +8,16 @@ use Application\Console\BaseTestingRoutine;
 
 class DebuggerTest extends BaseTestingRoutine {
 
-    public
-            $testCandidate;
-
     public function __construct() {
+        
         parent::__construct();
-        $this -> testCandidate = new \Application\Core\Debugger();
+        
+        self::$testClass = new \Application\Core\Debugger();
     }
 
     public function testPre()
     {
-        $this ->AssertMultipleTrue($this -> testCandidate, 'pre', array(
+        $this ->AssertMultipleTrue('pre', array(
             array
             (
                 'parameters' => array(

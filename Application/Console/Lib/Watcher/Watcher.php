@@ -20,10 +20,10 @@ class Watcher extends Console{
     {
         $hash1 = $this ->MD5_dir($this -> dir);
         
+        echo $this ->linebreak(2) , 'Watching Directory ' . $this -> dir;
+        
         while(true)
-        {
-            echo $this ->linebreak(2) , 'Watching Directory ' . $this -> dir , ' '. $hash1;
-            
+        {            
             $testHash = $this ->MD5_dir($this -> dir);
             
             if($hash1 != $testHash)

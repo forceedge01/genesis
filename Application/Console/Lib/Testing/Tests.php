@@ -23,6 +23,16 @@ class Test extends BaseTestingRoutine{
 
         $this ->LoadTestFiles();
     }
+    
+    public function ClearResults()
+    {
+        self::$assertions = 0;
+        self::$failed = 0;
+        self::$method = '';
+        self::$passed = 0;
+        self::$rustart = 0;
+        self::$start_microtime = 0;
+    }
 
     public function RunTests()
     {

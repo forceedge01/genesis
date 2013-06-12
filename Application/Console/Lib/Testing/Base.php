@@ -31,6 +31,21 @@ class BaseTestingRoutine extends Console{
         return method_exists($object, $method);
     }
 
+    public function AssertGreaterThan(){}
+    public function AssertLessThan(){}
+    public function AssertArrayHasKey(){}
+    public function AssertNotEmpty(){}
+    public function AssertIsNumber(){}
+    public function AssertIsArray(){}
+    public function AssertIsObject(){}
+    public function AssertClassHasParent(){}
+    public function AssertClassIsChild(){}
+    public function AssertClassHasProperty(){}
+    public function AssertIsFloat(){}
+    public function AssertIsString(){}
+    public function AssertIsJSON(){}
+    public function AssertIsBoolean(){}
+
     /**
      *
      * @param type $param

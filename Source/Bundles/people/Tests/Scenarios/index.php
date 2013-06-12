@@ -31,6 +31,9 @@ class TestpeopleController extends BaseTestingRoutine
             array(
                 'case' => 'contains',
                 'expected' => 'people',
+            ),
+            array(
+                'case' => 'string',
             )
         ));
     }

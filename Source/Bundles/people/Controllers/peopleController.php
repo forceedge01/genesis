@@ -23,12 +23,12 @@ final class peopleController extends peopleBundleController implements peopleCon
       }
 
       public function listAction(){
+          
+          return 1;
 
             $params["PageTitle"] = "All people";
 
             //Used by the HTMLGenerator in the list view.
-            
-            
             $params['table'] = array(
 
               'class' => 'paginate',
@@ -64,7 +64,7 @@ final class peopleController extends peopleBundleController implements peopleCon
             );
 
             //This will be used in the template to generate the above declared table.
-            $this->htmlgen = $this ->GetComponent('HTMLGenerator');
+            $this->htmlgen = $this ->GetComponent('HTMLGenerator');;
 
             $this->Render("people:list.html.php", $params);
 

@@ -5,6 +5,9 @@ namespace Application\Console;
 
 
 class Console {
+    
+    private 
+            $object;
 
     public function init(){
 
@@ -170,8 +173,6 @@ class Console {
     function switchOption($switch) {
 
         $args = explode(':', $switch);
-        
-        print_r($args);
 
         switch (strtolower($args[0]))
         {
@@ -239,8 +240,14 @@ class Console {
 
                     case 'all':
                     {
-                        $test = new Test();
-                        $test ->RunTests();
+                        if(is_object($this -> object))
+                            unset($this -> object);
+                        
+                        $this -> object = new Test();
+                        
+                        $this -> object ->RunTests();
+                        
+                        $this -> object -> clearResults();
                         break;
                     }
                 }

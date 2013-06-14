@@ -112,7 +112,7 @@ class Bundle extends Console {
 
         $initTemplate = '<?php
 
-DEFINE(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->name.'\');';
+Set::Config(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->name.'\');';
 
         fwrite($handle, $initTemplate);
 
@@ -640,45 +640,42 @@ class ' . $this->name . 'BundleController extends ApplicationController{
 
         $initRoute = '<?php
 
-use \\Application\\Core\\Router;
 
-
-
-Router::$Route[\'' . $this->name . '\'] = array(
+Set::Route(\'' . $this->name . '\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':index",
       "Pattern" => "/' . $this->name . '/"
-);
+));
 
-Router::$Route[\'' . $this->name . '_List\'] = array(
+Set::Route(\'' . $this->name . '_List\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':list",
       "Pattern" => "/' . $this->name . '/List/"
-);
+));
 
-Router::$Route[\'' . $this->name . '_View\'] = array(
+Set::Route(\'' . $this->name . '_View\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':view",
       "Pattern" => "/' . $this->name . '/View/{id}/"
-);
+));
 
-Router::$Route[\'' . $this->name . '_Create\'] = array(
+Set::Route(\'' . $this->name . '_Create\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':create",
       "Pattern" => "/' . $this->name . '/Create/"
-);
+));
 
-Router::$Route[\'' . $this->name . '_Edit\'] = array(
+Set::Route(\'' . $this->name . '_Edit\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':edit",
       "Pattern" => "/' . $this->name . '/Edit/{id}/"
-);
+));
 
-Router::$Route[\'' . $this->name . '_Delete\'] = array(
+Set::Route(\'' . $this->name . '_Delete\', array(
 
       "Controller" => "' . $this->name . ':' . $this->name . ':delete",
       "Pattern" => "/' . $this->name . '/Delete/{id}/"
-);
+));
               ';
 
             fwrite($handle, $initRoute);

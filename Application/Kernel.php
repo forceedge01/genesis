@@ -11,9 +11,12 @@ class AppKernal extends Loader{
 
     public static
             $phpVersion,
-            $msyqlVersion;
+            $msyqlVersion,
+            $scriptStartTime;
 
     public static function initialize() {
+        
+        self::$scriptStartTime = microtime();
 
         self::checkDependencies();
 

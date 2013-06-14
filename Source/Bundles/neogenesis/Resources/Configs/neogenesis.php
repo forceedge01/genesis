@@ -1,3 +1,3 @@
 <?php
 
-DEFINE('BUNDLE_NEOGENESIS_PATH', BUNDLES_FOLDER . 'neogenesis');
+Set::Config('BUNDLE_NEOGENESIS_PATH', BUNDLES_FOLDER . 'neogenesis');

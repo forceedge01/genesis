@@ -18,6 +18,9 @@ class Loader{
             $interfaces = array(),
             $files = array(),
             $loadedFiles = array();
+    
+    public static 
+            $appConfiguration = array();
 
     private static function fetchAllBundles(){
 
@@ -47,7 +50,8 @@ class Loader{
             'Debugger.php',
             'Variable.php',
             'AppMethods.php',
-            'Getter.php',
+            'Get.php',
+            'Manager.php',
             'Request.php',
             'Response.php',
             'Router.php',
@@ -100,6 +104,7 @@ class Loader{
                 self::loadFilesFromDir($bundle . BUNDLE_INTERFACES, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
+                
             }
             else{
 
@@ -114,7 +119,6 @@ class Loader{
                 exit;
 
             }
-
         }
 
     }
@@ -127,12 +131,15 @@ class Loader{
 
             foreach($files as $file){
 
-                $filepath = $directory . '/' . $file;
+                $filepath = str_replace('//', '/', $directory . '/' . $file);
 
                 if(is_file($filepath) && self::fileExtensionIs($filepath, $extensions))
                 {
                     self::$loadedFiles[] = $filepath;
                     require $filepath;
+                    
+                    if(isset($config))
+                        self::$appConfiguration = $config;
                 }
                 else if($subdirectories)
                 {
@@ -165,6 +172,8 @@ class Loader{
 
     public static function loadFramework()
     {
+        require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.php';
+        
         self::load('configs', APPLICATION_CONFIGS_FOLDER);
 
         self::load('interfaces', APPLICATION_CLASSES_FOLDER . 'Interfaces/');

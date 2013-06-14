@@ -3,9 +3,9 @@
 namespace Application\Core;
 
 
-use \Application\Interfaces\Getter as GetterInterface;
+use \Application\Interfaces\Manager as ManagerInterface;
 
-class Getter extends AppMethods implements GetterInterface{
+class Manager extends AppMethods implements ManagerInterface{
 
     /**
      *
@@ -211,9 +211,8 @@ class Getter extends AppMethods implements GetterInterface{
         return $this ->GetComponent('Dir');
     }
 
-    public function GetManager ( )
+    public static function GetConfigs()
     {
-        return $this;
+        return Loader::$appConfiguration;
     }
-
 }

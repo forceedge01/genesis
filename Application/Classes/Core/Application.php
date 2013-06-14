@@ -27,7 +27,7 @@ class Application extends Template{
 
                     $this->GetCoreObject('Session')->Destroy();
 
-                    $this->setError(array('Logged Out' => 'Your session has expired, please login again.'))->forwardTo(AUTH_LOGIN_ROUTE);
+                    $this->setError(array('Logged Out' => 'Your session has expired, please login again.'))->forwardTo(\Get::Config('Application.Login_Route_Name'));
                 }
 
             }
@@ -103,26 +103,26 @@ class Application extends Template{
      * 
      * @return \Application\Core\Request Object
      */
-    public function Request(){
-
-        return $this->Request;
-    }
+//    public function Request(){
+//
+//        return $this->Request;
+//    }
 
     /**
      * 
      * @return \Application\Core\Router Object
      */
-    public function Route(){
-
-        return $this->Router;
-    }
+//    public function Router(){
+//
+//        return $this->Router;
+//    }
     
     /**
      * 
      * @return \Application\Core\Response Object
      */
-    public function Response(){
-
-        return $this->Response;
-    }
+//    public function Response(){
+//
+//        return $this->Response;
+//    }
 }

@@ -1,5 +1,27 @@
 <?php
 
+Set::Config('Auth', array(
+    
+    'Form' => array(
+     
+        'EmailFieldName' => 'email',
+        'PasswordFieldName' => 'password',
+    ),
+    'Validation' => array(
+        
+        'Email' => true,
+    ),
+    'DBTable' => array(
+        
+        'AuthTableName' => 'Users',
+        'AuthColumnName' => 'email',
+    ),
+    'Entity' => 'User',
+    'PasswordEncryption' => 'SHA512',
+    'LoginRoute' => 'Login',
+    'LogoutRoute' => 'Logout',
+));
+
 define('AUTH_EMAIL_FIELD_NAME', 'email');//POST request
 
 define('AUTH_PASSWORD_FIELD_NAME', 'password');//POST request

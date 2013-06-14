@@ -1,5 +1,18 @@
 <?php
 
+Set::Config('Application', array(
+    
+    'Name' => 'Project Genesis NS 0.2',
+    'Admin_Email' => 'wahab.qureshi@digitalanimal.com',
+    'Base_Route_Name' => 'Application',
+    'Session' => array(
+        
+        'Enabled' => false,
+        'Interval' => 60*60,
+        'Login_Route_Name' => 'Login_Home',
+    )
+));
+
 define('APPLICATION_NAME', 'Project Genesis NS 0.2');
 
 define('SESSION_ENABLED', false);

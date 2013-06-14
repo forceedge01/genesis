@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Router extends Getter{
+class Router extends Manager{
 
     private
             $url,
@@ -66,7 +66,8 @@ class Router extends Getter{
      */
     public function forwardRequest(){
         
-        Cache::CheckForCachedFile($this->GetPattern());
+        if(\Get::Config('Cache.enabled'))
+            Cache::CheckForCachedFile($this->GetPattern());
 
         $value = array();
 

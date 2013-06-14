@@ -6,9 +6,9 @@ namespace Application\Components;
  * Author: Wahab Qureshi.
  */
 
-use Application\Core\Getter;
+use Application\Core\Manager;
 
-class Analytics extends Getter {
+class Analytics extends Manager {
 
     private
             $connection,

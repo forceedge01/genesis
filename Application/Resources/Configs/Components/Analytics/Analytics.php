@@ -1,5 +1,16 @@
 <?php
 
+Set::Config('Analytics', array(
+   
+    'TrackVisits' => true,
+    'TrackUnqiueVisitsOnly' => true,
+    'IgnoreIpAddress' => '::1',
+    'TrackTableName' => 'Tracks',
+    'ResetInterval' => 24*60*60,
+    'RecordInsiteTracks' => true,
+    'EnableBotTrap' => true
+));
+
 define('ANALYTICS_TRACK_VISITS', true);
 
 define('ANALYTICS_TRACK_UNIQUE_VISITS_ONLY', false);

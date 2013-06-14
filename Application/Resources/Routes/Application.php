@@ -1,11 +1,7 @@
 <?php
 
-use Application\Core\Router;
-
-
-
-Router::$Route['Application'] = array(
-
+Set::Route('Application', array(
+    
     'Controller' => ':Application:index',
     'Pattern' => '/',
-);
+));

@@ -8,13 +8,13 @@ class Cache extends AppMethods{
     
     public static function CheckForCachedFile($pattern)
     {        
-        $file = str_replace('//', '/', CACHE_FOLDER . $pattern . '/index.html');
+        $file = str_replace('//', '/', \Get::Config('Cache.folder') . $pattern . '/index.html');
         
         if(file_exists($file))
         {            
             $lastModified = filemtime($file);
             
-            if($lastModified + CACHE_EXPIRE < time())
+            if($lastModified + \Get::Config('Cache.expire') < time())
             {
                 return false;
             }
@@ -31,7 +31,7 @@ class Cache extends AppMethods{
     {   
         $folderChunks = explode('/', $pattern);
         
-        $patt = CACHE_FOLDER;
+        $patt = \Get::Config('Cache.folder');
         
         foreach($folderChunks as $f)
         {

@@ -1,7 +1,8 @@
-<?php
+<?php 
 
-DEFINE('CACHE_FOLDER', ROOT . 'Public/Cache/');
-
-DEFINE('CACHE_EXPIRE', 60*60);
-
-DEFINE('CACHE_ENABLE', true);
+Set::Config('Cache', array(
+    
+    'expire' => 60*60,
+    'folder' => ROOT . 'Public/Cache/',
+    'enabled' => false,
+));

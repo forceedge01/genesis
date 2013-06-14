@@ -4,7 +4,7 @@ namespace Application\Interfaces;
 
 
 
-interface Getter{
+interface Manager{
 
     public function GetComponent( $object, $args );
 

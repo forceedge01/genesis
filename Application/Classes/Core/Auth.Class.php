@@ -1,0 +1,142 @@
+<?php
+
+namespace Application\Core;
+
+
+
+class Auth extends Application{
+
+    protected
+            $username,
+            $password,
+            $authTable,
+            $authField;
+
+    public
+            $User;
+
+    public function __construct(){
+
+        $this->username = $_POST[\Get::Config('Auth.Form.EmailFieldName')];
+
+        $this->password = $_POST[\Get::Config('Auth.Form.PasswordFieldName')];
+
+        $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
+
+        $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
+
+    }
+
+    public function forwardToLoginPage()
+    {
+        $this->forwardTo(\Get::Config('Auth.LoginRoute'));
+    }
+
+    public function logout()
+    {
+        if(\Get::Config('Auth.LogoutRoute'))
+        {
+            $this->forwardToController(\Get::Config('Auth.LogoutRoute'));
+        }
+
+        $this->GetCoreObject('Session')->Destroy();
+
+        $this->forwardTo(\Get::Config('Auth.LoggedOutDefaultRoute'));
+    }
+
+    /**
+     *
+     * @return boolean return true on success, false on failure
+     * <br /><br />Use this function to authenticate a user in your login system, will function based on the parameters provided in the Auth config file.
+     */
+    public function authenticateUser(){
+
+        if(\Get::Config('Auth.Validation.Email'))
+        {
+            if(!$this->isValidEmail($this->username))
+            {
+                $this->setError(array('Invalid User' => 'Invalid characters found in email address'));
+                return false;
+            }
+        }
+
+        if($this->authenticate())
+        {
+            $userObject = \Get::Config('Auth.EntityRepository');
+
+            if(class_exists($userObject))
+            {
+                $this->User = new $userObject();
+            }
+            else
+            {
+                $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+            }
+
+            $this->GetCoreObject('Session')->set('email', $this->username);
+
+            $this->GetCoreObject('Session')->set('login_time', time());
+
+            $objectMethod = \Get::Config('Auth.UserPopulateMethod');
+
+            $this->User['login_expires'] = time() + \Get::Config('Auth.Interval');
+
+            $this->User->$objectMethod();
+
+            return true;
+        }
+        else
+        {
+
+            $this->setError(array('Invalid User' => 'Invalid username or password'));
+
+            return false;
+
+        }
+    }
+
+    private function authenticate(){
+
+            $password = $hash = hash(\Get::Config('Auth.PasswordEncryption'), $this->password);
+
+            $db = new Database();
+
+            $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
+
+            if($db->GetNumberOfRows())
+                return true;
+            else
+                return false;
+    }
+
+    /**
+     *
+     * @param string $email - the email you want to validate
+     * @return boolean returns true on success false on failure.
+     */
+    public function isValidEmail($email){
+
+        $pattern = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i';
+
+        if(preg_match($pattern, $email))
+            return true;
+        else
+            return false;
+    }
+
+    public function GetCurrentUser(){
+
+        return $this->User;
+    }
+
+    /**
+     * Checks to see if the user is logged into the application or not.
+     */
+    public function isLoggedIn(){
+
+        if(!empty($_SESSION['login_expires']))
+            return true;
+        else
+            return false;
+    }
+}

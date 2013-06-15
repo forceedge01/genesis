@@ -1,8 +1,8 @@
 <?php
 
 define('HOW_TO_CREATE_A_BUNDLE', '
-<i><h3> === SESSION ENABLED BUT CLASS :: '.AUTH_USER_ENTITY.'() ENTITY COULD NOT BE FOUND === </h3></i>
-                    <p>You have enabled sessions for this application in <b>application/configs/Application.php</b>, but the <b>AUTH_USER_ENTITY</b> defined as <b>\''.AUTH_USER_ENTITY.'\'</b> could not be found. Either disable sessions by setting the SESSION_ENABLED config to false or create a bundle with an Entity using the following methods:
+<i><h3> === SESSION ENABLED BUT CLASS :: '.\Get::Config('Auth.EntityRepository').'() ENTITY COULD NOT BE FOUND === </h3></i>
+                    <p>You have enabled sessions for this application in <b>application/configs/Application.php</b>, but the <b>AUTH_USER_ENTITY</b> defined as <b>\''.\Get::Config('Auth.EntityRepository').'\'</b> could not be found. Either disable sessions by setting the SESSION_ENABLED config to false or create a bundle with an Entity using the following methods:
                         <ol>
                             <li>You can create it running the command line script from <b>Application/Console/index.php</b></p></li>
                             <li>You can create an entity manually following the instructions below.</li>
@@ -10,7 +10,7 @@ define('HOW_TO_CREATE_A_BUNDLE', '
                     <p style="color: red">
                         <br />
                         <i>Application/Configs/Auth.php</i><br /><br />
-                            define (\'AUTH_USER_ENTITY\', \''.AUTH_USER_ENTITY.'\') ;
+                            define (\'AUTH_USER_ENTITY\', \''.\Get::Config('Auth.EntityRepository').'\') ;
                     </p>
                     <p>
                         Please take the time to setup Application/Configs/Auth.php and create bundles for the whole mechanism accordingly. i.e, a user entity bundle and a login bundle.

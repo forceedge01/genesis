@@ -49,6 +49,12 @@ class Database extends Template {
      */
     public function __construct($params = null) {
 
+        if(!\Get::Config('Database.connect'))
+        {
+            echo 'Attempting to connect to database while connection turned off in config.';
+            exit;
+        }
+
         $this->domain = $params['domain'];
 
         $this->host = \Get::Config('Database.host');
@@ -69,7 +75,7 @@ class Database extends Template {
         }
     }
 
-    protected function GetConnection ( )
+    public function GetConnection ( )
     {
         return $this -> activeConnection;
     }
@@ -118,7 +124,7 @@ class Database extends Template {
                         $mail->send($params);
                     }
 
-                    trigger_error($this->activeConnection->error . 'SQL: ' . $sql);
+                    trigger_error($this->activeConnection->error . 'Error in SQL: ' . $sql);
                 }
                 else
                 {
@@ -318,7 +324,7 @@ class Database extends Template {
      */
     private function prepare(array $params = array(), $type = null) {
 
-        $query = function ( ) use  ( $params, $type){
+        $query = function ($query = null) use  ( $params, $type){
 
             foreach ($params as $key => $value) {
 
@@ -581,7 +587,7 @@ class Database extends Template {
      */
     public function GetRecordBy($params) {
 
-        $this->queryInit($params)->Query();
+        $this->queryInit('*', $params)->Query();
 
         return $this;
     }
@@ -592,11 +598,11 @@ class Database extends Template {
      * @param array $params
      * @return mixed Returns just one of matching records
      */
-    public function GetOneRecordBy($id, array $params = array()) {
+    public function GetOneRecordBy(array $params = array()) {
 
         $params['limit'] = 1;
 
-        $this->queryInit($id, $params)->Query();
+        $this->queryInit($params)->Query();
 
         return $this->queryResult[0];
     }
@@ -846,7 +852,7 @@ class Database extends Template {
      */
     public function DeleteRecord($id) {
 
-        $this->Query('delete from `' . DBNAME . '`.`' . $this->queryTable . '` where ' . $this->queryTablePrimaryKey . ' = ' . $id);
+        $this->Query('delete from `' . \Get::Config('Database.name') . '`.`' . $this->queryTable . '` where ' . $this->queryTablePrimaryKey . ' = ' . $id);
 
         return $this;
     }
@@ -890,7 +896,7 @@ class Database extends Template {
         where
             referenced_table_name is not null
         AND
-            TABLE_SCHEMA = '".DBNAME."'
+            TABLE_SCHEMA = '".\Get::Config('Database.name')."'
         AND
             table_name = '$table'");
 
@@ -916,7 +922,7 @@ class Database extends Template {
         if ($table == null)
             $table = $this->queryTable;
 
-        $this->Query("SHOW COLUMNS FROM {$table} FROM " . DBNAME);
+        $this->Query("SHOW COLUMNS FROM {$table} FROM " . \Get::Config('Database.name'));
 
         foreach ($this->queryResult as $columns) {
 

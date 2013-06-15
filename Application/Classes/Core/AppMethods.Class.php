@@ -27,7 +27,7 @@ class AppMethods extends Variable{
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         $randomString = '';
-        
+
         for ($i = 0; $i < $length; $i++) {
 
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
@@ -210,5 +210,15 @@ class AppMethods extends Variable{
     public function ReturnTrue(){
 
         return true;
+    }
+
+    public function GetServerInfo($key)
+    {
+        return $_SERVER[$key];
+    }
+
+    public function GetBrowserAgent()
+    {
+        return $_SERVER['HTTP_USER_AGENT'];
     }
 }

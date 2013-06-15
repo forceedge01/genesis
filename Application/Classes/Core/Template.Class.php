@@ -238,14 +238,17 @@ class Template extends Router {
      */
     protected function setFlash($message) {
 
-        if(is_array($message)){
-            foreach ($message as $me) {
-
+        if(is_array($message))
+        {
+            foreach ($message as $me)
+            {
                 $_SESSION['FlashMessages'][] = $me;
             }
         }
         else
             $_SESSION['FlashMessages'][] = $message;
+
+//        $this->pre($_SESSION);
 
         return $this;
     }
@@ -355,10 +358,10 @@ class Template extends Router {
      */
     public function Flashes() {
 
-        if (!empty($_SESSION['FlashMessages'])) {
-
-            foreach ($_SESSION['FlashMessages'] as $message) {
-
+        if (!empty($_SESSION['FlashMessages']))
+        {
+            foreach ($_SESSION['FlashMessages'] as $message)
+            {
                 echo '<div class="message alert">'  . $message . '</div>';
             }
 

@@ -11,6 +11,6 @@ class ApplicationController extends Application{
 
     public function indexAction(){
 
-        $this->forwardTo('users_login');
+        $this->forwardTo('users_List');
     }
 }

@@ -1,6 +1,6 @@
 <div class="wrapper">
 
-    <div class=""><a href="<?=$this->setRoute('users_Create')?>">Create new users</a></div>
+    Welcome <?=$this->User->email;?>, <a href="<?=$this->setRoute('users_logout')?>">Logout</a>
 
     <div class="widget">
 

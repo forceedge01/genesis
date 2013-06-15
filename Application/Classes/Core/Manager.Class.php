@@ -114,6 +114,15 @@ class Manager extends AppMethods implements ManagerInterface{
 
     /**
      *
+     * @return \Application\Core\Response;
+     */
+    public function GetResponseManager ()
+    {
+        return $this ->GetCoreObject('Response');
+    }
+
+    /**
+     *
      * @return \Application\Components\Variable
      */
     public function GetVariableManager ( )

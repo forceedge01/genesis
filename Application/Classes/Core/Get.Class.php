@@ -66,7 +66,9 @@ class Get{
                 }
                 else
                 {
-                    return 'Key '.$index.' not found.';
+                    echo '<pre>Key '.$index.' not found as defined by <b>'.$key.'</b><br /><br />';
+                    print_r(debug_backtrace(1, 3)[1]);
+                    exit;
                 }
             }
 

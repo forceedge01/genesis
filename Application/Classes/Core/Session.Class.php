@@ -51,6 +51,14 @@ class Session extends Request{
         return $this;
     }
 
+    public function IsSessionKeySet($Name){
+
+        if(isset($_SESSION[$Name]))
+            return $this;
+        else
+            return false;
+    }
+
     public function Get($name){
 
         return $_SESSION[$name];

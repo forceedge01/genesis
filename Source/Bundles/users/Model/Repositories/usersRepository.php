@@ -13,4 +13,3 @@ use \Application\Bundles\users\Interfaces\usersRepositoryInterface;
 final class usersRepository extends ApplicationRepository implements usersRepositoryInterface{
 
 }
-              

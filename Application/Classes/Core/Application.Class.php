@@ -21,41 +21,72 @@ class Application extends Template{
 
         if(\Get::Config('Application.Session.Enabled'))
         {
-            call_user_func_array(array($this->GetCoreObject('Session'), 'Start'), \Get::Config('Application.Session.Secure', 'Application.Session.HttpOnly'));
+            $session = $this->GetCoreObject('Session');
 
-            if(@$_SESSION['login_expires'] != false)
+            call_user_func_array(array($session, 'Start'), \Get::Config('Application.Session.Secure', 'Application.Session.HttpOnly'));
+
+            // Check for login interval expiration and authorized page view
+            if($session->IsSessionKeySet('login_expires'))
             {
-                if(time() > $_SESSION['login_expires'])
+                if(time() > $session->Get('login_expires'))
                 {
-                    $this->GetCoreObject('Session')->Destroy();
+                    $session->Destroy()->Start();
 
-                    $this->setError(array('Logged Out' => 'Your session has expired, please login again.'))->forwardTo(\Get::Config('Auth.LoginRoute'));
+                    $this
+                        ->setError(array('Logged Out' => 'Your session has expired, please login again.'))
+                            ->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
-
             }
             else
             {
-                if(!@isset($_SESSION['login_expires']) AND $this->checkExceptionRoutes() AND !isset($_SESSION['routeError']))
+                if(!$session->IsSessionKeySet('login_expires') AND $this->checkExceptionRoutes() AND !$session->IsSessionKeySet('route_error'))
                 {
-                    $this->setError(array('Access Denied' => 'You need to login to access this page.'))->forwardTo(\Get::Config('Auth.LoginRoute'));
+                    $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+
+                    $this
+                        ->setError(array('Access Denied' => 'You need to login to access this page.'))
+                            ->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
 
             }
 
-            if(\Get::Config('Auth.Entity'))
+            // Populate User object with user defined method
+            if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
             {
-                $userObject = \Get::Config('Auth.EntityRepository');
-                $objectMethod = \Get::Config('Auth.UserPopulateMethod');
+                $userObject = \Get::Config('Auth.Login.EntityRepository');
+                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
+                $object = null;
 
                 if(class_exists($userObject))
-                    $this->User = new $userObject();
-                else{
-
-                    echo HOW_TO_CREATE_A_BUNDLE;
+                {
+                    $object = new $userObject();
+                }
+                else
+                {
+                    echo \Get::Config('Manuals.HowToCreateABundle');
                     exit;
                 }
 
-                $this->User->$objectMethod(@$_SESSION['email']);
+                $this->User = $object->$objectMethod();
+
+                $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
+
+                // Prevent Session Hijacking
+                if(isset($this->User->$tableColumn))
+                {
+                    $browser = $this->GetBrowserAgent();
+
+                    $db = new Database();
+
+                    $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))->GetOneRecordBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn));
+
+                    $login_check = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password->password.$browser);
+
+                    if($login_check != $session->Get('login_string'))
+                    {
+                        $session->Destroy()->Start();
+                    }
+                }
             }
         }
     }

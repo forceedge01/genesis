@@ -2,8 +2,8 @@
 
 Set::Config('AUTH_BYPASS_ROUTES', array(
 
-    \Get::Config('Auth.LoginRoute'),
-    \Get::Config('Auth.LogoutRoute'),
-    \Get::Config('Auth.LoginAuthRoute'),
-    \Get::Config('Auth.LoggedOutDefaultRoute'),
+    \Get::Config('Auth.Login.LoginRoute'),
+    \Get::Config('Auth.Login.LogoutHookRoute'),
+    \Get::Config('Auth.Login.LoginAuthRoute'),
+    \Get::Config('Auth.Login.LoggedOutDefaultRoute'),
 ));

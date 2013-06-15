@@ -12,14 +12,11 @@ class Auth extends Application{
             $authTable,
             $authField;
 
-    public
-            $User;
-
     public function __construct(){
 
-        $this->username = $_POST[\Get::Config('Auth.Form.EmailFieldName')];
+        $this->username = @$_POST[\Get::Config('Auth.Form.EmailFieldName')];
 
-        $this->password = $_POST[\Get::Config('Auth.Form.PasswordFieldName')];
+        $this->password = @$_POST[\Get::Config('Auth.Form.PasswordFieldName')];
 
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
 
@@ -29,19 +26,21 @@ class Auth extends Application{
 
     public function forwardToLoginPage()
     {
-        $this->forwardTo(\Get::Config('Auth.LoginRoute'));
+        $this->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
-    public function logout()
+    public function logout($message = null)
     {
-        if(\Get::Config('Auth.LogoutRoute'))
+        if(\Get::Config('Auth.Login.LogoutHookRoute'))
         {
-            $this->forwardToController(\Get::Config('Auth.LogoutRoute'));
+            $this->forwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
         }
 
-        $this->GetCoreObject('Session')->Destroy();
+        $this->GetCoreObject('Session')->Destroy()->Start();
 
-        $this->forwardTo(\Get::Config('Auth.LoggedOutDefaultRoute'));
+        $this->setFlash($message);
+
+        $this->forwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
     }
 
     /**
@@ -60,53 +59,87 @@ class Auth extends Application{
             }
         }
 
-        if($this->authenticate())
+        if($this->CheckBruteForceLogins())
         {
-            $userObject = \Get::Config('Auth.EntityRepository');
-
-            if(class_exists($userObject))
+            if($this->authenticate())
             {
-                $this->User = new $userObject();
+                $userObject = \Get::Config('Auth.Login.EntityRepository');
+                $object = null;
+
+                if(class_exists($userObject))
+                {
+                    $object = new $userObject();
+                }
+                else
+                {
+                    $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+                }
+
+                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
+
+                $this->User = $object->$objectMethod();
+
+                $session = $this->GetCoreObject('Session');
+
+                $session->set('username', $this->username);
+
+                $session->set('login_time', time());
+
+                $session->set('login_expires', time() + \Get::Config('Auth.Security.Interval'));
+
+                return true;
             }
             else
             {
-                $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+                $this->setError(array('Invalid User' => 'Invalid username or password'));
+
+                return false;
             }
-
-            $this->GetCoreObject('Session')->set('email', $this->username);
-
-            $this->GetCoreObject('Session')->set('login_time', time());
-
-            $objectMethod = \Get::Config('Auth.UserPopulateMethod');
-
-            $this->User['login_expires'] = time() + \Get::Config('Auth.Interval');
-
-            $this->User->$objectMethod();
-
-            return true;
         }
         else
         {
-
-            $this->setError(array('Invalid User' => 'Invalid username or password'));
-
+            $this->setError('Your account has been locked for trying too many times, try again later');
             return false;
-
         }
     }
 
     private function authenticate(){
 
-            $password = $hash = hash(\Get::Config('Auth.PasswordEncryption'), $this->password);
+        $db = new Database();
 
-            $db = new Database();
+        $password = $hash = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->password . \Get::Config('Auth.Security.Salt'));
 
-            $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
+        $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
 
-            if($db->GetNumberOfRows())
-                return true;
-            else
-                return false;
+        if($db->GetNumberOfRows())
+        {
+            $userBrowser = $_SERVER['HTTP_USER_AGENT'];
+
+            $this->GetCoreObject('Session')->Set('login_string', hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser));
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public function generatePassword($length = 10)
+    {
+        return $this->GenerateRandomString($length);
+    }
+
+    public function generatePasswordHash($password)
+    {
+        return hash(\Get::Config('Auth.PasswordEncryption'), $password.\Get::Config('Auth.Security.Salt'));
+    }
+
+    public function forwardToLoggedInPage()
+    {
+        if($this->GetCoreObject('Session')->IsSessionKeySet('AccessedRoute'))
+        {
+            $this->forwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
+        }
+
+        $this->forwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
     }
 
     /**
@@ -138,5 +171,35 @@ class Auth extends Application{
             return true;
         else
             return false;
+    }
+
+    private function CheckBruteForceLogins()
+    {
+        $session = $this->GetCoreObject('Session');
+
+        if($session->IsSessionKeySet('Blocked.'.$this->username))
+        {
+            $timeBlocked = $session->Get('Blocked.'.$this->username);
+
+            if(($timeBlocked + \Get::Config('Auth.Security.BlockedCoolDownPeriod')) < time())
+            {
+                $session->Remove('Blocked.'.$this->username)->Remove('BruteForceAttempt');
+            }
+        }
+
+        if($session->IsSessionKeySet('BruteForceAttempt'))
+        {
+            $session->Set('BruteForceAttempt', ($session->Get('BruteForceAttempt')+1));
+
+            if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.MaxLoginAttempts'))
+            {
+                $session->Set('Blocked.'.$this->username, time());
+                return false;
+            }
+        }
+        else
+            $session->Set('BruteForceAttempt', 0);
+
+        return true;
     }
 }

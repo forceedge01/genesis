@@ -207,8 +207,6 @@ class Router extends Manager{
             $this->lastRoute = $URL;
             $this->routePattern = $URL;
 
-//            unset($_SESSION['routeError']);
-
             return $this->lastRoute;
         }
 
@@ -218,6 +216,9 @@ class Router extends Manager{
             'Pattern' => $this->pattern,
             'Backtrace' => debug_backtrace()
         );
+
+        echo 'Route not found: '.$this->route;
+        exit;
 
         $this->forwardToController('Error_Route_Not_Found', $error);
     }
@@ -266,6 +267,8 @@ class Router extends Manager{
     public function forwardTo($route, $urlQueryString = null){
 
         self::$LastRoute = $this->pattern;
+
+        $this->GetCoreObject('Session')->Set('LastRoute', $route);
 
         $route = $this->getRoute($route);
 
@@ -450,6 +453,8 @@ class Router extends Manager{
 
         if(!empty($pattern))
             $this->pattern = $pattern;
+        else
+            $this->SetPattern ();
 
         foreach(self::$Route as $routeKey => $routes){
 

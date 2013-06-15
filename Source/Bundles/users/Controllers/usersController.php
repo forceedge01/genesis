@@ -33,10 +33,14 @@ final class usersController extends usersBundleController implements usersContro
           {
               $auth = new \Application\Core\Auth();
 
-              $auth->authenticateUser();
-              $this->prex($auth);
-
-              $auth->logout();
+              if($auth->authenticateUser())
+              {
+                  $auth->forwardToLoggedInPage();
+              }
+              else
+              {
+                  $auth->forwardToLoginPage();
+              }
           }
           else
           {
@@ -46,7 +50,8 @@ final class usersController extends usersBundleController implements usersContro
 
       public function logoutAction()
       {
-          $this->forwardTo('users_login');
+          $auth = new \Application\Core\Auth();
+          $auth->logout('You have been logged out.');
       }
 
       public function listAction(){
@@ -59,32 +64,7 @@ final class usersController extends usersBundleController implements usersContro
                 'class' => 'paginate',
                 'title' => 'Dataset',
                 'tbody' => $this->GetRepository("users:users")->GetAll(array('order by' => 'id desc')),
-                'ignoreFields' => array(),
-                'actions' => array(
-
-                    'Edit' => array(
-
-                        'route' => 'users_Edit',
-                        'routeParam' => 'id',
-                        'dataParam' => 'users__id',
-                    ),
-
-                    'View' => array(
-
-                        'route' => 'users_View',
-                        'routeParam' => 'id',
-                        'dataParam' => 'users__id',
-                    ),
-
-                    'Delete' => array(
-
-                        'message' => 'Are you sure you want to delete this record?',
-                        'class' => 'remove',
-                        'route' => 'users_Delete',
-                        'routeParam' => 'id',
-                        'dataParam' => 'users__id',
-                    ),
-                )
+                'ignoreFields' => array('users__password', 'users__salt'),
 
               );
 

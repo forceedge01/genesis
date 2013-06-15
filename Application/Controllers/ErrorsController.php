@@ -15,6 +15,8 @@ class ErrorsController extends Application implements Error{
 
         $params = null;
 
+        $this->prex($route);
+
         $params['PageTitle'] = 'Route Not Found!';
 
         $params['Error'] = array(
@@ -23,7 +25,7 @@ class ErrorsController extends Application implements Error{
             'Pattern' => $pattern,
             'Backtrace' => $backtrace
         );
-        
+
         $this ->GetResponseManager() ->SetNotFound();
 
         $this->Render(':Errors/Route_Not_Found.html.php', $params);
@@ -43,7 +45,7 @@ class ErrorsController extends Application implements Error{
             'Route' => $route,
             'Backtrace' => $backtrace
         );
-        
+
         $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors/Action_Not_Found.html.php', $params);
@@ -63,7 +65,7 @@ class ErrorsController extends Application implements Error{
             'Route' => $route,
             'Backtrace' => $backtrace
         );
-        
+
         $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors/Class_Not_Found.html.php', $params);

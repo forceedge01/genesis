@@ -24,7 +24,7 @@ final class usersController extends usersBundleController implements usersContro
 
       public function loginAction()
       {
-          $this->Render('users:login.html.php');
+          $this->Render('users:login.html.php', 'Login');
       }
 
       public function loginAuthAction()

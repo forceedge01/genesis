@@ -85,7 +85,7 @@ class Auth extends Application{
 
                 $session->set('login_time', time());
 
-                $session->set('login_expires', time() + \Get::Config('Auth.Security.Interval'));
+                $session->set('login_expires', time() + \Get::Config('Auth.Security.SessionInterval'));
 
                 return true;
             }
@@ -198,7 +198,7 @@ class Auth extends Application{
             }
         }
         else
-            $session->Set('BruteForceAttempt', 0);
+            $session->Set('BruteForceAttempt', 1);
 
         return true;
     }

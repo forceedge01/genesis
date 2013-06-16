@@ -45,9 +45,9 @@ class Template extends Router {
      * @param type $template
      * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
      */
-    public function Render($template, array $params = array()) {
+    public function Render($template, $pageTitle, array $params = array()) {
 
-        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
+        $this->title = $pageTitle;
 
         extract($params);
 
@@ -105,8 +105,6 @@ class Template extends Router {
      * @return string $html - returns the html of the page rendered for further process or output.
      */
     public function RenderTemplate($template, array $params = array()) {
-
-        $this->title = (!empty($params['PageTitle']) ? $params['PageTitle'] : $this->GetPageTitle() );
 
         extract($params);
 

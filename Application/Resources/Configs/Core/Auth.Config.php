@@ -18,11 +18,11 @@ Set::Config('Auth', array(
     ),
     'Security' => array(
 
-        'Interval' => 60*60,
+        'SessionInterval' => 60*60, // 1
         'MaxLoginAttempts' => 3,
-        'BlockedCoolDownPeriod' => 10,
-        'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs',
-        'PasswordEncryption' => 'SHA512',
+        'BlockedCoolDownPeriod' => 10, // 1
+        'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs', // 2
+        'PasswordEncryption' => 'SHA512', // 3
     ),
     'Login' => array(
 
@@ -30,8 +30,17 @@ Set::Config('Auth', array(
         'UserPopulateMethod' => 'populateUser',
         'LoginRoute' => 'users_login',
         'LoggedOutDefaultRoute' => 'users_login',
-        'LogoutHookRoute' => false,
+        'LogoutHookRoute' => false, // 4
         'LoginAuthRoute' => 'users_login_auth',
         'LoggedInDefaultRoute' => 'Application',
     ),
 ));
+
+/*
+ * Legend
+ * 
+ * 1. In seconds
+ * 2. Used for encryption of password generation and authentication
+ * 3. Used for password encryption and authentication
+ * 4. User defined method fired before user is logged out
+ */

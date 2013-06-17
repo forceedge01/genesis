@@ -56,22 +56,22 @@ final class usersController extends usersBundleController implements usersContro
 
       public function listAction(){
 
-              $params["PageTitle"] = "All users";
+            $params["PageTitle"] = "All users";
 
-              //Used by the HTMLGenerator in the list view.
-              $params['table'] = array(
+            //Used by the HTMLGenerator in the list view.
+            $params['table'] = array(
 
-                'class' => 'paginate',
-                'title' => 'Dataset',
-                'tbody' => $this->GetRepository("users:users")->GetAll(array('order by' => 'id desc')),
-                'ignoreFields' => array('users__password', 'users__salt'),
+              'class' => 'paginate',
+              'title' => 'Dataset',
+              'tbody' => $this->GetRepository("users:users")->GetAll(array('order by' => 'id desc')),
+              'ignoreFields' => array('users__password', 'users__salt'),
 
-              );
+            );
 
-              //This will be used in the template to generate the above declared table.
-              $this->htmlgen = $this ->GetComponent('HTMLGenerator');
+            //This will be used in the template to generate the above declared table.
+            $this->htmlgen = $this ->GetComponent('HTMLGenerator');
 
-              $this->Render("users:list.html.php", $params);
+            $this->Render("users:list.html.php", $params);
 
       }
 

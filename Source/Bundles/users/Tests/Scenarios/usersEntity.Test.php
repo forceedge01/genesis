@@ -4,9 +4,9 @@ namespace Application\Bundles\users\Tests;
 
 
 
-use Application\Console\BaseTestingRoutine;
+use Application\Console\WebTestCase;
 
-class TestusersEntity extends BaseTestingRoutine
+class TestusersEntity extends WebTestCase
 {
     public function testExampleMethod()
     {   

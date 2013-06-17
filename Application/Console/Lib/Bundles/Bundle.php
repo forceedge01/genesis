@@ -748,9 +748,9 @@ namespace Application\\Bundles\\'.$this->name.'\\Tests;
 
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Controller extends BaseTestingRoutine
+class Test'.$this -> name.'Controller extends WebTestCase
 {
     public function testIndexAction()
     {
@@ -775,9 +775,9 @@ namespace Application\\Bundles\\'.$this->name.'\\Tests;
 
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Entity extends BaseTestingRoutine
+class Test'.$this -> name.'Entity extends WebTestCase
 {
     public function testExampleMethod()
     {
@@ -802,9 +802,9 @@ namespace Application\\Bundles\\'.$this->name.'\\Tests;
 
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Repository extends BaseTestingRoutine
+class Test'.$this -> name.'Repository extends WebTestCase
 {
     public function testExampleMethod()
     {
@@ -814,6 +814,43 @@ class Test'.$this -> name.'Repository extends BaseTestingRoutine
 
         //Checks if the returned value of this function is an integer
         $this ->AssertTrue($method, array(\'case\' => \'array\'));
+    }
+}';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Templates.Test.php', 'w+');
+
+        $initTemplate = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Tests;
+
+
+
+use Application\\Console\\WebTestCase;
+
+class Test'.$this -> name.'Templates extends WebTestCase
+{
+    public function testTemplateList()
+    {
+        $this->AssertTemplate(\''.$this->name.':list.html.php\');
+    }
+    
+    public function testTemplateCreate()
+    {
+        $this->AssertTemplate(\''.$this->name.':create.html.php\');
+    }
+    
+    public function testTemplateEdit()
+    {
+        $this->AssertTemplate(\''.$this->name.':edit.html.php\');
+    }
+    
+    public function testTemplateView()
+    {
+        $this->AssertTemplate(\''.$this->name.':view.html.php\');
     }
 }';
 

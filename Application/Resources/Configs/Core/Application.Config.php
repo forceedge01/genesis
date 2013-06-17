@@ -7,7 +7,7 @@ Set::Config('Application', array(
     'Base_Route_Name' => 'Application',
     'Session' => array(
 
-        'Enabled' => true,
+        'Enabled' => false,
         'Secure' => false,
         'HttpOnly' => true,
     )

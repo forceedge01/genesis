@@ -40,7 +40,7 @@ class Test extends BaseTestingRoutine{
         }
 
         foreach ($this -> testBundles as $bundle)
-        {
+        {            
             $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Entity';
 
             if(class_exists($object))
@@ -56,6 +56,13 @@ class Test extends BaseTestingRoutine{
             }
 
             $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Controller';
+
+            if(class_exists($object))
+            {
+                $this->CallMethods($object);
+            }
+            
+            $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Templates';
 
             if(class_exists($object))
             {

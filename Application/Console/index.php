@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../Resources/Configs/Core/BundleGenerator.php';
+require __DIR__ . '/../Resources/Configs/Core/BundleGenerator.Config.php';
 
 require __DIR__ . '/Console.php';
 

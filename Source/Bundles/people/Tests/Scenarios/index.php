@@ -4,9 +4,9 @@ namespace Application\Bundles\people\Tests;
 
 
 
-use Application\Console\BaseTestingRoutine;
+use Application\Console\WebTestCase;
 
-class TestpeopleController extends BaseTestingRoutine
+class TestpeopleController extends WebTestCase
 {
     public function __construct()
     {
@@ -40,5 +40,10 @@ class TestpeopleController extends BaseTestingRoutine
     public function testRoute()
     {
         $this ->AssertURL('http://localhost/GENESIS/index.php/people/List');
+    }
+    
+    public function testTemplatelist()
+    {
+        $this->AssertTemplate('people:list.html.php', 'input[name=username]|#abc');
     }
 }

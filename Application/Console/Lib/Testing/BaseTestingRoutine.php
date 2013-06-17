@@ -28,7 +28,25 @@ class BaseTestingRoutine extends Console{
             self::$passed = self::$failed = self::$assertions = self::$tests = self::$coverage = self::$method = 0;
     }
     
+    protected static function RegisterAssertion()
+    {
+        self::$assertions += 1;
+    }
+
+    protected static function RegisterPass($message = null)
+    {
+        self::$passed +=1;
+        if($message)
+            echo $message;
+    }
     
+    protected static function RegisterFail($message = null)
+    {
+        self::$failed +=1;
+        if($message)
+            echo $message;
+    }
+
     // Private Methods //
     
     private function checkMethodExistance($method)
@@ -49,57 +67,7 @@ class BaseTestingRoutine extends Console{
             self::$failed += 1;
             echo $failed;
         }
-    }
-    
-    private function setupCURL($url, $data = null)
-    {
-        $tuCurl = curl_init();
-        curl_setopt($tuCurl, CURLOPT_URL, $url);
-        curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($tuCurl, CURLOPT_HEADER, false);
-        curl_setopt($tuCurl, CURLOPT_HTTP200ALIASES, array(200, 301, 302));
-
-//        curl_setopt($tuCurl, CURLOPT_PORT , 443);
-//        curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-//        curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
-//        curl_setopt($tuCurl, CURLOPT_SSLCERT, getcwd() . "/client.pem");
-//        curl_setopt($tuCurl, CURLOPT_SSLKEY, getcwd() . "/keyout.pem");
-//        curl_setopt($tuCurl, CURLOPT_CAINFO, getcwd() . "/ca.pem");
-
-        if($data)
-        {
-            curl_setopt($tuCurl, CURLOPT_POST, 1);
-            curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $data);
-        }
-//        curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, 1);
-//        curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Content-Type: text/xml","SOAPAction: \"/soap/action/query\"", "Content-length: ".strlen($data)));
-
-        $tuData = curl_exec($tuCurl);
-
-        $httpCode = curl_getinfo($tuCurl, CURLINFO_HTTP_CODE);
-
-        if($httpCode == 404) {
-
-            curl_close($tuCurl);
-            return false;
-        }
-
-        else if(!curl_errno($tuCurl))
-        {
-          $info = curl_getinfo($tuCurl);
-          echo $this ->linebreak(1).$this ->green('Took ' . $info['total_time']*1000 . ' ms to send a request to ' . $info['url']) ;
-        }
-        else
-        {
-          echo 'Curl error: ' . curl_error($tuCurl);
-        }
-
-        curl_close($tuCurl);
-
-        return $tuData;
-    }
-    
+    }    
     
     // Protected Methods //
     
@@ -157,9 +125,16 @@ class BaseTestingRoutine extends Console{
     public function AssertNumberOfMethodArguments($method, $numberOfParameters)
     {
         $with = ' with '.__FUNCTION__.'();';
+        
+        if(!$this -> checkMethodExistance($method))
+        {
+            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
+            self::$failed += 1;
+            return false;
+        }
         $passed = $this->green('Test on '. get_class(self::$testClass). '() -> '.$method.' passed'.$with);
         $failed = $this->red('Test on '. get_class(self::$testClass). '() -> '.$method.' failed in class '. get_called_class() . $with).$this->linebreak(1);
-        
+
         $classMethod = new \ReflectionMethod(self::$testClass, $method);
         $argumentCount = count($classMethod->getParameters());
         if($argumentCount == $numberOfParameters)
@@ -175,12 +150,20 @@ class BaseTestingRoutine extends Console{
     public function AssertArgumentParameterForMethod($method, $argument)
     {
         $with = ' with '.__FUNCTION__.'();';
+
+        if(!$this -> checkMethodExistance($method))
+        {
+            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
+            self::$failed += 1;
+            return false;
+        }
+
         $passed = $this->green('Test on '. get_class(self::$testClass). '() -> '.$method .' passed'.$with);
         $failed = $this->red('Test on '. get_class(self::$testClass). '() -> '.$method .' failed in class '. get_called_class() . $with).$this->linebreak(1);
-        
+
         $classMethod = new \ReflectionMethod(self::$testClass, $method);
         $params = $classMethod->getParameters();
-        
+
         $pass = 0;
         foreach($params as $obj)
         {
@@ -189,7 +172,7 @@ class BaseTestingRoutine extends Console{
                 $pass = 1;
             }
         }
-        
+
         if($pass)
         {
             $this ->updateResult(1, $passed, $failed);
@@ -589,31 +572,6 @@ class BaseTestingRoutine extends Console{
             echo $this ->linebreak(1) . $this -> red('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
             self::$failed += 1;
         }
-    }
-
-    public function AssertURL($url, $data = null)
-    {
-        self::$assertions +=1;
-
-        echo $this ->linebreak(2) . $this -> blue('Verifying URL at '.$url) ;
-
-        if($this ->setupCURL($url, $data))
-        {
-            echo $this ->linebreak(1) . $this -> green('URL: '.$url.' verified with AssertURL();') ;
-            self::$passed += 1;
-        }
-        else
-        {
-            echo $this ->linebreak(1) . $this -> red('URL: unable to verify URL: '.$url.' with AssertURL();') ;
-            self::$failed += 1;
-        }
-    }
-
-    public function crawlURL($url, $data = null)
-    {
-        echo $this ->linebreak(2) . $this -> blue('Initiating URL crawl at '.$url) ;
-
-        return $this ->setupCURL($url, urlencode($data)) ;
     }
 
     public function ShowResults() {

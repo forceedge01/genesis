@@ -237,6 +237,12 @@ class Console {
                         $test = New Test('method');
                         $test->RunTests();
                     }
+                    
+                    case 'templates':
+                    {
+                        $test = New Test('template');
+                        $test->RunTests();
+                    }
 
                     case 'all':
                     {

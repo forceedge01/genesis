@@ -12,6 +12,7 @@ function getOptions() {
         'test:routes',
         'test:classes',
         'test:methods',
+        'test:templates',
         'test:all',
         'automate:testing',
         'exit'

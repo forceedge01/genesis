@@ -11,7 +11,7 @@ class CacheTest extends base{
     {
         self::$testClass = new \Application\Core\Cache();
         
-        $method = 'CheckCacheFile';
+        $method = 'CheckForCachedFile';
         
         $this ->AssertNumberOfMethodArguments($method, 1);
         $this ->AssertArgumentParameterForMethod($method, 'pattern');

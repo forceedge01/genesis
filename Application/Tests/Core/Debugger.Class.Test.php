@@ -4,9 +4,9 @@ namespace Application\Core\Tests;
 
 
 
-use Application\Console\BaseTestingRoutine;
+use Application\Console\WebTestCase;
 
-class DebuggerTest extends BaseTestingRoutine {
+class DebuggerTest extends WebTestCase {
 
     public function __construct() {
         

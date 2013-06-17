@@ -5,6 +5,8 @@
     <div class="widget">
 
         <?=$this->htmlgen->Output($table, 'table')?>
+        
+        <input type="text" id="abc" name="username">
 
     </div>
 

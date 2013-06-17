@@ -5,8 +5,8 @@ namespace Application\Console;
 
 
 class Console {
-    
-    private 
+
+    private
             $object;
 
     public function init(){
@@ -108,12 +108,12 @@ class Console {
 
     public function showAllOptions($options) {
 
-        $this->linebreak(2);
+        foreach ($options as $key => $option) {
 
-        foreach ($options as $option) {
+            echo $this->green($key).$this->linebreak(1);
 
-            echo $option;
-            $this->linebreak(1);
+            foreach($option as $opt)
+                echo $this->linebreak(1).' '.$opt;
         }
 
         $this->linebreak(2);
@@ -248,16 +248,16 @@ class Console {
                     {
                         if(!is_object($this -> object))
                             $this -> object = new Test();
-                        
+
                         $this -> object ->RunTests();
-                        
+
                         $this -> object -> clearResults();
                         break;
                     }
                 }
                 break;
             }
-            
+
             case 'automate':
             {
                 switch($args[1])
@@ -268,7 +268,7 @@ class Console {
                         $watcher ->automate();
                     }
                 }
-            }   
+            }
 
             default:
             {
@@ -293,7 +293,7 @@ class Console {
     {
         return "\033[41m".$string."\033[0m";
     }
-    
+
     public function greenOnRed($string)
     {
         return "\033[42m".$string."\033[0m";

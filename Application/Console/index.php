@@ -7,15 +7,21 @@ require __DIR__ . '/Console.php';
 function getOptions() {
 
     return array(
-        'bundle:create',
-        'bundle:delete',
-        'test:routes',
-        'test:classes',
-        'test:methods',
-        'test:templates',
-        'test:all',
-        'automate:testing',
-        'exit'
+        'Bundles' => array(
+            'bundle:create',
+            'bundle:delete',
+        ),
+        'Tests' => array(
+            'test:routes',
+            'test:classes',
+            'test:methods',
+            'test:templates',
+            'test:all',
+        ),
+        'Other' => array(
+            'automate:testing',
+            'exit'
+        )
     );
 }
 

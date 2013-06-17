@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-require_once __DIR__ . '/Resources/Configs/Core/AppDirs.php';
+require_once __DIR__ . '/Resources/Configs/Core/AppDirs.Config.php';
 require_once __DIR__ . '/Loader.php';
 
 class AppKernal extends Loader{
@@ -15,7 +15,7 @@ class AppKernal extends Loader{
             $scriptStartTime;
 
     public static function initialize() {
-        
+
         self::$scriptStartTime = microtime();
 
         self::checkDependencies();
@@ -25,7 +25,7 @@ class AppKernal extends Loader{
         $route = new Router();
 
         if(!$route->forwardRequest()){
-            
+
             header( 'HTTP/1.1 404 Not Found', true, 404 );
 
             echo '<h1>Pattern: ' . $route->GetPattern() . ' Not Found!!</h1>';

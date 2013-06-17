@@ -18,8 +18,8 @@ class Loader{
             $interfaces = array(),
             $files = array(),
             $loadedFiles = array();
-    
-    public static 
+
+    public static
             $appConfiguration = array();
 
     private static function fetchAllBundles(){
@@ -30,7 +30,8 @@ class Loader{
 
             'Welcome',
             'neogenesis',
-            'people'
+            'people',
+            'users'
         );
 
         // Do not edit below this line
@@ -47,21 +48,19 @@ class Loader{
 
         $classes = array(
 
-            'Debugger.php',
-            'Variable.php',
-            'AppMethods.php',
-            'Get.php',
-            'Manager.php',
-            'Request.php',
-            'Response.php',
-            'Router.php',
-            'Cache.php',
-            'Template.php',
-            'Application.php',
-            'Database.php',
-            'Auth.php',
-            'Session.php',
-
+            'Debugger.Class.php',
+            'Variable.Class.php',
+            'AppMethods.Class.php',
+            'Manager.Class.php',
+            'Request.Class.php',
+            'Response.Class.php',
+            'Router.Class.php',
+            'Cache.Class.php',
+            'Template.Class.php',
+            'Application.Class.php',
+            'Database.Class.php',
+            'Auth.Class.php',
+            'Session.Class.php',
         );
 
         foreach($classes as $class){
@@ -104,7 +103,7 @@ class Loader{
                 self::loadFilesFromDir($bundle . BUNDLE_INTERFACES, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
                 self::loadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
-                
+
             }
             else{
 
@@ -124,7 +123,7 @@ class Loader{
     }
 
     protected static function loadFilesFromDir($directory, array $extensions, $subdirectories = true){
-        
+
         if(is_dir($directory)){
 
             $files = scandir($directory);
@@ -137,7 +136,7 @@ class Loader{
                 {
                     self::$loadedFiles[] = $filepath;
                     require $filepath;
-                    
+
                     if(isset($config))
                         self::$appConfiguration = $config;
                 }
@@ -172,8 +171,9 @@ class Loader{
 
     public static function loadFramework()
     {
-        require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.php';
-        
+        require_once APPLICATION_CLASSES_FOLDER . 'Core/Get.Class.php';
+        require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.Class.php';
+
         self::load('configs', APPLICATION_CONFIGS_FOLDER);
 
         self::load('interfaces', APPLICATION_CLASSES_FOLDER . 'Interfaces/');
@@ -208,12 +208,12 @@ class Loader{
 
         return self::$files;
     }
-    
+
     public static function loadClassesAndComponentsTestFiles()
     {
         self::$loadedFiles = array();
         self::loadFilesFromDir(APPLICATION_TESTS_FOLDER, array('php')) ;
-        
+
         return self::$loadedFiles;
     }
 

@@ -101,20 +101,28 @@ class Test extends BaseTestingRoutine{
 
         $obj = new $object();
 
-        echo $this ->linebreak(2).'<=========================================================>';
+        echo $this ->linebreak(2).'<===================================================================>';
 
         echo $this ->linebreak(1).'Running test method: ',$this -> blue($object) , '() in file ' . $this -> blue($f ->getFileName()) , $this->linebreak(1);
 
-        echo '<=========================================================>';
+        echo '<===================================================================>';
 
         foreach($methods as $method)
         {
             self::$tests += 1;
             
-            echo $this->linebreak(2),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';
-            echo $this ->linebreak(1),' -> ', $method, '();';
-            echo $this ->linebreak(1),'< - - - - - - - - - - - - - - - - - - - - - - - - - - - - >';
+            echo $this ->linebreak(1),' -> ', $this->blue($method), '();';
+            
+            ob_end_clean();
+            ob_start();
+            
             $obj -> $method();
+            $content = ob_get_clean();
+            
+            if($content)
+                echo $content;
+            else
+                echo $this->linebreak (1),'    - No tests found';
         }
     }
 

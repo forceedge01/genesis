@@ -99,9 +99,8 @@ class TemplateTestCase extends BaseTestingRoutine{
     
     protected function AssertTemplate($template, $selector = null){
         
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $template.' passed'.$with);
-        $failed = $this->red('Test on '. $template. ($selector ? ' containing '.$selector : '').' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Test on '. $template.' passed');
+        $failed = $this->red(__FUNCTION__ . '(); Test on '. $template. ($selector ? ' containing '.$selector : '').' failed in class '. get_called_class());
         
         $cssSelector = $selector;
         
@@ -117,7 +116,7 @@ class TemplateTestCase extends BaseTestingRoutine{
             {
                 if(!$selector)
                 {
-                    self::RegisterPass($passed . $this->blue(' - File was found.'));
+                    self::RegisterPass($passed, 'File was found');
                 }
                 else
                 {
@@ -125,22 +124,22 @@ class TemplateTestCase extends BaseTestingRoutine{
 
                     if($matches)
                     {
-                        self::RegisterPass ($passed. $this->blue(' -  '.count($matches).' Match(es) found for selector: '.$cssSelector));
+                        self::RegisterPass ($passed, count($matches).' Match(es) found for selector: '.$cssSelector);
                     }
                     else
                     {
-                        self::RegisterFail ($failed . $this->red(' - No matches found for selector '.$cssSelector));
+                        self::RegisterFail ($failed, 'No matches found for selector '.$cssSelector);
                     }
                 }
             }
             else
             {
-                self::RegisterFail ($failed . $this->red(' - Error: File is empty'));
+                self::RegisterFail ($failed, 'Error: File is empty');
             }
         }
         else
         {
-            self::RegisterFail ($failed . $this->red(' - Error: File not found'));
+            self::RegisterFail ($failed, 'Error: File not found');
         }
     }
 }

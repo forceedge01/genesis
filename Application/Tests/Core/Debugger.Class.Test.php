@@ -38,5 +38,7 @@ class DebuggerTest extends WebTestCase {
         ));
 
         $this ->AssertURL('http://localhost/GENESIS/index.php/people');
+        
+        $this ->AssertRedirect('http://localhost/GENESIS/index.php/people/', 'http://localhost/GENESIS/index.php/login/');
     }
 }

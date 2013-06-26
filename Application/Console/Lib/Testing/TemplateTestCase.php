@@ -6,7 +6,8 @@ namespace Application\Console;
 
 class TemplateTestCase extends BaseTestingRoutine{
     
-    private function GetTemplatePath($template){
+    private function GetTemplatePath($template)
+    {
 
         $templateParams = explode(':', $template);
 
@@ -20,18 +21,23 @@ class TemplateTestCase extends BaseTestingRoutine{
         }
     }
     
-    private function CheckForMatches($regex, $content)
+    private function CheckForMatches($regex, $contents)
     {
         $matches = null;
         
-        if(preg_match($regex, $content, $matches))
+        foreach($contents as $column => $content)
         {
-            return count($matches);
+            if(preg_match($regex, $content, $matches, PREG_OFFSET_CAPTURE))
+            {
+                $matches[0]['line'] = $column+1;
+                $match[] = $matches;
+            }
         }
-        else
-        {
-            return 0;
-        }
+        
+        if($match)
+            return $match;
+        
+        return 0;
     }
     
     private function ChunkAndMatchSelector($selector, $content)
@@ -39,7 +45,6 @@ class TemplateTestCase extends BaseTestingRoutine{
         $regex = $this->GenerateRegex($selector);
         
         return $this->CheckForMatches($regex, $content);
-        
     }
     
     private function GenerateRegex($selector)
@@ -48,33 +53,43 @@ class TemplateTestCase extends BaseTestingRoutine{
         {
             $chunks = explode('|', $selector);
             
+            $reg = array();
+            
             foreach($chunks as $chunk)
             {
-                if(strpos($chunk,'['))
+                if(strpos($chunk,'[') !== false)
                 {
                     $selectorChunks = explode('[', $chunk);
                     $equals = explode('=', $selectorChunks[1]);
                     $equals[1] = substr($equals[1], 0, -1);
                 
-                    $sel = "{$selectorChunks[0]}[^>]+{$equals[0]}\\s*=\\s*['\"]{$equals[1]}['\"][^>]*";
+                    $reg[] = "{$selectorChunks[0]}[^>]+{$equals[0]}\\s*=\\s*['\"]{$equals[1]}['\"][^>]*";
                 }
-                else if(strpos($chunk,'#'))
+                else if(strpos($chunk,'#') !== false)
                 {
                     $id = explode('#', $chunk);
-                    $id = '[^<]*'.$id[0]."\\s*=\\s*['\"]".$id[1]."['\"][^>]*";
+                    $reg[] = $id[0]."[^<]*id\\s*=\\s*['\"]".$id[1]."['\"][^>]*";
                 }
-                else if(strpos($chunk,'.'))
+                else if(strpos($chunk,'.') !== false)
                 {
                     $class = explode('.', $chunk);
-                    $class = '[^<]*'.$class[0]."\\s*=\\s*['\"]".$class[1]."['\"][^>]*";
+                    $reg[] = $class[0]."[^<]*class\\s*=\\s*['\"]".$class[1]."['\"][^>]*";
                 }
             }
             
-            return "/<{$sel}{$id}{$class}>/i";
+            $regex = function($regularExpression) use ($reg){
+                
+                foreach($reg as $regex)
+                    $regularExpression .= $regex;
+                
+                return $regularExpression;
+            };
+            
+            return "/<{$regex()}>/i";
         }
         else
         {
-            if(strpos($selector, '['))
+            if(strpos($selector, '[') !== false)
             {
                 $selectorChunks = explode('[', $selector);
                 $equals = explode('=', $selectorChunks[1]);
@@ -82,14 +97,14 @@ class TemplateTestCase extends BaseTestingRoutine{
                 
                 return "/<{$selectorChunks[0]}[^>]+\\s*{$equals[0]}\\s*=\\s*['\"]{$equals[1]}['\"][^>]*>/i";
             }
-            else if(strpos($selector,'#'))
+            else if(strpos($selector,'#') !== false)
             {
                 $selectorChunks = explode('#', $selector);
                 return "/<{$selectorChunks[0]}[^>]+id\\s*=\\s*['\"]{$selectorChunks[1]}['\"][^>]*>/i";
             }
-            else if(strpos($selector, '.'))
+            else if(strpos($selector, '.') !== false)
             {
-                $selectorChunks = explode('#', $selector);
+                $selectorChunks = explode('.', $selector);
                 return "/<{$selectorChunks[0]}[^>]+class\\s*=\\s*['\"]{$selectorChunks[1]}['\"][^>]*>/i";
             }
         }
@@ -97,8 +112,8 @@ class TemplateTestCase extends BaseTestingRoutine{
         return false;
     }
     
-    protected function AssertTemplate($template, $selector = null){
-        
+    protected function AssertTemplate($template, $selector = null)
+    {
         $passed = $this->green(__FUNCTION__ . '(); Test on '. $template.' passed');
         $failed = $this->red(__FUNCTION__ . '(); Test on '. $template. ($selector ? ' containing '.$selector : '').' failed in class '. get_called_class());
         
@@ -110,7 +125,7 @@ class TemplateTestCase extends BaseTestingRoutine{
         
         if(is_file($templatePath))
         {
-            $contents = file_get_contents($templatePath);
+            $contents = file($templatePath);
 
             if($contents)
             {
@@ -124,7 +139,14 @@ class TemplateTestCase extends BaseTestingRoutine{
 
                     if($matches)
                     {
-                        self::RegisterPass ($passed, count($matches).' Match(es) found for selector: '.$cssSelector);
+                        self::RegisterPass ($passed, count($matches).' Match(es) found for selector: '.$cssSelector.', Matches:');
+                        
+                        $index = 1;
+                        foreach($matches as $match)
+                        {
+                            echo $this->linebreak(1),'        - ',$index,'. ',$match[0][0],' on Col: ',$match[0][1],' Line:', $match[0]['line'];
+                            $index ++;
+                        }
                     }
                     else
                     {
@@ -140,6 +162,42 @@ class TemplateTestCase extends BaseTestingRoutine{
         else
         {
             self::RegisterFail ($failed, 'Error: File not found');
+        }
+    }
+    
+    public function AssertTemplateMultiple($template, array $selectors)
+    {
+        foreach($selectors as $selector)
+        {
+            $this->AssertTemplate ($template, $selector);
+        }
+    }
+    
+    public function AssertIsTrue($value)
+    {
+        self::RegisterAssertion();
+        
+        if($value === true)
+        {
+            self::RegisterPass(__FUNCTION__ . '(); Value returned was true');
+        }
+        else
+        {
+            self::RegisterFail(__FUNCTION__ . '(); Value got: '.$value.', Expected: true');
+        }
+    }
+    
+    public function AssertIsFalse($value)
+    {
+        self::RegisterAssertion();
+        
+        if($value === false)
+        {
+            self::RegisterPass(__FUNCTION__ . '(); Value returned was false');
+        }
+        else
+        {
+            self::RegisterFail(__FUNCTION__ . '(); Value got: '.$value.', Expected: false');
         }
     }
 }

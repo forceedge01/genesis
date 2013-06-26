@@ -37,10 +37,8 @@ final class usersController extends usersBundleController implements usersContro
               {
                   $auth->forwardToLoggedInPage();
               }
-              else
-              {
-                  $auth->forwardToLoginPage();
-              }
+              
+              $auth->forwardToLoginPage();
           }
           else
           {

@@ -29,7 +29,7 @@ class Bundle extends Console {
 
         if (mkdir(BUNDLES_FOLDER . $this->name)) {
 
-            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createViews() -> createTests() ->CreateAssets();
+            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests() ->CreateAssets();
         }
 
         echo 'Bundle ' . $this->name . ' has been created successfully!';
@@ -170,6 +170,30 @@ final class ' . $this->name . 'Repository extends ApplicationRepository implemen
               ';
 
         fwrite($handle, $initEntity);
+
+        fclose($handle);
+
+        return $this;
+    }
+    
+    private function createModel(){
+
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/' . $this->name . 'Model.php', 'w+');
+
+        $Model = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Models;
+
+
+
+
+// Model represents the logic of '.$this->name.' table with the application
+    
+final class ' . $this->name . 'Model{
+
+}';
+
+        fwrite($handle, $Model);
 
         fclose($handle);
 

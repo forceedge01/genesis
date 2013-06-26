@@ -4,6 +4,8 @@ Hello, please login
 
     <div> username: <input type="text" name="username"></div>
     <div> password: <input type="password" name="password"></div>
+    
+    <div> username: <input type="text" name="username"></div>
 
     <div> <input type="submit" name="login" value="login"></div>
 </form>

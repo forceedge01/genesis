@@ -243,6 +243,12 @@ class Console {
                         $test = New Test('template');
                         $test->RunTests();
                     }
+                    
+                    case 'models':
+                    {
+                        $test = New Test('model');
+                        $test->RunTests();
+                    }
 
                     case 'all':
                     {

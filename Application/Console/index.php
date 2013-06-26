@@ -16,6 +16,7 @@ function getOptions() {
             'test:classes',
             'test:methods',
             'test:templates',
+            'test:model',
             'test:all',
         ),
         'Other' => array(

@@ -881,6 +881,28 @@ class Test'.$this -> name.'Templates extends WebTestCase
         fwrite($handle, $initTemplate);
 
         fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Model.Test.php', 'w+');
+
+        $initTemplate = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Tests;
+
+
+
+use Application\\Console\\WebTestCase;
+
+class Test'.$this -> name.'Model extends WebTestCase
+{
+    public function testModelMethod()
+    {
+        
+    }
+}';
+
+        fwrite($handle, $initTemplate);
+
+        fclose($handle);
 
         return $this;
     }

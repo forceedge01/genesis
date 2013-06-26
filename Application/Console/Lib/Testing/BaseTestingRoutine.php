@@ -27,14 +27,10 @@ class BaseTestingRoutine extends Console{
         if(self::$passed == null)
             self::$passed = self::$failed = self::$assertions = self::$tests = self::$coverage = self::$method = 0;
     }
-    
-    protected static function RegisterAssertion()
-    {
-        self::$assertions += 1;
-    }
 
     protected static function RegisterPass($message = null, $info = null)
     {
+        self::$assertions += 1;
         self::$passed += 1;
         
         $console = new Console();
@@ -47,6 +43,7 @@ class BaseTestingRoutine extends Console{
     
     protected static function RegisterFail($message = null, $info = null)
     {
+        self::$assertions += 1;
         self::$failed += 1;
         
         $console = new Console();
@@ -371,8 +368,6 @@ class BaseTestingRoutine extends Console{
      */
     public function AssertTrue($method, array $params)
     {
-        self::$assertions +=1;
-
         if(!$this -> checkMethodExistance($method))
         {
             self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
@@ -448,8 +443,6 @@ class BaseTestingRoutine extends Console{
 
     public function AssertFalse($method, array $params)
     {
-        self::$assertions +=1;
-
         if(!$this -> checkMethodExistance($method))
         {
             self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
@@ -531,8 +524,6 @@ class BaseTestingRoutine extends Console{
 
     public function AssertContains($data, $expected)
     {
-        self::$assertions +=1;
-
         if(strpos($data, $expected) >=0 and $data != false)
         {
             self::RegisterPass($this -> green(__FUNCTION__ . '(); Data contains ' . ($expected) . ' passed contains'));
@@ -545,8 +536,6 @@ class BaseTestingRoutine extends Console{
 
     public function AssertEquals($data, $expected)
     {
-        self::$assertions +=1;
-
         if($data === $expected)
         {
             self::RegisterPass($this -> green(__FUNCTION__ . '(); Data: ' . $data . ' is equal to '.$expected));
@@ -583,8 +572,6 @@ class BaseTestingRoutine extends Console{
 
     public function AssertType($data, $type)
     {
-        self::$assertions +=1;
-
         $passed = $this->green(__FUNCTION__ . '(); Test type '.$type.' passed');
         $failed = $this->red(__FUNCTION__ . '(); Test type '.$type.' failed in class '. get_called_class());
 

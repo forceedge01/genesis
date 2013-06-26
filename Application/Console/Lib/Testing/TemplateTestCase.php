@@ -119,8 +119,6 @@ class TemplateTestCase extends BaseTestingRoutine{
         
         $cssSelector = $selector;
         
-        self::RegisterAssertion();
-        
         $templatePath = $this->GetTemplatePath($template);
         
         if(is_file($templatePath))
@@ -175,8 +173,6 @@ class TemplateTestCase extends BaseTestingRoutine{
     
     public function AssertIsTrue($value)
     {
-        self::RegisterAssertion();
-        
         if($value === true)
         {
             self::RegisterPass(__FUNCTION__ . '(); Value returned was true');
@@ -188,9 +184,7 @@ class TemplateTestCase extends BaseTestingRoutine{
     }
     
     public function AssertIsFalse($value)
-    {
-        self::RegisterAssertion();
-        
+    {   
         if($value === false)
         {
             self::RegisterPass(__FUNCTION__ . '(); Value returned was false');

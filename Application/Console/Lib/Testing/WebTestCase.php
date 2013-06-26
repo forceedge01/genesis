@@ -66,8 +66,6 @@ class WebTestCase extends TemplateTestCase{
 
     public function AssertURL($url, $data = null)
     {
-        self::RegisterAssertion();
-        
         $info = $this ->setupCURL($url, $data);
 
         if($info)
@@ -82,8 +80,6 @@ class WebTestCase extends TemplateTestCase{
     
     public function AssertRedirect($url, $redirectUrl)
     {
-        self::RegisterAssertion();
-        
         $info = $this->setupCURL($url, false);
         
         if(strtolower($redirectUrl) == strtolower($info['url']))

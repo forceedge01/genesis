@@ -189,7 +189,7 @@ namespace Application\\Bundles\\'.$this->name.'\\Models;
 
 // Model represents the logic of '.$this->name.' table with the application
     
-final class ' . $this->name . 'Model{
+final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterface{
 
 }';
 
@@ -405,7 +405,30 @@ namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
  * @author Abc <Abc@example.com>
  *
  */
-interface '.$this->name.'Repositoryinterface {
+interface '.$this->name.'RepositoryInterface {
+
+}
+        ';
+
+        fwrite($handle, $initControllerInterface);
+
+        fclose($handle);
+        
+        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'Model.Interface.php', 'w+');
+
+        $initControllerInterface = '<?php
+
+namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+
+
+
+/**
+ *
+ * @group groupName
+ * @author Abc <Abc@example.com>
+ *
+ */
+interface '.$this->name.'ModelInterface {
 
 }
         ';

@@ -13,7 +13,7 @@ class Console {
 
         if (!isset($_SERVER['SERVER_NAME'])) {
 
-            echo $this ->blue('Welcome to Genesis console generator, please choose an option and proceed with the onscreen instructions.') ;
+            echo $this ->blue(' =========>>> Welcome to Genesis console generator, please choose an option and proceed with the onscreen instructions. <<<=========') ;
             $this->linebreak(1);
 
             while (true) {
@@ -241,6 +241,12 @@ class Console {
                     case 'templates':
                     {
                         $test = New Test('template');
+                        $test->RunTests();
+                    }
+                    
+                    case 'models':
+                    {
+                        $test = New Test('model');
                         $test->RunTests();
                     }
 

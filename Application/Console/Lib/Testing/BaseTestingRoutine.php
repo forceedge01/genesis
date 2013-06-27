@@ -27,24 +27,31 @@ class BaseTestingRoutine extends Console{
         if(self::$passed == null)
             self::$passed = self::$failed = self::$assertions = self::$tests = self::$coverage = self::$method = 0;
     }
-    
-    protected static function RegisterAssertion()
+
+    protected static function RegisterPass($message = null, $info = null)
     {
         self::$assertions += 1;
-    }
-
-    protected static function RegisterPass($message = null)
-    {
-        self::$passed +=1;
+        self::$passed += 1;
+        
+        $console = new Console();
+        
         if($message)
-            echo $message;
+            echo $console->linebreak(1), $console->green ('    - '.$message);
+        if($info)
+            echo $console->linebreak(1), '      - ', $console->blue($info);
     }
     
-    protected static function RegisterFail($message = null)
+    protected static function RegisterFail($message = null, $info = null)
     {
-        self::$failed +=1;
+        self::$assertions += 1;
+        self::$failed += 1;
+        
+        $console = new Console();
+        
         if($message)
-            echo $message;
+            echo $console->linebreak(1), $console->red ('    - '.$message);
+        if($info)
+            echo $console->linebreak(1), '      - ', $console->blue($info);
     }
 
     // Private Methods //
@@ -54,20 +61,6 @@ class BaseTestingRoutine extends Console{
         self::$method = $method;
         return method_exists(self::$testClass, $method);
     }
-    
-    private function updateResult($bool, $passed, $failed)
-    {
-        if($bool)
-        {
-            self::$passed += 1;
-            echo $passed;
-        }
-        else
-        {
-            self::$failed += 1;
-            echo $failed;
-        }
-    }    
     
     // Protected Methods //
     
@@ -92,74 +85,66 @@ class BaseTestingRoutine extends Console{
 
     public function AssertGreaterThan($val1, $val2)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test '. $val1. ' > '.$val2.' passed'.$with);
-        $failed = $this->red('Test '. $val1. ' > '.$val2.' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = __FUNCTION__ . '(); '. $val1. ' is greater than '.$val2;
+        $failed = __FUNCTION__ . '(); '. $val1. ' is not greater than '.$val2.', failed in class '. get_called_class();
         
         if($val1 > $val2)
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertLessThan($val1, $val2)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test '. $val1. ' < '.$val2.' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test '. $val1. ' < '.$val2.' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. $val1. ' is less than '.$val2);
+        $failed = $this->red(__FUNCTION__ . '(); '. $val1. ' is not less than '.$val2.', failed in class '. get_called_class());
         
         if($val1 < $val2)
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertNumberOfMethodArguments($method, $numberOfParameters)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        
         if(!$this -> checkMethodExistance($method))
         {
-            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
-            self::$failed += 1;
+            self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
             return false;
         }
-        $passed = $this->green('Test on '. get_class(self::$testClass). '() -> '.$method.' passed'.$with);
-        $failed = $this->red('Test on '. get_class(self::$testClass). '() -> '.$method.' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. get_class(self::$testClass). '() -> '.$method.' has '.$numberOfParameters.' of arguments');
+        $failed = $this->red(__FUNCTION__ . '(); '. get_class(self::$testClass). '() -> '.$method.' does not have '.$numberOfParameters.' of arguments, failed in class '. get_called_class());
 
         $classMethod = new \ReflectionMethod(self::$testClass, $method);
         $argumentCount = count($classMethod->getParameters());
         if($argumentCount == $numberOfParameters)
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertArgumentParameterForMethod($method, $argument)
     {
-        $with = ' with '.__FUNCTION__.'();';
-
         if(!$this -> checkMethodExistance($method))
         {
-            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
-            self::$failed += 1;
+            self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
             return false;
         }
 
-        $passed = $this->green('Test on '. get_class(self::$testClass). '() -> '.$method .' passed'.$with);
-        $failed = $this->red('Test on '. get_class(self::$testClass). '() -> '.$method .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. get_class(self::$testClass). '() -> '.$method .' has an argument named '.$argument);
+        $failed = $this->red(__FUNCTION__ . '(); '. get_class(self::$testClass). '() -> '.$method .' does not have an argument named '.$argument.', failed in class '. get_called_class());
 
         $classMethod = new \ReflectionMethod(self::$testClass, $method);
         $params = $classMethod->getParameters();
@@ -175,203 +160,191 @@ class BaseTestingRoutine extends Console{
 
         if($pass)
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertArrayHasKey($array, $key)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on Array [ '.$key .' ] passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on Array [ '.$key .' ] failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Array has key [ '.$key .' ]');
+        $failed = $this->red(__FUNCTION__ . '(); Array does not contain [ '.$key .' ], failed in class '. get_called_class());
         
         if(array_key_exists($key, $array))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertNotEmpty($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable passed is not empty');
+        $failed = $this->red(__FUNCTION__ . '(); Variable passed is '. $variable .', failed in class '. get_called_class());
         
         if($variable)
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsNumber($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable passed is a number');
+        $failed = $this->red(__FUNCTION__ . '(); Variable '. $variable .' is not a number, failed in class '. get_called_class());
         
         if(is_numeric($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsArray($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable passed is an array');
+        $failed = $this->red(__FUNCTION__ . '(); Variable passed is not an array, failed in class '. get_called_class());
         
         if(is_array($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsObject($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable.' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable passed is an object');
+        $failed = $this->red(__FUNCTION__ . '(); Variable passed '. $variable .' is not an object, failed in class '. get_called_class());
         
         if(is_array($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertClassHasParent($class, $parent)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $class.'() passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $class .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. get_class($class).'() has parent '.$parent);
+        $failed = $this->red(__FUNCTION__ . '(); '. get_class($class) .' does not have a parent class '.$parent.', failed in class '. get_called_class());
         
         if(is_subclass_of($class, $parent))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertClassHasChild($class, $child)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $class .'() passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $class .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. get_class($class) .'() has child class '.$child);
+        $failed = $this->red(__FUNCTION__ . '(); '. get_class($class) .' does not have class, failed in class '. get_called_class());
         
         if(is_subclass_of($child, $class))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertClassHasProperty($class, $property)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $class .'() passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $class .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); '. get_class($class) .'() has property \''.$property.'\'');
+        $failed = $this->red(__FUNCTION__ . '(); '. get_class($class) .'() does not have property \''.$property.'\', failed in class '. get_called_class());
         
         if(property_exists($class, $property))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsFloat($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable '. $variable .' is float');
+        $failed = $this->red(__FUNCTION__ . '(); Variable '. $variable .' is not float, failed in class '. get_called_class());
         
         if(is_float($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsString($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable \''. $variable .'\' is string');
+        $failed = $this->red(__FUNCTION__ . '(); Variable \''. $variable .'\' is not a string, failed in class '. get_called_class());
         
         if(is_string($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsJSON($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable \''. $variable .'\' is JSON object');
+        $failed = $this->red(__FUNCTION__ . '(); Variable \''. $variable .'\' is not a JSON object, failed in class '. get_called_class());
         
         if(json_decode($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
     
     public function AssertIsBoolean($variable)
     {
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test on '. $variable .' passed'.$with).$this->linebreak(1);
-        $failed = $this->red('Test on '. $variable .' failed in class '. get_called_class() . $with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Variable '. $variable .' is a boolean');
+        $failed = $this->red(__FUNCTION__ . '(); Variable '. $variable .' is not a boolean, failed in class '. get_called_class());
         
         if(is_bool($variable))
         {
-            $this ->updateResult(1, $passed, $failed);
+            self::RegisterPass($passed);
         }
         else
         {
-            $this ->updateResult(0, $passed, $failed);
+            self::RegisterFail($failed);
         }
     }
 
@@ -395,19 +368,14 @@ class BaseTestingRoutine extends Console{
      */
     public function AssertTrue($method, array $params)
     {
-        self::$assertions +=1;
-
-        $with = ' with '.__FUNCTION__.'();';
-
         if(!$this -> checkMethodExistance($method))
         {
-            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
-            self::$failed += 1;
+            self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
             return false;
         }
 
-        $passed = $this->green('Test on '. @$params['expected']. ' type '.$params['case'].' passed'.$with);
-        $failed = $this->linebreak(2).$this->red('Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().' run on '.get_class(self::$testClass).'() -> '.$method.'();'.$with);
+        $passed = $this->green(__FUNCTION__ . '(); Test on '. @$params['expected']. ' type '.$params['case'].' passed');
+        $failed = $this->red(__FUNCTION__ . '(); Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().' run on '.get_class(self::$testClass).'() -> '.$method.'();');
 
         ob_start();
 
@@ -431,50 +399,58 @@ class BaseTestingRoutine extends Console{
             {
                 if(is_int(strpos($param, $params['expected'])) and strpos($param, $params['expected'])>=0)
                 {
-                    $pass = 1;
+                    self::RegisterPass($passed);
+                    return true;
                 }
                 else
                 {
-                    $pass = 0;
+                    self::RegisterFail($failed);
+                    return false;
                 }
             }
             else if(strtolower($params['case']) == 'equals')
             {
                 if($param == $params['expected'])
                 {
-                    $pass = 1;
+                    self::RegisterPass($passed);
+                    return true;
                 }
                 else
                 {
-                    $pass = 0;
+                    self::RegisterFail($failed);
+                    return false;
                 }
             }
         }
         else
         {
             $pass = $this->CheckType($param, $params['case']);
+            
+            if($pass)
+            {
+                self::RegisterPass($passed);
+                return true;
+            }
+            else
+            {
+                self::RegisterFail($failed);
+                return false;
+            }
         }
-
-        $this ->updateResult($pass, $passed, $failed);
 
         return $this;
     }
 
     public function AssertFalse($method, array $params)
     {
-        self::$assertions +=1;
-
-        $with = ' with '.__FUNCTION__.'();';
-
         if(!$this -> checkMethodExistance($method))
         {
-            echo $this ->linebreak(2).$this->red( 'Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed' . $with );
-            self::$failed += 1;
+            self::RegisterFail($this->red(__FUNCTION__ . '(); Method ' . $method . ' for object ' . get_class(self::$testClass) . ' was not found, test failed'));
             return false;
         }
 
-        $passed = $this->green('Test on '. @$params['expected']. ' type '.$params['case'].' passed'.$with);
-        $failed = $this->red('Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class().$with).$this->linebreak(1);
+        $passed = $this->green(__FUNCTION__ . '(); Test on '. @$params['expected']. ' type '.$params['case'].' passed');
+        $failed = $this->red(__FUNCTION__ . '(); Test on '. @$params['expected']. ' type '.$params['case'].' failed in class '. get_called_class());
 
         ob_start();
 
@@ -492,22 +468,26 @@ class BaseTestingRoutine extends Console{
             {
                 if(strpos($param, $params['expected']) === false)
                 {
-                    $pass = 1;
+                    self::RegisterPass($passed);
+                    return true;
                 }
                 else
                 {
-                    $pass = 0;
+                    self::RegisterFail($failed);
+                    return false;
                 }
             }
             else if(strtolower($params['case']) == 'equals')
             {
                 if($param != $params['expected'])
                 {
-                    $pass = 1;
+                    self::RegisterPass($passed);
+                    return true;
                 }
                 else
                 {
-                    $pass = 0;
+                    self::RegisterFail($failed);
+                    return false;
                 }
             }
         }
@@ -515,15 +495,15 @@ class BaseTestingRoutine extends Console{
         {
             if($this->CheckType($param, $params['case']))
             {
-                $pass = 0;
+                self::RegisterFail($failed);
+                return false;
             }
             else
             {
-                $pass = 1;
+                self::RegisterPass($passed);
+                return true;
             }
         }
-
-        $this ->updateResult($pass, $passed, $failed);
 
         return $this;
     }
@@ -544,33 +524,25 @@ class BaseTestingRoutine extends Console{
 
     public function AssertContains($data, $expected)
     {
-        self::$assertions +=1;
-
         if(strpos($data, $expected) >=0 and $data != false)
         {
-            echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertContains();') ;
-            self::$passed += 1;
+            self::RegisterPass($this -> green(__FUNCTION__ . '(); Data contains ' . ($expected) . ' passed contains'));
         }
         else
         {
-            echo $this ->linebreak(1) . $this -> red('Data: ' . print_r($expected) . ' failed contains with AssertContains();') ;
-            self::$failed += 1;
+            self::RegisterFail($this -> red(__FUNCTION__ . '(); Data: ' . $expected . ' does not contain '.$expected.' failed contains test in'. get_called_class()));
         }
     }
 
     public function AssertEquals($data, $expected)
     {
-        self::$assertions +=1;
-
         if($data === $expected)
         {
-            echo $this ->linebreak(1) . $this -> green('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
-            self::$passed += 1;
+            self::RegisterPass($this -> green(__FUNCTION__ . '(); Data: ' . $data . ' is equal to '.$expected));
         }
         else
         {
-            echo $this ->linebreak(1) . $this -> red('Data: ' . print_r($expected) . ' passed contains with AssertEquals();') ;
-            self::$failed += 1;
+            self::RegisterFail($this -> red(__FUNCTION__ . '(); Got: ' . $data . ', Expected: '.$expected.', failed equals test in '. get_called_class()));
         }
     }
 
@@ -600,129 +572,86 @@ class BaseTestingRoutine extends Console{
 
     public function AssertType($data, $type)
     {
-        self::$assertions +=1;
+        $passed = $this->green(__FUNCTION__ . '(); Test type '.$type.' passed');
+        $failed = $this->red(__FUNCTION__ . '(); Test type '.$type.' failed in class '. get_called_class());
 
-        $with = ' with '.__FUNCTION__.'();';
-        $passed = $this->green('Test type '.$type.' passed'.$with);
-        $failed = $this->red('Test type '.$type.' failed in class '. get_called_class().$with).$this->linebreak(1);
-
-        $this ->updateResult($this ->CheckType($data, $type), $passed, $failed);
+        if($this ->CheckType($data, $type))
+        {
+            self::RegisterPass($passed);
+            return true;
+        }
+        
+        self::RegisterFail($failed);
+        return false;
     }
 
     private function CheckType($data, $type)
     {
-        if(strtolower($type) == 'integer')
-        {
-            if(is_int($data))
-            {
-                return true;
-            }
-            else
-            {
+        switch(strtolower($type)){
+            
+            case 'integer':
+                
+                if(is_int($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'number')
-        {
-            if(is_numeric($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'number':
+            
+                if(is_int($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'string')
-        {
-            if(!empty($data) AND is_string($data))
-            {
-                return true;
-            }
-            else
-            {
+                
+            case 'string':
+            
+                if(!empty($data) AND is_string($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'json')
-        {
-            if(json_decode($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'json':
+            
+                if(json_decode($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'array')
-        {
-            if(is_array($data) && !empty($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'array':
+            
+                if(is_array($data) && !empty($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'object')
-        {
-            if(is_object($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'object':
+            
+                if(is_object($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'boolean')
-        {
-
-            if($data == false || is_bool($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'boolean':
+            
+                if($data == false || is_bool($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'char')
-        {
-            if(sizeof($data) == 1)
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'char':
+            
+                if(sizeof($data) == 1)
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'float')
-        {
-            if(is_float($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'float':
+            
+                if(is_float($data))
+                    return true;
                 return false;
-            }
-        }
-        else if(strtolower($type) == 'notNull')
-        {
-            if(!is_null($data))
-            {
-                return true;
-            }
-            else
-            {
+            
+            case 'notNull':
+            
+                if(!is_null($data))
+                    return true;
                 return false;
-            }
+                
+            default:
+                return false;
+                
         }
-
-        return false;
     }
 }

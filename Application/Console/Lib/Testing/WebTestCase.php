@@ -15,6 +15,8 @@ class WebTestCase extends TemplateTestCase{
     
     private function setupCURL($url, $data = null)
     {
+        $info = array();
+        
         $tuCurl = curl_init();
         curl_setopt($tuCurl, CURLOPT_URL, $url);
         curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
@@ -50,7 +52,7 @@ class WebTestCase extends TemplateTestCase{
         else if(!curl_errno($tuCurl))
         {
           $info = curl_getinfo($tuCurl);
-          echo $this ->linebreak(1).$this ->green('Took ' . $info['total_time']*1000 . ' ms to send a request to ' . $info['url']) ;
+          $info['message'] = ('Took ' . $info['total_time']*1000 . ' ms and '.$info['redirect_count'].' redirect(s) to send a request to ' . $info['url'] . ', Returned status '.$info['http_code']);
         }
         else
         {
@@ -59,24 +61,37 @@ class WebTestCase extends TemplateTestCase{
 
         curl_close($tuCurl);
 
-        return $tuData;
+        return $info;
     }
 
     public function AssertURL($url, $data = null)
     {
-        self::RegisterAssertion();
+        $info = $this ->setupCURL($url, $data);
 
-        echo $this ->linebreak(2) . $this -> blue('Verifying URL at '.$url) ;
-
-        if($this ->setupCURL($url, $data))
+        if($info)
         {
-            echo $this ->linebreak(1) . $this -> green('URL: '.$url.' verified with AssertURL();') ;
-            self::RegisterPass();
+            self::RegisterPass($this -> green(__FUNCTION__ . '(); '.$url.' verified'), $info['message']);
         }
         else
         {
-            echo $this ->linebreak(1) . $this -> red('URL: unable to verify URL: '.$url.' with AssertURL();') ;
-            self::RegisterFail();
+            self::RegisterFail($this -> red(__FUNCTION__ . '(); unable to verify URL: '.$url));
         }
+    }
+    
+    public function AssertRedirect($url, $redirectUrl)
+    {
+        $info = $this->setupCURL($url, false);
+        
+        if(strtolower($redirectUrl) == strtolower($info['url']))
+        {
+            $message = __FUNCTION__ . '(); Redirect test '.$url.' => '.$redirectUrl.' passed';
+            self::RegisterPass($this->green($message), $info['message']);
+            
+            return true;
+        }
+        
+        self::RegisterFail($this->red(__FUNCTION__ . '(); Redirect test failed, got '.$url.' => '.$info['url'].' Instead of '.$redirectUrl));
+        
+        return false;
     }
 }

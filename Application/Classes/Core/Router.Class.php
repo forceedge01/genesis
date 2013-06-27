@@ -289,7 +289,8 @@ class Router extends Manager{
 
         header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
-        exit;
+        if(@isset($_SERVER['HTTP_HOST']))
+            exit;
     }
 
     /**

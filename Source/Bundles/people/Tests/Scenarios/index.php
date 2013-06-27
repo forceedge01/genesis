@@ -44,6 +44,6 @@ class TestpeopleController extends WebTestCase
     
     public function testTemplatelist()
     {
-        $this->AssertTemplate('people:list.html.php', 'input[name=username]|#abc');
+        $this->AssertTemplate('people:list.html.php', 'input#abc|[name=username]');
     }
 }

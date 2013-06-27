@@ -10,5 +10,19 @@ Set::Config('Application', array(
         'Enabled' => false,
         'Secure' => false,
         'HttpOnly' => true,
-    )
+    ),
+    'Environment' => array(
+
+        'State' => 'development',
+        'UnderDevelopmentPage' => array(
+
+            'State' => true,
+            'Controller' => ':Application:UnderDevelopment',
+            'ExemptIPs' => array(
+
+                '::1',
+            ),
+        )
+
+    ),
 ));

@@ -144,7 +144,7 @@ class AppMethods extends Variable{
 
     public function RefactorUrl($url){
 
-        $chunks = explode('/', $url);
+        $chunks = $this->Variable($url)->RemoveDoubleOccuranceOf(array('/'))->Explode('/')->GetVariableResult();
 
         $array = $chunks;
 
@@ -220,5 +220,39 @@ class AppMethods extends Variable{
     public function GetBrowserAgent()
     {
         return $_SERVER['HTTP_USER_AGENT'];
+    }
+
+    public function LocatePath($key)
+    {
+        $identifier = $this->Variable($key)->Explode('/')->GetArrayIndex(0);
+
+        if($identifier)
+        {
+            // Is bundle
+
+            $path = $this->RefactorUrl(BUNDLES_FOLDER . $key);
+            if(file_exists($path))
+            {
+                return $path;
+            }
+            else
+            {
+                echo '<b>Invalid path, File was not found: ', $path, '</b>';
+            }
+        }
+        else
+        {
+            // is Root folder
+
+            $path = $this->RefactorUrl(APPLICATION_FOLDER . $key);
+            if(file_exists($path))
+            {
+                return $path;
+            }
+            else
+            {
+                echo '<b>Invalid path, File was not found: ', $path, '</b>';
+            }
+        }
     }
 }

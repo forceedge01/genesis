@@ -38,7 +38,7 @@ Set::Config('Auth', array(
 
 /*
  * Legend
- * 
+ *
  * 1. In seconds
  * 2. Used for encryption of password generation and authentication
  * 3. Used for password encryption and authentication

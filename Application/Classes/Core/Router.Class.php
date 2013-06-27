@@ -68,7 +68,21 @@ class Router extends Manager{
 
         $value = array();
 
-        //render the right application controller to render template;
+        if(\Get::Config('Application.Environment.UnderDevelopmentPage.State'))
+        {
+            if(!$this->Variable(getenv('REMOTE_ADDR'))->Has(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
+            {
+                $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
+
+                $objectName = $this->GetControllerNamespace($controllerAction);
+
+                $objectAction = $controllerAction[2] . 'Action';
+
+                $this->callAction($objectName, $objectAction);
+            }
+        }
+
+        // Render the right controller;
         foreach(self::$Route as $key => $value){
 
             $this->funcVariable = null;
@@ -119,7 +133,6 @@ class Router extends Manager{
                         $param = $this->params[$index];
 
                         $this->funcVariable[] = $this->params[$index];
-
                     }
                 }
 
@@ -419,7 +432,7 @@ class Router extends Manager{
 
         $this->SetPattern();
 
-        foreach(\Get::Config('AUTH_BYPASS_ROUTES') as $route){
+        foreach(\Get::Config('AuthBypassRoutes') as $route){
 
             $pattern = $this->getRawRoute($route);
 

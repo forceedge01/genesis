@@ -28,7 +28,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetNotFound();
 
-        $this->Render(':Errors/Route_Not_Found.html.php', $params);
+        $this->Render(':Errors/RouteNotFound.html.php', $params);
     }
 
     public function ActionNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -48,7 +48,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/Action_Not_Found.html.php', $params);
+        $this->Render(':Errors/ActionNotFound.html.php', $params);
     }
 
     public function ClassNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -68,7 +68,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/Class_Not_Found.html.php', $params);
+        $this->Render(':Errors/ClassNotFound.html.php', $params);
     }
 
     public function NotFoundError404Action(){

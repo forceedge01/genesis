@@ -13,6 +13,8 @@
 
     <body>
 
+        <!-- sample comment goes here -->
+
         <?=$this->RenderTemplate(':MainMenu.html.php')?>
 
         <div class="wrapper">

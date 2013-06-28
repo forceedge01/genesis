@@ -339,7 +339,7 @@ class Router extends Manager{
             $this->forwardToController('Action_Not_Found', $error);
         }
 
-        if(\Get::Config('Cache.enabled'))
+        if(\Get::Config('Cache.html.enabled'))
             Cache::CheckForCachedFile($this->GetPattern());
 
         if(count($this->ObjectArguments) != 0)

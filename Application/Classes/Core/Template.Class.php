@@ -8,7 +8,12 @@ class Template extends Router {
 
     private
             $title,
-            $bundle;
+            $bundle,
+            $html;
+
+    protected static
+            $cssFiles = array(),
+            $jsFiles = array();
 
     /**
      *
@@ -64,19 +69,86 @@ class Template extends Router {
         else
             $this->templateNotFound($templateUrl['template']);
 
-        $html = ob_get_clean();
+        $this->html = ob_get_clean();
 
-        if(\Get::Config('Errors.enableHtmlValidation') && !empty($html)){
+        $this->CheckJsCacheOptions();
+        $this->CheckCssCacheOptions();
+        $this->CheckHtmlCacheOptions();
 
-            $this->GetComponent('ValidationEngine')->validateHTML ($html);
+        if(\Get::Config('Cache.html.minify'))
+            $this->html = Cache::Minify ($this->html,'html');
+
+        if(\Get::Config('Errors.enableHtmlValidation') && !empty($this->html)){
+
+            $this->GetComponent('ValidationEngine')->validateHTML ($this->html);
         }
 
-        echo $html;
+        echo $this->html;
 
-        if(\Get::Config('Cache.enabled'))
-            Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $html);
+        if(\Get::Config('Cache.html.enabled'))
+            Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
 
-        unset($html);
+        unset($this->html);
+    }
+
+    private function CheckHtmlCacheOptions()
+    {
+        if(\Get::Config('Cache.html.enabled'))
+        {
+            $html = $this->html;
+
+            if(\Get::Config('Cache.html.minify'))
+                $html = Cache::Minify ($html, 'html');
+
+            if(\Get::Config('Cache.html.compress'))
+                $html = Cache::Compress ($html, 'html');
+
+            $this->html = $html;
+
+            return Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
+        }
+    }
+
+    private function CheckJsCacheOptions()
+    {
+        if(\Get::Config('Cache.javascript.enabled'))
+        {
+            $html = $this->html;
+
+            if(\Get::Config('Cache.javascript.minify'))
+                foreach(self::$jsFiles as $file)
+                    $jsFiles[] = Cache::Minify ($file, 'javascript');
+
+            if(\Get::Config('Cache.javascript.compress'))
+                foreach(self::$jsFiles as $file)
+                    $jsFiles[] = Cache::Compress ($file, 'javascript');
+
+            if(\Get::Config('Cache.javascript.unify'))
+                $html = Cache::Unify ($html, self::$jsFiles);
+
+            return $this->html = $html;
+        }
+    }
+
+    private function CheckCssCacheOptions($html)
+    {
+        if(\Get::Config('Cache.css.enabled'))
+        {
+            $html = $this->html;
+
+            if(\Get::Config('Cache.css.minify'))
+                foreach(self::$cssFiles as $file)
+                    $cssFiles[] = Cache::Minify ($file, 'css');
+
+            if(\Get::Config('Cache.css.compress'))
+                foreach(self::$cssFiles as $file)
+                    $cssFiles[] = Cache::Compress ($file, 'css');
+
+            if(\Get::Config('Cache.css.unify'))
+                $html = Cache::Unify ($html, self::$cssFiles);
+
+            return $this->html = $html;
+        }
     }
 
     /**

@@ -255,4 +255,13 @@ class AppMethods extends Variable{
             }
         }
     }
+
+    public function GetLocation($file)
+    {
+        $chunks = $this->Variable($file)->Explode('/')->GetVariableResult();
+        $file['name'] = end($chunks);
+        $file['path'] = dirname($file);
+
+        return $file;
+    }
 }

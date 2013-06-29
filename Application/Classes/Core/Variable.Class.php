@@ -7,16 +7,16 @@ namespace Application\Core;
  */
 
 class Variable extends Debugger {
-    
+
     private
         $variable;
-    
+
     public function __construct($variable = null) {
-        
+
         $this -> variable = $variable;
         return $this;
     }
-    
+
     public function Variable($var) {
 
         $this->variable = $var;
@@ -226,7 +226,7 @@ class Variable extends Debugger {
 
         return $this;
     }
-    
+
     public function IsEmpty(){
 
         if(empty($this->variable))
@@ -332,33 +332,33 @@ class Variable extends Debugger {
 
         return $this->variable->$property;
     }
-    
+
     public function PropertyEquals ( $property, $equals){
-        
+
         if ( $this -> variable -> $property == $equals)
             return $this;
         else
             return false;
-    }    
-    
+    }
+
     public function IndexEquals ( $index, $equals){
-        
+
         if ( $this -> variable[$index] == $equals)
             return $this;
         else
             return false;
     }
-    
+
     public function PropertyIsNotEqualTo ( $property, $equals){
-        
+
         if ( $this -> variable -> $property != $equals)
             return $this;
         else
             return false;
-    }    
-    
+    }
+
     public function IndexIsNotEqualTo ( $index, $equals){
-        
+
         if ( $this -> variable[$index] != $equals)
             return $this;
         else
@@ -368,6 +368,11 @@ class Variable extends Debugger {
     public function GetArrayIndex($key){
 
         return $this->variable[$key];
+    }
+
+    public function GetLastArrayIndex()
+    {
+        return end($this->variable);
     }
 
     public function CallMethod($method){
@@ -490,5 +495,5 @@ class Variable extends Debugger {
         $this->Replace($list);
         return $this;
     }
-    
+
 }

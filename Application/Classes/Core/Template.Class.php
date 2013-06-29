@@ -11,7 +11,7 @@ class Template extends Router {
             $bundle,
             $html;
 
-    protected static
+    public static
             $cssFiles = array(),
             $jsFiles = array();
 
@@ -75,11 +75,11 @@ class Template extends Router {
         $this->CheckCssCacheOptions();
         $this->CheckHtmlCacheOptions();
 
-        if(\Get::Config('Cache.html.minify'))
-            $this->html = Cache::Minify ($this->html,'html');
+        if(\Get::Config('Cache.html.compress.enabled'))
+            $this->html = Cache::Compress ($this->html, \Get::Config('Cache.html.compress.level'));
 
-        if(\Get::Config('Errors.enableHtmlValidation') && !empty($this->html)){
-
+        if(\Get::Config('Errors.enableHtmlValidation') && !empty($this->html))
+        {
             $this->GetComponent('ValidationEngine')->validateHTML ($this->html);
         }
 
@@ -100,8 +100,8 @@ class Template extends Router {
             if(\Get::Config('Cache.html.minify'))
                 $html = Cache::Minify ($html, 'html');
 
-            if(\Get::Config('Cache.html.compress'))
-                $html = Cache::Compress ($html, 'html');
+            if(\Get::Config('Cache.html.compress.enabled'))
+                $html = Cache::Compress ($html, \Get::Config('Cache.html.compress.level'));
 
             $this->html = $html;
 
@@ -115,39 +115,45 @@ class Template extends Router {
         {
             $html = $this->html;
 
-            if(\Get::Config('Cache.javascript.minify'))
-                foreach(self::$jsFiles as $file)
-                    $jsFiles[] = Cache::Minify ($file, 'javascript');
-
-            if(\Get::Config('Cache.javascript.compress'))
-                foreach(self::$jsFiles as $file)
-                    $jsFiles[] = Cache::Compress ($file, 'javascript');
-
             if(\Get::Config('Cache.javascript.unify'))
                 $html = Cache::Unify ($html, self::$jsFiles);
 
-            return $this->html = $html;
+            if(\Get::Config('Cache.javascript.minify'))
+            {
+                foreach(self::$jsFiles as $file)
+                    Cache::Minify ($file, 'javascript');
+            }
+
+            $this->html = $html;
+
+            return true;
         }
     }
 
-    private function CheckCssCacheOptions($html)
+    private function ReplaceJsFiles($jsFiles)
+    {
+        for($index = 0; $index < count($jsFiles); $index++ )
+            $this->html = str_replace (self::$jsFiles[$index], $jsFiles[$index], $this->html);
+
+        return true;
+    }
+
+    private function CheckCssCacheOptions()
     {
         if(\Get::Config('Cache.css.enabled'))
         {
             $html = $this->html;
 
-            if(\Get::Config('Cache.css.minify'))
-                foreach(self::$cssFiles as $file)
-                    $cssFiles[] = Cache::Minify ($file, 'css');
-
-            if(\Get::Config('Cache.css.compress'))
-                foreach(self::$cssFiles as $file)
-                    $cssFiles[] = Cache::Compress ($file, 'css');
-
             if(\Get::Config('Cache.css.unify'))
                 $html = Cache::Unify ($html, self::$cssFiles);
 
-            return $this->html = $html;
+            if(\Get::Config('Cache.css.minify'))
+                foreach(self::$cssFiles as $file)
+                    Cache::Minify ($file, 'css');
+
+            $this->html = $html;
+
+            return true;
         }
     }
 
@@ -206,12 +212,16 @@ class Template extends Router {
      */
     public function includeCSS($css, $params = null) {
 
-        if($this->associateAssetBundle($css))
-            $css = '<link rel="stylesheet" type="text/css" href="' . $this->bundle[0] . 'CSS/' . $this->bundle[1] . '" ' . $params . ' />';
-        else
-            $css = '<link rel="stylesheet" type="text/css" href="' . CSS_FOLDER . $css . '" ' . $params . ' />';
+        $source = null;
 
-        echo $css;
+        if($this->associateAssetBundle($css))
+            $source =  $this->bundle[0] . 'CSS/' . $this->bundle[1];
+        else
+            $source = CSS_FOLDER . $css;
+
+        self::$cssFiles[] = $source;
+
+        echo "<link rel='stylesheet' type='text/css' href='{$source}' {$params}/>";
     }
 
     /**
@@ -222,12 +232,16 @@ class Template extends Router {
      */
     public function includeJS($js, $params = null) {
 
-        if($this->associateAssetBundle($js))
-            $js = '<script type="text/javascript" src="' . $this->bundle[0] . 'JS/' . $this->bundle[1] . '" ' . $params . '></script>';
-        else
-            $js = '<script type="text/javascript" src="' . JS_FOLDER . $js . '" ' . $params . '></script>';
+        $source = null;
 
-        echo $js;
+        if($this->associateAssetBundle($js))
+            $source =  $this->bundle[0] . 'JS/' . $this->bundle[1];
+        else
+            $source = JS_FOLDER . $js;
+
+        self::$jsFiles[] = $source;
+
+        echo "<script type='text/javascript' src='{$source}' {$params}></script>";
     }
 
     /**
@@ -259,17 +273,15 @@ class Template extends Router {
         $identifier = end($chunks);
 
          if ($identifier == 'js')
-                $asset = JS_FOLDER . '/' . $asset;
+            return JS_FOLDER . '/' . $asset;
 
-            else if ($identifier == 'css')
-                $asset = CSS_FOLDER . 'Assets/CSS/' . $asset;
+        else if ($identifier == 'css')
+            return CSS_FOLDER . 'Assets/CSS/' . $asset;
 
-            else if ($identifier == 'png' || $identifier == 'bmp' || $identifier == 'jpg' || $identifier == 'jpeg' || $identifier == 'gif' || $identifier == 'tiff')
-                $asset = IMAGES_FOLDER . $asset;
-            else
-                $asset = SOURCE_FOLDER . 'Assets/' . $asset;
-
-        return $asset;
+        else if ($identifier == 'png' || $identifier == 'bmp' || $identifier == 'jpg' || $identifier == 'jpeg' || $identifier == 'gif' || $identifier == 'tiff')
+            return IMAGES_FOLDER . $asset;
+        else
+            return SOURCE_FOLDER . 'Assets/' . $asset;
     }
 
     /**

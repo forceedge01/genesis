@@ -133,7 +133,7 @@ Set::Config(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$t
 
         $initEntity = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Entities;
+namespace Bundles\\'.$this->name.'\\Entities;
 
 
 
@@ -154,7 +154,7 @@ final class ' . $this->name . 'Entity extends ApplicationEntity {
 
         $initEntity = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Repositories;
+namespace Bundles\\'.$this->name.'\\Repositories;
 
 
 
@@ -182,7 +182,7 @@ final class ' . $this->name . 'Repository extends ApplicationRepository implemen
 
         $Model = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Models;
+namespace Bundles\\'.$this->name.'\\Models;
 
 
 
@@ -313,7 +313,7 @@ final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterfac
 
         $initControllerInterface = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\'.$this->name.'\\Interfaces;
 
 
 /**
@@ -395,7 +395,7 @@ interface '.$this->name.'ControllerInterface {
 
         $initControllerInterface = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\'.$this->name.'\\Interfaces;
 
 
 
@@ -418,7 +418,7 @@ interface '.$this->name.'RepositoryInterface {
 
         $initControllerInterface = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\'.$this->name.'\\Interfaces;
 
 
 
@@ -448,16 +448,16 @@ interface '.$this->name.'ModelInterface {
 
         $initController = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Controllers;
+namespace Bundles\\'.$this->name.'\\Controllers;
 
 
 
-use \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity;
-use \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository;
+use \\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity;
+use \\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository;
 
 use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
 
-use Application\\Bundles\\' . $this->name . '\\Interfaces\\' . $this->name . 'ControllerInterface;
+use Bundles\\' . $this->name . '\\Interfaces\\' . $this->name . 'ControllerInterface;
 
 
 final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController implements ' . $this->name . 'ControllerInterface{
@@ -657,7 +657,7 @@ final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleContr
 
         $initController = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Controllers;
+namespace Bundles\\'.$this->name.'\\Controllers;
 
 
 
@@ -791,7 +791,7 @@ root{
 
         $initTemplate = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\'.$this->name.'\\Tests;
 
 
 
@@ -801,7 +801,7 @@ class Test'.$this -> name.'Controller extends WebTestCase
 {
     public function testIndexAction()
     {
-        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+        self::$testClass = new \\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
 
         $method = \'IndexAction\';
 
@@ -818,7 +818,7 @@ class Test'.$this -> name.'Controller extends WebTestCase
 
         $initTemplate = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\'.$this->name.'\\Tests;
 
 
 
@@ -828,7 +828,7 @@ class Test'.$this -> name.'Entity extends WebTestCase
 {
     public function testExampleMethod()
     {
-        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
+        self::$testClass = new \\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
 
         $method = \'\';
 
@@ -845,7 +845,7 @@ class Test'.$this -> name.'Entity extends WebTestCase
 
         $initTemplate = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\'.$this->name.'\\Tests;
 
 
 
@@ -855,7 +855,7 @@ class Test'.$this -> name.'Repository extends WebTestCase
 {
     public function testExampleMethod()
     {
-        self::$testClass = new \\Application\\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
+        self::$testClass = new \\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
 
         $method = \'\';
 
@@ -872,7 +872,7 @@ class Test'.$this -> name.'Repository extends WebTestCase
 
         $initTemplate = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\'.$this->name.'\\Tests;
 
 
 
@@ -909,7 +909,7 @@ class Test'.$this -> name.'Templates extends WebTestCase
 
         $initTemplate = '<?php
 
-namespace Application\\Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\'.$this->name.'\\Tests;
 
 
 

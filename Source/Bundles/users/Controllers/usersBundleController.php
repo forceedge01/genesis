@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Controllers;
+namespace Bundles\users\Controllers;
 
 
 

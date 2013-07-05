@@ -1,12 +1,12 @@
 <?php
 
-namespace Application\Bundles\Welcome\Controllers;
+namespace Bundles\Welcome\Controllers;
 
 
 
 use Application\Core\Controllers\ApplicationController;
 
-use Application\Bundles\Welcome\Interfaces\WelcomeControllerInterface;
+use Bundles\Welcome\Interfaces\WelcomeControllerInterface;
 
 
 final class WelcomeController extends ApplicationController implements WelcomeControllerInterface {

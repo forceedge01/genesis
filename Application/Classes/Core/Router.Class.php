@@ -153,7 +153,7 @@ class Router extends Manager{
         if($controllerAction[0] == null)
             $namespace = '\\Application\\Core\\Controllers\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+            $namespace = '\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
 
         return $namespace.$controllerAction[1] . 'Controller';
     }

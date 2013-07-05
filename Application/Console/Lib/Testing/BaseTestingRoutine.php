@@ -584,6 +584,21 @@ class BaseTestingRoutine extends Console{
         self::RegisterFail($failed);
         return false;
     }
+    
+    public function AssertRegularExpression($regex, $content)
+    {
+        $passed = $this->green(__FUNCTION__ . '(); Regex '.$regex.' found in content passed');
+        $failed = $this->red(__FUNCTION__ . '(); Regex '.$regex.' was not found, failed in class '. get_called_class());
+
+        if(preg_match($regex, $content))
+        {
+            self::RegisterPass($passed);
+            return true;
+        }
+        
+        self::RegisterFail($failed);
+        return false;
+    }
 
     private function CheckType($data, $type)
     {

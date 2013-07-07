@@ -10,7 +10,8 @@ Set::Route('users', array(
 Set::Route('users_login', array(
 
       "Controller" => "users:users:login",
-      "Pattern" => "/login/"
+      "Pattern" => "/login/",
+      "Method" => "get"
 ));
 
 Set::Route('users_logout', array(
@@ -22,7 +23,7 @@ Set::Route('users_logout', array(
 Set::Route('users_login_auth', array(
 
       "Controller" => "users:users:loginAuth",
-      "Pattern" => "/loginAuth/"
+      "Pattern" => "/loginAuth/",
 ));
 
 Set::Route('users_List', array(

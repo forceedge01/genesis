@@ -3,7 +3,7 @@
 namespace Application\Bundles\WelcomeBundle\Entities;
 
 
-use Application\Core\Entities\ApplicationEntity;
+use Application\Entities\ApplicationEntity;
 
 
 final class WelcomeEntity extends ApplicationEntity {

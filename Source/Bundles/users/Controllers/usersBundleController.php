@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Bundles\users\Controllers;
+namespace Bundles\users\Controllers;
 
 
 
-use \Application\Core\Controllers\ApplicationController;
+use \Application\Controllers\ApplicationController;
 
 
 // Use this class to inherit methods used in all or some of your users bundle controllers
@@ -13,4 +13,3 @@ use \Application\Core\Controllers\ApplicationController;
 class usersBundleController extends ApplicationController{
 
 }
-              

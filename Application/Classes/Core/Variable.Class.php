@@ -496,4 +496,8 @@ class Variable extends Debugger {
         return $this;
     }
 
+    public function Search($value)
+    {
+        return array_search($value, $this->variable);
+    }
 }

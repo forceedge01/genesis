@@ -15,13 +15,13 @@ Set::Config('Cache', array(
     ),
     'javascript' => array(
 
-        'enabled' => true,
+        'enabled' => false,
         'minify' => false,
         'unify' => true
     ),
     'css' => array(
 
-        'enabled' => true,
+        'enabled' => false,
         'minify' => true,
         'unify' => true
     ),

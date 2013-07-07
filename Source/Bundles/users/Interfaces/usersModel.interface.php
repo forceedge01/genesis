@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Interfaces;
+namespace Bundles\users\Interfaces;
 
 
 

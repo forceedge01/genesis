@@ -1,11 +1,11 @@
 <?php
 
-namespace Application\Core\Models;
+namespace Application\Models;
 
 
 
 use Application\Interfaces\Models\Model;
 
 class ApplicationModel implements Model {
-    
+
 }

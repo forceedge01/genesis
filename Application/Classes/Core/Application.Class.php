@@ -53,21 +53,9 @@ class Application extends Template{
             // Populate User object with user defined method
             if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
             {
-                $userObject = \Get::Config('Auth.Login.EntityRepository');
-                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
-                $object = null;
+                $auth = new Auth();
 
-                if(class_exists($userObject))
-                {
-                    $object = new $userObject();
-                }
-                else
-                {
-                    echo \Get::Config('Manuals.HowToCreateABundle');
-                    exit;
-                }
-
-                $this->User = $object->$objectMethod();
+                $this->User = $auth->GetCurrentUser();
 
                 $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
 
@@ -130,30 +118,12 @@ class Application extends Template{
         }
     }
 
-    /**
-     *
-     * @return \Application\Core\Request Object
-     */
-//    public function Request(){
-//
-//        return $this->Request;
-//    }
-
-    /**
-     *
-     * @return \Application\Core\Router Object
-     */
-//    public function Router(){
-//
-//        return $this->Router;
-//    }
-
-    /**
-     *
-     * @return \Application\Core\Response Object
-     */
-//    public function Response(){
-//
-//        return $this->Response;
-//    }
+    protected function PageUnderDevelopment()
+    {
+        if($this->Variable(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs'))->Search(getenv('REMOTE_ADDR')) === false)
+        {
+            echo 'This page is under development, please check back later';
+            exit;
+        }
+    }
 }

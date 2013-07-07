@@ -73,23 +73,23 @@ class Router extends Manager{
             if(!$this->Variable(getenv('REMOTE_ADDR'))->Has(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
             {
                 $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
-
-                $objectName = $this->GetControllerNamespace($controllerAction);
-
-                $objectAction = $controllerAction[2] . 'Action';
-
-                $this->callAction($objectName, $objectAction);
+                $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
             }
         }
 
+        $this->funcVariable = null;
+
+        // Should the value contain a regular expression?
         // Render the right controller;
-        foreach(self::$Route as $key => $value){
-
-            $this->funcVariable = null;
-
-            $value['Pattern'] = $this->extractVariable($value['Pattern']);
-
-            if($value['Pattern'] == $this->pattern){
+        foreach(self::$Route as $key => $value)
+        {
+            if($this->extractVariable($value['Pattern']) == $this->pattern)
+            {
+                if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
+                {
+                    echo 'Request method denied';
+                    return false;
+                }
 
                 if(isset($value['Inject']))
                     $this->ObjectArguments = $value['Inject'];
@@ -98,11 +98,7 @@ class Router extends Manager{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                $objectName = $this->GetControllerNamespace($controllerAction);
-
-                $objectAction = $controllerAction[2] . 'Action';
-
-                $this->callAction($objectName, $objectAction, $this->funcVariable);
+                $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariable);
             }
         }
 
@@ -118,21 +114,19 @@ class Router extends Manager{
 
         if(strpos($route,'{'))
         {
-            $routeParams = explode('/', $route);
-
             $pattern = '(\\{.*?\\})';
+
+            $routeParams = explode('/', $route);
 
             $index = 0;
 
-            foreach($routeParams as $param){
-
-                if(preg_match($pattern, $param, $variables)){
-
-                    if(isset($this->params[$index])){
-
-                        $param = $this->params[$index];
-
-                        $this->funcVariable[] = $this->params[$index];
+            foreach($routeParams as $param)
+            {
+                if(preg_match($pattern, $param, $variables))
+                {
+                    if(isset($this->params[$index]))
+                    {
+                        $this->funcVariable[] = $param = $this->params[$index];
                     }
                 }
 
@@ -141,19 +135,18 @@ class Router extends Manager{
                 $index++;
             }
 
-            $route = $this->reconstructPattern($routeParams);
+            return implode('/', $routeParams);
         }
 
         return $route;
-
     }
 
     private function GetControllerNamespace($controllerAction){
 
         if($controllerAction[0] == null)
-            $namespace = '\\Application\\Core\\Controllers\\';
+            $namespace = '\\Application\\Controllers\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
+            $namespace = '\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
 
         return $namespace.$controllerAction[1] . 'Controller';
     }
@@ -187,20 +180,9 @@ class Router extends Manager{
      * @param type $route
      * @return string Gets a route and its details
      */
-    protected function getRoute($route){
-
-        try{
-
-            $route =  $this->setRoute($route);
-
-            return $route;
-
-        }
-        catch(Exception $e){
-
-            echo $e->getMessage();
-        }
-
+    protected function getRoute($route)
+    {
+        return  $this->setRoute($route);
     }
 
     /**
@@ -213,9 +195,9 @@ class Router extends Manager{
         if(!empty($route))
             $this->route = $route;
 
-        if(isset(self::$Route[$this->route])){
+        if(\Get::Route($this->route)){
 
-            $URL = self::$Route[$this->route]['Pattern'];
+            $URL = \Get::Route($this->route.'.Pattern');
 
             $this->lastRoute = $URL;
             $this->routePattern = $URL;
@@ -229,9 +211,6 @@ class Router extends Manager{
             'Pattern' => $this->pattern,
             'Backtrace' => debug_backtrace()
         );
-
-        echo 'Route not found: '.$this->route;
-        exit;
 
         $this->forwardToController('Error_Route_Not_Found', $error);
     }
@@ -264,7 +243,7 @@ class Router extends Manager{
 
             'routeName' => $this->route,
             'Pattern' => $this->pattern,
-            'Backtrace' => debug_backtrace()
+            'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
 
         );
 
@@ -300,8 +279,8 @@ class Router extends Manager{
      * @param type $variable<br />
      * Calls an action of a controller.
      */
-    private function callAction($objectName, $objectAction, $variable = null){
-
+    private function callAction($objectName, $objectAction, $variable = null)
+    {
         if(!empty($variable))
             $this->funcVariable = $variable;
 
@@ -314,7 +293,7 @@ class Router extends Manager{
                 'Class' => $objectName,
                 'Controller' => $objectName  . ':' . str_replace('Action','',$objectAction),
                 'Route' => $this->lastRoute,
-                'Backtrace' => debug_backtrace()
+                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
 
             );
 
@@ -332,7 +311,7 @@ class Router extends Manager{
                 'Class' => $objectName,
                 'Controller' => $objectName  . ':' . str_replace('Action','',$objectAction),
                 'Route' => $this->lastRoute,
-                'Backtrace' => debug_backtrace()
+                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
 
             );
 
@@ -371,40 +350,14 @@ class Router extends Manager{
      * <br />
      * Forward control from one controller to another without redirecting.
      */
-    public function forwardToController($route, $variable = null){
-
-        $controller = $this->getController($route);// /Sites/Bla/Bla
+    public function forwardToController($route, $variable = null)
+    {
+        $controller = $this->getController($route);
 
         $controllerAction = explode(':', $controller);
 
-        $objectName = $this->GetControllerNamespace($controllerAction);
+        $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variable);
 
-        $objectAction = $controllerAction[2] . 'Action';
-
-        $this->callAction($objectName, $objectAction, $variable);
-
-    }
-
-    /**
-     *
-     * @param type $params
-     * @return string reconstructs url broken down in extractVariables.
-     */
-    private function reconstructPattern($params){
-
-        $pattern = function($params){
-
-            $qualified = null;
-
-            foreach($params as $param){
-
-                $qualified .= $param . '/';
-            }
-
-            return str_replace('//', '/', $qualified);
-        };
-
-        return $pattern($params);
     }
 
     /**
@@ -487,7 +440,7 @@ class Router extends Manager{
         $error = array(
 
             'Pattern' => $this->pattern,
-            'Backtrace' => debug_backtrace()
+            'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
 
         );
 

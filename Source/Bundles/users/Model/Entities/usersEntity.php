@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Bundles\users\Entities;
+namespace Bundles\users\Entities;
 
 
 
-use \Application\Core\Entities\ApplicationEntity;
+use \Application\Entities\ApplicationEntity;
 
 // This Entity represents users table
 

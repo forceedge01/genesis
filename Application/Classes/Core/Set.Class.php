@@ -2,9 +2,9 @@
 
 
 class Set extends Application\Core\Loader{
-    
+
     /**
-     * 
+     *
      * @param string $key
      * @param mixed $config
      */
@@ -12,9 +12,9 @@ class Set extends Application\Core\Loader{
     {
         Application\Core\Loader::$appConfiguration[$key] = $config;
     }
-    
+
     /**
-     * 
+     *
      * @param string $key
      * @param array $routeParams
      */

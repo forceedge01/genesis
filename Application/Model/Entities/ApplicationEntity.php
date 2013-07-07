@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Core\Entities;
+namespace Application\Entities;
 
 
 use Application\Core\Database;
@@ -39,6 +39,16 @@ class ApplicationEntity extends Database implements Entity{
 
     /**
      *
+     * @param Mixed $id Can be the primary key value or an array of column and values
+     * @return mixed Returns the matching data set from the database.
+     */
+    public function Find(array $params = array()) {
+
+        return $this->RemoveTableNameFromFields($this->Table($this->tableName)->GetOneRecordBy($params));
+    }
+
+    /**
+     *
      * @param string $entity
      * @return object
      */
@@ -68,5 +78,17 @@ class ApplicationEntity extends Database implements Entity{
             $id = $this->id;
 
         return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
+    }
+
+    protected function RemoveTableNameFromFields($object)
+    {
+        $newObj = null;
+        foreach($object as $key => $obj)
+        {
+            $key = str_replace($this->tableName.'__', '', $key);
+            $newObj->$key = $obj;
+        }
+
+        return $newObj;
     }
 }

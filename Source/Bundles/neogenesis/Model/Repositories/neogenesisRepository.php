@@ -4,7 +4,7 @@ namespace Application\Bundles\neogenesis\Repositories;
 
 
 
-use \Application\Core\Repositories\ApplicationRepository;
+use \Application\Repositories\ApplicationRepository;
 
 // This Repository holds methods for neogenesis table
 

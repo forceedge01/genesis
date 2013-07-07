@@ -66,7 +66,7 @@ class Manager extends AppMethods implements ManagerInterface{
     /**
      *
      * @param type $bundleColonEntityName
-     * @return \Application\Core\Repositories\ApplicationRepository returns an entity object
+     * @return \Application\Repositories\ApplicationRepository returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
     public function GetRepository($bundleColonEntityName){
@@ -74,9 +74,9 @@ class Manager extends AppMethods implements ManagerInterface{
         $bundle = explode(':', $bundleColonEntityName);
 
         if($bundle[0] == null)
-            $namespace = '\\Application\\Core\\Repositories\\';
+            $namespace = '\\Application\\Repositories\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Repositories\\';
+            $namespace = '\\Bundles\\'.$bundle[0].'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
 
@@ -86,7 +86,7 @@ class Manager extends AppMethods implements ManagerInterface{
     /**
      *
      * @param type $bundleColonEntityName
-     * @return \Application\Core\Entities\ApplicationEntity returns an entity object
+     * @return \Application\Entities\ApplicationEntity returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
      */
     public function GetEntity($bundleColonEntityName){
@@ -96,7 +96,7 @@ class Manager extends AppMethods implements ManagerInterface{
         if($bundle[0] == null)
             $namespace = '\\Application\\Core\\Entities\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Entities\\';
+            $namespace = '\\Bundles\\'.$bundle[0].'\\Entities\\';
 
         $bundle[1] .= 'Entity';
 

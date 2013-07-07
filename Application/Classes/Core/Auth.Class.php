@@ -24,14 +24,14 @@ class Auth extends Application{
 
     }
 
-    public function forwardToLoginPage()
+    public function forwardToLoginPage($message = null)
     {
-        $this->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->setFlash($message)->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     public function logout($message = null)
     {
-        if(\Get::Config('Auth.Login.LogoutHookRoute'))
+        if(\Get::Config('Auth.Login.BeforeLogoutHookRoute'))
         {
             $this->forwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
         }
@@ -40,15 +40,21 @@ class Auth extends Application{
 
         $this->setFlash($message);
 
+        if(\Get::Config('Auth.Login.AfterLogoutHookRoute'))
+        {
+            $this->forwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
+        }
+
         $this->forwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
     }
 
     /**
      *
+     * @param string $message Invalid username or password flash message
      * @return boolean return true on success, false on failure
      * <br /><br />Use this function to authenticate a user in your login system, will function based on the parameters provided in the Auth config file.
      */
-    public function authenticateUser(){
+    public function authenticateUser($message){
 
         if(\Get::Config('Auth.Validation.Email'))
         {
@@ -77,21 +83,21 @@ class Auth extends Application{
 
                 $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
 
-                $this->User = $object->$objectMethod();
+                if($objectMethod)
+                    $this->User = $object->$objectMethod();
+                else
+                    $this->User = $this->GetEntity('users:users')->Find(array($this->authField => $this->username));
 
                 $session = $this->GetCoreObject('Session');
-
                 $session->set('username', $this->username);
-
                 $session->set('login_time', time());
-
                 $session->set('login_expires', time() + \Get::Config('Auth.Security.SessionInterval'));
 
                 return true;
             }
             else
             {
-                $this->setError(array('Invalid User' => 'Invalid username or password'));
+                $this->setError(array('Invalid User' => $message));
 
                 return false;
             }
@@ -157,11 +163,6 @@ class Auth extends Application{
             return false;
     }
 
-    public function GetCurrentUser(){
-
-        return $this->User;
-    }
-
     /**
      * Checks to see if the user is logged into the application or not.
      */
@@ -201,5 +202,31 @@ class Auth extends Application{
             $session->Set('BruteForceAttempt', 1);
 
         return true;
+    }
+
+    public function GetCurrentUser()
+    {
+        $userObject = \Get::Config('Auth.Login.EntityRepository');
+        $object = null;
+
+        if(class_exists($userObject))
+        {
+            $object = new $userObject();
+        }
+        else
+        {
+            $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+        }
+
+        $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
+
+        if($objectMethod)
+        {
+            return $object->$objectMethod();
+        }
+        else
+        {
+            return $this->GetEntity('users:users')->Find(array($this->authField => $this->GetSessionManager()->Get('username')));
+        }
     }
 }

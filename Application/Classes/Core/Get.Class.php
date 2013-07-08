@@ -15,9 +15,7 @@ class Get{
         
         if($config === null)
         {
-            echo '<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>';
-            print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-            exit;
+            die('<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
         }
         
         return $config;

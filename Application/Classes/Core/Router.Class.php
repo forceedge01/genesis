@@ -87,8 +87,7 @@ class Router extends Manager{
             {
                 if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
                 {
-                    echo 'Request method denied';
-                    return false;
+                    die('Access request denied');
                 }
 
                 if(isset($value['Inject']))
@@ -385,13 +384,15 @@ class Router extends Manager{
     protected function checkExceptionRoutes(){
 
         $this->SetPattern();
-
-        foreach(\Get::Config('AuthBypassRoutes') as $route){
-
-            $pattern = $this->getRawRoute($route);
-
-            if($this->pattern == $pattern)
+        
+        foreach(\Get::Config('Auth.Security.Bypass') as $pattern)
+        {   
+            $pattern = '/'.str_replace('/', '\\/', $pattern).'/';
+            
+            if(preg_match($pattern, $this->pattern))
+            {
                 return false;
+            }
         }
 
         return true;
@@ -405,9 +406,13 @@ class Router extends Manager{
     protected function lastAccessedPage(){
 
         if(isset(self::$LastRoute))
+        {
             return $this->getRouteFromPattern(self::$LastRoute);
+        }
         else
+        {
             return true;
+        }
     }
 
     /**

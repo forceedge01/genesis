@@ -7,15 +7,18 @@ Set::Config('Auth', array(
         'EmailFieldName' => 'username',
         'PasswordFieldName' => 'password',
     ),
+    
     'Validation' => array(
 
         'Email' => true,
     ),
+    
     'DBTable' => array(
 
         'AuthTableName' => 'users',
         'AuthColumnName' => 'email',
     ),
+    
     'Security' => array(
 
         'SessionInterval' => 60*60, // 1
@@ -23,7 +26,14 @@ Set::Config('Auth', array(
         'BlockedCoolDownPeriod' => 10, // 1
         'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs', // 2
         'PasswordEncryption' => 'SHA512', // 3
+        'Bypass' => array(
+
+            '^/$',
+            '^/login/$',
+            '^/loginAuth/$'
+        )
     ),
+    
     'Login' => array(
 
         'EntityRepository' => '\\Bundles\\users\\Entities\\usersEntity',

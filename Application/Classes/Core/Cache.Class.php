@@ -129,6 +129,8 @@ class Cache extends AppMethods{
                 $url = JS_FOLDER . 'Unified/';
                 $tag = '<script type="text/javascript" src="'.$url.'unified.'.$modify.'.'.$extension.'"></script>';
                 Template::$jsFiles = array($url.'unified.'.$modify.'.'.$extension);
+                
+                $html = str_replace('</body>', $tag.'</body>', $html);
 
                 break;
             }
@@ -147,6 +149,8 @@ class Cache extends AppMethods{
                 $url = CSS_FOLDER . 'Unified/';
                 $tag = '<link rel="stylesheet" href="'.$url.'unified.'.$modify.'.'.$extension.'" type="text/css">';
                 Template::$cssFiles = array($url.'unified.'.$modify.'.'.$extension);
+                
+                $html = str_replace('</head>', $tag.'</head>', $html);
 
                 break;
             }
@@ -170,7 +174,7 @@ class Cache extends AppMethods{
             fclose($handle);
         }
 
-        return $html.$tag;
+        return $html;
     }
 
     public static function Compress($content, $level = 3)

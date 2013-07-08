@@ -11,7 +11,7 @@ class ApplicationController extends Application{
 
     public function indexAction(){
 
-        $this->forwardTo('users_List');
+        $this->forwardTo(\Get::Config('Application.LandingPageRoute'));
     }
 
     public function UnderDevelopmentAction()

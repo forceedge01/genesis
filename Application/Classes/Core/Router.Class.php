@@ -195,8 +195,8 @@ class Router extends Manager{
         if(!empty($route))
             $this->route = $route;
 
-        if(\Get::Route($this->route)){
-
+        if(\Get::Route($this->route))
+        {
             $URL = \Get::Route($this->route.'.Pattern');
 
             $this->lastRoute = $URL;
@@ -209,7 +209,7 @@ class Router extends Manager{
 
             'Route' => $this->route,
             'Pattern' => $this->pattern,
-            'Backtrace' => debug_backtrace()
+            'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
         $this->forwardToController('Error_Route_Not_Found', $error);

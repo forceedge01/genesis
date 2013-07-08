@@ -11,7 +11,16 @@ class Get{
     {
         $keys = func_get_args();
 
-        return self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
+        $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
+        
+        if($config === null)
+        {
+            echo '<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>';
+            print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+            exit;
+        }
+        
+        return $config;
     }
 
     /**
@@ -59,8 +68,6 @@ class Get{
                 }
                 else
                 {
-                    echo '<pre>Key '.$index.' not found as defined by <b>'.$key.', called by class: </b><br /><br />';
-                    print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
                     return false;
                 }
             }

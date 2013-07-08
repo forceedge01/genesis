@@ -10,4 +10,7 @@ use Bundles\users\Interfaces\usersModelinterface;
 
 final class usersModel implements usersModelinterface {
 
+    public function __construct(\Bundles\users\Entities\usersEntity $usersEntity) {
+        ;
+    }
 }

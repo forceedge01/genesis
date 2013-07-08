@@ -329,6 +329,83 @@ class Template extends Router {
         else
             echo 'Unable to include asset, file extension missing.';
     }
+    
+    /**
+     * @param array $exclusions names of files to exclude
+     */
+    public function IncludeBundleAssets($bundle, array $exclusions = array(), $css = true, $js = true)
+    {
+        if($css)
+        {
+            $this->IncludeAssetDir($bundle, 'css', ROOT.'Public/Assets/Bundles/'.$bundle.'/CSS', $exclusions);
+        }
+        
+        if($js)
+        {
+            $this->IncludeAssetDir($bundle, 'js', ROOT.'Public/Assets/Bundles/'.$bundle.'/JS', $exclusions);
+        }
+    }
+    
+    private function IncludeAssetDir($bundle, $assetType, $dir, $exclusions = array(), $append = null)
+    {
+        $assets = scandir($dir);
+        foreach($assets as $asset)
+        {
+            if($asset != '.' and $asset != '..' and !$this->Variable($exclusions)->Search($asset))
+            {
+                switch($assetType)
+                {
+                    case 'css':
+                    {
+                        if(is_dir($dir.'/'.$asset))
+                        {
+                            $this->IncludeAssetDir ($bundle,'css', $dir.'/'.$asset, array(), str_replace(ROOT.'Public/Assets/Bundles/'.$bundle.'/CSS/', '', $dir.'/'.$asset));
+                        }
+                        else
+                        {
+                            if($append)
+                                $append .= '/';
+                            
+                            $this->includeCSS ($bundle.':'.$append.$asset);
+                        }
+                        break;
+                    }
+                    
+                    case 'js':
+                    {
+                        if(is_dir($dir.'/'.$asset))
+                            $this->IncludeAssetDir ($bundle, 'js', $dir.'/'.$asset, array(), str_replace(ROOT.'Public/Assets/Bundles/'.$bundle.'/JS/', '', $dir.'/'.$asset));
+                        else
+                        {
+                            if($append)
+                                $append .= '/';
+                            
+                            $this->includeJS ($bundle.':'.$append.$asset);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @param string $bundle
+     */
+    public function IncludeBundleCssAssets($bundle, $exclusions = array())
+    {
+        $this->IncludeBundleAssets($bundle, $exclusions, true, false);
+    }
+    
+    /**
+     * 
+     * @param string $bundle
+     */
+    public function IncludeBundleJsAssets($bundle, $exclusions = array())
+    {
+        $this->IncludeBundleAssets($bundle, $exclusions, false, true);
+    }
 
     /**
      *

@@ -29,6 +29,14 @@ final class usersController extends usersBundleController implements usersContro
 
       public function loginAuthAction()
       {
+          
+          $usersEntity = $this->GetEntity('users:users')->Find(array('username' => 'its.inevitable@hotmail.com'));
+          $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
+          
+          $usersModel->createNew();
+          $usersModel->dosomething();
+          $usersModel->getAllAssociatedData();
+          
           if($this->GetRequestManager()->IsPost('login'))
           {
               $auth = new \Application\Core\Auth();

@@ -1,15 +1,15 @@
 <?php
 
-namespace Application\Bundles\users\Controllers;
+namespace Bundles\users\Controllers;
 
 
 
-use \Application\Bundles\users\Entities\usersEntity;
-use \Application\Bundles\users\Repositories\usersRepository;
+use \Bundles\users\Entities\usersEntity;
+use \Bundles\users\Repositories\usersRepository;
 
 use \Application\Components\HTMLGenerator\HTMLGenerator;
 
-use Application\Bundles\users\Interfaces\usersControllerInterface;
+use \Bundles\users\Interfaces\usersControllerInterface;
 
 
 final class usersController extends usersBundleController implements usersControllerInterface{
@@ -33,11 +33,11 @@ final class usersController extends usersBundleController implements usersContro
           {
               $auth = new \Application\Core\Auth();
 
-              if($auth->authenticateUser())
+              if($auth->authenticateUser('Invalid username or password entered'))
               {
                   $auth->forwardToLoggedInPage();
               }
-              
+
               $auth->forwardToLoginPage();
           }
           else
@@ -52,9 +52,9 @@ final class usersController extends usersBundleController implements usersContro
           $auth->logout('You have been logged out.');
       }
 
-      public function listAction(){
-
-            $params["PageTitle"] = "All users";
+      public function listAction()
+      {
+          $params["PageTitle"] = "All users";
 
             //Used by the HTMLGenerator in the list view.
             $params['table'] = array(
@@ -69,7 +69,7 @@ final class usersController extends usersBundleController implements usersContro
             //This will be used in the template to generate the above declared table.
             $this->htmlgen = $this ->GetComponent('HTMLGenerator');
 
-            $this->Render("users:list.html.php", $params);
+            $this->Render("users:list.html.php", 'All users', $params);
 
       }
 
@@ -95,7 +95,7 @@ final class usersController extends usersBundleController implements usersContro
 
               $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
 
-              $this->Render("users:view.html.php", $params);
+              $this->Render("users:view.html.php", "View User {$id}", $params);
 
       }
 

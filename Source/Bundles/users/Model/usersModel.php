@@ -1,13 +1,13 @@
 <?php
 
-namespace Application\Bundles\users\Models;
+namespace Bundles\users\Models;
 
 
 
-use Application\Bundles\users\Interfaces\usersModelinterface;
+use Bundles\users\Interfaces\usersModelinterface;
 
 // Model represents the logic of users table with the application
-    
+
 final class usersModel implements usersModelinterface {
 
 }

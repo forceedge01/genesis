@@ -30,7 +30,6 @@ class Loader{
 
             'Welcome',
             'neogenesis',
-            'people',
             'users'
         );
 

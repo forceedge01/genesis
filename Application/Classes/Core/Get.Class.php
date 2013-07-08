@@ -11,36 +11,29 @@ class Get{
     {
         $keys = func_get_args();
 
-        $configs = array();
-
-        foreach($keys as $key)
-        {
-            $configs[$key] = self::GetGlobal(Application\Core\Loader::$appConfiguration, $key);
-        }
-
-        if(count($configs) == 1)
-        {
-            reset($configs);
-            return $configs[key($configs)];
-        }
-        else
-            return $configs;
+        return self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
     }
 
     /**
      *
      * @param mixed any number of params
      * @return Route variable
+     * @example Route('Application','Welcome');
      */
     public static function Route()
     {
         $keys = func_get_args();
 
+        return self::ProcessGet(Application\Core\Router::$Route, $keys);
+    }
+
+    private static function ProcessGet($globalVariable, $keys)
+    {
         $configs = array();
 
         foreach($keys as $key)
         {
-            $configs[$key] = self::GetGlobal(Application\Core\Router::$Route, $key);
+            $configs[$key] = self::GetGlobal($globalVariable, $key);
         }
 
         if(count($configs) == 1)
@@ -66,9 +59,9 @@ class Get{
                 }
                 else
                 {
-                    echo '<pre>Key '.$index.' not found as defined by <b>'.$key.'</b><br /><br />';
-                    print_r(debug_backtrace(1, 3)[1]);
-                    exit;
+                    echo '<pre>Key '.$index.' not found as defined by <b>'.$key.', called by class: </b><br /><br />';
+                    print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+                    return false;
                 }
             }
 

@@ -4,7 +4,7 @@ namespace Bundles\Welcome\Controllers;
 
 
 
-use Application\Core\Controllers\ApplicationController;
+use Application\Controllers\ApplicationController;
 
 use Bundles\Welcome\Interfaces\WelcomeControllerInterface;
 
@@ -16,7 +16,7 @@ final class WelcomeController extends ApplicationController implements WelcomeCo
 
     public function indexAction() {
 
-        $params['PageTitle'] = 'Welcome to ' . APPLICATION_NAME;
+        $params['PageTitle'] = 'Welcome to ' . \Get::Config('Application.Name');
 
         $params['table'] = array(
 
@@ -149,6 +149,11 @@ final class WelcomeController extends ApplicationController implements WelcomeCo
         $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
         $this->Render('Welcome:index.html.php', $params);
+    }
+
+    public function viewAction($id)
+    {
+        echo $id;
     }
 
 }

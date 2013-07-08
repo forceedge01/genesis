@@ -136,7 +136,7 @@ class Cache extends AppMethods{
             {
                 foreach($files as $file)
                 {
-                    $html = preg_replace('#<link .*'.$file.'.*>#i', '', $html);
+                    $html = preg_replace('#<link .*'.$file.'(?!>).*/>#i', '', $html);
                     $file = str_replace(HOST, ROOT, $file);
                     $modify .= filectime(str_replace(HOST, ROOT, $file));
                     $aggregatedContents .= file_get_contents ($file);

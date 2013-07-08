@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Core\Repositories;
+namespace Application\Repositories;
 
 
 
@@ -33,13 +33,13 @@ class ApplicationRepository extends Database implements Repository {
 
         $entity = $this
                 ->Table($this->tableName);
-                
+
         if(count($tables))
             return $entity
                 ->AggregateOnly($tables)
                 ->GetRecordBy($id)
                     ->GetResultSet();
-        
+
         return $entity
                 ->GetRecordBy($id)
                     ->GetResultSet();
@@ -69,13 +69,13 @@ class ApplicationRepository extends Database implements Repository {
 
         $entity = $this
                 ->Table($this->tableName, $this->tableColumns);
-        
+
         if(count($tables))
-            return $entity 
+            return $entity
                 ->AggregateOnly($tables)
                 ->GetRecords($params)
                     ->GetResultSet() ;
-        
+
         return $entity
                 ->GetRecords($params)
                     ->GetResultSet() ;
@@ -90,13 +90,13 @@ class ApplicationRepository extends Database implements Repository {
 
         $entity = $this
                 ->Table($this->tableName, $this->tableColumns);
-        
+
         if(count($tables))
-            return $entity 
+            return $entity
                 ->AggregateOnly($tables)
                 ->GetRecords($params)
                     ->GetResultSet() ;
-        
+
         return $entity
                 ->GetRecords($params)
                     ->GetResultSet() ;
@@ -113,7 +113,7 @@ class ApplicationRepository extends Database implements Repository {
 
         return $this
                 ->Table($this->tableName, $this->tableColumns)
-                ->Count($column, $predicament) 
+                ->Count($column, $predicament)
                 ->Execute()
                     ->GetResultSet();
     }

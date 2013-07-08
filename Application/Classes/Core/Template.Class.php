@@ -55,6 +55,7 @@ class Template extends Router {
         $this->title = $pageTitle;
 
         extract($params);
+        unset($params);
 
         $templateUrl = $this->GetTemplate($template);
 
@@ -178,13 +179,18 @@ class Template extends Router {
 
     /**
      *
-     * @param type $template
-     * @param type $params
+     * @param string $template
+     * @param mixed $params
+     * @param boolean $extract Extract variables and unset the params array - defaults to true
      * @return string $html - returns the html of the page rendered for further process or output.
      */
-    public function RenderTemplate($template, array $params = array()) {
-
-        extract($params);
+    public function RenderTemplate($template, $params = array(), $extract = true)
+    {
+        if($extract)
+        {
+            extract($params);
+            unset($params);
+        }
 
         $template = $this->GetTemplate($template);
 
@@ -202,6 +208,17 @@ class Template extends Router {
         $html = ob_get_clean();
 
         return $html;
+    }
+
+    /**
+     *
+     * @param string $template
+     * @param mixed $params
+     * @return html Will include a template and pass variables without extracting them, prefereable use within templates to include other templates
+     */
+    public function IncludeTemplate($template, $params)
+    {
+        return $this->RenderTemplate($template, $params, false);
     }
 
     /**
@@ -320,17 +337,20 @@ class Template extends Router {
      */
     protected function setFlash($message) {
 
-        if(is_array($message))
+        if(!empty($message))
         {
-            foreach ($message as $me)
+            if(is_array($message))
             {
-                $_SESSION['FlashMessages'][] = $me;
+                foreach ($message as $me)
+                {
+                    $_SESSION['FlashMessages'][] = $me;
+                }
+            }
+            else
+            {
+                $_SESSION['FlashMessages'][] = $message;
             }
         }
-        else
-            $_SESSION['FlashMessages'][] = $message;
-
-//        $this->pre($_SESSION);
 
         return $this;
     }
@@ -342,14 +362,20 @@ class Template extends Router {
      */
     protected function setError($message) {
 
-        if(is_array($message)){
-            foreach ($message as $error) {
-
-                $_SESSION['Errors'][] = $error;
+        if($message)
+        {
+            if(is_array($message))
+            {
+                foreach ($message as $error)
+                {
+                    $_SESSION['Errors'][] = $error;
+                }
+            }
+            else
+            {
+                $_SESSION['Errors'][] = $message;
             }
         }
-        else
-            $_SESSION['Errors'][] = $message;
 
         return $this;
     }

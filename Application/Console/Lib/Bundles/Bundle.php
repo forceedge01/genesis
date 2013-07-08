@@ -175,7 +175,7 @@ final class ' . $this->name . 'Repository extends ApplicationRepository implemen
 
         return $this;
     }
-    
+
     private function createModel(){
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/' . $this->name . 'Model.php', 'w+');
@@ -188,7 +188,7 @@ namespace Bundles\\'.$this->name.'\\Models;
 
 
 // Model represents the logic of '.$this->name.' table with the application
-    
+
 final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterface{
 
 }';
@@ -208,9 +208,8 @@ final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterfac
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Header.html.php', 'w+');
 
-        $initTemplate = '<?=$this->RenderTemplate(":Header.html.php", $params)?>
+        $initTemplate = '<?=$this->IncludeTemplate(":Header.html.php", $params)?>
 
-<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 <?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
 
 ';
@@ -221,9 +220,9 @@ final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterfac
 
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
 
-        $initTemplate = ' <?=$this->RenderTemplate(":Footer.html.php", $params)?>
+        $initTemplate = '<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
 
-<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
+<?=$this->IncludeTemplate(":Footer.html.php", $params)?>
 ';
 
         fwrite($handle, $initTemplate);
@@ -413,7 +412,7 @@ interface '.$this->name.'RepositoryInterface {
         fwrite($handle, $initControllerInterface);
 
         fclose($handle);
-        
+
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'Model.Interface.php', 'w+');
 
         $initControllerInterface = '<?php
@@ -867,7 +866,7 @@ class Test'.$this -> name.'Repository extends WebTestCase
         fwrite($handle, $initTemplate);
 
         fclose($handle);
-        
+
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Templates.Test.php', 'w+');
 
         $initTemplate = '<?php
@@ -884,17 +883,17 @@ class Test'.$this -> name.'Templates extends WebTestCase
     {
         $this->AssertTemplate(\''.$this->name.':list.html.php\');
     }
-    
+
     public function testTemplateCreate()
     {
         $this->AssertTemplate(\''.$this->name.':create.html.php\');
     }
-    
+
     public function testTemplateEdit()
     {
         $this->AssertTemplate(\''.$this->name.':edit.html.php\');
     }
-    
+
     public function testTemplateView()
     {
         $this->AssertTemplate(\''.$this->name.':view.html.php\');
@@ -904,7 +903,7 @@ class Test'.$this -> name.'Templates extends WebTestCase
         fwrite($handle, $initTemplate);
 
         fclose($handle);
-        
+
         $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Model.Test.php', 'w+');
 
         $initTemplate = '<?php
@@ -919,7 +918,7 @@ class Test'.$this -> name.'Model extends WebTestCase
 {
     public function testModelMethod()
     {
-        
+
     }
 }';
 

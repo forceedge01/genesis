@@ -1,11 +1,11 @@
 <?php
 
-namespace Application\Bundles\neogenesis\Controllers;
+namespace Bundles\neogenesis\Controllers;
 
 
 
-use \Application\Bundles\neogenesis\Entities\neogenesisEntity;
-use \Application\Bundles\neogenesis\Repositories\neogenesisRepository;
+use \Bundles\neogenesis\Entities\neogenesisEntity;
+use \Bundles\neogenesis\Repositories\neogenesisRepository;
 
 use \Application\Components\HTMLGenerator\HTMLGenerator;
 
@@ -197,4 +197,3 @@ class neogenesisController extends neogenesisBundleController{
             }
       }
 }
-              

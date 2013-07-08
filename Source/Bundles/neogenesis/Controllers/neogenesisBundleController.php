@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Bundles\neogenesis\Controllers;
+namespace Bundles\neogenesis\Controllers;
 
 
 
-use \Application\Core\Controllers\ApplicationController;
+use \Application\Controllers\ApplicationController;
 
 
 // Use this class to inherit methods used in all or some of your controllers
@@ -13,4 +13,3 @@ use \Application\Core\Controllers\ApplicationController;
 class neogenesisBundleController extends ApplicationController{
 
 }
-              

@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Core\Controllers;
+namespace Application\Controllers;
 
 
 
@@ -17,5 +17,6 @@ class ApplicationController extends Application{
     public function UnderDevelopmentAction()
     {
         $this->Render(':SiteUnderDevelopment.html.php', 'Site Under Development');
+        exit;
     }
 }

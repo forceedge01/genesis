@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Interfaces;
+namespace Bundles\users\Interfaces;
 
 
 
@@ -13,4 +13,3 @@ namespace Application\Bundles\users\Interfaces;
 interface usersRepositoryinterface {
 
 }
-        

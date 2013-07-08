@@ -16,7 +16,7 @@ Set::Config('Application', array(
         'State' => 'development',
         'UnderDevelopmentPage' => array(
 
-            'State' => true,
+            'State' => false,
             'Controller' => ':Application:UnderDevelopment',
             'ExemptIPs' => array(
 

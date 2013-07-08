@@ -2,5 +2,6 @@
 
 jQuery(document).ready(function(){
 
+    $('.paginate').gear('paginate');
 });
 

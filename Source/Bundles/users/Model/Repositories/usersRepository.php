@@ -1,12 +1,12 @@
 <?php
 
-namespace Application\Bundles\users\Repositories;
+namespace Bundles\users\Repositories;
 
 
 
-use \Application\Core\Repositories\ApplicationRepository;
+use \Application\Repositories\ApplicationRepository;
 
-use \Application\Bundles\users\Interfaces\usersRepositoryInterface;
+use \Bundles\users\Interfaces\usersRepositoryInterface;
 
 // This Repository holds methods to query users table
 

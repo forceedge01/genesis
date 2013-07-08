@@ -26,13 +26,16 @@ Set::Config('Auth', array(
     ),
     'Login' => array(
 
-        'EntityRepository' => '\\Application\\Bundles\\users\\Entities\\usersEntity',
-        'UserPopulateMethod' => 'populateUser',
+        'EntityRepository' => '\\Bundles\\users\\Entities\\usersEntity',
+        'UserPopulateMethod' => false,
+
         'LoginRoute' => 'users_login',
-        'LoggedOutDefaultRoute' => 'users_login',
-        'LogoutHookRoute' => false, // 4
         'LoginAuthRoute' => 'users_login_auth',
         'LoggedInDefaultRoute' => 'Application',
+
+        'LoggedOutDefaultRoute' => 'users_login',
+        'BeforeLogoutHookRoute' => false, // 4
+        'AfterLogoutHookRoute' => false, // 5
     ),
 ));
 
@@ -43,4 +46,5 @@ Set::Config('Auth', array(
  * 2. Used for encryption of password generation and authentication
  * 3. Used for password encryption and authentication
  * 4. User defined method fired before user is logged out
+ * 5. User defined method fired after user is logged out
  */

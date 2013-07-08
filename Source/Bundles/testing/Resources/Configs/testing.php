@@ -1,3 +1,0 @@
-<?php
-
-DEFINE('BUNDLE_TESTING_PATH', BUNDLES_FOLDER . 'testing');

@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Router extends Manager{
+class Router extends AppMethods{
 
     private
             $url,
@@ -384,11 +384,11 @@ class Router extends Manager{
     protected function checkExceptionRoutes(){
 
         $this->SetPattern();
-        
+
         foreach(\Get::Config('Auth.Security.Bypass') as $pattern)
-        {   
+        {
             $pattern = '/'.str_replace('/', '\\/', $pattern).'/';
-            
+
             if(preg_match($pattern, $this->pattern))
             {
                 return false;

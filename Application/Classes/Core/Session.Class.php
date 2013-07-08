@@ -6,6 +6,8 @@ namespace Application\Core;
 
 class Session extends Request{
 
+    protected $User;
+
     public function Start($secure = false, $httponly = true){
 
         $session_name = 'secure_session_id37736'; // Set a custom session name
@@ -139,4 +141,18 @@ class Session extends Request{
         $this ->UnsetCookie($Name);
     }
 
+    public function GetUsername()
+    {
+        return $this->Get('username');
+    }
+
+    public function GetLoginTime()
+    {
+        return $this->Get('login_time');
+    }
+
+    public function GetUser()
+    {
+        return $this->GetEntity('users:users')->FindBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->Get('username')));
+    }
 }

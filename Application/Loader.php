@@ -49,8 +49,8 @@ class Loader{
 
             'Debugger.Class.php',
             'Variable.Class.php',
-            'AppMethods.Class.php',
             'Manager.Class.php',
+            'AppMethods.Class.php',
             'Request.Class.php',
             'Response.Class.php',
             'Router.Class.php',

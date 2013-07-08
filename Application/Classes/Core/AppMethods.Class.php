@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class AppMethods extends Variable{
+class AppMethods extends Manager{
 
     /**
      *
@@ -73,7 +73,7 @@ class AppMethods extends Variable{
         if($bundle[0] == null)
             $namespace = '\\Application\\Core\\Repositories\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Repositories\\';
+            $namespace = '\\Bundles\\'.$bundle[0].'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
 
@@ -93,7 +93,7 @@ class AppMethods extends Variable{
         if($bundle[0] == null)
             $namespace = '\\Application\\Core\\Entities\\';
         else
-            $namespace = '\\Application\\Bundles\\'.$bundle[0].'\\Entities\\';
+            $namespace = '\\Bundles\\'.$bundle[0].'\\Entities\\';
 
         $bundle[1] .= 'Entity';
 

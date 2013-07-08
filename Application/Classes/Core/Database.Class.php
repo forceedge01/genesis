@@ -686,6 +686,9 @@ class Database extends Template {
         {
             $params = $this->prepare($id);
 
+            if(!$params)
+                $this->setError ('Failed to prepare params '.print_r($id, true).', check if field exists in table');
+
             $this->query .= ' where ' . $params;
 
         }

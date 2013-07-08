@@ -191,6 +191,20 @@ namespace Bundles\\'.$this->name.'\\Models;
 
 final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterface{
 
+    public function Create' . $this->name . '()
+    {
+
+    }
+
+    public function Update' . $this->name . '()
+    {
+
+    }
+
+    public function Delete' . $this->name . '()
+    {
+
+    }
 }';
 
         fwrite($handle, $Model);

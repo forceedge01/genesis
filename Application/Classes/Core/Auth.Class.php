@@ -86,7 +86,7 @@ class Auth extends Application{
                 if($objectMethod)
                     $this->User = $object->$objectMethod();
                 else
-                    $this->User = $this->GetEntity('users:users')->Find(array($this->authField => $this->username));
+                    $this->User = $this->GetEntity('users:users')->FindBy(array($this->authField => $this->username));
 
                 $session = $this->GetCoreObject('Session');
                 $session->set('username', $this->username);
@@ -204,29 +204,32 @@ class Auth extends Application{
         return true;
     }
 
-    public function GetCurrentUser()
+    public function GetUser()
     {
-        $userObject = \Get::Config('Auth.Login.EntityRepository');
-        $object = null;
+        if($this->GetSessionManager()->Get('username'))
+        {
+            $userObject = \Get::Config('Auth.Login.EntityRepository');
+            $object = null;
 
-        if(class_exists($userObject))
-        {
-            $object = new $userObject();
-        }
-        else
-        {
-            $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
-        }
+            if(class_exists($userObject))
+            {
+                $object = new $userObject();
+            }
+            else
+            {
+                $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+            }
 
-        $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
+            $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
 
-        if($objectMethod)
-        {
-            return $object->$objectMethod();
-        }
-        else
-        {
-            return $this->GetEntity('users:users')->Find(array($this->authField => $this->GetSessionManager()->Get('username')));
+            if($objectMethod)
+            {
+                return $object->$objectMethod();
+            }
+            else
+            {
+                return $this->GetEntity('users:users')->FindBy(array($this->authField => $this->GetSessionManager()->Get('username')));
+            }
         }
     }
 }

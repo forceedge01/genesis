@@ -55,7 +55,7 @@ class Application extends Template{
             {
                 $auth = new Auth();
 
-                $this->User = $auth->GetCurrentUser();
+                $this->User = $auth->GetUser();
 
                 $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
 

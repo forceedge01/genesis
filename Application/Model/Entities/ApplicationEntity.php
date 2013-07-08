@@ -42,9 +42,9 @@ class ApplicationEntity extends Database implements Entity{
      * @param Mixed $id Can be the primary key value or an array of column and values
      * @return mixed Returns the matching data set from the database.
      */
-    public function Find(array $params = array()) {
+    public function FindBy(array $params = array()) {
 
-        return $this->RemoveTableNameFromFields($this->Table($this->tableName)->GetOneRecordBy($params));
+        return $this->CreateEntity($this->Table($this->tableName)->GetOneRecordBy($params));
     }
 
     /**
@@ -80,9 +80,13 @@ class ApplicationEntity extends Database implements Entity{
         return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
     }
 
-    protected function RemoveTableNameFromFields($object)
+    private function CreateEntity($object)
     {
-        $newObj = null;
+        return $this->RemoveTableName($object, $this->GetEntity("{$this->tableName}:{$this->tableName}"));
+    }
+
+    private function RemoveTableName($object, $newObj = null)
+    {
         foreach($object as $key => $obj)
         {
             $key = str_replace($this->tableName.'__', '', $key);
@@ -90,5 +94,15 @@ class ApplicationEntity extends Database implements Entity{
         }
 
         return $newObj;
+    }
+
+    public function GetId()
+    {
+        return $this->id;
+    }
+
+    public function GetClean()
+    {
+        return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
 }

@@ -29,14 +29,7 @@ final class usersController extends usersBundleController implements usersContro
 
       public function loginAuthAction()
       {
-          
-          $usersEntity = $this->GetEntity('users:users')->Find(array('username' => 'its.inevitable@hotmail.com'));
-          $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
-          
-          $usersModel->createNew();
-          $usersModel->dosomething();
-          $usersModel->getAllAssociatedData();
-          
+
           if($this->GetRequestManager()->IsPost('login'))
           {
               $auth = new \Application\Core\Auth();
@@ -202,6 +195,10 @@ final class usersController extends usersBundleController implements usersContro
       public function deleteAction($id){
 
             if($this->Request()->isAjax()){
+
+              $usersEntity = new \Bundles\users\Entities\usersEntity(2);
+              $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
+              $usersModel->DeleteUser();
 
               $users = $this->getEntity("users:users");
 

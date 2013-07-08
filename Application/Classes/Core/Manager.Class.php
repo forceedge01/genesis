@@ -5,7 +5,7 @@ namespace Application\Core;
 
 use \Application\Interfaces\Manager as ManagerInterface;
 
-class Manager extends AppMethods implements ManagerInterface{
+class Manager extends Variable implements ManagerInterface{
 
     /**
      *

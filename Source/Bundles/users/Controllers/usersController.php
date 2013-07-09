@@ -3,9 +3,10 @@
 namespace Bundles\users\Controllers;
 
 use \Bundles\users\Entities\usersEntity;
-use \Bundles\users\Repositories\usersRepository;
-use \Application\Components\HTMLGenerator\HTMLGenerator;
+use \Bundles\users\Models\usersModel;
 use \Bundles\users\Interfaces\usersControllerInterface;
+
+// Controller is responsible for the interactions between a model and a template
 
 final class usersController extends usersBundleController implements usersControllerInterface {
 
@@ -71,7 +72,7 @@ final class usersController extends usersBundleController implements usersContro
 
     public function viewAction($id)
     {
-        $usersModel = new \Bundles\users\Models\usersModel();
+        $usersModel = new usersModel();
         $usersModel->SetEntity('users:users');
 
         $params["table"] = array(
@@ -96,7 +97,7 @@ final class usersController extends usersBundleController implements usersContro
 
     public function createAction()
     {
-        $usersModel = new \Bundles\users\Models\usersModel();
+        $usersModel = new usersModel();
         $usersModel->SetEntity('users:users');
 
         if ($this->GetRequestManager()->isPost("submit"))
@@ -141,7 +142,7 @@ final class usersController extends usersBundleController implements usersContro
 
     public function editAction($id) {
 
-        $usersModel = new \Bundles\users\Models\usersModel();
+        $usersModel = new usersModel();
 
         $usersModel->SetEntity('users:users');
 
@@ -191,7 +192,7 @@ final class usersController extends usersBundleController implements usersContro
         if ($this->GetRequestManager()->isAjax())
         {
             $usersEntity = new usersEntity($id);
-            $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
+            $usersModel = new usersModel($usersEntity);
 
             if ($usersModel->DeleteUser())
             {

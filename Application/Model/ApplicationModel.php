@@ -28,7 +28,7 @@ class ApplicationModel extends AppMethods implements Model {
      * @param string $bundleColonEntity
      * @param array $params
      * @return \Application\Models\ApplicationModel
-     * Sets entity object from an array of parameters
+     * Sets entity object from an array of parameters if provided for the model to use, if not will set an empty entity to use.
      */
     public function SetEntity($bundleColonEntity, $params = array())
     {

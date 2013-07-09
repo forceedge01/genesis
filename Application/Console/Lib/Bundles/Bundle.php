@@ -409,13 +409,11 @@ namespace Bundles\\{$this->name}\\Controllers;
 
 
 
-use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
-
 use \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity;
-use \\Bundles\\{$this->name}\\Repositories\\{$this->name}Repository;
-
+use \\Bundles\\{$this->name}\\Models\\{$this->name}Model;
 use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ControllerInterface;
 
+// Controller is responsible for the interactions between a model and a template
 
 final class {$this->name}Controller extends {$this->name}BundleController implements {$this->name}ControllerInterface{
 
@@ -475,7 +473,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
     public function viewAction(\$id)
     {
-        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
         \$params['table'] = array(
@@ -503,7 +501,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
     public function createAction()
     {
-        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
         if(\$this->GetRequestManager()->isPost('submit'))
@@ -562,7 +560,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
     public function editAction(\$id)
     {
-        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
         if(\$this->GetRequestManager()->isPost('submit'))
@@ -615,7 +613,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         if(\$this->GetRequestManager()->isAjax())
         {
             \${$this->name}Entity = new {$this->name}Entity(\$id);
-            ${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model(\${$this->name}Entity);
+            ${$this->name}Model = new {$this->name}Model(\${$this->name}Entity);
 
             \${$this->name} = \$this->getEntity('{$this->name}:{$this->name}');
 

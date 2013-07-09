@@ -223,7 +223,7 @@ class Database extends Template {
      * @return boolean - true on success, false on failure<br />
      * <br />Update a table record(s)
      */
-    protected function SaveRecord(array $params = array()) {
+    protected function SaveRecord($params = array()) {
 
         if (count($params) == 0)
             $params = $_REQUEST;
@@ -1162,5 +1162,15 @@ class Database extends Template {
     {
         $this -> queryJoins[] = $table .' AS '.$alias.' ON '.$predicament;
         return $this;
+    }
+    
+    public function prepareForTable($table, $params)
+    {
+        $array = array();
+        
+        foreach($params as $key => $value)
+            $array[$table.'__'.$key] = $value;
+        
+        return $array;
     }
 }

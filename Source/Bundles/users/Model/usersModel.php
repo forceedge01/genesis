@@ -2,8 +2,6 @@
 
 namespace Bundles\users\Models;
 
-
-
 use Bundles\users\Interfaces\usersModelinterface;
 use Application\Models\ApplicationModel;
 
@@ -11,18 +9,32 @@ use Application\Models\ApplicationModel;
 
 final class usersModel extends ApplicationModel implements usersModelinterface {
 
-    public function CreateUser()
+    public function CreateUser() 
     {
-
+        $this->entityObject->users__password = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->entityObject->users__password);
+        
+        if ($this->GetEntityObject()->Save($this->entityObject))
+            return true;
+        
+        return false;
     }
 
     public function UpdateUser()
     {
-
-    }
-
-    public function DeleteUser()
-    {
+        $this->entityObject->users__password = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->entityObject->users__password);
         
+        if ($this->GetEntityObject()->Save())
+            return true;
+        
+        return false;
     }
+
+    public function DeleteUser() 
+    {
+        if ($this->GetEntityObject()->Delete())
+            return true;
+        
+        return false;
+    }
+
 }

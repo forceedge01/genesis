@@ -264,4 +264,37 @@ class AppMethods extends Manager{
 
         return $file;
     }
+    
+    public function ObjectToArray($obj)
+    {
+        try{
+            $array = array();
+
+            foreach($obj as $key => $value)
+                $array[$key] = $value;
+
+            return $array;
+        }
+        catch(Exception $e)
+        {
+            trigger_error($e->getMessage());
+        }
+    }
+    
+    public function ArrayToObject(array $array)
+    {
+        try
+        {
+            $obj = new \stdClass();
+
+            foreach($array as $key => $value)
+                $obj->$key = $value;
+
+            return $obj;
+        }
+        catch(Exception $e)
+        {
+            trigger_error($e->getMessage());
+        }
+    }
 }

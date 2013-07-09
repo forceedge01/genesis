@@ -29,7 +29,6 @@ class Loader{
         $bundles = array(
 
             'Welcome',
-            'neogenesis',
             'users'
         );
 

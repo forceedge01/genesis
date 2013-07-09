@@ -47,7 +47,8 @@ class Template extends Router {
 
     /**
      *
-     * @param type $template
+     * @param string $template bundle:template
+     * @param string $pageTitle The page title to set
      * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
      */
     public function Render($template, $pageTitle, array $params = array()) {

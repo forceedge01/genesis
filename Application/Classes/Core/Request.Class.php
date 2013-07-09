@@ -213,4 +213,19 @@ class Request extends AppMethods{
         else
             return false;
     }
+    
+    public function PostParams()
+    {
+        return $_POST;
+    }
+    
+    public function GetParams()
+    {
+        return $_GET;
+    }
+    
+    public function RequestParams()
+    {
+        return $_REQUEST;
+    }
 }

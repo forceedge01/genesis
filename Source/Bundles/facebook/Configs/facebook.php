@@ -1,3 +1,0 @@
-<?php
-
-DEFINE('BUNDLE_FACEBOOK_PATH', BUNDLES_FOLDER . 'facebook');

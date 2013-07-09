@@ -10,9 +10,8 @@ use Application\Interfaces\Entities\Entity;
 
 class ApplicationEntity extends Database implements Entity{
 
-    protected
-            $id,
-            $tableName;
+    protected $tableName;
+    public $id;
 
     public function __construct($params = null) {
 
@@ -56,14 +55,23 @@ class ApplicationEntity extends Database implements Entity{
 
         return $this->Table(str_replace('Entity', '', $entity));
     }
+    
+    public function SetTableName($table)
+    {
+        $this->tableName = $table;
+        return $this;
+    }
 
     /**
      *
      * @param array $params Pass in the data for saving it to the database, if not provided<br>
      * the submitted data in globals will be taken and matched to the table on which the operation is applied.
      */
-    public function Save(array $params = array(), array $tables = array()) {
+    public function Save($params = array(), array $tables = array()) {
 
+        if(is_object($params))
+            $params = $this->ObjectToArray ($params);
+        
         return $this->Table($this->tableName)->QueryOnly($tables)->SaveRecord($params)->GetAffectedRows();
     }
 

@@ -31,3 +31,9 @@ Set::Route('users_List', array(
       "Controller" => "users:users:list",
       "Pattern" => "/users/List/"
 ));
+
+Set::Route('users_Create', array(
+
+      "Controller" => "users:users:create",
+      "Pattern" => "/users/create/"
+));

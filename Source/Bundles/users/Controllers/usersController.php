@@ -101,51 +101,51 @@ final class usersController extends usersBundleController implements usersContro
       }
 
       public function createAction(){
-
-            if($this->Request() ->isPost("submit")){
-
-              if($this->GetEntity("usersBundle:users")->Save())
-                  $this->setFlash(array("Success" => "Create successful."));
-              else
-                  $this->setError(array("Failure" => "Failed to create."));
-
-              $this->forwardTo("users_List");
-
+          
+          $usersModel = new \Bundles\users\Models\usersModel();
+          
+          $usersModel->SetEntity('users:users');
+          
+          if ($this->GetRequestManager()->isPost("submit")) 
+          {
+            if(!$usersModel->SetEntity('users:users', $this->GetRequestManager()->PostParams()))
+            {
+                $this->setError ('Empty data passed');
+            }
+              
+            if($usersModel->CreateUser())
+            {
+                $this->setFlash(array("Success" => "Create successful."));
+            }
+            else
+            {
+                $this->setError(array("Failure" => "Failed to create."));
             }
 
-            $params["PageTitle"] = "Create New users";
+            $this->forwardTo("users_List");
+          }
 
-            $params['form'] = array(
+          $params['form'] = array(
 
-                'class' => 'form',
-                'action' => $this->setRoute('users_Create'),
-                'title' => 'Random Title',
-                'inputs' => array(
+            'class' => 'form',
+            'action' => $this->setRoute('users_Create'),
+            'title' => 'Random Title',
+            'table' => $usersModel->GetEntityObject()->GetFormFields(),
 
-                    'text' => array(
+            'submission' => array(
 
-                        'label' => 'Name',
-                        'name' => 'Name',
-                        'value' => 'Enter your name',
-                    )
+                'submit' => array(
+
+                    'value' => 'Create new record',
+                    'name' => 'submit'
                 ),
-                'table' => $this->GetEntity("users:users")->GetFormFields(),
-
-                'submission' => array(
-
-                    'submit' => array(
-
-                        'value' => 'Create new record',
-                        'name' => 'submit'
-                    ),
-               ),
-
+              ),
             );
 
             //This will be used in the template to generate the above declared form.
             $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
 
-            $this->Render("users:create.html.php", $params);
+            $this->Render("users:create.html.php", 'Create New users', $params);
 
       }
 

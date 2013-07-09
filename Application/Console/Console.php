@@ -237,13 +237,13 @@ class Console {
                         $test = New Test('method');
                         $test->RunTests();
                     }
-                    
+
                     case 'templates':
                     {
                         $test = New Test('template');
                         $test->RunTests();
                     }
-                    
+
                     case 'models':
                     {
                         $test = New Test('model');
@@ -308,6 +308,13 @@ class Console {
     public function blue($string)
     {
         return "\033[34m".$string."\033[37m";
+    }
+
+    public function createFile($filePath, $content)
+    {
+        $handle = fopen($filePath, 'w+');
+        fwrite($handle, $content);
+        fclose($handle);
     }
 
 }

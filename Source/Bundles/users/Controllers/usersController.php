@@ -2,118 +2,111 @@
 
 namespace Bundles\users\Controllers;
 
-
-
 use \Bundles\users\Entities\usersEntity;
 use \Bundles\users\Repositories\usersRepository;
-
 use \Application\Components\HTMLGenerator\HTMLGenerator;
-
 use \Bundles\users\Interfaces\usersControllerInterface;
 
+final class usersController extends usersBundleController implements usersControllerInterface {
 
-final class usersController extends usersBundleController implements usersControllerInterface{
-
-      public
+    public
             $htmlgen;
 
-      public function indexAction()
-      {
-           $this->forwardToController("users_List");
-      }
+    public function indexAction()
+    {
+        $this->forwardToController("users_List");
+    }
 
-      public function loginAction()
-      {
-          $this->Render('users:login.html.php', 'Login');
-      }
+    public function loginAction()
+    {
+        $this->Render('users:login.html.php', 'Login');
+    }
 
-      public function loginAuthAction()
-      {
+    public function loginAuthAction()
+    {
 
-          if($this->GetRequestManager()->IsPost('login'))
-          {
-              $auth = new \Application\Core\Auth();
+        if ($this->GetRequestManager()->IsPost('login'))
+        {
+            $auth = new \Application\Core\Auth();
 
-              if($auth->authenticateUser('Invalid username or password entered'))
-              {
-                  $auth->forwardToLoggedInPage();
-              }
-
-              $auth->forwardToLoginPage();
-          }
-          else
-          {
-              $this->setError('Unable to login')->forwardTo('users_login');
-          }
-      }
-
-      public function logoutAction()
-      {
-          $auth = new \Application\Core\Auth();
-          $auth->logout('You have been logged out.');
-      }
-
-      public function listAction()
-      {
-          $params["PageTitle"] = "All users";
-
-            //Used by the HTMLGenerator in the list view.
-            $params['table'] = array(
-
-              'class' => 'paginate',
-              'title' => 'Dataset',
-              'tbody' => $this->GetRepository("users:users")->GetAll(array('order by' => 'id desc')),
-              'ignoreFields' => array('users__password', 'users__salt'),
-
-            );
-
-            //This will be used in the template to generate the above declared table.
-            $this->htmlgen = $this ->GetComponent('HTMLGenerator');
-
-            $this->Render("users:list.html.php", 'All users', $params);
-
-      }
-
-      public function viewAction($id){
-
-              $params["PageTitle"] = "View users";
-
-              $params["table"] = array(
-
-                  'title' => 'View',
-                  'class' => 'paginate',
-                  'tbody' => $this->GetEntity("users:users")->Get($id),
-                  'actions' => array(
-
-                      'Edit' => array(
-
-                        'route' => 'users_Edit',
-                        'routeParam' => 'id',
-                        'dataParam' => 'users__id',
-                    ),
-                  ),
-              );
-
-              $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
-
-              $this->Render("users:view.html.php", "View User {$id}", $params);
-
-      }
-
-      public function createAction(){
-          
-          $usersModel = new \Bundles\users\Models\usersModel();
-          
-          $usersModel->SetEntity('users:users');
-          
-          if ($this->GetRequestManager()->isPost("submit")) 
-          {
-            if(!$usersModel->SetEntity('users:users', $this->GetRequestManager()->PostParams()))
+            if ($auth->authenticateUser('Invalid username or password entered'))
             {
-                $this->setError ('Empty data passed');
+                $auth->forwardToLoggedInPage();
             }
-              
-            if($usersModel->CreateUser())
+
+            $auth->forwardToLoginPage();
+
+        }
+        else
+        {
+            $this->setError('Unable to login')->forwardTo('users_login');
+        }
+    }
+
+    public function logoutAction()
+    {
+        $auth = new \Application\Core\Auth();
+        $auth->logout('You have been logged out.');
+    }
+
+    public function listAction()
+    {
+        $params["PageTitle"] = "All users";
+
+        //Used by the HTMLGenerator in the list view.
+        $params['table'] = array(
+            'class' => 'paginate',
+            'title' => 'Dataset',
+            'tbody' => $this
+                        ->GetRepository("users:users")
+                            ->GetAll(array('order by' => 'id desc')),
+            'ignoreFields' => array('users__password', 'users__salt'),
+        );
+
+        //This will be used in the template to generate the above declared table.
+        $this->htmlgen = $this->GetComponent('HTMLGenerator');
+
+        $this->Render("users:list.html.php", 'All users', $params);
+    }
+
+    public function viewAction($id)
+    {
+        $usersModel = new \Bundles\users\Models\usersModel();
+        $usersModel->SetEntity('users:users');
+
+        $params["table"] = array(
+            'title' => 'View',
+            'class' => 'paginate',
+            'tbody' => $usersModel
+                        ->GetEntityObject()
+                            ->Get($id),
+            'actions' => array(
+                'Edit' => array(
+                    'route' => 'users_Edit',
+                    'routeParam' => 'id',
+                    'dataParam' => 'users__id',
+                ),
+            ),
+        );
+
+        $this->htmlgen = $this->GetComponent('HTMLGenerator');
+
+        $this->Render("users:view.html.php", "View User {$id}", $params);
+    }
+
+    public function createAction()
+    {
+        $usersModel = new \Bundles\users\Models\usersModel();
+        $usersModel->SetEntity('users:users');
+
+        if ($this->GetRequestManager()->isPost("submit"))
+        {
+            if (!$usersModel->SetEntity('users:users', $this->GetRequestManager()->PostParams()))
+            {
+                $this->setError('Empty data passed');
+            }
+
+            if ($usersModel->CreateUser())
             {
                 $this->setFlash(array("Success" => "Create successful."));
             }
@@ -123,89 +116,92 @@ final class usersController extends usersBundleController implements usersContro
             }
 
             $this->forwardTo("users_List");
-          }
+        }
 
-          $params['form'] = array(
-
+        $params['form'] = array(
             'class' => 'form',
             'action' => $this->setRoute('users_Create'),
             'title' => 'Random Title',
-            'table' => $usersModel->GetEntityObject()->GetFormFields(),
-
+            'table' => $usersModel
+                        ->GetEntityObject()
+                            ->GetFormFields(),
             'submission' => array(
-
                 'submit' => array(
-
                     'value' => 'Create new record',
                     'name' => 'submit'
                 ),
-              ),
-            );
+            ),
+        );
 
-            //This will be used in the template to generate the above declared form.
-            $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
+        //This will be used in the template to generate the above declared form.
+        $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-            $this->Render("users:create.html.php", 'Create New users', $params);
+        $this->Render("users:create.html.php", 'Create New users', $params);
+    }
 
-      }
+    public function editAction($id) {
 
-      public function editAction($id){
+        $usersModel = new \Bundles\users\Models\usersModel();
 
-            if($this->Request()->isPost("submit")){
+        $usersModel->SetEntity('users:users');
 
-              if($users = $this->getEntity("usersBundle:users")->Save())
-                  $this->setFlash(array("Success" => "Update successful."));
-              else
-                  $this->setError(array("Failure" => "Failed to update."));
+        if ($this->Request()->isPost("submit"))
+        {
+            $usersModel->SetEntity('users:users', $this->GetRequestManager()->PostParams());
 
-              $this->forwardTo("users_List");
-
+            if ($usersModel->UpdateUser())
+            {
+                $this->setFlash(array("Success" => "Update successful."));
+            }
+            else
+            {
+                $this->setError(array("Failure" => "Failed to update."));
             }
 
-            $params["form"] = array(
+            $this->forwardTo("users_List");
+        }
 
-                'title' => 'Edit',
-                'action' => $this->setRoute('users_Edit', array('id' => $id)),
-                'table' => $this->GetEntity('users:users')->Get($id),
-                'submission' => array(
+        $params['form'] = array(
+            'title' => 'Edit',
+            'action' => $this->setRoute('users_Edit', array('id' => $id)),
+            'table' => $usersModel
+                        ->GetEntityObject()
+                            ->Get($id),
+            'submission' => array(
+                'submit' => array(
+                    'value' => 'Save changes',
+                    'name' => 'submit'
+                ),
+            )
+        );
 
-                    'submit' => array(
+        $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-                        'value' => 'Save changes',
-                        'name' => 'submit'
-                    ),
-                )
+        $this->Render('users:edit.html.php', 'Edit users', $params);
+    }
 
-            );
+    /**
+     *
+     * @param int $id the id to delete from the database
+     * By default is ajax controlled.
+     *
+     */
+    public function deleteAction($id) {
 
-            $params["PageTitle"] = "Edit users";
+        if ($this->GetRequestManager()->isAjax())
+        {
+            $usersEntity = new usersEntity($id);
+            $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
 
-            $this->htmlgen = $this ->GetComponent('HTMLGenerator') ;
-
-            $this->Render("users:edit.html.php", $params);
-
-      }
-
-      /**
-       *
-       * @param int $id the id to delete from the database
-       * By default is ajax controlled.
-       *
-       */
-      public function deleteAction($id){
-
-            if($this->Request()->isAjax()){
-
-              $usersEntity = new \Bundles\users\Entities\usersEntity(2);
-              $usersModel = new \Bundles\users\Models\usersModel($usersEntity);
-              $usersModel->DeleteUser();
-
-              $users = $this->getEntity("users:users");
-
-              if($users->delete($id))
-                  echo 'success:Delete was successful';
-              else
-                  echo 'error:Delete was unsuccessful';
+            if ($usersModel->DeleteUser())
+            {
+                echo 'success:Delete was successful';
             }
-      }
+            else
+            {
+                echo 'error:Delete was unsuccessful';
+            }
+        }
+    }
+
 }

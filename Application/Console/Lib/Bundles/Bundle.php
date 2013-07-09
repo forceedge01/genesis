@@ -10,7 +10,9 @@ class Bundle extends Console {
 
     public
             $name,
-            $renderMethod;
+            $renderMethod,
+            $singular,
+            $bundleFolder;
 
     public function __construct($type) {
 
@@ -23,16 +25,21 @@ class Bundle extends Console {
 
             echo 'Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ';
 
-            $this->name = str_replace('bundle', '', strtolower($this->readUser()));
+            $this->name = $this->singular = str_replace('bundle', '', strtolower($this->readUser()));
+
+            if(substr($this->singular, -1) == 's')
+                  $this->singular = substr($this->singular, 0, -1);
 
         }
 
-        if (mkdir(BUNDLES_FOLDER . $this->name)) {
+        $this->bundleFolder = $this->bundleFolder;
+
+        if (mkdir($this->bundleFolder)) {
 
             $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests() ->CreateAssets();
         }
 
-        echo 'Bundle ' . $this->name . ' has been created successfully!';
+        echo "Bundle {$this->name} has been created successfully!";
 
         $this->linebreak(2);
     }
@@ -104,229 +111,181 @@ class Bundle extends Console {
 
     private function createConfig(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Resources');
+        mkdir($this->bundleFolder . '/Resources');
+        mkdir($this->bundleFolder . '/Resources/Configs');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Configs');
+        $initTemplate = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Configs/' . $this->name . '.Config.php', 'w+');
+Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', BUNDLES_FOLDER{$this->name});";
 
-        $initTemplate = '<?php
-
-Set::Config(\'BUNDLE_'.strtoupper($this->name).'_PATH\', BUNDLES_FOLDER . \''.$this->name.'\');';
-
-        fwrite($handle, $initTemplate);
-
-        fclose($handle);
+        $this->createFile($this->bundleFolder . "/Resources/Configs/{$this->name}.Config.php", $initTemplate);
 
         return $this;
     }
 
     private function createEntity(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Model');
+        mkdir($this->bundleFolder . '/Model');
+        mkdir($this->bundleFolder . '/Model/Entities');
+        mkdir($this->bundleFolder . '/Model/Repositories');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Entities');
+        $initEntity = "<?php
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Model/Repositories');
-
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Entities/' . $this->name . 'Entity.php', 'w+');
-
-        $initEntity = '<?php
-
-namespace Bundles\\'.$this->name.'\\Entities;
+namespace Bundles\\{$this->name}\\Entities;
 
 
 
 use \\Application\\Core\\Entities\\ApplicationEntity;
 
-// This Entity represents '.$this->name.' table
+// This Entity represents {$this->name} table
 
-final class ' . $this->name . 'Entity extends ApplicationEntity {
+final class {$this->name}Entity extends ApplicationEntity {
 
 }
-              ';
+";
 
-        fwrite($handle, $initEntity);
+        $this->createFile($this->bundleFolder . "/Model/Entities/{$this->name}Entity.php", $initEntity);
 
-        fclose($handle);
+        $initRepository = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/Repositories/' . $this->name . 'Repository.php', 'w+');
-
-        $initEntity = '<?php
-
-namespace Bundles\\'.$this->name.'\\Repositories;
+namespace Bundles\\{$this->name}\\Repositories;
 
 
 
 use \\Application\\Core\\Repositories\\ApplicationRepository;
 
-use \\Application\\Bundles\\'.$this->name.'\\Interfaces\\'.$this->name.'RepositoryInterface;
+use \\Application\\Bundles\\{$this->name}\\Interfaces\\{$this->name}RepositoryInterface;
 
-// This Repository holds methods to query '.$this->name.' table
+// This Repository holds methods to query {$this->name} table
 
-final class ' . $this->name . 'Repository extends ApplicationRepository implements '.$this->name.'Repository.Interface{
+final class {$this->name}Repository extends ApplicationRepository implements {$this->name}Repository.Interface{
 
 }
-              ';
+              ";
 
-        fwrite($handle, $initEntity);
-
-        fclose($handle);
+        $this->createFile($this->bundleFolder . "/Model/Repositories/{$this->name}Repository.php", $initRepository);
 
         return $this;
     }
 
     private function createModel(){
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Model/' . $this->name . 'Model.php', 'w+');
+        $Model = "<?php
 
-        $Model = '<?php
-
-namespace Bundles\\'.$this->name.'\\Models;
+namespace Bundles\\{$this->name}\\Models;
 
 
 
 
-// Model represents the logic of '.$this->name.' table with the application
+// Model represents the logic of {$this->name} table with the application
 
-final class ' . $this->name . 'Model implements ' . $this->name . 'ModelInterface{
+final class {$this->name}Model implements {$this->name}ModelInterface{
 
-    public function Create' . $this->name . '()
+    public function Create{$this->singular}()
     {
+        if (\$this->GetEntityObject()->Save(\$this->entityObject))
+            return true;
 
+        return false;
     }
 
-    public function Update' . $this->name . '()
+    public function Update{$this->singular}()
     {
+        if (\$this->GetEntityObject()->Save())
+            return true;
 
+        return false;
     }
 
-    public function Delete' . $this->name . '()
+    public function Delete{$this->singular}()
     {
+        if (\$this->GetEntityObject()->Delete())
+            return true;
 
+        return false;
     }
-}';
+}";
 
-        fwrite($handle, $Model);
-
-        fclose($handle);
+        $this->createFile($this->bundleFolder . "/Model/{$this->name}Model.php", $Model);
 
         return $this;
     }
 
     private function createViews(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Views');
+        mkdir($this->bundleFolder . '/Resources/Views');
+        mkdir($this->bundleFolder . '/Resources/Views/ControllerViews');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews');
+        $initTemplate = "<?=\$this->IncludeTemplate(':Header.html.php', \$params)?>
+<?=\$this->setAsset('{$this->name}:{$this->name}.css')?>
+";
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Header.html.php', 'w+');
+        $this->createFile($this->bundleFolder . '/Resources/Views/' . 'Header.html.php', $initTemplate);
 
-        $initTemplate = '<?=$this->IncludeTemplate(":Header.html.php", $params)?>
+        $initTemplate = "<?=\$this->setAsset('{$this->name}:{$this->name}.js')?>
+<?=\$this->IncludeTemplate(':Footer.html.php', \$params)?>
+";
 
-<?=$this->setAsset("'.$this->name.':'.$this->name.'.css")?>
+        $this->createFile($this->bundleFolder . '/Resources/Views/' . 'Footer.html.php', $initTemplate);
 
-';
-
-        fwrite($handle, $initTemplate);
-
-        fclose($handle);
-
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/' . 'Footer.html.php', 'w+');
-
-        $initTemplate = '<?=$this->setAsset("'.$this->name.':'.$this->name.'.js")?>
-
-<?=$this->IncludeTemplate(":Footer.html.php", $params)?>
-';
-
-        fwrite($handle, $initTemplate);
-
-        fclose($handle);
-
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/list.html.php', 'w+');
-
-        $initTemplate = '<div class="wrapper">
-
-    <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_Create\')?>">Create new '.$this->name.'</a></div>
-
-    <div class="widget">
-
-        <?=$this->htmlgen->Output($table, \'table\')?>
-
+        $initTemplate = "<div class='wrapper'>
+    <div class=''>
+        <a href='<?=\$this->setRoute('{$this->name}_Create')?>'>Create new {$this->singular}</a>
     </div>
-
-</div>';
-
-            fwrite($handle, $initTemplate);
-
-            fclose($handle);
-
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/view.html.php', 'w+');
-
-            $initTemplate = '<div class="wrapper">
-
-    <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
-
-    <div class="widget">
-
-        <?=$this->htmlgen->Output($table, \'table\')?>
-
+    <h3>List of all {$this->name}</h3>
+    <div class='widget'>
+        <?=\$this->htmlgen->Output(\$table, 'table')?>
     </div>
+</div>";
 
-</div>';
+        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/list.html.php', $initTemplate);
 
-            fwrite($handle, $initTemplate);
-
-            fclose($handle);
-
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/create.html.php', 'w+');
-
-            $initTemplate = '<div class="wrapper">
-
-    <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
-
-    <div class="widget">
-
-        <?=$this->htmlgen->Output($form, \'form\')?>
-
+        $initTemplate = "<div class='wrapper'>
+    <div class=''>
+        <a href='<?=\$this->setRoute('{$this->name}_List')?>'>View All {$this->name}</a>
     </div>
-
-</div>';
-
-            fwrite($handle, $initTemplate);
-
-            fclose($handle);
-
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Views/ControllerViews/edit.html.php', 'w+');
-
-            $initTemplate = '<div class="wrapper">
-
-    <div class=""><a href="<?=$this->setRoute(\'' . $this->name . '_List\')?>">View All '.$this->name.'</a></div>
-
-    <div class="widget">
-
-        <?=$this->htmlgen->Output($form, \'form\')?>
-
+    <h3>View {$this->singular}</h3>
+    <div class='widget'>
+        <?=\$this->htmlgen->Output(\$table, 'table')?>
     </div>
+</div>";
 
-</div>';
+        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/view.html.php', $initTemplate);
 
-            fwrite($handle, $initTemplate);
+        $initTemplate = "<div class='wrapper'>
+    <div class=''>
+        <a href='<?=\$this->setRoute('{$this->name}_List')?>'>View All {$this->name}</a>
+    </div>
+    <h3>Create new {$this->singular}</h3>
+    <div class='widget'>
+        <?=\$this->htmlgen->Output(\$form, 'form')?>
+    </div>
+</div>";
 
-            fclose($handle);
+        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/create.html.php', $initTemplate);
 
-            return $this;
+        $initTemplate = "<div class='wrapper'>
+    <div class=''>
+        <a href='<?=\$this->setRoute('{$this->name}_List')?>'>View All {$this->name}</a>
+    </div>
+    <h3>Edit {$this->singular}</h3>
+    <div class='widget'>
+        <?=\$this->htmlgen->Output(\$form, 'form')?>
+    </div>
+</div>";
+
+        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/edit.html.php', $initTemplate);
+
+        return $this;
     }
 
     private function createInterface(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Interfaces');
+        mkdir($this->bundleFolder . '/Interfaces');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'Controller.Interface.php', 'w+');
+        $initControllerInterface = "<?php
 
-        $initControllerInterface = '<?php
-
-namespace Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 /**
@@ -335,13 +294,12 @@ namespace Bundles\\'.$this->name.'\\Interfaces;
  * @author John Doe <john.doe@example.com>
  *
  */
-interface '.$this->name.'ControllerInterface {
+interface {$this->name}ControllerInterface {
 
     /**
      *
      * @author <Above>
      *
-     * @param type $name Description
      * @return type Description
      *
      * @example path description
@@ -353,31 +311,30 @@ interface '.$this->name.'ControllerInterface {
      *
      * @author <Above>
      *
-     * @param type $name Description
+     * @param type \$id Description
      * @return type Description
      *
      * @example path description
      *
      */
-    public function viewAction($id);
+    public function viewAction(\$id);
 
     /**
      *
      * @author <Above>
      *
-     * @param type $name Description
+     * @param type \$id Description
      * @return type Description
      *
      * @example path description
      *
      */
-    public function editAction($id);
+    public function editAction(\$id);
 
     /**
      *
      * @author <Above>
      *
-     * @param type $name Description
      * @return type Description
      *
      * @example path description
@@ -389,26 +346,21 @@ interface '.$this->name.'ControllerInterface {
      *
      * @author <Above>
      *
-     * @param type $name Description
+     * @param type \$id Description
      * @return type Description
      *
      * @example path description
      *
      */
-    public function deleteAction($id);
+    public function deleteAction(\$id);
 }
+";
 
-';
+        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Controller.Interface.php", $initControllerInterface);
 
-        fwrite($handle, $initControllerInterface);
+        $initControllerInterface = "<?php
 
-        fclose($handle);
-
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'Repository.Interface.php', 'w+');
-
-        $initControllerInterface = '<?php
-
-namespace Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 
@@ -418,20 +370,16 @@ namespace Bundles\\'.$this->name.'\\Interfaces;
  * @author Abc <Abc@example.com>
  *
  */
-interface '.$this->name.'RepositoryInterface {
+interface {$this->name}RepositoryInterface {
 
 }
-        ';
+";
 
-        fwrite($handle, $initControllerInterface);
+        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Repository.Interface.php", $initControllerInterface);
 
-        fclose($handle);
+        $initControllerInterface = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Interfaces/' . $this->name . 'Model.Interface.php', 'w+');
-
-        $initControllerInterface = '<?php
-
-namespace Bundles\\'.$this->name.'\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 
@@ -441,308 +389,322 @@ namespace Bundles\\'.$this->name.'\\Interfaces;
  * @author Abc <Abc@example.com>
  *
  */
-interface '.$this->name.'ModelInterface {
+interface {$this->name}ModelInterface {
 
 }
-        ';
+";
 
-        fwrite($handle, $initControllerInterface);
-
-        fclose($handle);
+        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Model.Interface.php", $initControllerInterface);
 
         return $this;
     }
 
     private function createController(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Controllers');
+        mkdir($this->bundleFolder . '/Controllers');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'Controller.php', 'w+');
+        $initController = "<?php
 
-        $initController = '<?php
-
-namespace Bundles\\'.$this->name.'\\Controllers;
+namespace Bundles\\{$this->name}\\Controllers;
 
 
-
-use \\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity;
-use \\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository;
 
 use \\Application\\Components\\HTMLGenerator\\HTMLGenerator;
 
-use Bundles\\' . $this->name . '\\Interfaces\\' . $this->name . 'ControllerInterface;
+use \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity;
+use \\Bundles\\{$this->name}\\Repositories\\{$this->name}Repository;
+
+use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ControllerInterface;
 
 
-final class ' . $this->name . 'Controller extends ' . $this->name . 'BundleController implements ' . $this->name . 'ControllerInterface{
+final class {$this->name}Controller extends {$this->name}BundleController implements {$this->name}ControllerInterface{
 
-      public
-            $htmlgen;
+    public
+          \$htmlgen;
 
-      public function indexAction(){
+    public function indexAction()
+    {
+        \$this->forwardToController('{$this->name}_List');
+    }
 
-              $this->forwardToController("' . $this->name . '_List");
-      }
+    public function listAction()
+    {
+        //Used by the HTMLGenerator in the list view.
+        \$params['table'] = array(
 
-      public function listAction(){
+          'class' => 'paginate',
+          'title' => 'Dataset',
+          'tbody' => \$this
+                          ->GetRepository('{$this->name}:{$this->name}')
+                              ->GetAll(array('order by' => 'id desc')),
+          'ignoreFields' => array(),
+          'actions' => array(
 
-              $params["PageTitle"] = "All ' . $this->name . '";
+              'Edit' => array(
 
-              //Used by the HTMLGenerator in the list view.
-              $params[\'table\'] = array(
+                  'route' => '{$this->name}_Edit',
+                  'routeParam' => 'id',
+                  'dataParam' => '{$this->name}__id',
+              ),
 
-                \'class\' => \'paginate\',
-                \'title\' => \'Dataset\',
-                \'tbody\' => $this->GetRepository("' . $this->name . ':'.$this->name.'")->GetAll(array(\'order by\' => \'id desc\')),
-                \'ignoreFields\' => array(),
-                \'actions\' => array(
+              'View' => array(
 
-                    \'Edit\' => array(
+                  'route' => '{$this->name}_View',
+                  'routeParam' => 'id',
+                  'dataParam' => '{$this->name}__id',
+              ),
 
-                        \'route\' => \'' . $this->name . '_Edit\',
-                        \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '__id\',
-                    ),
+              'Delete' => array(
 
-                    \'View\' => array(
+                  'message' => 'Are you sure you want to delete this record?',
+                  'class' => 'remove',
+                  'route' => '{$this->name}_Delete',
+                  'routeParam' => 'id',
+                  'dataParam' => '{$this->name}__id',
+              ),
+          )
 
-                        \'route\' => \'' . $this->name . '_View\',
-                        \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '__id\',
-                    ),
+        );
 
-                    \'Delete\' => array(
+        //This will be used in the template to generate the above declared table.
+        \$this->htmlgen = \$this ->GetComponent('HTMLGenerator');
 
-                        \'message\' => \'Are you sure you want to delete this record?\',
-                        \'class\' => \'remove\',
-                        \'route\' => \'' . $this->name . '_Delete\',
-                        \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '__id\',
-                    ),
-                )
+        \$this->Render('{$this->name}:list.html.php', 'List {$this->name}', \$params);
 
-              );
+    }
 
-              //This will be used in the template to generate the above declared table.
-              $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\');
+    public function viewAction(\$id)
+    {
+        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
-              $this->Render("' . $this->name . ':list.html.php", \'List ' . $this->name . '\', $params);
+        \$params['table'] = array(
 
-      }
+            'title' => 'View',
+            'class' => 'paginate',
+            'tbody' => \${$this->name}Model
+                        ->GetEntityObject()
+                            ->Get(\$id),
+            'actions' => array(
 
-      public function viewAction($id){
+                'Edit' => array(
 
-              $params["PageTitle"] = "View ' . $this->name . '";
+                  'route' => '{$this->name}_Edit',
+                  'routeParam' => 'id',
+                  'dataParam' => '{$this->name}__id',
+              ),
+            ),
+        );
 
-              $params["table"] = array(
+        \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-                  \'title\' => \'View\',
-                  \'class\' => \'paginate\',
-                  \'tbody\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->Get($id),
-                  \'actions\' => array(
+        \$this->Render('{$this->name}:view.html.php', 'View {$this->singular}', \$params);
+    }
 
-                      \'Edit\' => array(
+    public function createAction()
+    {
+        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
-                        \'route\' => \'' . $this->name . '_Edit\',
-                        \'routeParam\' => \'id\',
-                        \'dataParam\' => \'' . $this->name . '__id\',
-                    ),
-                  ),
-              );
-
-              $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
-
-              $this->Render("' . $this->name . ':view.html.php", \'View ' . $this->name . '\', $params);
-
-      }
-
-      public function createAction(){
-
-            if($this->Request() ->isPost("submit")){
-
-              if($this->GetEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
-                  $this->setFlash(array("Success" => "Create successful."));
-              else
-                  $this->setError(array("Failure" => "Failed to create."));
-
-              $this->forwardTo("' . $this->name . '_List");
-
+        if(\$this->GetRequestManager()->isPost('submit'))
+        {
+            if (!\${$this->name}Model->SetEntity('{$this->name}:{$this->name}', \$this->GetRequestManager()->PostParams()))
+            {
+                \$this->setError('Empty data passed');
             }
 
-            $params["PageTitle"] = "Create New ' . $this->name . '";
+            if(\${$this->name}Model->Create{$this->singular}())
+            {
+                \$this->setFlash(array('Success' => 'Create successful.'));
+            }
+            else
+            {
+                \$this->setError(array('Failure' => 'Failed to create.'));
+            }
 
-            $params[\'form\'] = array(
+            \$this->forwardTo('{$this->name}_List');
+        }
 
-                \'class\' => \'form\',
-                \'action\' => $this->setRoute(\'' . $this->name . '_Create\'),
-                \'title\' => \'Random Title\',
-                \'inputs\' => array(
+        \$params['form'] = array(
 
-                    \'text\' => array(
+            'class' => 'form',
+            'action' => \$this->setRoute('{$this->name}_Create'),
+            'title' => 'Random Title',
+            'inputs' => array(
 
-                        \'label\' => \'Name\',
-                        \'name\' => \'Name\',
-                        \'value\' => \'Enter your name\',
-                    )
+                'text' => array(
+
+                    'label' => 'Name',
+                    'name' => 'Name',
+                    'value' => 'Enter your name',
+                )
+            ),
+            'table' => \${$this->name}Model
+                        ->GetEntityObject()
+                            ->GetFormFields(),
+
+            'submission' => array(
+
+                'submit' => array(
+
+                    'value' => 'Create new record',
+                    'name' => 'submit'
                 ),
-                \'table\' => $this->GetEntity("' . $this->name . ':'.$this->name.'")->GetFormFields(),
+            ),
 
-                \'submission\' => array(
+        );
 
-                    \'submit\' => array(
+        //This will be used in the template to generate the above declared form.
+        \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-                        \'value\' => \'Create new record\',
-                        \'name\' => \'submit\'
-                    ),
-               ),
+        \$this->Render('{$this->name}:create.html.php', 'Create new {$this->singular}', \$params);
+    }
 
-            );
+    public function editAction(\$id)
+    {
+        \${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model();
+        \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
 
-            //This will be used in the template to generate the above declared form.
-            $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
+        if(\$this->GetRequestManager()->isPost('submit'))
+        {
+            \${$this->name}Model->SetEntity('{$this->name}:{$this->name}', \$this->GetRequestManager()->PostParams());
 
-            $this->Render("' . $this->name . ':create.html.php", \'Create ' . $this->name . '\', $params);
-
-      }
-
-      public function editAction($id){
-
-            if($this->Request()->isPost("submit")){
-
-              if($'.$this->name.' = $this->getEntity("' . $this->name . 'Bundle:'.$this->name.'")->Save())
-                  $this->setFlash(array("Success" => "Update successful."));
-              else
-                  $this->setError(array("Failure" => "Failed to update."));
-
-              $this->forwardTo("' . $this->name . '_List");
-
+            if(\${$this->name}Model->Update{$this->singular}())
+            {
+                \$this->setFlash(array('Success' => 'Update successful.'));
+            }
+            else
+            {
+                \$this->setError(array('Failure' => 'Failed to update.'));
             }
 
-            $params["form"] = array(
+            \$this->forwardTo('{$this->name}_List');
+        }
 
-                \'title\' => \'Edit\',
-                \'action\' => $this->setRoute(\''.$this->name.'_Edit\', array(\'id\' => $id)),
-                \'table\' => $this->GetEntity(\''.$this->name.':'.$this->name.'\')->Get($id),
-                \'submission\' => array(
+        \$params['form'] = array(
 
-                    \'submit\' => array(
+            'title' => 'Edit',
+            'action' => \$this->setRoute('{$this->name}_Edit', array('id' => \$id)),
+            'table' => \${$this->name}Model
+                        ->GetEntityObject()
+                            ->Get(\$id),
+            'submission' => array(
 
-                        \'value\' => \'Save changes\',
-                        \'name\' => \'submit\'
-                    ),
-                )
+                'submit' => array(
 
-            );
+                    'value' => 'Save changes',
+                    'name' => 'submit'
+                ),
+            )
 
-            $params["PageTitle"] = "Edit '.$this->name.'";
+        );
 
-            $this->htmlgen = $this ->GetComponent(\'HTMLGenerator\') ;
+        \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-            $this->Render("' . $this->name . ':edit.html.php", \'Edit ' . $this->name . '\', $params);
+        \$this->Render('{$this->name}:edit.html.php', 'Edit {$this->singular}', \$params);
+    }
 
-      }
+    /**
+     *
+     * @param int \$id the id to delete from the database
+     * By default is ajax controlled.
+     *
+     */
+    public function deleteAction(\$id)
+    {
+        if(\$this->GetRequestManager()->isAjax())
+        {
+            \${$this->name}Entity = new {$this->name}Entity(\$id);
+            ${$this->name}Model = new \Bundles\{$this->name}\Models\{$this->name}Model(\${$this->name}Entity);
 
-      /**
-       *
-       * @param int $id the id to delete from the database
-       * By default is ajax controlled.
-       *
-       */
-      public function deleteAction($id){
+            \${$this->name} = \$this->getEntity('{$this->name}:{$this->name}');
 
-            if($this->Request()->isAjax()){
-
-              $'.$this->name.' = $this->getEntity("' . $this->name . ':'.$this->name.'");
-
-              if($' . $this->name . '->delete($id))
-                  echo \'success:Delete was successful\';
-              else
-                  echo \'error:Delete was unsuccessful\';
+            if(\${$this->name}Model->Delete{$this->singular}())
+            {
+                echo 'success:Delete was successful';
             }
-      }
+            else
+            {
+                echo 'error:Delete was unsuccessful';
+            }
+        }
+    }
 }
-              ';
 
-            fwrite($handle, $initController);
+";
 
-            fclose($handle);
+        $this->createFile($this->bundleFolder . "/Controllers/{$this->name}Controller.php", $initController);
 
-            $handle = fopen(BUNDLES_FOLDER . $this->name . '/Controllers/' . $this->name . 'BundleController.php', 'w+');
+        $initController = "<?php
 
-        $initController = '<?php
-
-namespace Bundles\\'.$this->name.'\\Controllers;
+namespace Bundles\\{$this->name}\\Controllers;
 
 
 
 use \\Application\\Core\\Controllers\\ApplicationController;
 
 
-// Use this class to inherit methods used in all or some of your ' . $this->name . ' bundle controllers
-// ' . $this->name . ' bundle created at: ' . date('l, d F, Y') . '
+// Use this class to inherit methods used in all or some of your {$this->name} bundle controllers
+// {$this->name} bundle created at: " . date('l, d F, Y') . "
 
-class ' . $this->name . 'BundleController extends ApplicationController{
+class {$this->name}BundleController extends ApplicationController{
 
 }
-              ';
 
-            fwrite($handle, $initController);
+";
 
-            fclose($handle);
+        $this->createFile("/Controllers/{$this->name}BundleController.php", $initController);
 
-            return $this;
+        return $this;
     }
 
     private function createRoutes(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Resources/Routes');
+        mkdir($this->bundleFolder . '/Resources/Routes');
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Resources/Routes/' . $this->name . '.Routes.php', 'w+');
-
-        $initRoute = '<?php
+        $initRoute = "<?php
 
 
-Set::Route(\'' . $this->name . '\', array(
+Set::Route('{$this->name}', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':index",
-      "Pattern" => "/' . $this->name . '/"
+      'Controller' => '{$this->name}:{$this->name}:index',
+      'Pattern' => '/{$this->name}/'
 ));
 
-Set::Route(\'' . $this->name . '_List\', array(
+Set::Route('{$this->name}_List', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':list",
-      "Pattern" => "/' . $this->name . '/List/"
+      'Controller' => '{$this->name}:{$this->name}:list',
+      'Pattern' => '/{$this->name}/List/'
 ));
 
-Set::Route(\'' . $this->name . '_View\', array(
+Set::Route('{$this->name}_View', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':view",
-      "Pattern" => "/' . $this->name . '/View/{id}/"
+      'Controller' => '{$this->name}:{$this->name}:view',
+      'Pattern' => '/{$this->name}/View/{id}/'
 ));
 
-Set::Route(\'' . $this->name . '_Create\', array(
+Set::Route('{$this->name}_Create', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':create",
-      "Pattern" => "/' . $this->name . '/Create/"
+      'Controller' => '{$this->name}:{$this->name}:create',
+      'Pattern' => '/{$this->name}/Create/'
 ));
 
-Set::Route(\'' . $this->name . '_Edit\', array(
+Set::Route('{$this->name}_Edit', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':edit",
-      "Pattern" => "/' . $this->name . '/Edit/{id}/"
+      'Controller' => '{$this->name}:{$this->name}:edit',
+      'Pattern' => '/{$this->name}/Edit/{id}/'
 ));
 
-Set::Route(\'' . $this->name . '_Delete\', array(
+Set::Route('{$this->name}_Delete', array(
 
-      "Controller" => "' . $this->name . ':' . $this->name . ':delete",
-      "Pattern" => "/' . $this->name . '/Delete/{id}/"
+      'Controller' => '{$this->name}:{$this->name}:delete',
+      'Pattern' => '/{$this->name}/Delete/{id}/'
 ));
-              ';
+";
 
-            fwrite($handle, $initRoute);
+        $this->createFile($this->bundleFolder . "/Resources/Routes/{$this->name}.Routes.php", $initRoute);
 
-            fclose($handle);
-
-            return $this;
+        return $this;
     }
 
     private function CreateAssets(){
@@ -752,193 +714,159 @@ Set::Route(\'' . $this->name . '_Delete\', array(
         mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/JS');
         mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/CSS');
 
-        $handle = fopen(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/JS/' . $this->name . '.js', 'w+');
-
-        $initRoute = '/* Javascript for '.$this->name.' Bundle */
+        $initJs = "/* Javascript for {$this->name} Bundle */
 
 jQuery(document).ready(function(){
 
 });
 
-';
+";
 
-            fwrite($handle, $initRoute);
+        $this->createFile(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . "/JS/{$this->name}.js", $initJs);
 
-            fclose($handle);
-
-        $handle = fopen(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/CSS/' . $this->name . '.css', 'w+');
-
-        $initRoute = '/* Stylesheet for '.$this->name.' Bundle */
+        $initCss= "/* Stylesheet for {$this->name} Bundle */
 
 root{
     font-size: 12px;
     font-family: verdana;
     color: black;
-}';
+}";
 
-            fwrite($handle, $initRoute);
+        $this->createFile(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . "/CSS/{$this->name}.css", $initCss);
 
-            fclose($handle);
-
-            return $this;
+        return $this;
     }
 
     private function createTests(){
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Tests');
+        mkdir($this->bundleFolder . '/Tests');
+        mkdir($this->bundleFolder . '/Tests/Config');
 
-        mkdir(BUNDLES_FOLDER . $this->name . '/Tests/Config');
+        $initTests = '<?php';
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Config/' . $this->name . '.Test.Config.php', 'w+');
+        $this->createFile($this->bundleFolder . "/Tests/Config/{$this->name}.Test.Config.php", $initTests);
 
-        $initTemplate = '<?php
-            ';
+        mkdir($this->bundleFolder . '/Tests/Scenarios');
 
-        fwrite($handle, $initTemplate);
+        $initTests = "<?php
 
-        fclose($handle);
-
-        mkdir(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios');
-
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Controller.Test.php', 'w+');
-
-        $initTemplate = '<?php
-
-namespace Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 
 
 use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Controller extends WebTestCase
+class Test{$this -> name}Controller extends WebTestCase
 {
     public function testIndexAction()
     {
-        self::$testClass = new \\Bundles\\'.$this->name.'\\Controllers\\'.$this->name.'Controller();
+        self::\$testClass = new \\Bundles\\{$this->name}\\Controllers\\{$this->name}Controller();
 
-        $method = \'IndexAction\';
+        \$method = 'IndexAction';
 
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($method, array(\'case\' => \'string\'));
+        \$this->AssertTrue(\$method, array('case' => 'string'));
     }
-}';
+}";
 
-        fwrite($handle, $initTemplate);
+        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Controller.Test.php", $initTests);
 
-        fclose($handle);
+        $initTests = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Entity.Test.php', 'w+');
-
-        $initTemplate = '<?php
-
-namespace Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 
 
 use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Entity extends WebTestCase
+class Test{$this -> name}Entity extends WebTestCase
 {
     public function testExampleMethod()
     {
-        self::$testClass = new \\Bundles\\'.$this->name.'\\Entities\\'.$this->name.'Entity();
+        self::\$testClass = new \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity();
 
-        $method = \'\';
+        \$method = '';
 
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($method, array(\'case\' => \'string\'));
+        \$this->AssertTrue(\$method, array('case' => 'string'));
     }
-}';
+}";
 
-        fwrite($handle, $initTemplate);
+        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Entity.Test.php", $initTests);
 
-        fclose($handle);
+        $initTests = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Repository.Test.php', 'w+');
-
-        $initTemplate = '<?php
-
-namespace Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 
 
 use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Repository extends WebTestCase
+class Test{$this -> name}Repository extends WebTestCase
 {
     public function testExampleMethod()
     {
-        self::$testClass = new \\Bundles\\'.$this->name.'\\Repositories\\'.$this->name.'Repository();
+        self::\$testClass = new \\Bundles\\{$this->name}\\Repositories\\{$this->name}Repository();
 
-        $method = \'\';
+        \$method = '';
 
         //Checks if the returned value of this function is an integer
-        $this ->AssertTrue($method, array(\'case\' => \'array\'));
+        \$this->AssertTrue(\$method, array('case' => 'array'));
     }
-}';
+}";
 
-        fwrite($handle, $initTemplate);
+        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Repository.Test.php", $initTests);
 
-        fclose($handle);
+        $initTests = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Templates.Test.php', 'w+');
-
-        $initTemplate = '<?php
-
-namespace Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 
 
 use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Templates extends WebTestCase
+class Test{$this -> name}Templates extends WebTestCase
 {
     public function testTemplateList()
     {
-        $this->AssertTemplate(\''.$this->name.':list.html.php\');
+        \$this->AssertTemplate('{$this->name}:list.html.php');
     }
 
     public function testTemplateCreate()
     {
-        $this->AssertTemplate(\''.$this->name.':create.html.php\');
+        \$this->AssertTemplate('{$this->name}:create.html.php');
     }
 
     public function testTemplateEdit()
     {
-        $this->AssertTemplate(\''.$this->name.':edit.html.php\');
+        \$this->AssertTemplate('{$this->name}:edit.html.php');
     }
 
     public function testTemplateView()
     {
-        $this->AssertTemplate(\''.$this->name.':view.html.php\');
+        \$this->AssertTemplate('{$this->name}:view.html.php');
     }
-}';
+}";
 
-        fwrite($handle, $initTemplate);
+        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Templates.Test.php", $initTests);
 
-        fclose($handle);
+        $initTests = "<?php
 
-        $handle = fopen(BUNDLES_FOLDER . $this->name . '/Tests/Scenarios/' . $this->name . 'Model.Test.php', 'w+');
-
-        $initTemplate = '<?php
-
-namespace Bundles\\'.$this->name.'\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 
 
 use Application\\Console\\WebTestCase;
 
-class Test'.$this -> name.'Model extends WebTestCase
+class Test{$this -> name}Model extends WebTestCase
 {
     public function testModelMethod()
     {
 
     }
-}';
+}";
 
-        fwrite($handle, $initTemplate);
-
-        fclose($handle);
+        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Model.Test.php", $initTests);
 
         return $this;
     }

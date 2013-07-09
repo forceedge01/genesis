@@ -17,9 +17,9 @@ final class usersController extends usersBundleController implements usersContro
       public
             $htmlgen;
 
-      public function indexAction(){
-
-              $this->forwardToController("users_List");
+      public function indexAction()
+      {
+           $this->forwardToController("users_List");
       }
 
       public function loginAction()

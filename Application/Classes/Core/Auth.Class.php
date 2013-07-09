@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Auth extends Application{
+class Auth extends Template{
 
     protected
             $username,
@@ -111,7 +111,7 @@ class Auth extends Application{
 
     private function authenticate(){
 
-        $db = new Database();
+        $db = $this->GetDatabaseManager();
 
         $password = $hash = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->password . \Get::Config('Auth.Security.Salt'));
 

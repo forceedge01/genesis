@@ -11,7 +11,6 @@ Set::Config('Cache', array(
             'level' => 5
         ),
         'expire' => 60*60,
-        'folder' => ROOT . 'Public/Cache/',
     ),
     'javascript' => array(
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Tests;
+namespace Bundles\users\Tests;
 
 
 
@@ -10,7 +10,7 @@ class TestusersController extends WebTestCase
 {        
     public function testIndexAction()
     {
-        self::$testClass = new \Application\Bundles\users\Controllers\usersController();
+        self::$testClass = new \Bundles\users\Controllers\usersController();
             
         $method = 'IndexAction';
         

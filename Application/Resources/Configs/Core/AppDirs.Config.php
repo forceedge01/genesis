@@ -32,6 +32,8 @@ define('SOURCE_FOLDER', ROOT . 'Source/');
 
 define('BUNDLES_FOLDER', SOURCE_FOLDER . 'Bundles/');
 
+define('CACHE_FOLDER', ROOT . 'Public/Cache');
+
 
 
 // Templating and public folders

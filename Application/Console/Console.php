@@ -218,46 +218,65 @@ class Console {
 
             case 'test':
             {
+                $this->object = New Test();
+                
                 switch($args[1])
                 {
                     case 'routes':
                     {
-                        $test = New Test('route');
-                        $test->RunTests();
+                        $this->object->RunTests('route');
+                        break;
                     }
 
                     case 'classes':
                     {
-                        $test = New Test('class');
-                        $test->RunTests();
+                        $this->object->RunTests('class');
+                        break;
                     }
 
                     case 'methods':
                     {
-                        $test = New Test('method');
-                        $test->RunTests();
+                        $this->object->RunTests('method');
+                        break;
                     }
 
                     case 'templates':
                     {
-                        $test = New Test('template');
-                        $test->RunTests();
+                        $this->object->RunTests('template');
+                        break;
                     }
 
                     case 'models':
                     {
-                        $test = New Test('model');
-                        $test->RunTests();
+                        $this->object->RunTests('model');
+                        break;
                     }
 
                     case 'all':
                     {
-                        if(!is_object($this -> object))
-                            $this -> object = new Test();
+                        if(!is_object($this->object))
+                            $this->object = new Test();
 
-                        $this -> object ->RunTests();
+                        $this->object->RunTests();
 
-                        $this -> object -> clearResults();
+                        $this->object->clearResults();
+                        break;
+                    }
+                }
+                break;
+            }
+            
+            case 'cache':
+            {
+                require_once APPLICATION_CLASSES_FOLDER . 'Core/Debugger.Class.php';
+                require_once APPLICATION_COMPONENTS_FOLDER . 'Directory/Directory.Class.php';
+                
+                $cache = new Cache();
+                switch($args[1])
+                {
+                    case 'clear':
+                    {
+                        $cache->Clear();
                         break;
                     }
                 }
@@ -272,8 +291,10 @@ class Console {
                     {
                         $watcher = new Watcher($args[2], 'test:all');
                         $watcher ->automate();
+                        break;
                     }
                 }
+                break;
             }
 
             default:

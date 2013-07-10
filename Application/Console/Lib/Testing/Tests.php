@@ -19,8 +19,11 @@ class Test extends BaseTestingRoutine{
         $this ->LoadTestFiles();
     }
 
-    public function RunTests()
+    public function RunTests($type = null)
     {        
+        if($type != null)
+            $this->type = $type;
+        
         error_reporting(E_ERROR);
 
         foreach($this -> testClassesAndComponents as $classOrComponent)

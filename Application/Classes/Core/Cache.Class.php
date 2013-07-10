@@ -8,7 +8,7 @@ class Cache extends AppMethods{
 
     public static function CheckForCachedFile($pattern)
     {
-        $file = str_replace('//', '/', \Get::Config('Cache.html.folder') . $pattern . '/index.html');
+        $file = str_replace('//', '/', CACHE_FOLDER . $pattern . '/index.html');
 
         if(file_exists($file))
         {
@@ -31,7 +31,7 @@ class Cache extends AppMethods{
     {
         $folderChunks = explode('/', $pattern);
 
-        $patt = \Get::Config('Cache.html.folder');
+        $patt = CACHE_FOLDER;
 
         foreach($folderChunks as $f)
         {

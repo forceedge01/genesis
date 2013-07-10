@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Tests;
+namespace Bundles\users\Tests;
 
 
 
@@ -10,7 +10,7 @@ class TestusersEntity extends WebTestCase
 {
     public function testExampleMethod()
     {   
-        self::$testClass = new \Application\Bundles\users\Entities\usersEntity();
+        self::$testClass = new \Bundles\users\Entities\usersEntity();
         
         $method = '';
 

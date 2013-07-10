@@ -19,6 +19,9 @@ function getOptions() {
             'test:model',
             'test:all',
         ),
+        'Cache' => array(
+            'cache:clear'
+        ),
         'Other' => array(
             'automate:testing',
             'exit'

@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Bundles\users\Tests;
+namespace Bundles\users\Tests;
 
 
 
@@ -10,7 +10,7 @@ class TestusersTemplates extends WebTestCase
 {
     public function testTemplateExampleMethod()
     {
-        self::$testClass = new \Application\Bundles\users\Repositories\usersRepository();
+        self::$testClass = new \Bundles\users\Repositories\usersRepository();
 
         $method = '';
 

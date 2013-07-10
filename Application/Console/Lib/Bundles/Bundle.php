@@ -10,8 +10,9 @@ class Bundle extends Console {
 
     public
             $name,
-            $renderMethod,
+            $bundle,
             $singular,
+            $renderMethod,
             $bundleFolder;
 
     public function __construct($type) {
@@ -25,17 +26,17 @@ class Bundle extends Console {
 
             echo 'Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ';
 
-            $this->name = $this->singular = str_replace('bundle', '', strtolower($this->readUser()));
+            $this->bundle = preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle';
+            $this->name = $this->singular = preg_replace('/bundle/i', '', $this->bundle);
 
-            if(substr($this->singular, -1) == 's')
-                  $this->singular = substr($this->singular, 0, -1);
-
+            if(substr($this->name, -1) == 's' || substr($this->name, -1) == 'S')
+                  $this->singular = substr($this->name, 0, -1);
         }
 
-        $this->bundleFolder = $this->bundleFolder;
+        $this->bundleFolder = BUNDLES_FOLDER . $this->name;
 
-        if (mkdir($this->bundleFolder)) {
-
+        if (mkdir($this->bundleFolder)) 
+        {
             $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests() ->CreateAssets();
         }
 
@@ -116,7 +117,7 @@ class Bundle extends Console {
 
         $initTemplate = "<?php
 
-Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', BUNDLES_FOLDER{$this->name});";
+Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', BUNDLES_FOLDER . '{$this->name}');";
 
         $this->createFile($this->bundleFolder . "/Resources/Configs/{$this->name}.Config.php", $initTemplate);
 
@@ -135,7 +136,7 @@ namespace Bundles\\{$this->name}\\Entities;
 
 
 
-use \\Application\\Core\\Entities\\ApplicationEntity;
+use \\Application\\Entities\\ApplicationEntity;
 
 // This Entity represents {$this->name} table
 
@@ -152,13 +153,13 @@ namespace Bundles\\{$this->name}\\Repositories;
 
 
 
-use \\Application\\Core\\Repositories\\ApplicationRepository;
+use \\Application\\Repositories\\ApplicationRepository;
 
-use \\Application\\Bundles\\{$this->name}\\Interfaces\\{$this->name}RepositoryInterface;
+use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}RepositoryInterface;
 
 // This Repository holds methods to query {$this->name} table
 
-final class {$this->name}Repository extends ApplicationRepository implements {$this->name}Repository.Interface{
+final class {$this->name}Repository extends ApplicationRepository implements {$this->name}RepositoryInterface{
 
 }
               ";
@@ -176,6 +177,7 @@ namespace Bundles\\{$this->name}\\Models;
 
 
 
+use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ModelInterface;
 
 // Model represents the logic of {$this->name} table with the application
 
@@ -391,6 +393,38 @@ namespace Bundles\\{$this->name}\\Interfaces;
  */
 interface {$this->name}ModelInterface {
 
+    /**
+     *
+     * @author <Above>
+     *
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function Create{$this->singular}();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function Update{$this->singular}();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function Delete{$this->singular}();
 }
 ";
 
@@ -613,9 +647,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         if(\$this->GetRequestManager()->isAjax())
         {
             \${$this->name}Entity = new {$this->name}Entity(\$id);
-            ${$this->name}Model = new {$this->name}Model(\${$this->name}Entity);
-
-            \${$this->name} = \$this->getEntity('{$this->name}:{$this->name}');
+            \${$this->name}Model = new {$this->name}Model(\${$this->name}Entity);
 
             if(\${$this->name}Model->Delete{$this->singular}())
             {
@@ -639,7 +671,7 @@ namespace Bundles\\{$this->name}\\Controllers;
 
 
 
-use \\Application\\Core\\Controllers\\ApplicationController;
+use \\Application\\Controllers\\ApplicationController;
 
 
 // Use this class to inherit methods used in all or some of your {$this->name} bundle controllers
@@ -651,7 +683,7 @@ class {$this->name}BundleController extends ApplicationController{
 
 ";
 
-        $this->createFile("/Controllers/{$this->name}BundleController.php", $initController);
+        $this->createFile($this->bundleFolder . "/Controllers/{$this->name}BundleController.php", $initController);
 
         return $this;
     }
@@ -740,7 +772,8 @@ root{
         mkdir($this->bundleFolder . '/Tests');
         mkdir($this->bundleFolder . '/Tests/Config');
 
-        $initTests = '<?php';
+        $initTests = '<?php
+            ';
 
         $this->createFile($this->bundleFolder . "/Tests/Config/{$this->name}.Test.Config.php", $initTests);
 

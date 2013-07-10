@@ -35,7 +35,7 @@ class Bundle extends Console {
 
         $this->bundleFolder = BUNDLES_FOLDER . $this->name;
 
-        if (mkdir($this->bundleFolder)) 
+        if (mkdir($this->bundleFolder))
         {
             $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests() ->CreateAssets();
         }
@@ -772,8 +772,10 @@ root{
         mkdir($this->bundleFolder . '/Tests');
         mkdir($this->bundleFolder . '/Tests/Config');
 
-        $initTests = '<?php
-            ';
+        $initTests = "<?php
+
+
+Set::Config('{$this->name}Testing', array());";
 
         $this->createFile($this->bundleFolder . "/Tests/Config/{$this->name}.Test.Config.php", $initTests);
 
@@ -783,9 +785,12 @@ root{
 
 namespace Bundles\\{$this->name}\\Tests;
 
+require_once '../Config/{$this->name}.Test.Config.php';
+
 
 
 use Application\\Console\\WebTestCase;
+
 
 class Test{$this -> name}Controller extends WebTestCase
 {
@@ -806,11 +811,14 @@ class Test{$this -> name}Controller extends WebTestCase
 
 namespace Bundles\\{$this->name}\\Tests;
 
+require_once '../Config/{$this->name}.Test.Config.php';
 
 
-use Application\\Console\\WebTestCase;
 
-class Test{$this -> name}Entity extends WebTestCase
+use Application\\Console\\BaseTestingRoutine;
+
+
+class Test{$this -> name}Entity extends BaseTestingRoutine
 {
     public function testExampleMethod()
     {
@@ -829,11 +837,13 @@ class Test{$this -> name}Entity extends WebTestCase
 
 namespace Bundles\\{$this->name}\\Tests;
 
+require_once '../Config/{$this->name}.Test.Config.php';
 
 
-use Application\\Console\\WebTestCase;
+use Application\\Console\\BaseTestingRoutine;
 
-class Test{$this -> name}Repository extends WebTestCase
+
+class Test{$this -> name}Repository extends BaseTestingRoutine
 {
     public function testExampleMethod()
     {
@@ -852,11 +862,14 @@ class Test{$this -> name}Repository extends WebTestCase
 
 namespace Bundles\\{$this->name}\\Tests;
 
+require_once '../Config/{$this->name}.Test.Config.php';
 
 
-use Application\\Console\\WebTestCase;
 
-class Test{$this -> name}Templates extends WebTestCase
+use Application\\Console\\TemplateTestCase;
+
+
+class Test{$this -> name}Templates extends TemplateTestCase
 {
     public function testTemplateList()
     {
@@ -885,13 +898,26 @@ class Test{$this -> name}Templates extends WebTestCase
 
 namespace Bundles\\{$this->name}\\Tests;
 
+require_once '../Config/{$this->name}.Test.Config.php';
 
 
-use Application\\Console\\WebTestCase;
 
-class Test{$this -> name}Model extends WebTestCase
+use Application\\Console\\BaseTestingRoutine;
+
+
+class Test{$this -> name}Model extends BaseTestingRoutine
 {
-    public function testModelMethod()
+    public function testModelCreate{$this->singular}Method()
+    {
+
+    }
+
+    public function testModelUpdate{$this->singular}Method()
+    {
+
+    }
+
+    public function testModelDelete{$this->singular}Method()
     {
 
     }

@@ -14,16 +14,16 @@ class Test extends BaseTestingRoutine{
     public function __construct($type = null) {
 
         parent::__construct();
-        
+
         $this->type = $type;
         $this ->LoadTestFiles();
     }
 
     public function RunTests($type = null)
-    {        
+    {
         if($type != null)
             $this->type = $type;
-        
+
         error_reporting(E_ERROR);
 
         foreach($this -> testClassesAndComponents as $classOrComponent)
@@ -43,29 +43,36 @@ class Test extends BaseTestingRoutine{
         }
 
         foreach ($this -> testBundles as $bundle)
-        {            
-            $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Entity';
+        {
+            $object = 'Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Entity';
 
             if(class_exists($object))
             {
                 $this->CallMethods($object);
             }
 
-            $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Repository';
+            $object = 'Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Repository';
 
             if(class_exists($object))
             {
                 $this->CallMethods($object);
             }
 
-            $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Controller';
+            $object = 'Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Model';
 
             if(class_exists($object))
             {
                 $this->CallMethods($object);
             }
-            
-            $object = 'Application\\Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Templates';
+
+            $object = 'Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Controller';
+
+            if(class_exists($object))
+            {
+                $this->CallMethods($object);
+            }
+
+            $object = 'Bundles\\'.$bundle.'\\Tests\\Test'.$bundle.'Templates';
 
             if(class_exists($object))
             {
@@ -79,7 +86,7 @@ class Test extends BaseTestingRoutine{
     }
 
     private function CallMethods($object)
-    {   
+    {
         $f = new \ReflectionClass($object);
 
         $methods = array();
@@ -113,15 +120,15 @@ class Test extends BaseTestingRoutine{
         foreach($methods as $method)
         {
             self::$tests += 1;
-            
+
             echo $this ->linebreak(1),' -> ', $this->blue($method), '();';
-            
+
             ob_end_clean();
             ob_start();
-            
+
             $obj -> $method();
             $content = ob_get_clean();
-            
+
             if($content)
                 echo $content;
             else

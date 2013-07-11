@@ -84,6 +84,10 @@ class Console {
             {
                 color: yellowgreen; cont-size: 14; padding: 5px;
             }
+            input[type="radio"]:checked+label
+            {
+                color: orange;
+            }
             
             </style>
             ';
@@ -109,7 +113,7 @@ class Console {
                 
                 foreach($option as $opt)
                 {
-                    echo "<div class='option'><input type='radio' id='$opt' name='option[]' value='$opt'> <label for='$opt'> $opt</label></div><br />";
+                    echo "<div class='option'><input type='radio' ".($_POST['option'][0] == $opt ? 'checked=checked' : '')." id='$opt' name='option[]' value='$opt'> <label for='$opt'> $opt</label></div><br />";
                 }
             }
 
@@ -119,7 +123,7 @@ class Console {
 
             foreach ($bundles as $bundle) {
 
-                echo "<div class='option'><input type='radio' name='bundleName[]' value='$bundle'> <label for=''>$bundle</label></div><br />";
+                echo "<div class='option'><input type='radio' id='$bundle' ".($_POST['bundleName'][0] == $bundle ? 'checked=checked' : '')." name='bundleName[]' value='$bundle'> <label for='$bundle'>$bundle</label></div><br />";
             }
 
             echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';

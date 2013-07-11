@@ -56,11 +56,11 @@ class Auth extends Template{
      */
     public function authenticateUser($message){
 
-        if(\Get::Config('Auth.Validation.Email'))
+        if(\Get::Config('Auth.Validation.Email.Enable'))
         {
             if(!$this->isValidEmail($this->username))
             {
-                $this->setError(array('Invalid User' => 'Invalid characters found in email address'));
+                $this->setError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
                 return false;
             }
         }
@@ -104,7 +104,7 @@ class Auth extends Template{
         }
         else
         {
-            $this->setError('Your account has been locked for trying too many times, try again later');
+            $this->setError(\Get::Config('Auth.Security.BruteForce.Message'));
             return false;
         }
     }
@@ -113,7 +113,7 @@ class Auth extends Template{
 
         $db = $this->GetDatabaseManager();
 
-        $password = $hash = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->password . \Get::Config('Auth.Security.Salt'));
+        $password = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->password . \Get::Config('Auth.Security.Salt'));
 
         $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
 
@@ -122,6 +122,7 @@ class Auth extends Template{
             $userBrowser = $_SERVER['HTTP_USER_AGENT'];
 
             $this->GetCoreObject('Session')->Set('login_string', hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser));
+            
             return true;
         }
         else
@@ -135,7 +136,7 @@ class Auth extends Template{
 
     public function generatePasswordHash($password)
     {
-        return hash(\Get::Config('Auth.PasswordEncryption'), $password.\Get::Config('Auth.Security.Salt'));
+        return hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.\Get::Config('Auth.Security.Salt'));
     }
 
     public function forwardToLoggedInPage()
@@ -182,7 +183,7 @@ class Auth extends Template{
         {
             $timeBlocked = $session->Get('Blocked.'.$this->username);
 
-            if(($timeBlocked + \Get::Config('Auth.Security.BlockedCoolDownPeriod')) < time())
+            if(($timeBlocked + \Get::Config('Auth.Security.BruteForce.BlockedCoolDownPeriod')) < time())
             {
                 $session->Remove('Blocked.'.$this->username)->Remove('BruteForceAttempt');
             }
@@ -192,7 +193,7 @@ class Auth extends Template{
         {
             $session->Set('BruteForceAttempt', ($session->Get('BruteForceAttempt')+1));
 
-            if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.MaxLoginAttempts'))
+            if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.BruteForce.MaxLoginAttempts'))
             {
                 $session->Set('Blocked.'.$this->username, time());
                 return false;

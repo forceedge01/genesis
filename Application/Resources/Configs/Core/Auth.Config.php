@@ -10,7 +10,11 @@ Set::Config('Auth', array(
     
     'Validation' => array(
 
-        'Email' => true,
+        'Email' => array(
+            
+            'Enable' =>true,
+            'Message' => 'Invalid characters found in email address'
+        ),
     ),
     
     'DBTable' => array(
@@ -22,8 +26,12 @@ Set::Config('Auth', array(
     'Security' => array(
 
         'SessionInterval' => 60*60, // 1
-        'MaxLoginAttempts' => 3,
-        'BlockedCoolDownPeriod' => 10, // 1
+        'BruteForce' => array(
+            
+            'MaxLoginAttempts' => 3,
+            'Message' => 'Your account has been locked for trying too many times, try again later',
+            'BlockedCoolDownPeriod' => 10, // 1
+        ),
         'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs', // 2
         'PasswordEncryption' => 'SHA512', // 3
         'Bypass' => array(

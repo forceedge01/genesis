@@ -6,6 +6,7 @@ Set::Config('Application', array(
     'Admin_Email' => 'wahab.qureshi@digitalanimal.com',
     'Base_Route_Name' => 'Application',
     'LandingPageRoute' => 'users_List',
+    'Environment' => 'production',
     'Session' => array(
 
         'Enabled' => true,

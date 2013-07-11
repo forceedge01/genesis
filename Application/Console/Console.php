@@ -13,7 +13,7 @@ class Console {
 
         if (!isset($_SERVER['SERVER_NAME'])) {
 
-            echo $this ->blue(' =========>>> Welcome to Genesis console generator, please choose an option and proceed with the onscreen instructions. <<<=========') ;
+            echo $this ->blue(' =========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<=========') ;
             $this->linebreak(1);
 
             while (true) {
@@ -35,8 +35,60 @@ class Console {
                 $this->switchOption($args[0]);
             }
         } else {
+            
+            echo '
+            <title>Simplify</title>
+            <style>
+            
+            .mainHeading
+            {
+                color: steelblue; font-size: 18px; padding: 10px; background-color: whitesmoke;
+            }
+            
+            .heading
+            {
+                color: steelblue; background-color: whitesmoke; padding: 10px; font-size: 16px; float: left; width: 100%; margin: 10px 0px;
+            }
+            
+            .form
+            {
+                line-height: 25px;
+            }
+            
+            .form input[type=text]
+            {
+                width: 200px;
+                padding: 5px;
+            }
+            
+            .form .option label:hover
+            {
+                background-color: ghostwhite;
+            }
+            
+            .option input
+            {
+                float: left;
+                width: 3%;
+            }
+            
+            .option label
+            {
+                display: block;
+                float: left;
+                width: 96%;
+                padding: 3px;
+            }
+            
+            .subHeading
+            {
+                color: yellowgreen; cont-size: 14; padding: 5px;
+            }
+            
+            </style>
+            ';
 
-            echo '<h4>Welcome to Genesis CRUD generator, please choose an option and proceed with the onscreen instructions.</h4>';
+            echo '<div class="mainHeading">Welcome to Genesis Simplify Engine.</div>';
 
             $options = getOptions();
 
@@ -49,25 +101,25 @@ class Console {
                 $this->switchOption($option[0]);
             }
 
-            echo '<form method="post">';
+            echo '<form method="post" class="form">';
 
             foreach ($options as $key => $option) {
 
-                echo "<h4>$key</h4>";
+                echo "<div class='subHeading'>$key</div>";
                 
                 foreach($option as $opt)
                 {
-                    echo '<input type="radio" name="option[]" value="' . $opt . '">' . $opt . '</input><br />';
+                    echo "<div class='option'><input type='radio' id='$opt' name='option[]' value='$opt'> <label for='$opt'> $opt</label></div><br />";
                 }
             }
 
-            echo '<h4>List of bundles installed</h4>';
+            echo '<div class="heading">List of bundles installed</div>';
 
             $bundles = $bundle->readBundles(true);
 
             foreach ($bundles as $bundle) {
 
-                echo '<input type="radio" name="bundleName[]" value="' . $bundle . '">' . $bundle . '</input><br />';
+                echo "<div class='option'><input type='radio' name='bundleName[]' value='$bundle'> <label for=''>$bundle</label></div><br />";
             }
 
             echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';
@@ -373,4 +425,8 @@ class Console {
         fclose($handle);
     }
 
+    public function decide($readMessage, $htmlDefault)
+    {
+        return ( !$_SERVER['SERVER_NAME'] ? $this->readUser($readMessage) : $htmlDefault);
+    }
 }

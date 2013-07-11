@@ -44,12 +44,12 @@ class Bundle extends Console {
 
         echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
         
-        $ans = $this->readUser($this->blue('Do you want to create assets for this bundle? [yes/no]: '));
+        $ans = $this->decide($this->blue('Do you want to create assets for this bundle? [yes/no]: '), 'yes');
         
         if($ans == 'yes')
         {
             $this->CreateAssets();
-            echo $this->green("Assets for bundle {$bundleName} were successfully created.");
+            echo $this->green("Assets for bundle {$this->name} were successfully created.");
         }
         
         echo $this->linebreak(2);
@@ -82,6 +82,7 @@ class Bundle extends Console {
         else
         {
             $bundleName = $this->name;
+            $ans = 'yes';
         }
 
         if($ans == 'yes')
@@ -100,7 +101,7 @@ class Bundle extends Console {
                     
                     do
                     {
-                        $ans = $this->readUser($this->blue("Do you want to delete assets of {$bundleName} bundle? [yes/no]: "));
+                        $ans = $this->decide($this->blue("Do you want to delete assets of {$bundleName} bundle? [yes/no]: "), 'yes');
                     }
                     while($ans == null);
                     

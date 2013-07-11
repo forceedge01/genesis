@@ -24,7 +24,9 @@ class Bundle extends Console {
 
         if(!isset($_SERVER['SERVER_NAME'])){
 
-            echo 'Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ';
+            echo $this->linebreak(1);
+            
+            echo $this->blue('Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ');
 
             $this->bundle = preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle';
             $this->name = $this->singular = preg_replace('/bundle/i', '', $this->bundle);
@@ -37,51 +39,97 @@ class Bundle extends Console {
 
         if (mkdir($this->bundleFolder))
         {
-            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests() ->CreateAssets();
+            $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests();
         }
 
-        echo "Bundle {$this->name} has been created successfully!";
-
-        $this->linebreak(2);
+        echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
+        
+        $ans = $this->readUser($this->blue('Do you want to create assets for this bundle? [yes/no]: '));
+        
+        if($ans == 'yes')
+        {
+            $this->CreateAssets();
+            echo $this->green("Assets for bundle {$bundleName} were successfully created.");
+        }
+        
+        echo $this->linebreak(2);
     }
 
     public function deleteBundle() {
 
         if(!isset($_SERVER['SERVER_NAME'])){
-
+            
+            $ans = null;
+            
             $this->linebreak(1);
-
             echo 'Bundles you have in your application: ';
 
             $this->linebreak(1);
-
             $this->readBundles(false);
-
             $this->linebreak(1);
 
-            echo 'Enter name of the bundle you want to delete: ';
-
-            $bundleName = $this->readUser();
+            $bundleName = $this->readUser($this->blue('Enter name of the bundle you want to delete: '));
             $this->linebreak(1);
+            
+            do
+            {
+                $ans = $this->readUser($this->blue("Are you sure you want to delete $bundleName [yes/no]: "));
 
+                $this->linebreak(1);
+            }
+            while($ans == null);
         }
         else
+        {
             $bundleName = $this->name;
+        }
 
-        if(!empty($bundleName))
-            if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName)){
-
-                if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName)){
-
-                    $this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName);
+        if($ans == 'yes')
+        {
+            if(!empty($bundleName))
+            {
+                echo '... ',$this->linebreak(1);
+                
+                if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
+                {
+                    echo $this->green("Bundle {$bundleName} has been deleted successfully.");
+                    
+                    echo $this->linebreak(2);
+                    
+                    $ans = null;
+                    
+                    do
+                    {
+                        $ans = $this->readUser($this->blue("Do you want to delete assets of {$bundleName} bundle? [yes/no]: "));
+                    }
+                    while($ans == null);
+                    
+                    if($ans == 'yes')
+                    {
+                        echo '... ';
+                        
+                        if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName))
+                        {
+                            if($this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName))
+                            {
+                                echo $this->green("Assets of bundle {$bundleName} deleted successfully.");
+                            }
+                        }
+                        else
+                        {
+                            echo $this->red("Assets of bundle {$bundleName} were not found");
+                        }
+                    }                    
                 }
-
-                echo 'Bundle has been deleted successfully.';
+                else
+                {
+                    echo $this->red("Bundle {$bundleName} was not found");
+                }
             }
-            else
-                echo 'Unable to delete bundle.';
-        else
-            echo 'Bundle must have a name!';
+        }
+        
+        echo $this->linebreak(2);
+        
     }
 
     public function readBundles($return) {

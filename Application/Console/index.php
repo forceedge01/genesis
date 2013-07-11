@@ -23,7 +23,7 @@ function getOptions() {
             'cache:clear'
         ),
         'Other' => array(
-            'automate:testing',
+            'automate:testing-(beta)',
             'exit'
         )
     );

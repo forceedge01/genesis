@@ -1,1 +1,2 @@
- <?=$this->RenderTemplate(":Footer.html.php")?>
+<?=$this->IncludeJs('Welcome:Welcome.js');?>
+<?=$this->RenderTemplate(":Footer.html.php")?>

@@ -16,7 +16,7 @@ final class WelcomeController extends ApplicationController implements WelcomeCo
 
     public function indexAction() {
 
-        $params['PageTitle'] = 'Welcome to ' . \Get::Config('Application.Name');
+        $params['title'] = 'Welcome to ' . \Get::Config('Application.Name');
 
         $params['table'] = array(
 
@@ -148,7 +148,7 @@ final class WelcomeController extends ApplicationController implements WelcomeCo
 
         $this->htmlgen = $this->GetComponent('HTMLGenerator');
 
-        $this->Render('Welcome:index.html.php', $params);
+        $this->Render('Welcome:index.html.php', 'Welcome to Genesis', $params);
     }
 
     public function viewAction($id)

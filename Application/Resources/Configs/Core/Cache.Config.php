@@ -14,7 +14,7 @@ Set::Config('Cache', array(
     ),
     'javascript' => array(
 
-        'enabled' => true,
+        'enabled' => false,
         'unify' => true,
         'placement' => 'startof-body'
     ),

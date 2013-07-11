@@ -17,7 +17,7 @@ Set::Route('Class_Not_Found', array(
 Set::Route('Action_Not_Found', array(
 
     'Controller' => ':Errors:ActionNotFound',
-    'Pattern' => '/ActionNotFound/'
+    'Pattern' => '/ActionNotFound/',
 
 ));
 

@@ -5,7 +5,7 @@
 
         <legend>
 
-            <h1>Welcome to <?=APPLICATION_NAME?></h1>
+            <h1><?=$title;?></h1>
 
         </legend>
 
@@ -33,11 +33,11 @@
 
             <br />
 
-            <?=$this->htmlgen->Output($params['form'],'form')?>
+            <?=$this->htmlgen->Output($form,'form')?>
 
             <br />
 
-            <?=$this->htmlgen->Output($params['sections'], 'sections')?>
+            <?=$this->htmlgen->Output($sections, 'sections')?>
 
             <p>This page will tell you how to use The Genesis project to build your own web application.</p>
 

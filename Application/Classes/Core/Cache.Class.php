@@ -117,8 +117,7 @@ class Cache extends AppMethods{
             {
                 foreach($files as $file)
                 {
-                    $pattern = "<script .*$file.*></script>";
-                    $html = preg_replace('#'.$pattern.'#i', '', $html);
+                    $html = preg_replace("#<script .*$file.*></script>#i", '', $html);
                     $file = str_replace(HOST, ROOT, $file);
                     $modify .= filectime($file);
                     $aggregatedContents .= file_get_contents ($file);
@@ -129,8 +128,20 @@ class Cache extends AppMethods{
                 $url = JS_FOLDER . 'Unified/';
                 $tag = '<script type="text/javascript" src="'.$url.'unified.'.$modify.'.'.$extension.'"></script>';
                 Template::$jsFiles = array($url.'unified.'.$modify.'.'.$extension);
-                
-                $html = str_replace('</body>', $tag.'</body>', $html);
+                $placement = explode('-', \Get::Config('Cache.javascript.placement'));
+               
+                if($placement[0] == 'endof')
+                {   
+                    $html = str_replace('</'.$placement[1], $tag.'</'.$placement[1], $html);
+                }
+                else if($placement[1])
+                {
+                    $html = str_replace('<'.$placement[1].'>', "<{$placement[1]}>$tag", $html);
+                }
+                else
+                {
+                    $html = str_replace('</head>', "</head>$tag", $html);
+                }
 
                 break;
             }
@@ -140,7 +151,7 @@ class Cache extends AppMethods{
                 {
                     $html = preg_replace('#<link .*'.$file.'(?!>).*/>#i', '', $html);
                     $file = str_replace(HOST, ROOT, $file);
-                    $modify .= filectime(str_replace(HOST, ROOT, $file));
+                    $modify .= filectime($file);
                     $aggregatedContents .= file_get_contents ($file);
                 }
 
@@ -150,7 +161,20 @@ class Cache extends AppMethods{
                 $tag = '<link rel="stylesheet" href="'.$url.'unified.'.$modify.'.'.$extension.'" type="text/css">';
                 Template::$cssFiles = array($url.'unified.'.$modify.'.'.$extension);
                 
-                $html = str_replace('</head>', $tag.'</head>', $html);
+                $placement = explode('-', \Get::Config('Cache.css.placement'));
+               
+                if($placement[0] == 'endof')
+                {   
+                    $html = str_replace('</'.$placement[1], $tag.'</'.$placement[1], $html);
+                }
+                else if($placement[1])
+                {
+                    $html = str_replace('<'.$placement[1].'>', "<{$placement[1]}>$tag", $html);
+                }
+                else
+                {
+                    $html = str_replace('<head>', "<head>$tag", $html);
+                }
 
                 break;
             }

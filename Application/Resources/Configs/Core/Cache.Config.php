@@ -15,14 +15,15 @@ Set::Config('Cache', array(
     'javascript' => array(
 
         'enabled' => true,
-        'minify' => false,
-        'unify' => true
+        'unify' => true,
+        'placement' => 'startof-body'
     ),
     'css' => array(
 
         'enabled' => true,
         'minify' => true,
-        'unify' => false
+        'unify' => true,
+        'placement' => 'startof-body'
     ),
 ));
 

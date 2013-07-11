@@ -142,7 +142,7 @@ class TemplateTestCase extends BaseTestingRoutine{
                         $index = 1;
                         foreach($matches as $match)
                         {
-                            echo $this->linebreak(1),'        - ',$index,'. ',$match[0][0],' Line: ', $match[0]['line'],', Col: ',$match[0][1];
+                            echo $this->linebreak(1),$this->space(8), '- ',$index,'. ',$match[0][0],' Line: ', $match[0]['line'],', Col: ',$match[0][1];
                             $index ++;
                         }
                     }

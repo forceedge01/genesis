@@ -132,7 +132,7 @@ class Test extends BaseTestingRoutine{
             if($content)
                 echo $content;
             else
-                echo $this->linebreak (1),'    - No tests found';
+                echo $this->linebreak (1),$this->space (4), '- No tests found';
         }
     }
 

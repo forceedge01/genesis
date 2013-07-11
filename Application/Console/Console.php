@@ -36,7 +36,7 @@ class Console {
             }
         } else {
 
-            echo '<h3>Welcome to Genesis CRUD generator, please choose an option and proceed with the onscreen instructions.</h3>';
+            echo '<h4>Welcome to Genesis CRUD generator, please choose an option and proceed with the onscreen instructions.</h4>';
 
             $options = getOptions();
 
@@ -51,9 +51,14 @@ class Console {
 
             echo '<form method="post">';
 
-            foreach ($options as $option) {
+            foreach ($options as $key => $option) {
 
-                echo '<input type="radio" name="option[]" value="' . $option . '">' . $option . '</input><br />';
+                echo "<h4>$key</h4>";
+                
+                foreach($option as $opt)
+                {
+                    echo '<input type="radio" name="option[]" value="' . $opt . '">' . $opt . '</input><br />';
+                }
             }
 
             echo '<h4>List of bundles installed</h4>';
@@ -159,8 +164,8 @@ class Console {
         }
     }
 
-    public function linebreak($val) {
-
+    public function linebreak($val) 
+    {
         for ($i = 0; $i < $val; $i++) {
 
             if (!isset($_SERVER['SERVER_NAME']))
@@ -168,6 +173,21 @@ class Console {
             else
                 echo '<br />';
         }
+    }
+    
+    public function space($num)
+    {
+        $space = null;
+        
+        for ($i = 0; $i < $num; $i++) {
+
+            if (!isset($_SERVER['SERVER_NAME']))
+                $space .= ' ';
+            else
+                $space .= '&nbsp;';
+        }
+        
+        return $space;
     }
 
     function switchOption($switch) {
@@ -308,27 +328,42 @@ class Console {
 
     public function green($string)
     {
-        return "\033[32m".$string."\033[37m";
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[32m".$string."\033[37m";
+        else
+            return "<font color='#339933'>$string</font>";
     }
 
     public function red($string)
     {
-        return "\033[31m".$string."\033[37m";
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[31m".$string."\033[37m";
+        else
+            return "<font color='#B80000'>$string</font>";
     }
 
     public function blackOnRed($string)
     {
-        return "\033[41m".$string."\033[0m";
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[41m".$string."\033[0m";
+        else
+            return "<div style='background-color: #CC9999; padding: 10px'>$string</div>";
     }
 
     public function greenOnRed($string)
     {
-        return "\033[42m".$string."\033[0m";
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[42m".$string."\033[0m";
+        else
+            return "<div style='background-color: #CCFF99; padding: 10px'>$string</div>";
     }
 
     public function blue($string)
     {
-        return "\033[34m".$string."\033[37m";
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[34m".$string."\033[37m";
+        else
+            return "<font color='steelblue'>$string</font>";
     }
 
     public function createFile($filePath, $content)

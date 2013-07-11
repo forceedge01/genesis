@@ -36,9 +36,9 @@ class BaseTestingRoutine extends Console{
         $console = new Console();
 
         if($message)
-            echo $console->linebreak(1), $console->green ('    - '.$message);
+            echo $console->linebreak(1), $console->green ($console->space (4).'- '.$message);
         if($info)
-            echo $console->linebreak(1), '      - ', $console->blue($info);
+            echo $console->linebreak(1), $console->space (6), '- ', $console->blue($info);
     }
 
     protected static function RegisterFail($message = null, $info = null)
@@ -49,9 +49,9 @@ class BaseTestingRoutine extends Console{
         $console = new Console();
 
         if($message)
-            echo $console->linebreak(1), $console->red ('    - '.$message);
+            echo $console->linebreak(1), $console->red ($console->space (4) . '- '.$message);
         if($info)
-            echo $console->linebreak(1), '      - ', $console->blue($info);
+            echo $console->linebreak(1), $console->space (6), '- ', $console->blue($info);
     }
 
     // Private Methods //

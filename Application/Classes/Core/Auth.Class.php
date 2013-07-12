@@ -15,37 +15,33 @@ class Auth extends Template{
     public function __construct(){
 
         $this->username = @$_POST[\Get::Config('Auth.Form.EmailFieldName')];
-
         $this->password = @$_POST[\Get::Config('Auth.Form.PasswordFieldName')];
-
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
-
         $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
-
     }
 
-    public function forwardToLoginPage($message = null)
+    public function ForwardToLoginPage($message = null)
     {
-        $this->setFlash($message)->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->SetFlash($message)->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
-    public function logout($message = null)
+    public function Logout($message = null)
     {
         if(\Get::Config('Auth.Login.BeforeLogoutHookRoute'))
         {
-            $this->forwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
+            $this->ForwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
         }
 
         $this->GetCoreObject('Session')->Destroy()->Start();
 
-        $this->setFlash($message);
+        $this->SetFlash($message);
 
         if(\Get::Config('Auth.Login.AfterLogoutHookRoute'))
         {
-            $this->forwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
+            $this->ForwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
         }
 
-        $this->forwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
+        $this->ForwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
     }
 
     /**
@@ -54,20 +50,20 @@ class Auth extends Template{
      * @return boolean return true on success, false on failure
      * <br /><br />Use this function to authenticate a user in your login system, will function based on the parameters provided in the Auth config file.
      */
-    public function authenticateUser($message){
+    public function AuthenticateUser($message){
 
         if(\Get::Config('Auth.Validation.Email.Enable'))
         {
-            if(!$this->isValidEmail($this->username))
+            if(!$this->IsValidEmail($this->username))
             {
-                $this->setError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
+                $this->SetError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
                 return false;
             }
         }
 
         if($this->CheckBruteForceLogins())
         {
-            if($this->authenticate())
+            if($this->Authenticate())
             {
                 $userObject = \Get::Config('Auth.Login.EntityRepository');
                 $object = null;
@@ -78,7 +74,7 @@ class Auth extends Template{
                 }
                 else
                 {
-                    $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+                    $this->ForwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
                 }
 
                 $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
@@ -89,9 +85,9 @@ class Auth extends Template{
                     $this->User = $this->GetEntity('users:users')->FindBy(array($this->authField => $this->username));
 
                 $session = $this->GetCoreObject('Session');
-                $session->set('username', $this->username);
-                $session->set('login_time', time());
-                $session->set('login_expires', time() + \Get::Config('Auth.Security.SessionInterval'));
+                $session->Set('username', $this->username);
+                $session->Set('login_time', time());
+                $session->Set('login_expires', time() + \Get::Config('Auth.Security.SessionInterval'));
 
                 return true;
             }
@@ -104,12 +100,12 @@ class Auth extends Template{
         }
         else
         {
-            $this->setError(\Get::Config('Auth.Security.BruteForce.Message'));
+            $this->SetError(\Get::Config('Auth.Security.BruteForce.Message'));
             return false;
         }
     }
 
-    private function authenticate(){
+    private function Authenticate(){
 
         $db = $this->GetDatabaseManager();
 
@@ -129,24 +125,24 @@ class Auth extends Template{
             return false;
     }
 
-    public function generatePassword($length = 10)
+    public function GeneratePassword($length = 10)
     {
         return $this->GenerateRandomString($length);
     }
 
-    public function generatePasswordHash($password)
+    public function GeneratePasswordHash($password)
     {
         return hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.\Get::Config('Auth.Security.Salt'));
     }
 
-    public function forwardToLoggedInPage()
+    public function ForwardToLoggedInPage()
     {
         if($this->GetCoreObject('Session')->IsSessionKeySet('AccessedRoute'))
         {
-            $this->forwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
+            $this->ForwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
         }
 
-        $this->forwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
+        $this->ForwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
     }
 
     /**
@@ -218,7 +214,7 @@ class Auth extends Template{
             }
             else
             {
-                $this->forwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+                $this->ForwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
             }
 
             $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');

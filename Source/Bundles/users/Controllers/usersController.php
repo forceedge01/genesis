@@ -104,16 +104,16 @@ final class usersController extends usersBundleController implements usersContro
         {
             if (!$usersModel->SetEntity('users:users', $this->GetRequestManager()->PostParams()))
             {
-                $this->setError('Empty data passed');
+                $this->SetError('Empty data passed');
             }
 
             if ($usersModel->CreateUser())
             {
-                $this->setFlash(array("Success" => "Create successful."));
+                $this->SetFlash(array("Success" => "Create successful."));
             }
             else
             {
-                $this->setError(array("Failure" => "Failed to create."));
+                $this->SetError(array("Failure" => "Failed to create."));
             }
 
             $this->forwardTo("users_List");
@@ -152,11 +152,11 @@ final class usersController extends usersBundleController implements usersContro
 
             if ($usersModel->UpdateUser())
             {
-                $this->setFlash(array("Success" => "Update successful."));
+                $this->SetFlash(array("Success" => "Update successful."));
             }
             else
             {
-                $this->setError(array("Failure" => "Failed to update."));
+                $this->SetError(array("Failure" => "Failed to update."));
             }
 
             $this->forwardTo("users_List");

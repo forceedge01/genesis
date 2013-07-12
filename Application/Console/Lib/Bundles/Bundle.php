@@ -596,7 +596,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
             if(\${$this->name}Model->Create{$this->singular}())
             {
-                \$this->setFlash(array('Success' => 'Create successful.'));
+                \$this->SetFlash(array('Success' => 'Create successful.'));
             }
             else
             {
@@ -652,7 +652,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
             if(\${$this->name}Model->Update{$this->singular}())
             {
-                \$this->setFlash(array('Success' => 'Update successful.'));
+                \$this->SetFlash(array('Success' => 'Update successful.'));
             }
             else
             {

@@ -35,7 +35,7 @@ class Request extends AppMethods{
      */
     public function IsAjax(){
 
-        if($this->variable($_SERVER['HTTP_X_REQUESTED_WITH'])->IsNotEmpty()->ToLower()->Equals('xmlhttprequest')) {
+        if($this->Variable($_SERVER['HTTP_X_REQUESTED_WITH'])->IsNotEmpty()->ToLower()->Equals('xmlhttprequest')) {
 
             return $this;
         }
@@ -53,7 +53,7 @@ class Request extends AppMethods{
      */
     public function IsPost($key = null){
 
-        if($this->variable($_SERVER['REQUEST_METHOD'])->Equals('POST')) {
+        if($this->Variable($_SERVER['REQUEST_METHOD'])->Equals('POST')) {
 
             if(!empty($key)){
 
@@ -79,7 +79,7 @@ class Request extends AppMethods{
      */
     public function IsGet($key = null){
 
-        if($this->variable($_SERVER['REQUEST_METHOD'])->Equals('GET')) {
+        if($this->Variable($_SERVER['REQUEST_METHOD'])->Equals('GET')) {
 
             if(!empty($key)){
 

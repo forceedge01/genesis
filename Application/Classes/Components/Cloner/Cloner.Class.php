@@ -163,7 +163,7 @@ class Cloner extends Database {
 
                 $path = TEST_CANDIDATE_DIR;
 
-                $this->setFlash('Creating Test Candidate from: ' . $path . STREETTEAM_ZIP_NAME);
+                $this->SetFlash('Creating Test Candidate from: ' . $path . STREETTEAM_ZIP_NAME);
             }
             else
                 $path = SITE_MATERIAL_FOLDER;

@@ -69,7 +69,7 @@ class Template extends Router {
             require $templateUrl['path'].BUNDLE_VIEW_FOOTER_FILE;
         }
         else
-            $this->templateNotFound($templateUrl['template']);
+            $this->TemplateNotFound($templateUrl['template']);
 
         $this->html = ob_get_clean();
 
@@ -163,7 +163,7 @@ class Template extends Router {
      *
      * @param type $template - if template not found, render template not found error page
      */
-    private function templateNotFound($template){
+    private function TemplateNotFound($template){
 
         $params['Backtrace'] = debug_backtrace();
 
@@ -197,7 +197,7 @@ class Template extends Router {
 
         if(!is_file($template['template'])){
 
-            $this->templateNotFound ($template['template']);
+            $this->TemplateNotFound ($template['template']);
 
             exit;
         }
@@ -228,7 +228,7 @@ class Template extends Router {
      * @param type $params
      * Generates a css html tag
      */
-    public function includeCSS($css, $params = null) {
+    public function IncludeCSS($css, $params = null) {
 
         $source = null;
 
@@ -248,7 +248,7 @@ class Template extends Router {
      * @param type $params
      * Generates a JS html tag
      */
-    public function includeJS($js, $params = null) {
+    public function IncludeJS($js, $params = null) {
 
         $source = null;
 
@@ -268,7 +268,7 @@ class Template extends Router {
      * @param type $params
      * Generates an img html tag
      */
-    public function includeImage($image, $params = null) {
+    public function IncludeImage($image, $params = null) {
 
         if($this->associateAssetBundle($image))
             $image = '<img src="' . $this->bundle[0] . 'Images/' . $this->bundle[1] . '" ' . $params . ' />';
@@ -301,14 +301,19 @@ class Template extends Router {
         else
             return SOURCE_FOLDER . 'Assets/' . $asset;
     }
+    
+    public function Path($route, array $routeVars = array())
+    {
+        return $this->setRoute($route, $routeVars);
+    }
 
     /**
      *
      * @param type $asset
      * @param type $params
-     * Returns tag depending whether the asset is an image a css or a js file.
+     * Returns tag depending whether the asset is an image, css or a js file.
      */
-    public function setAsset($asset, $params = null) {
+    public function SetAsset($asset, $params = null) {
 
         $chunks = explode('.', $asset);
 
@@ -413,7 +418,7 @@ class Template extends Router {
      * @param type $array - the flash message to set
      * Set a flash message for the immidiate next template to be rendered, after displaying the message is deleted.
      */
-    protected function setFlash($message) {
+    protected function SetFlash($message) {
 
         if(!empty($message))
         {
@@ -438,7 +443,7 @@ class Template extends Router {
      * @param type $array - The error message to display
      * Sets an Error message for the immidiate next template to be rendered, after displaying message is deleted.
      */
-    protected function setError($message) {
+    protected function SetError($message) {
 
         if($message)
         {
@@ -514,7 +519,7 @@ class Template extends Router {
     }
 
     /**
-     * Display Errors set by setErrors
+     * Display Errors set by SetErrors
      */
     public function Errors() {
 
@@ -540,7 +545,7 @@ class Template extends Router {
     }
 
     /**
-     * flash all messages set by setFlash
+     * flash all messages set by SetFlash
      */
     public function Flashes() {
 
@@ -560,7 +565,7 @@ class Template extends Router {
      * @param type $params
      * @return string A styled string for elements
      */
-    public function applyStyle($params = array()){
+    public function ApplyStyle($params = array()){
 
         $style = ' style="';
 

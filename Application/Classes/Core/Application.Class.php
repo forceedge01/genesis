@@ -33,8 +33,8 @@ class Application extends Template{
                     $session->Destroy()->Start();
 
                     $this
-                        ->setError(array('Logged Out' => 'Your session has expired, please login again.'))
-                            ->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                        ->SetError(array('Logged Out' => 'Your session has expired, please login again.'))
+                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
             }
             else
@@ -45,7 +45,7 @@ class Application extends Template{
 
                     $this
                         ->setError(array('Access Denied' => 'You need to login to access this page.'))
-                            ->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
 
             }
@@ -94,7 +94,7 @@ class Application extends Template{
         }
         else {
 
-            $this->setError('You need more previliges to access this page.')->forwardTo(APPLICATION_BASE_ROUTE_NAME);
+            $this->SetError('You need more previliges to access this page.')->forwardTo(APPLICATION_BASE_ROUTE_NAME);
         }
 
     }

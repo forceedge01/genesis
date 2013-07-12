@@ -64,7 +64,7 @@ class Router extends AppMethods{
      * @return boolean - true on success, false on failure<br />
      * <br />Forwards the request to the appropriate controller once the params are read.
      */
-    public function forwardRequest(){
+    public function ForwardRequest(){
 
         $value = array();
 
@@ -73,7 +73,7 @@ class Router extends AppMethods{
             if(!$this->Variable(getenv('REMOTE_ADDR'))->Has(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
             {
                 $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
-                $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
+                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
             }
         }
 
@@ -83,7 +83,7 @@ class Router extends AppMethods{
         // Render the right controller;
         foreach(self::$Route as $key => $value)
         {
-            if($this->extractVariable($value['Pattern']) == $this->pattern)
+            if($this->ExtractVariable($value['Pattern']) == $this->pattern)
             {
                 if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
                 {
@@ -97,7 +97,7 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariable);
+                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariable);
             }
         }
 
@@ -109,7 +109,7 @@ class Router extends AppMethods{
      * @param type $route
      * @return string extract variables in the url
      */
-    private function extractVariable($route){
+    private function ExtractVariable($route){
 
         if(strpos($route,'{'))
         {
@@ -156,16 +156,16 @@ class Router extends AppMethods{
      * @param type $variable
      * @return string The complete route, to be used in templates.
      */
-    public function setRoute($route, $variable = null){
+    public function SetRoute($route, array $variable = array()){
 
         $this->route = $route;
 
         $this->funcVariable = $variable;
 
-        $this->getRawRoute();
+        $this->GetRawRoute();
 
         if(!empty($variable))
-            $this->extractAndReplaceVariable();
+            $this->ExtractAndReplaceVariable();
 
         $URL = HOST . 'index.php' . $this->routePattern;
 
@@ -179,9 +179,9 @@ class Router extends AppMethods{
      * @param type $route
      * @return string Gets a route and its details
      */
-    protected function getRoute($route)
+    protected function GetRoute($route)
     {
-        return  $this->setRoute($route);
+        return  $this->SetRoute($route);
     }
 
     /**
@@ -189,7 +189,7 @@ class Router extends AppMethods{
      * @param type $route
      * @return string gets raw route without any modification.
      */
-    private function getRawRoute($route = null){
+    private function GetRawRoute($route = null){
 
         if(!empty($route))
             $this->route = $route;
@@ -211,7 +211,7 @@ class Router extends AppMethods{
             'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
-        $this->forwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardToController('Error_Route_Not_Found', $error);
     }
 
     /**
@@ -219,7 +219,7 @@ class Router extends AppMethods{
      * @param type $route
      * @return string Gets the controller for a route specified.
      */
-    protected function getController($route){
+    protected function GetController($route){
 
         if(!empty($route))
             $this->route = $route;
@@ -246,7 +246,7 @@ class Router extends AppMethods{
 
         );
 
-        $this->forwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardToController('Error_Route_Not_Found', $error);
     }
 
     /**
@@ -255,13 +255,13 @@ class Router extends AppMethods{
      * @param type $urlQueryString - append this query string to the url to redirect to<br />
      * Redirects to a route.
      */
-    public function forwardTo($route, $urlQueryString = null){
+    public function ForwardTo($route, $urlQueryString = null){
 
         self::$LastRoute = $this->pattern;
 
         $this->GetCoreObject('Session')->Set('LastRoute', $route);
 
-        $route = $this->getRoute($route);
+        $route = $this->GetRoute($route);
 
         session_write_close();
 
@@ -278,7 +278,7 @@ class Router extends AppMethods{
      * @param type $variable<br />
      * Calls an action of a controller.
      */
-    private function callAction($objectName, $objectAction, $variable = null)
+    private function CallAction($objectName, $objectAction, $variable = null)
     {
         if(!empty($variable))
             $this->funcVariable = $variable;
@@ -296,7 +296,7 @@ class Router extends AppMethods{
 
             );
 
-            $this->forwardToController ('Class_Not_Found', $error);
+            $this->ForwardToController ('Class_Not_Found', $error);
 
         }
 
@@ -314,7 +314,7 @@ class Router extends AppMethods{
 
             );
 
-            $this->forwardToController('Action_Not_Found', $error);
+            $this->ForwardToController('Action_Not_Found', $error);
         }
 
         if(\Get::Config('Cache.html.enabled'))
@@ -349,13 +349,13 @@ class Router extends AppMethods{
      * <br />
      * Forward control from one controller to another without redirecting.
      */
-    public function forwardToController($route, $variable = null)
+    public function ForwardToController($route, $variable = null)
     {
-        $controller = $this->getController($route);
+        $controller = $this->GetController($route);
 
         $controllerAction = explode(':', $controller);
 
-        $this->callAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variable);
+        $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variable);
 
     }
 
@@ -364,14 +364,15 @@ class Router extends AppMethods{
      * @return boolean - true on success, false on failure<br />
      * <br />Extracts multiple variables and sets them up for use in setRoute
      */
-    private function extractAndReplaceVariable(){
+    private function ExtractAndReplaceVariable(){
 
         if(is_array($this->funcVariable))
-            foreach($this->funcVariable as $key => $value){
-
+        {
+            foreach($this->funcVariable as $key => $value)
+            {
                 $this->routePattern = str_replace('{'.$key.'}', $value, $this->routePattern);
-
             }
+        }
 
         return true;
     }
@@ -381,7 +382,7 @@ class Router extends AppMethods{
      * @return boolean - true on success, false on failure<br />
      * <br />Checks wether the page landed on is an exception to session security or not.
      */
-    protected function checkExceptionRoutes(){
+    protected function CheckExceptionRoutes(){
 
         $this->SetPattern();
 
@@ -403,11 +404,11 @@ class Router extends AppMethods{
      * @return boolean<br>
      * Returns the last accessed page route
      */
-    protected function lastAccessedPage(){
+    protected function LastAccessedPage(){
 
         if(isset(self::$LastRoute))
         {
-            return $this->getRouteFromPattern(self::$LastRoute);
+            return $this->GetRouteFromPattern(self::$LastRoute);
         }
         else
         {
@@ -421,7 +422,7 @@ class Router extends AppMethods{
      * @return route <br>
      * Returns a route for a given pattern
      */
-    protected function getRouteFromPattern($pattern = null){
+    protected function GetRouteFromPattern($pattern = null){
 
         if(!empty($pattern))
             $this->pattern = $pattern;
@@ -449,7 +450,7 @@ class Router extends AppMethods{
 
         );
 
-        $this->forwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardToController('Error_Route_Not_Found', $error);
     }
 
     /**

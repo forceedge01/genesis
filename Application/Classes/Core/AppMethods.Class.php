@@ -77,7 +77,7 @@ class AppMethods extends Manager{
 
         $bundle[1] .= 'Repository';
 
-        return $this->getObject($namespace.$bundle[1], $bundle[1]);
+        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -97,7 +97,7 @@ class AppMethods extends Manager{
 
         $bundle[1] .= 'Entity';
 
-        return $this->getObject($namespace.$bundle[1], $bundle[1]);
+        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -162,7 +162,7 @@ class AppMethods extends Manager{
 
         foreach($deleteIndex as $key){
 
-            $array = $this->deleteIndex($array, $key);
+            $array = $this->DeleteIndex($array, $key);
         }
 
         $index = 0;
@@ -180,10 +180,10 @@ class AppMethods extends Manager{
         return implode('/', $array);
     }
 
-    private function deleteIndex($array, $key){
+    private function DeleteIndex($array, $key){
 
         if(isset($array[$key])) unset($array[$key]);
-        else $array = $this->deleteIndex ($array , $key-1);
+        else $array = $this->DeleteIndex ($array , $key-1);
 
         return $array;
     }

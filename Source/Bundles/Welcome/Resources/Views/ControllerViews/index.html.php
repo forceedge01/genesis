@@ -174,10 +174,11 @@
                         <li>Template::IncludeCSS ( string $asset, string params )</li>
                         <li>Template::IncludeJS ( string $asset, string params )</li>
                         <li>Template::IncludeImage ( string $asset, string params )</li>
+                        <li>Template::Path ( string $route, array $params optional )</li>
                         <li>Template::Asset ( string $asset )</li>
-                        <li>Template::setAsset ( string $asset, string params )</li>
-                        <li>Template::setFlash ( array $Message )</li>
-                        <li>Template::setError ( array $Error )</li>
+                        <li>Template::SetAsset ( string $asset, string params )</li>
+                        <li>Template::SetFlash ( array $Message )</li>
+                        <li>Template::SetError ( array $Error )</li>
                         <li>Template::IfExistsElse ( void $if, void $else, expression $operator :: optional )</li>
                         <li>Template::Errors ( void )</li>
                         <li>Template::FlashAll ( void )</li>
@@ -271,8 +272,8 @@
                 'includeCSS',
                 'includeJS',
                 'includeImage',
-                'setFlash',
-                'setError',
+                'SetFlash',
+                'SetError',
                 'ifExistsElse'
 
             ),

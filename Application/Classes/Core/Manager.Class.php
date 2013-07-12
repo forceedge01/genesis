@@ -80,7 +80,7 @@ class Manager extends Variable implements ManagerInterface{
 
         $bundle[1] .= 'Repository';
 
-        return $this->getObject($namespace.$bundle[1], $bundle[1]);
+        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**
@@ -100,7 +100,7 @@ class Manager extends Variable implements ManagerInterface{
 
         $bundle[1] .= 'Entity';
 
-        return $this->getObject($namespace.$bundle[1], $bundle[1]);
+        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
     }
 
     /**

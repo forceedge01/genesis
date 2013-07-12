@@ -70,7 +70,7 @@ class Debugger {
         {
             margin: 0px auto;
             position: relative;
-            width: 60%;
+            width: 80%;
             padding: 15px;
             border-radius: 10px;
             border: 1px solid gray;

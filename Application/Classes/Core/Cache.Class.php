@@ -65,41 +65,29 @@ class Cache extends AppMethods{
             }
 
             case 'javascript':
+            case 'css':
             {
                 $content = str_replace(HOST, ROOT, $content);
 
-                $jsContents = preg_replace('/(\s+)/', ' ', preg_replace('!(/\*.*\*/)!xs', '', preg_replace('!\s*//.*(?!\n)!s', "", file_get_contents($content))));
+                if($case == 'javascript')
+                    $Contents = preg_replace('/(\s+)/', ' ', preg_replace('!(/\*.*\*/)!xs', '', preg_replace('!\s*//.*(?!\n)!s', "", file_get_contents($content))));
+                else
+                    $Contents = preg_replace('/(\s+)/', ' ', preg_replace('!/\*.*?\*/!s', '', file_get_contents($content)));
 
                 $directory = dirname($content);
                 $fileName = end(explode('/', $content));
 
                 $path = $directory.'/Minified/';
                 $path = $directory.'/';
-                mkdir($path);
+
+                if(!is_dir($path))
+                    mkdir($path);
 
                 $handle = fopen($path.$fileName, 'w+');
-                fwrite($handle, $jsContents);
+                fwrite($handle, $Contents);
                 fclose($handle);
 
-                return $path.$file['name'];
-            }
-
-            case 'css':
-            {
-                $content = str_replace(HOST, ROOT, $content);
-                $cssContents = preg_replace('/(\s+)/', ' ', preg_replace('!/\*.*?\*/!s', '', file_get_contents($content)));
-                $directory = dirname($content);
-                $fileName = end(explode('/', $content));
-
-                $path = $directory.'/Minified/';
-                $path = $directory . '/';
-                mkdir($path);
-
-                $handle = fopen($path.$fileName, 'w+');
-                fwrite($handle, $cssContents);
-                fclose($handle);
-
-                return $path.$file['name'];
+                return $path.$fileName;
             }
         }
     }
@@ -110,6 +98,7 @@ class Cache extends AppMethods{
         $extension = pathinfo($files[0], PATHINFO_EXTENSION);
         $modify = null;
         $tag = null;
+        $placement = null;
 
         switch($extension)
         {
@@ -128,20 +117,8 @@ class Cache extends AppMethods{
                 $url = JS_FOLDER . 'Unified/';
                 $tag = '<script type="text/javascript" src="'.$url.'unified.'.$modify.'.'.$extension.'"></script>';
                 Template::$jsFiles = array($url.'unified.'.$modify.'.'.$extension);
+
                 $placement = explode('-', \Get::Config('Cache.javascript.placement'));
-               
-                if($placement[0] == 'endof')
-                {   
-                    $html = str_replace('</'.$placement[1], $tag.'</'.$placement[1], $html);
-                }
-                else if($placement[1])
-                {
-                    $html = str_replace('<'.$placement[1].'>', "<{$placement[1]}>$tag", $html);
-                }
-                else
-                {
-                    $html = str_replace('</head>', "</head>$tag", $html);
-                }
 
                 break;
             }
@@ -160,24 +137,24 @@ class Cache extends AppMethods{
                 $url = CSS_FOLDER . 'Unified/';
                 $tag = '<link rel="stylesheet" href="'.$url.'unified.'.$modify.'.'.$extension.'" type="text/css">';
                 Template::$cssFiles = array($url.'unified.'.$modify.'.'.$extension);
-                
+
                 $placement = explode('-', \Get::Config('Cache.css.placement'));
-               
-                if($placement[0] == 'endof')
-                {   
-                    $html = str_replace('</'.$placement[1], $tag.'</'.$placement[1], $html);
-                }
-                else if($placement[1])
-                {
-                    $html = str_replace('<'.$placement[1].'>', "<{$placement[1]}>$tag", $html);
-                }
-                else
-                {
-                    $html = str_replace('<head>', "<head>$tag", $html);
-                }
 
                 break;
             }
+        }
+
+        if($placement[0] == 'endof')
+        {
+            $html = str_replace('</'.$placement[1], $tag.'</'.$placement[1], $html);
+        }
+        else if($placement[1])
+        {
+            $html = str_replace('<'.$placement[1].'>', "<{$placement[1]}>$tag", $html);
+        }
+        else
+        {
+            $html = str_replace('<head>', "<head>$tag", $html);
         }
 
         $fileName = 'unified.'.$modify.'.'.$extension;

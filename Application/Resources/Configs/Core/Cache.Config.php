@@ -20,7 +20,7 @@ Set::Config('Cache', array(
     ),
     'css' => array(
 
-        'enabled' => true,
+        'enabled' => false,
         'minify' => true,
         'unify' => true,
         'placement' => 'startof-body'

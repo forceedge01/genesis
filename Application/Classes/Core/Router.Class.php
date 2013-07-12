@@ -83,17 +83,18 @@ class Router extends AppMethods{
         // Render the right controller;
         foreach(self::$Route as $key => $value)
         {
+            $this->lastRoute = $key;
+
             if($this->ExtractVariable($value['Pattern']) == $this->pattern)
             {
                 if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
-                {
-                    die('Access request denied');
-                }
+                    $this->SetErrorArgs('Access request denied', 'Router', '0')->ThrowException();
+
+                if(isset($value['Requirements']))
+                    $this->ValidateVariables($value['Requirements']);
 
                 if(isset($value['Inject']))
                     $this->ObjectArguments = $value['Inject'];
-
-                $this->lastRoute = $key;
 
                 $controllerAction = explode(':', $value['Controller']);
 
@@ -102,6 +103,20 @@ class Router extends AppMethods{
         }
 
         return false;
+    }
+
+    private function ValidateVariables($requirement)
+    {
+        foreach($requirement as $key => $pattern)
+        {
+            if(!preg_match($pattern, $this->funcVariable['{'.$key.'}']))
+            {
+                $this
+                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable \'$'.$key.'='.$this->funcVariable[$key].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
+                    ->ThrowError();
+            }
+
+        }
     }
 
     /**
@@ -125,7 +140,7 @@ class Router extends AppMethods{
                 {
                     if(isset($this->params[$index]))
                     {
-                        $this->funcVariable[] = $param = $this->params[$index];
+                        $param = $this->funcVariable[$param] = $this->params[$index];
                     }
                 }
 

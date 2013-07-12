@@ -28,8 +28,8 @@ Set::Route('users_login_auth', array(
 
 Set::Route('users_List', array(
 
-      "Controller" => "users:users:list",
-      "Pattern" => "/users/List/"
+    "Controller" => "users:users:list",
+    "Pattern" => "/users/List/",
 ));
 
 Set::Route('users_Create', array(

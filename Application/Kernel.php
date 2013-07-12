@@ -12,41 +12,35 @@ class AppKernal extends Loader{
     public static
             $phpVersion,
             $msyqlVersion,
-            $scriptStartTime;
+            $scriptStartTime,
+            $env;
 
-    public static function initialize() {
+    public static function Initialize($env) {
 
+        self::$env = $env;
         self::$scriptStartTime = microtime();
-
-        self::checkDependencies();
-
-        self::loadFramework();
-
+        self::CheckDependencies();
+        self::LoadFramework(self::$env);
         $route = new Router();
 
-        if(!$route->forwardRequest()){
+        if(!$route->ForwardRequest()){
 
             header( 'HTTP/1.1 404 Not Found', true, 404 );
-
-            echo '<h1>Pattern: ' . $route->GetPattern() . ' Not Found!!</h1>';
-
-            exit;
+            die('<h4>Pattern: ' . $route->GetPattern() . ' Not Found, <a href="javascript:history.back();">go back to last page</a>.</h4>');
         }
     }
 
-    private static function checkDependencies(){
+    private static function CheckDependencies(){
 
         $version = '5.3.0';
 
         if(version_compare(phpversion(), $version, '>='))
-                self::$phpVersion = phpversion();
-        else{
-            echo 'You need to update your php version, GENESIS needs atleast php '.$version;
-            exit;
-        }
+            self::$phpVersion = phpversion();
+        else
+            die('You need to update your php version, GENESIS needs atleast php '.$version);
     }
 
-    public static function get($fileType = null){
+    public static function Get($fileType = null){
 
         if(emtpy($fileType))
             return array(
@@ -66,4 +60,4 @@ class AppKernal extends Loader{
     }
 }
 
-AppKernal::initialize();
+AppKernal::Initialize('development');

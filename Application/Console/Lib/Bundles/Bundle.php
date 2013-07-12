@@ -25,7 +25,7 @@ class Bundle extends Console {
         if(!isset($_SERVER['SERVER_NAME'])){
 
             echo $this->linebreak(1);
-            
+
             echo $this->blue('Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ');
 
             $this->bundle = preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle';
@@ -43,24 +43,24 @@ class Bundle extends Console {
         }
 
         echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
-        
+
         $ans = $this->decide($this->blue('Do you want to create assets for this bundle? [yes/no]: '), 'yes');
-        
+
         if($ans == 'yes')
         {
             $this->CreateAssets();
             echo $this->green("Assets for bundle {$this->name} were successfully created.");
         }
-        
+
         echo $this->linebreak(2);
     }
 
     public function deleteBundle() {
 
         if(!isset($_SERVER['SERVER_NAME'])){
-            
+
             $ans = null;
-            
+
             $this->linebreak(1);
             echo 'Bundles you have in your application: ';
 
@@ -70,7 +70,7 @@ class Bundle extends Console {
 
             $bundleName = $this->readUser($this->blue('Enter name of the bundle you want to delete: '));
             $this->linebreak(1);
-            
+
             do
             {
                 $ans = $this->readUser($this->blue("Are you sure you want to delete $bundleName [yes/no]: "));
@@ -90,25 +90,25 @@ class Bundle extends Console {
             if(!empty($bundleName))
             {
                 echo '... ',$this->linebreak(1);
-                
+
                 if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
                 {
                     echo $this->green("Bundle {$bundleName} has been deleted successfully.");
-                    
+
                     echo $this->linebreak(2);
-                    
+
                     $ans = null;
-                    
+
                     do
                     {
                         $ans = $this->decide($this->blue("Do you want to delete assets of {$bundleName} bundle? [yes/no]: "), 'yes');
                     }
                     while($ans == null);
-                    
+
                     if($ans == 'yes')
                     {
                         echo '... ';
-                        
+
                         if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName))
                         {
                             if($this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName))
@@ -120,7 +120,7 @@ class Bundle extends Console {
                         {
                             echo $this->red("Assets of bundle {$bundleName} were not found");
                         }
-                    }                    
+                    }
                 }
                 else
                 {
@@ -128,9 +128,9 @@ class Bundle extends Console {
                 }
             }
         }
-        
+
         echo $this->linebreak(2);
-        
+
     }
 
     public function readBundles($return) {
@@ -746,38 +746,47 @@ class {$this->name}BundleController extends ApplicationController{
 
 Set::Route('{$this->name}', array(
 
-      'Controller' => '{$this->name}:{$this->name}:index',
-      'Pattern' => '/{$this->name}/'
+    'Controller' => '{$this->name}:{$this->name}:index',
+    'Pattern' => '/{$this->name}/'
 ));
 
 Set::Route('{$this->name}_List', array(
 
-      'Controller' => '{$this->name}:{$this->name}:list',
-      'Pattern' => '/{$this->name}/List/'
+    'Controller' => '{$this->name}:{$this->name}:list',
+    'Pattern' => '/{$this->name}/List/'
 ));
 
 Set::Route('{$this->name}_View', array(
 
-      'Controller' => '{$this->name}:{$this->name}:view',
-      'Pattern' => '/{$this->name}/View/{id}/'
+    'Controller' => '{$this->name}:{$this->name}:view',
+    'Pattern' => '/{$this->name}/View/{id}/',
+    'Requirements' => array(
+        'id' => '/^\d+$/'
+    )
 ));
 
 Set::Route('{$this->name}_Create', array(
 
-      'Controller' => '{$this->name}:{$this->name}:create',
-      'Pattern' => '/{$this->name}/Create/'
+    'Controller' => '{$this->name}:{$this->name}:create',
+    'Pattern' => '/{$this->name}/Create/'
 ));
 
 Set::Route('{$this->name}_Edit', array(
 
-      'Controller' => '{$this->name}:{$this->name}:edit',
-      'Pattern' => '/{$this->name}/Edit/{id}/'
+    'Controller' => '{$this->name}:{$this->name}:edit',
+    'Pattern' => '/{$this->name}/Edit/{id}/',
+    'Requirements' => array(
+        'id' => '/^\d+$/'
+    )
 ));
 
 Set::Route('{$this->name}_Delete', array(
 
-      'Controller' => '{$this->name}:{$this->name}:delete',
-      'Pattern' => '/{$this->name}/Delete/{id}/'
+    'Controller' => '{$this->name}:{$this->name}:delete',
+    'Pattern' => '/{$this->name}/Delete/{id}/',
+    'Requirements' => array(
+        'id' => '/^\d+$/'
+    )
 ));
 ";
 

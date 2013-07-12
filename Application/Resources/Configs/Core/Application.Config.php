@@ -10,7 +10,7 @@ Set::Config('Application', array(
     'Session' => array(
 
         'Enabled' => true,
-        'Secure' => false,
+        'HttpsSecure' => false,
         'HttpOnly' => true,
     ),
     'Environment' => array(

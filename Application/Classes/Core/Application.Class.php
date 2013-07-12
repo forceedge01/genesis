@@ -23,7 +23,7 @@ class Application extends Template{
         {
             $session = $this->GetCoreObject('Session');
 
-            call_user_func_array(array($session, 'Start'), \Get::Config('Application.Session.Secure', 'Application.Session.HttpOnly'));
+            call_user_func_array(array($session, 'Start'), \Get::Config('Application.Session.HttpsSecure', 'Application.Session.HttpOnly'));
 
             // Check for login interval expiration and authorized page view
             if($session->IsSessionKeySet('login_expires'))

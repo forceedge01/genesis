@@ -50,7 +50,7 @@ final class usersController extends usersBundleController implements usersContro
         $auth->logout('You have been logged out.');
     }
 
-    public function listAction()
+    public function listAction($id)
     {
         $params["PageTitle"] = "All users";
 

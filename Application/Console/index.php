@@ -1,6 +1,11 @@
 <?php
 
-require __DIR__ . '/../Resources/Configs/Core/BundleGenerator.Config.php';
+require __DIR__ . '/../Resources/Configs/Console/Console.Config.php';
+
+if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER and isset($_SERVER['SERVER_NAME']))
+{
+    header('Location: '.str_replace('Application/Console', '', $_SERVER['PHP_SELF'])); die();
+}
 
 require __DIR__ . '/Console.php';
 

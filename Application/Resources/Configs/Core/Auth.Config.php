@@ -3,47 +3,43 @@
 Set::Config('Auth', array(
 
     'Form' => array(
-
         'EmailFieldName' => 'username',
         'PasswordFieldName' => 'password',
     ),
-    
-    'Validation' => array(
 
+    'Validation' => array(
         'Email' => array(
-            
             'Enable' =>true,
             'Message' => 'Invalid characters found in email address'
         ),
     ),
-    
-    'DBTable' => array(
 
+    'DBTable' => array(
         'AuthTableName' => 'users',
         'AuthColumnName' => 'email',
     ),
-    
-    'Security' => array(
 
-        'SessionInterval' => 60*60, // 1
-        'BruteForce' => array(
-            
-            'MaxLoginAttempts' => 3,
-            'Message' => 'Your account has been locked for trying too many times, try again later',
-            'BlockedCoolDownPeriod' => 10, // 1
+    'Security' => array(
+        'Session' => array(
+            'Interval' => 60*60, // 1
+            'ExpireMessage' => 'Your session has expired, please login again.',
+            'BruteForce' => array(
+                'MaxLoginAttempts' => 3,
+                'Message' => 'Your account has been locked for trying too many times, try again later',
+                'BlockedCoolDownPeriod' => 10, // 1
+            ),
         ),
+
         'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs', // 2
         'PasswordEncryption' => 'SHA512', // 3
         'Bypass' => array(
-
             '^/$',
             '^/login/$',
             '^/loginAuth/$'
         )
     ),
-    
-    'Login' => array(
 
+    'Login' => array(
         'EntityRepository' => '\\Bundles\\users\\Entities\\usersEntity',
         'UserPopulateMethod' => false,
 
@@ -51,8 +47,8 @@ Set::Config('Auth', array(
         'LoginAuthRoute' => 'users_login_auth',
         'LoggedInDefaultRoute' => 'Application',
 
-        'LoggedOutDefaultRoute' => 'users_login',
         'BeforeLogoutHookRoute' => false, // 4
+        'LoggedOutDefaultRoute' => 'users_login',
         'AfterLogoutHookRoute' => false, // 5
     ),
 ));

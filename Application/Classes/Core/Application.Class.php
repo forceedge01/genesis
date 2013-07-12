@@ -33,7 +33,7 @@ class Application extends Template{
                     $session->Destroy()->Start();
 
                     $this
-                        ->SetError(array('Logged Out' => 'Your session has expired, please login again.'))
+                        ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
                             ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
             }

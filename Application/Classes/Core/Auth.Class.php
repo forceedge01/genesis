@@ -87,7 +87,7 @@ class Auth extends Template{
                 $session = $this->GetCoreObject('Session');
                 $session->Set('username', $this->username);
                 $session->Set('login_time', time());
-                $session->Set('login_expires', time() + \Get::Config('Auth.Security.SessionInterval'));
+                $session->Set('login_expires', time() + \Get::Config('Auth.Security.Session.Interval'));
 
                 return true;
             }
@@ -100,7 +100,7 @@ class Auth extends Template{
         }
         else
         {
-            $this->SetError(\Get::Config('Auth.Security.BruteForce.Message'));
+            $this->SetError(\Get::Config('Auth.Security.Session.BruteForce.Message'));
             return false;
         }
     }
@@ -118,7 +118,7 @@ class Auth extends Template{
             $userBrowser = $_SERVER['HTTP_USER_AGENT'];
 
             $this->GetCoreObject('Session')->Set('login_string', hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser));
-            
+
             return true;
         }
         else
@@ -179,7 +179,7 @@ class Auth extends Template{
         {
             $timeBlocked = $session->Get('Blocked.'.$this->username);
 
-            if(($timeBlocked + \Get::Config('Auth.Security.BruteForce.BlockedCoolDownPeriod')) < time())
+            if(($timeBlocked + \Get::Config('Auth.Security.Session.BruteForce.BlockedCoolDownPeriod')) < time())
             {
                 $session->Remove('Blocked.'.$this->username)->Remove('BruteForceAttempt');
             }
@@ -189,7 +189,7 @@ class Auth extends Template{
         {
             $session->Set('BruteForceAttempt', ($session->Get('BruteForceAttempt')+1));
 
-            if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.BruteForce.MaxLoginAttempts'))
+            if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.Session.BruteForce.MaxLoginAttempts'))
             {
                 $session->Set('Blocked.'.$this->username, time());
                 return false;

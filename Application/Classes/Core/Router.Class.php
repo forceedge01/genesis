@@ -45,6 +45,11 @@ class Router extends AppMethods{
 
     }
 
+    public function RedirectToHome()
+    {
+        $this->ForwardTo('Application');
+    }
+
     /**
      * Exploder pattern to an array in $this->params;
      */
@@ -169,15 +174,12 @@ class Router extends AppMethods{
     public function SetRoute($route, array $variable = array()){
 
         $this->funcVariables = $variable;
-
         $this->GetRawRoute($route);
 
         if(!empty($variable))
             $this->ExtractAndReplaceVariable();
 
-        $this->lastURL = getenv('SCRIPT_NAME') . $this->routePattern;
-
-        return $this->lastURL;
+        return $this->lastURL = $this->Variable(getenv('SCRIPT_NAME') . $this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
     }
 
     /**

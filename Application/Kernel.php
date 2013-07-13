@@ -2,10 +2,10 @@
 
 namespace Application\Core;
 
-
-
-require_once __DIR__ . '/Resources/Configs/Core/AppDirs.Config.php';
 require_once __DIR__ . '/Loader.php';
+require_once __DIR__ . '/Resources/Configs/Core/AppDirs.Config.php';
+require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.Class.php';
+require_once APPLICATION_CLASSES_FOLDER . 'Core/Get.Class.php';
 
 class AppKernal extends Loader{
 
@@ -60,4 +60,4 @@ class AppKernal extends Loader{
     }
 }
 
-AppKernal::Initialize('development');
+AppKernal::Initialize('prod');

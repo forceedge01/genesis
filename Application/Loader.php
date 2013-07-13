@@ -250,9 +250,6 @@ class Loader{
     {
         self::$environment = $environment;
 
-        require_once APPLICATION_CLASSES_FOLDER . 'Core/Get.Class.php';
-        require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.Class.php';
-
         if($environment == 'development')
             self::LoadDevelopment('configs', APPLICATION_CONFIGS_FOLDER);
         else

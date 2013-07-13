@@ -122,8 +122,7 @@ class Application extends Template{
     {
         if($this->Variable(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs'))->Search(getenv('REMOTE_ADDR')) === false)
         {
-            echo 'This page is under development, please check back later';
-            exit;
+            die('This page is under development, please check back later');
         }
     }
 }

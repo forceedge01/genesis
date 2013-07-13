@@ -14,22 +14,22 @@ class Debugger {
     public function pre() {
 
         $args = func_get_args();
-
         echo '<pre>';
-
         foreach ($args as $var)
             print_r($var);
-
         echo '</pre>';
     }
 
+    /**
+     *
+     * @param void $var - variable you want to dump to screen
+     * Will dump the variable on screen in readable format and then stop execution.
+     */
     public function prex() {
 
         $args = func_get_args();
-
         foreach ($args as $var)
             $this->pre($var);
-
         exit;
     }
 
@@ -39,13 +39,7 @@ class Debugger {
     public function debug() {
 
         $this->pre($this);
-
-        echo '<br />Libs loaded';
-
-        print_r(AppKernal::get());
-
-        echo '<br />Debug data: <br /><br />';
-
+        echo '<br />Libs loaded', print_r(AppKernal::get(), true), '<br />Debug data: <br /><br />';
         $this->pre(debug_backtrace());
     }
 
@@ -232,6 +226,14 @@ class Debugger {
         exit;
     }
 
+    /**
+     *
+     * @param type $message
+     * @param type $file
+     * @param type $line
+     * @param type $errorNumber
+     * @return \Application\Core\Debugger
+     */
     public function SetErrorArgs($message, $file, $line, $errorNumber = 0)
     {
         $this->message = $message;

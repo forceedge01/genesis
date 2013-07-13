@@ -10,7 +10,6 @@ class Get{
     public static function Config()
     {
         $keys = func_get_args();
-
         $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
 
         if($config === null)

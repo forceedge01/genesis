@@ -12,9 +12,7 @@ class Cache extends AppMethods{
 
         if(file_exists($file))
         {
-            $lastModified = filemtime($file);
-
-            if($lastModified + \Get::Config('Cache.html.expire') < time())
+            if(filemtime($file) + \Get::Config('Cache.html.expire') < time())
             {
                 return false;
             }
@@ -35,7 +33,11 @@ class Cache extends AppMethods{
 
         foreach($folderChunks as $f)
         {
-            mkdir($patt . '/' . $f);
+            $dir = $patt . '/' . $f;
+
+            if(!is_dir($dir))
+                mkdir($dir);
+
             $patt .= '/'.$f;
         }
 
@@ -51,8 +53,7 @@ class Cache extends AppMethods{
         ob_start();
         require $file;
         ob_end_flush();
-
-        exit;
+        die();
     }
 
     public static function Minify($content, $case)

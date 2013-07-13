@@ -10,11 +10,10 @@ class Router extends AppMethods{
             $url,
             $lastRoute,
             $lastURL,
-            $funcVariable,
+            $funcVariables,
             $routePattern,
             $route,
             $params,
-            $pageTitle,
             $Router,
             $ObjectArguments = array(),
             $pattern;
@@ -40,11 +39,7 @@ class Router extends AppMethods{
      */
     protected function SetPattern(){
 
-        $pattern = @$_SERVER['PATH_INFO'] . '/';
-
-        $pattern = str_replace('//', '/', $pattern);
-
-        $this->pattern = @$pattern;
+        $this->pattern = (isset($_SERVER['PATH_INFO']) ? str_replace('//', '/', $_SERVER['PATH_INFO'] . '/') : '/');
 
         return $this;
 
@@ -77,18 +72,20 @@ class Router extends AppMethods{
             }
         }
 
-        $this->funcVariable = null;
+        $this->funcVariables = array();
 
         // Should the value contain a regular expression?
         // Render the right controller;
         foreach(self::$Route as $key => $value)
         {
-            $this->lastRoute = $key;
-
             if($this->ExtractVariable($value['Pattern']) == $this->pattern)
             {
+                $this->lastRoute = $key;
+
                 if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
-                    $this->SetErrorArgs('Access request denied', 'Router', '0')->ThrowException();
+                    $this
+                        ->SetErrorArgs('Access request denied', 'Router', '0')
+                            ->ThrowException();
 
                 if(isset($value['Requirements']))
                     $this->ValidateVariables($value['Requirements']);
@@ -98,7 +95,7 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
-                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariable);
+                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
             }
         }
 
@@ -109,11 +106,11 @@ class Router extends AppMethods{
     {
         foreach($requirement as $key => $pattern)
         {
-            if(!preg_match($pattern, $this->funcVariable['{'.$key.'}']))
+            if(!preg_match($pattern, $this->funcVariables['{'.$key.'}']))
             {
                 $this
-                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable \'$'.$key.'='.$this->funcVariable[$key].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
-                    ->ThrowError();
+                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable \'$'.$key.'='.$this->funcVariables[$key].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
+                        ->ThrowError();
             }
 
         }
@@ -136,11 +133,11 @@ class Router extends AppMethods{
 
             foreach($routeParams as $param)
             {
-                if(preg_match($pattern, $param, $variables))
+                if(preg_match($pattern, $param))
                 {
                     if(isset($this->params[$index]))
                     {
-                        $param = $this->funcVariable[$param] = $this->params[$index];
+                        $param = $this->funcVariables[$param] = $this->params[$index];
                     }
                 }
 
@@ -158,11 +155,9 @@ class Router extends AppMethods{
     private function GetControllerNamespace($controllerAction){
 
         if($controllerAction[0] == null)
-            $namespace = '\\Application\\Controllers\\';
+            return '\\Application\\Controllers\\'.$controllerAction[1] . 'Controller';
         else
-            $namespace = '\\Bundles\\'.$controllerAction[0].'\\Controllers\\';
-
-        return $namespace.$controllerAction[1] . 'Controller';
+            return '\\Bundles\\'.$controllerAction[0].'\\Controllers\\' . $controllerAction[1] . 'Controller';
     }
 
     /**
@@ -173,18 +168,14 @@ class Router extends AppMethods{
      */
     public function SetRoute($route, array $variable = array()){
 
-        $this->route = $route;
+        $this->funcVariables = $variable;
 
-        $this->funcVariable = $variable;
-
-        $this->GetRawRoute();
+        $this->GetRawRoute($route);
 
         if(!empty($variable))
             $this->ExtractAndReplaceVariable();
 
-        $URL = HOST . 'index.php' . $this->routePattern;
-
-        $this->lastURL = $URL;
+        $this->lastURL = getenv('SCRIPT_NAME') . $this->routePattern;
 
         return $this->lastURL;
     }
@@ -211,10 +202,7 @@ class Router extends AppMethods{
 
         if(\Get::Route($this->route))
         {
-            $URL = \Get::Route($this->route.'.Pattern');
-
-            $this->lastRoute = $URL;
-            $this->routePattern = $URL;
+            $this->lastRoute = $this->routePattern = \Get::Route($this->route.'.Pattern');
 
             return $this->lastRoute;
         }
@@ -239,18 +227,14 @@ class Router extends AppMethods{
         if(!empty($route))
             $this->route = $route;
 
-        if(isset(self::$Route[$this->route])){
-
-            $URL = self::$Route[$this->route]['Pattern'];
+        if(isset(self::$Route[$this->route]))
+        {
+            $this->routePattern = $this->lastRoute = self::$Route[$this->route]['Pattern'];
             $controller = self::$Route[$this->route]['Controller'];
-
-            $this->lastRoute = $URL;
-            $this->routePattern = $URL;
 
             unset($_SESSION['routeError']);
 
             return $controller;
-
         }
 
         $error = array(
@@ -282,7 +266,7 @@ class Router extends AppMethods{
 
         header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
-        if(@isset($_SERVER['HTTP_HOST']))
+        if(getenv('HTTP_HOST'))
             exit;
     }
 
@@ -293,13 +277,13 @@ class Router extends AppMethods{
      * @param type $variable<br />
      * Calls an action of a controller.
      */
-    private function CallAction($objectName, $objectAction, $variable = null)
+    private function CallAction($objectName, $objectAction, array $variable = array())
     {
         if(!empty($variable))
-            $this->funcVariable = $variable;
+            $this->funcVariables = $variable;
 
-        if(!class_exists($objectName)){
-
+        if(!class_exists($objectName))
+        {
             echo 'Error: '.$objectName;
 
             $error = array(
@@ -312,7 +296,6 @@ class Router extends AppMethods{
             );
 
             $this->ForwardToController ('Class_Not_Found', $error);
-
         }
 
         $controller = new $objectName();
@@ -343,18 +326,18 @@ class Router extends AppMethods{
             }
         }
 
-        if(sizeof($this->funcVariable) != 0){
-
-            call_user_func_array (array($controller, $objectAction) , $this->funcVariable);
+        if(sizeof($this->funcVariables) != 0)
+        {
+            call_user_func_array (array($controller, $objectAction) , $this->funcVariables);
         }
-        else{
-
+        else
+        {
             call_user_func (array($controller, $objectAction));
         }
 
         unset($controller);
 
-        exit(0);
+        die();
     }
 
     /**
@@ -364,14 +347,13 @@ class Router extends AppMethods{
      * <br />
      * Forward control from one controller to another without redirecting.
      */
-    public function ForwardToController($route, $variable = null)
+    public function ForwardToController($route, array $variables = array())
     {
         $controller = $this->GetController($route);
 
         $controllerAction = explode(':', $controller);
 
-        $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variable);
-
+        $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variables);
     }
 
     /**
@@ -381,11 +363,11 @@ class Router extends AppMethods{
      */
     private function ExtractAndReplaceVariable(){
 
-        if(is_array($this->funcVariable))
+        if(is_array($this->funcVariables))
         {
-            foreach($this->funcVariable as $key => $value)
+            foreach($this->funcVariables as $key => $value)
             {
-                $this->routePattern = str_replace('{'.$key.'}', $value, $this->routePattern);
+                $this->routePattern = str_replace("\{$key\}", $value, $this->routePattern);
             }
         }
 
@@ -422,13 +404,9 @@ class Router extends AppMethods{
     protected function LastAccessedPage(){
 
         if(isset(self::$LastRoute))
-        {
             return $this->GetRouteFromPattern(self::$LastRoute);
-        }
-        else
-        {
-            return true;
-        }
+
+        return false;
     }
 
     /**
@@ -466,29 +444,6 @@ class Router extends AppMethods{
         );
 
         $this->ForwardToController('Error_Route_Not_Found', $error);
-    }
-
-    /**
-     *
-     * @param type $title
-     * @return \Router <br>
-     * Sets the page title
-     */
-    public function SetPageTitle($title){
-
-        $this->pageTitle = $title;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return string pageTitle
-     * Returns the page title of the current page
-     */
-    public function GetPageTitle(){
-
-        return $this->pageTitle;
     }
 
     /**

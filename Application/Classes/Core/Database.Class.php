@@ -958,7 +958,7 @@ class Database extends Template {
 
     public function GetFormFields() {
 
-        $table = $this->GetTableNameFromNameSpacedClass(get_called_class());
+        $table = $this->GetTableNameFromNameSpacedEntity(get_called_class());
         $this->Table($table);
         $foreignkeys = $this->ForeignKeys()->GetResultSet();
         $this->formFields[$table] = $this->GetTableColumns();

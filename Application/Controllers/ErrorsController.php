@@ -15,10 +15,6 @@ class ErrorsController extends Application implements Error{
 
         $params = null;
 
-        $this->prex($route);
-
-        $params['PageTitle'] = 'Route Not Found!';
-
         $params['Error'] = array(
 
             'Route' => $route,
@@ -28,15 +24,13 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetNotFound();
 
-        $this->Render(':Errors/RouteNotFound.html.php', $params);
+        $this->Render(':Errors/RouteNotFound.html.php', 'Route Not Found!', $params);
     }
 
     public function ActionNotFoundAction($action, $class, $controller, $route, $backtrace){
 
         $params = null;
 
-        $params['PageTitle'] = 'Action Not Found!';
-
         $params['Error'] = array(
 
             'Action' => $action,
@@ -48,15 +42,13 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/ActionNotFound.html.php', $params);
+        $this->Render(':Errors/ActionNotFound.html.php', 'Action Not Found!', $params);
     }
 
     public function ClassNotFoundAction($action, $class, $controller, $route, $backtrace){
 
         $params = null;
 
-        $params['PageTitle'] = 'Class Not Found!';
-
         $params['Error'] = array(
 
             'Action' => $action,
@@ -68,7 +60,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/ClassNotFound.html.php', $params);
+        $this->Render(':Errors/ClassNotFound.html.php', 'Class Not Found!', $params);
     }
 
     public function NotFoundError404Action(){

@@ -20,7 +20,7 @@ class Template extends Router {
      * @param string $template - template to render
      * @param array $params - The parameters to pass to a controller
      */
-    private function GetTemplate($template){
+    private function GetView($template){
 
         $templateParams = explode(':', $template);
 
@@ -53,18 +53,16 @@ class Template extends Router {
         extract($params);
         unset($params);
 
-        $templateUrl = $this->GetTemplate($template);
+        $templateUrl = $this->GetView($template);
 
         ob_start();
 
         if(is_file($templateUrl['template'])){
 
-            require $templateUrl['path'].\Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
             require $templateUrl['template'];
-            require $templateUrl['path'].\Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
         }
         else
-            $this->TemplateNotFound($templateUrl['template']);
+            $this->ViewNotFound($templateUrl['template']);
 
         $this->html = ob_get_clean();
 
@@ -158,7 +156,7 @@ class Template extends Router {
      *
      * @param type $template - if template not found, render template not found error page
      */
-    private function TemplateNotFound($template){
+    private function ViewNotFound($template){
 
         $params['Backtrace'] = debug_backtrace();
 
@@ -173,6 +171,34 @@ class Template extends Router {
 
     }
 
+    public function IncludeHeader()
+    {
+        $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
+                $this->GetClassFromNameSpacedController(get_called_class()).
+                '/'.
+                \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
+                \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE'));
+
+        if(is_file($path))
+            require_once $path;
+        else
+            $this->ViewNotFound ($path);
+    }
+
+    public function IncludeFooter()
+    {
+        $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
+                $this->GetClassFromNameSpacedController(get_called_class()).
+                '/'.
+                \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
+                \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE'));
+
+        if(is_file($path))
+            require_once $path;
+        else
+            $this->ViewNotFound ($path);
+    }
+
     /**
      *
      * @param string $template
@@ -180,7 +206,7 @@ class Template extends Router {
      * @param boolean $extract Extract variables and unset the params array - defaults to true
      * @return string $html - returns the html of the page rendered for further process or output.
      */
-    public function RenderTemplate($template, $params = array(), $extract = true)
+    public function RenderView($template, $params = array(), $extract = true)
     {
         if($extract)
         {
@@ -188,13 +214,12 @@ class Template extends Router {
             unset($params);
         }
 
-        $template = $this->GetTemplate($template);
+        $template = $this->GetView($template);
 
         if(!is_file($template['template'])){
 
-            $this->TemplateNotFound ($template['template']);
-
-            exit;
+            $this->ViewNotFound ($template['template']);
+            die();
         }
 
         ob_start();
@@ -212,9 +237,9 @@ class Template extends Router {
      * @param mixed $params
      * @return html Will include a template and pass variables without extracting them, prefereable use within templates to include other templates
      */
-    public function IncludeTemplate($template, $params)
+    public function IncludeView($template, $params)
     {
-        return $this->RenderTemplate($template, $params, false);
+        return $this->RenderView($template, $params, false);
     }
 
     /**

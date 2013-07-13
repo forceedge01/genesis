@@ -6,21 +6,9 @@ namespace Application\Core;
 
 class Cache extends AppMethods{
 
-    private static
-            $cacheFolder,
-            $jsFolder,
-            $cssFolder;
-
-    public function __construct($variable = null) {
-        parent::__construct($variable);
-        self::$cacheFolder = \Get::Config('CORE.CACHE_FOLDER');
-        self::$jsFolder = \Get::Config('CORE.TEMPLATING.JS_FOLDER');
-        self::$cssFolder = \Get::Config('CORE.TEMPLATING.CSS_FOLDER');
-    }
-
     public static function CheckForCachedFile($pattern)
     {
-        $file = str_replace('//', '/', self::$cacheFolder . $pattern . '/index.html');
+        $file = str_replace('//', '/', \Get::Config('CORE.CACHE_FOLDER') . $pattern . '/index.html');
 
         if(file_exists($file))
         {
@@ -41,7 +29,7 @@ class Cache extends AppMethods{
     {
         $folderChunks = explode('/', $pattern);
 
-        $patt = self::$cacheFolder;
+        $patt = \Get::Config('CORE.CACHE_FOLDER');
 
         foreach($folderChunks as $f)
         {
@@ -127,7 +115,7 @@ class Cache extends AppMethods{
 
                 $modify = hash('sha1', $modify);
                 $path = ROOT . 'Public/Assets/Js/Unified/';
-                $url =  self::$jsFolder . 'Unified/';
+                $url =  \Get::Config('CORE.TEMPLATING.JS_FOLDER') . 'Unified/';
                 $tag = '<script type="text/javascript" src="'.$url.'unified.'.$modify.'.'.$extension.'"></script>';
                 Template::$jsFiles = array($url.'unified.'.$modify.'.'.$extension);
 
@@ -147,7 +135,7 @@ class Cache extends AppMethods{
 
                 $modify = hash('sha1', $modify);
                 $path = ROOT . 'Public/Assets/CSS/Unified/';
-                $url = self::$cssFolder . 'Unified/';
+                $url = \Get::Config('CORE.TEMPLATING.CSS_FOLDER') . 'Unified/';
                 $tag = '<link rel="stylesheet" href="'.$url.'unified.'.$modify.'.'.$extension.'" type="text/css">';
                 Template::$cssFiles = array($url.'unified.'.$modify.'.'.$extension);
 
@@ -181,7 +169,7 @@ class Cache extends AppMethods{
 
             foreach($files as $file)
                 if($file != '.' AND $file != '..')
-                    unlink($path.'/'.$file);
+                    unlink($path.$file);
 
             $handle = fopen($path.$fileName, 'w+');
             fwrite($handle, $aggregatedContents);

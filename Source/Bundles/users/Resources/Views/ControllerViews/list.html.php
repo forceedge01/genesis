@@ -1,3 +1,5 @@
+<?=$this->includeHeader();?>
+
 <div class="wrapper">
 
     Welcome <?=$this->User->email;?>, <a href="<?=$this->setRoute('users_logout')?>">Logout</a>
@@ -9,3 +11,5 @@
     </div>
 
 </div>
+
+<?=$this->includeFooter();?>

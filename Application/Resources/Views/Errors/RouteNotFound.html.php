@@ -1,14 +1,14 @@
 <div class="errorPage">
 
-    <h1>ROUTE: $this -> setRoute ( <span><?=$params['Error']['Route'];?></span> ); WAS NOT FOUND, PLEASE CHECK IF THE SPECIFIED ROUTE EXISTS</h1>
+    <h1>Route: '<span><?=$Error['Route'];?></span>' was not found, please check if the specified route exists.</h1>
 
 <p>Error Originated from:</p>
 
-<?php $this->pre($params['Error']['Backtrace'][1]);?>
+<?php $this->pre($Error['Backtrace'][2]);?>
 
 
 <p>Full Backtrace:</p>
 
-<?php $this->pre($params['Error']['Backtrace']);?>
+<?php $this->pre($Error['Backtrace']);?>
 
 </div>

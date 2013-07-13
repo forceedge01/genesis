@@ -22,24 +22,14 @@ class Auth extends Template{
 
     public function ForwardToLoginPage($message = null)
     {
-        $this->SetFlash($message)->forwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->SetFlash($message)->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     public function Logout($message = null)
     {
-        if(\Get::Config('Auth.Login.BeforeLogoutHookRoute'))
-        {
-            $this->ForwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
-        }
-
-        $this->GetCoreObject('Session')->Destroy()->Start();
+        $this->GetCoreObject('Session')->Destroy()->Start()->RegenerateId(true);
 
         $this->SetFlash($message);
-
-        if(\Get::Config('Auth.Login.AfterLogoutHookRoute'))
-        {
-            $this->ForwardToController(\Get::Config('Auth.Login.LogoutHookRoute'));
-        }
 
         $this->ForwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
     }
@@ -63,38 +53,25 @@ class Auth extends Template{
 
         if($this->CheckBruteForceLogins())
         {
-            if($this->Authenticate())
+            $password = $this->Authenticate();
+
+            if($password)
             {
-                $userObject = \Get::Config('Auth.Login.EntityRepository');
-                $object = null;
-
-                if(class_exists($userObject))
-                {
-                    $object = new $userObject();
-                }
-                else
-                {
-                    $this->ForwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
-                }
-
-                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
-
-                if($objectMethod)
-                    $this->User = $object->$objectMethod();
-                else
-                    $this->User = $this->GetEntity('users:users')->FindBy(array($this->authField => $this->username));
-
                 $session = $this->GetCoreObject('Session');
+                $session->RegenerateId();
+                $session->Clear();
                 $session->Set('username', $this->username);
                 $session->Set('login_time', time());
                 $session->Set('login_expires', time() + \Get::Config('Auth.Security.Session.Interval'));
+                $userBrowser = $this->GetSessionManager()->GetBrowserAgent();
+                $login_string = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser);
+                $session->Set('login_string', $login_string);
 
-                return true;
+                return $this->GetUser();
             }
             else
             {
                 $this->setError(array('Invalid User' => $message));
-
                 return false;
             }
         }
@@ -115,11 +92,7 @@ class Auth extends Template{
 
         if($db->GetNumberOfRows())
         {
-            $userBrowser = $_SERVER['HTTP_USER_AGENT'];
-
-            $this->GetCoreObject('Session')->Set('login_string', hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser));
-
-            return true;
+            return $password;
         }
         else
             return false;
@@ -150,7 +123,7 @@ class Auth extends Template{
      * @param string $email - the email you want to validate
      * @return boolean returns true on success false on failure.
      */
-    public function isValidEmail($email){
+    public function IsValidEmail($email){
 
         $pattern = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i';
 
@@ -163,7 +136,7 @@ class Auth extends Template{
     /**
      * Checks to see if the user is logged into the application or not.
      */
-    public function isLoggedIn(){
+    public function IsLoggedIn(){
 
         if(!empty($_SESSION['login_expires']))
             return true;
@@ -203,29 +176,30 @@ class Auth extends Template{
 
     public function GetUser()
     {
-        if($this->GetSessionManager()->Get('username'))
+        $username = $this->GetSessionManager()->Get('username');
+
+        if($username)
         {
             $userObject = \Get::Config('Auth.Login.EntityRepository');
             $object = null;
 
             if(class_exists($userObject))
             {
+                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
                 $object = new $userObject();
+
+                if($objectMethod)
+                {
+                    return $object->$objectMethod();
+                }
+                else
+                {
+                    return $object->FindBy(array($this->authField => $username));
+                }
             }
             else
             {
                 $this->ForwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
-            }
-
-            $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
-
-            if($objectMethod)
-            {
-                return $object->$objectMethod();
-            }
-            else
-            {
-                return $this->GetEntity('users:users')->FindBy(array($this->authField => $this->GetSessionManager()->Get('username')));
             }
         }
     }

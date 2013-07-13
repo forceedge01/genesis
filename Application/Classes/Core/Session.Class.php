@@ -16,8 +16,10 @@ class Session extends Request{
         $cookieParams = session_get_cookie_params(); // Gets current cookies params.
         session_set_cookie_params($cookieParams["lifetime"], $cookieParams["path"], $cookieParams["domain"], $secure, $httponly);
         session_name($session_name); // Sets the session name to the one set above.
-        session_start(); // Start the php session
-        session_regenerate_id(true);
+
+        session_start();
+//        if(session_id())
+//            session_regenerate_id (true);
 
         return $this;
     }
@@ -32,7 +34,7 @@ class Session extends Request{
     public function Destroy(){
 
         // Unset all session values
-        $_SESSION = array();
+        $this->Clear();
 
         // get session parameters
         $params = session_get_cookie_params();
@@ -43,6 +45,18 @@ class Session extends Request{
         // Destroy session
         session_destroy();
 
+        return $this;
+    }
+
+    public function Clear()
+    {
+        $_SESSION = array();
+        return $this;
+    }
+
+    public function RegenerateId($bool)
+    {
+        session_regenerate_id($bool);
         return $this;
     }
 
@@ -64,8 +78,6 @@ class Session extends Request{
     public function Get($name){
 
         return $_SESSION[$name];
-
-        return $this;
     }
 
     public function Status(){
@@ -154,5 +166,15 @@ class Session extends Request{
     public function GetUser()
     {
         return $this->GetEntity('users:users')->FindBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->Get('username')));
+    }
+
+    public function GetServerInfo($key)
+    {
+        return $_SERVER[$key];
+    }
+
+    public function GetBrowserAgent()
+    {
+        return $_SERVER['HTTP_USER_AGENT'];
     }
 }

@@ -6,6 +6,10 @@ class Debugger {
 
     private $message, $file, $line, $errorNumber;
 
+    public function __construct() {
+        ini_set('error_reporting', E_ALL);
+    }
+
     /**
      *
      * @param void $var - variable you want to dump to screen

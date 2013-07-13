@@ -20,6 +20,8 @@ final class usersController extends usersBundleController implements usersContro
 
     public function loginAction()
     {
+        $this->PageUnderDevelopment();
+
         $this->Render('users:login.html.php', 'Login');
     }
 
@@ -32,28 +34,25 @@ final class usersController extends usersBundleController implements usersContro
 
             if ($auth->authenticateUser('Invalid username or password entered'))
             {
-                $auth->forwardToLoggedInPage();
+                $auth->ForwardToLoggedInPage();
             }
 
-            $auth->forwardToLoginPage();
-
+            $auth->ForwardToLoginPage();
         }
         else
         {
-            $this->setError('Unable to login')->forwardTo('users_login');
+            $this->setError('Unable to login')->ForwardTo('users_login');
         }
     }
 
     public function logoutAction()
     {
         $auth = new \Application\Core\Auth();
-        $auth->logout('You have been logged out.');
+        $auth->Logout('You have been logged out.');
     }
 
-    public function listAction($id)
+    public function listAction()
     {
-        $params["PageTitle"] = "All users";
-
         //Used by the HTMLGenerator in the list view.
         $params['table'] = array(
             'class' => 'paginate',

@@ -179,7 +179,7 @@ class Router extends AppMethods{
         if(!empty($variable))
             $this->ExtractAndReplaceVariable();
 
-        return $this->lastURL = $this->Variable(getenv('SCRIPT_NAME') . $this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
+        return $this->lastURL = $this->Variable(getenv('SCRIPT_NAME'). $this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
     }
 
     /**
@@ -215,6 +215,8 @@ class Router extends AppMethods{
             'Pattern' => $this->pattern,
             'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
+
+        ob_clean();
 
         $this->ForwardToController('Error_Route_Not_Found', $error);
     }
@@ -265,6 +267,8 @@ class Router extends AppMethods{
         $route = $this->GetRoute($route);
 
         session_write_close();
+
+        ob_end_flush();
 
         header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 

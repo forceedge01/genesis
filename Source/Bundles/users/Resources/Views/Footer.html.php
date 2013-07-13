@@ -1,2 +1,2 @@
 <?=$this->IncludeJs('users:users.js');?>
-<?=$this->IncludeTemplate(":Footer.html.php", $params)?>
+<?=$this->IncludeView(":Footer.html.php", $params)?>

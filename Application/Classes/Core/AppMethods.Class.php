@@ -190,16 +190,17 @@ class AppMethods extends Manager{
 
     public function GetClassFromNameSpacedClass($namespacedClass){
 
-        $position = (strrpos($namespacedClass, '\\'))+1;
-
-        return substr($namespacedClass, $position);
+        return substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1);
     }
 
-    public function GetTableNameFromNameSpacedClass($namespacedClass){
+    public function GetClassFromNameSpacedController($namespacedClass){
 
-        $namespaced = $this->GetClassFromNameSpacedClass($namespacedClass);
+        return str_replace('Controller', '', substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1));
+    }
 
-        return str_replace('Repository', '', str_replace('Entity', '', $namespaced));
+    public function GetTableNameFromNameSpacedEntity($namespacedClass){
+
+        return str_replace('Repository', '', str_replace('Entity', '', $this->GetClassFromNameSpacedClass($namespacedClass)));
     }
 
     public function ReturnFalse(){
@@ -210,16 +211,6 @@ class AppMethods extends Manager{
     public function ReturnTrue(){
 
         return true;
-    }
-
-    public function GetServerInfo($key)
-    {
-        return $_SERVER[$key];
-    }
-
-    public function GetBrowserAgent()
-    {
-        return $_SERVER['HTTP_USER_AGENT'];
     }
 
     public function LocatePath($key)

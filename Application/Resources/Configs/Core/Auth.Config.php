@@ -24,7 +24,7 @@ Set::Config('Auth', array(
             'Interval' => 60*60, // 1
             'ExpireMessage' => 'Your session has expired, please login again.',
             'BruteForce' => array(
-                'MaxLoginAttempts' => 20,
+                'MaxLoginAttempts' => 3,
                 'Message' => 'Your account has been locked for trying too many times, try again later',
                 'BlockedCoolDownPeriod' => 10, // 1
             ),
@@ -36,7 +36,8 @@ Set::Config('Auth', array(
             '^/$',
             '^/login/$',
             '^/loginAuth/$'
-        )
+        ),
+        'AccessDeniedMessage' => 'You need to login to access this page.'
     ),
 
     'Login' => array(
@@ -45,11 +46,9 @@ Set::Config('Auth', array(
 
         'LoginRoute' => 'users_login',
         'LoginAuthRoute' => 'users_login_auth',
-        'LoggedInDefaultRoute' => 'Application',
+        'LoggedInDefaultRoute' => 'users_List',
 
-        'BeforeLogoutHookRoute' => false, // 4
         'LoggedOutDefaultRoute' => 'users_login',
-        'AfterLogoutHookRoute' => false, // 5
     ),
 ));
 

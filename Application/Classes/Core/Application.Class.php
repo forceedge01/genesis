@@ -31,7 +31,7 @@ class Application extends Template{
                 if(time() > $session->Get('login_expires'))
                 {
                     $session->Destroy()->Start();
-
+                    $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
                     $this
                         ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
                             ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
@@ -42,9 +42,8 @@ class Application extends Template{
                 if(!$session->IsSessionKeySet('login_expires') AND $this->checkExceptionRoutes() AND !$session->IsSessionKeySet('route_error'))
                 {
                     $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
-
                     $this
-                        ->setError(array('Access Denied' => 'You need to login to access this page.'))
+                        ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
                             ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
 
@@ -62,7 +61,7 @@ class Application extends Template{
                 // Prevent Session Hijacking
                 if(isset($this->User->$tableColumn))
                 {
-                    $browser = $this->GetBrowserAgent();
+                    $browser = $this->GetSessionManager()->GetBrowserAgent();
 
                     $db = new Database();
 
@@ -73,6 +72,8 @@ class Application extends Template{
                     if($login_check != $session->Get('login_string'))
                     {
                         $session->Destroy()->Start();
+                        $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                        $this->SetError('For security reasons, you have been logged out.')->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                     }
                 }
             }

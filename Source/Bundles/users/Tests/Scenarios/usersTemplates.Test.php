@@ -10,7 +10,7 @@ class TestusersTemplates extends WebTestCase
 {
     public function testTemplateExampleMethod()
     {
-        self::$testClass = new \Bundles\users\Repositories\usersRepository();
+//        self::$testClass = new \Bundles\users\Repositories\usersRepository();
 
         $method = '';
 

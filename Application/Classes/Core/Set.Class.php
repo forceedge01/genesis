@@ -10,7 +10,7 @@ class Set extends Application\Core\Loader{
      */
     public static function Config($key, $config)
     {
-        Application\Core\Loader::$appConfiguration[$key] = $config;
+        self::$appConfiguration[$key] = $config;
     }
 
     /**

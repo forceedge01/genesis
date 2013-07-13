@@ -94,7 +94,7 @@ class Application extends Template{
         }
         else {
 
-            $this->SetError('You need more previliges to access this page.')->forwardTo(APPLICATION_BASE_ROUTE_NAME);
+            $this->SetError('You need more previliges to access this page.')->ForwardTo(\Get::Config('Application.Base_Route_Name'));
         }
 
     }

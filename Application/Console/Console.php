@@ -35,43 +35,43 @@ class Console {
                 $this->switchOption($args[0]);
             }
         } else {
-            
+
             echo '
             <title>Simplify</title>
             <style>
-            
+
             .mainHeading
             {
                 color: steelblue; font-size: 18px; padding: 10px; background-color: whitesmoke;
             }
-            
+
             .heading
             {
                 color: steelblue; background-color: whitesmoke; padding: 10px; font-size: 16px; float: left; width: 100%; margin: 10px 0px;
             }
-            
+
             .form
             {
                 line-height: 25px;
             }
-            
+
             .form input[type=text]
             {
                 width: 200px;
                 padding: 5px;
             }
-            
+
             .form .option label:hover
             {
                 background-color: ghostwhite;
             }
-            
+
             .option input
             {
                 float: left;
                 width: 3%;
             }
-            
+
             .option label
             {
                 display: block;
@@ -79,7 +79,7 @@ class Console {
                 width: 96%;
                 padding: 3px;
             }
-            
+
             .subHeading
             {
                 color: yellowgreen; cont-size: 14; padding: 5px;
@@ -88,7 +88,7 @@ class Console {
             {
                 color: orange;
             }
-            
+
             </style>
             ';
 
@@ -110,7 +110,7 @@ class Console {
             foreach ($options as $key => $option) {
 
                 echo "<div class='subHeading'>$key</div>";
-                
+
                 foreach($option as $opt)
                 {
                     echo "<div class='option'><input type='radio' ".($_POST['option'][0] == $opt ? 'checked=checked' : '')." id='$opt' name='option[]' value='$opt'> <label for='$opt'> $opt</label></div><br />";
@@ -220,7 +220,7 @@ class Console {
         }
     }
 
-    public function linebreak($val) 
+    public function linebreak($val)
     {
         for ($i = 0; $i < $val; $i++) {
 
@@ -230,11 +230,11 @@ class Console {
                 echo '<br />';
         }
     }
-    
+
     public function space($num)
     {
         $space = null;
-        
+
         for ($i = 0; $i < $num; $i++) {
 
             if (!isset($_SERVER['SERVER_NAME']))
@@ -242,7 +242,7 @@ class Console {
             else
                 $space .= '&nbsp;';
         }
-        
+
         return $space;
     }
 
@@ -254,16 +254,10 @@ class Console {
         {
             case 'bundle':
             {
-                if(!ALLOW_BUNDLE_CREATION_FROM_BROWSER AND isset($_SERVER['HTTP_HOST']))
-                {
-                    echo 'Access restricted.';
-                    exit;
-                }
-
                 if (isset($_SERVER['SERVER_NAME']))
                 {
                     $bundle = new Libraries\Bundle('html');
-                    $bundle->name = str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] )));
+                    $bundle->name = ucfirst(str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] ))));
                 }
                 else
                 {
@@ -295,7 +289,7 @@ class Console {
             case 'test':
             {
                 $this->object = New Test();
-                
+
                 switch($args[1])
                 {
                     case 'routes':
@@ -341,12 +335,12 @@ class Console {
                 }
                 break;
             }
-            
+
             case 'cache':
             {
-                require_once APPLICATION_CLASSES_FOLDER . 'Core/Debugger.Class.php';
-                require_once APPLICATION_COMPONENTS_FOLDER . 'Directory/Directory.Class.php';
-                
+                require_once \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Core/Debugger.Class.php';
+                require_once \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER') . 'Directory/Directory.Class.php';
+
                 $cache = new Cache();
                 switch($args[1])
                 {
@@ -431,6 +425,6 @@ class Console {
 
     public function decide($readMessage, $htmlDefault)
     {
-        return ( !$_SERVER['SERVER_NAME'] ? $this->readUser($readMessage) : $htmlDefault);
+        return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);
     }
 }

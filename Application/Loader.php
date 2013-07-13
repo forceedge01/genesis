@@ -30,12 +30,12 @@ class Loader{
         $bundles = array(
 
             'Welcome',
-            'users'
+            'users',
         );
 
         // Do not edit below this line
 
-        $bundlesDIR = BUNDLES_FOLDER;
+        $bundlesDIR = \Get::Config('CORE.BUNDLES_FOLDER');
 
         foreach($bundles as $bundle){
 
@@ -138,29 +138,23 @@ class Loader{
 
             if(is_dir($bundle)){
 
-                if(self::$environment == 'development')
-                    self::LoadConfigFilesFromDir($bundle . BUNDLE_CONFIGS, array('php'));
-                else
-                    self::LoadFilesFromDir($bundle . BUNDLE_CONFIGS, array('php'));
-
-                self::LoadFilesFromDir($bundle . BUNDLE_ROUTES, array('php'));
+//                if(self::$environment == 'development')
+//                    self::LoadConfigFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
+//                else
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES'), array('php'));
                 self::LoadFilesFromDir($bundle, array('php'), false);
-                self::LoadFilesFromDir($bundle . BUNDLE_INTERFACES, array('php'));
-                self::LoadFilesFromDir($bundle . BUNDLE_CONTROLLERS, array('php'));
-                self::LoadFilesFromDir($bundle . BUNDLE_DATABASE_FILES, array('php'));
-
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
             }
             else{
 
                 $params['Backtrace'] = debug_backtrace();
-
                 $message = ' not found in kernel::LoadBundles()';
-
-                require APPLICATION_RESOURCES_FOLDER . 'Views/Errors/Bundle_Not_Found.html.php';
-
+                require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
-
-                exit;
+                die();
 
             }
         }
@@ -246,29 +240,21 @@ class Loader{
         return $exists;
     }
 
-    public static function LoadFramework($environment)
+    public static function LoadFramework()
     {
-        self::$environment = $environment;
+//        self::$environment = $environment;
 
-        if($environment == 'development')
-            self::LoadDevelopment('configs', APPLICATION_CONFIGS_FOLDER);
-        else
-            self::Load('configs', APPLICATION_CONFIGS_FOLDER);
-
-        self::Load('interfaces', APPLICATION_CLASSES_FOLDER . 'Interfaces/');
-
-        self::Load('traits', APPLICATION_CLASSES_FOLDER . 'Traits/');
-
-        self::Load('classes', APPLICATION_CLASSES_FOLDER . 'Core/');
-
-        self::Load('components', APPLICATION_COMPONENTS_FOLDER);
-
-        self::Load('routes', APPLICATION_ROUTES_FOLDER);
-
-        self::Load('models', APPLICATION_MODELS_FOLDER);
-
-        self::Load('controllers', APPLICATION_CONTROLLERS_FOLDER);
-
+//        if($environment == 'development')
+//            self::LoadDevelopment('configs', \Get::Config('CORE.APPLICATION_CONFIGS_FOLDER'));
+//        else
+        self::Load('configs', \Get::Config('CORE.APPLICATION_CONFIGS_FOLDER'));
+        self::Load('interfaces', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Interfaces/');
+        self::Load('traits', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Traits/');
+        self::Load('classes', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Core/');
+        self::Load('components', \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER'));
+        self::Load('routes', \Get::Config('CORE.APPLICATION_ROUTES_FOLDER'));
+        self::Load('models', \Get::Config('CORE.APPLICATION_MODELS_FOLDER'));
+        self::Load('controllers', \Get::Config('CORE.APPLICATION_CONTROLLERS_FOLDER'));
         self::LoadBundles();
     }
 
@@ -291,7 +277,7 @@ class Loader{
     public static function LoadClassesAndComponentsTestFiles()
     {
         self::$LoadedFiles = array();
-        self::LoadFilesFromDir(APPLICATION_TESTS_FOLDER, array('php')) ;
+        self::LoadFilesFromDir(\Get::Config('CORE.APPLICATION_TESTS_FOLDER'), array('php')) ;
 
         return self::$LoadedFiles;
     }
@@ -305,7 +291,7 @@ class Loader{
             if(is_dir($bundle)){
 
                 $testBundles[] = $bundle;
-                self::LoadFilesFromDir($bundle . BUNDLE_TESTS, array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_TESTS'), array('php'));
             }
         }
 

@@ -14,7 +14,7 @@ class AppMethods extends Manager{
      */
     public function HashPassword($password) {
 
-        return hash(AUTH_PASSWORD_ENCRYPTION_ALGORITHM, $password);
+        return hash(\Get::Config('Auth.Security.PasswordEncryption'), $password);
     }
 
     /**
@@ -230,7 +230,7 @@ class AppMethods extends Manager{
         {
             // Is bundle
 
-            $path = $this->RefactorUrl(BUNDLES_FOLDER . $key);
+            $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER') . $key);
             if(file_exists($path))
             {
                 return $path;
@@ -244,7 +244,7 @@ class AppMethods extends Manager{
         {
             // is Root folder
 
-            $path = $this->RefactorUrl(APPLICATION_FOLDER . $key);
+            $path = $this->RefactorUrl(\Get::Config('CORE.APPLICATION_FOLDER') . $key);
             if(file_exists($path))
             {
                 return $path;
@@ -264,7 +264,7 @@ class AppMethods extends Manager{
 
         return $file;
     }
-    
+
     public function ObjectToArray($obj)
     {
         try{
@@ -280,7 +280,7 @@ class AppMethods extends Manager{
             trigger_error($e->getMessage());
         }
     }
-    
+
     public function ArrayToObject(array $array)
     {
         try

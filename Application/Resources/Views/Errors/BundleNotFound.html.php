@@ -1,6 +1,6 @@
 <div class="errorPage">
 
-    <h1>Bundle:: <span><?=$bundle?></span> <?=$message?></h1>
+    <h4>Bundle:: <span>'<?=$bundle?>'</span> <?=$message?></h4>
 
     <p>Error Originated from:</p>
 

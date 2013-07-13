@@ -15,9 +15,35 @@ class Bundle extends Console {
             $renderMethod,
             $bundleFolder;
 
+    private
+            $AssetsFolder,
+            $bundleAssetsFolder,
+            $bundleSourceFolder,
+            $bundleTestsFolder,
+            $bundleViewsFolder,
+            $bundleDatabaseFolder,
+            $bundleConfigsFolder,
+            $bundleControllersFolder,
+            $bundleInterfacesFolder,
+            $bundleRoutesFolder,
+            $bundleHeaderFileName,
+            $bundleFooterFileName;
+
     public function __construct($type) {
 
         $this->renderMethod = $type;
+        $this->bundleSourceFolder = \Get::Config('CORE.BUNDLES_FOLDER');
+        $this->AssetsFolder = \Get::Config('CORE.TEMPLATING.ASSETS_FOLDER');
+        $this->bundleAssetsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ASSETS_FOLDER');
+        $this->bundleTestsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_TESTS');
+        $this->bundleViewsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS');
+        $this->bundleControllersFolder = \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS');
+        $this->bundleDatabaseFolder = \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES');
+        $this->bundleConfigsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS');
+        $this->bundleInterfacesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES');
+        $this->bundleRoutesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES');
+        $this->bundleHeaderFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
+        $this->bundleFooterFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
     }
 
     public function createBundle() {
@@ -35,7 +61,7 @@ class Bundle extends Console {
                   $this->singular = substr($this->name, 0, -1);
         }
 
-        $this->bundleFolder = BUNDLES_FOLDER . $this->name;
+        $this->bundleFolder = $this->bundleSourceFolder . $this->name;
 
         if (mkdir($this->bundleFolder))
         {
@@ -91,7 +117,7 @@ class Bundle extends Console {
             {
                 echo '... ',$this->linebreak(1);
 
-                if ($this->removeDirectory(BUNDLES_FOLDER . $bundleName))
+                if ($this->removeDirectory($this->bundleSourceFolder . $bundleName))
                 {
                     echo $this->green("Bundle {$bundleName} has been deleted successfully.");
 
@@ -109,9 +135,9 @@ class Bundle extends Console {
                     {
                         echo '... ';
 
-                        if(is_dir(CONSOLE_BUNDLES_ASSETS_FOLDER .  $bundleName))
+                        if(is_dir($this->bundleAssetsFolder .  $bundleName))
                         {
-                            if($this->removeDirectory(CONSOLE_BUNDLES_ASSETS_FOLDER . $bundleName))
+                            if($this->removeDirectory($this->bundleAssetsFolder . $bundleName))
                             {
                                 echo $this->green("Assets of bundle {$bundleName} deleted successfully.");
                             }
@@ -135,13 +161,13 @@ class Bundle extends Console {
 
     public function readBundles($return) {
 
-        $bundles = scandir(BUNDLES_FOLDER);
+        $bundles = scandir($this->bundleSourceFolder);
 
         $bundlesArray = array();
 
         foreach ($bundles as $bundle) {
 
-            if (is_dir(BUNDLES_FOLDER . $bundle)) {
+            if (is_dir($this->bundleSourceFolder . $bundle)) {
 
                 if($bundle != '.' && $bundle != '..') {
 
@@ -162,22 +188,22 @@ class Bundle extends Console {
     private function createConfig(){
 
         mkdir($this->bundleFolder . '/Resources');
-        mkdir($this->bundleFolder . '/Resources/Configs');
+        mkdir($this->bundleFolder . $this->bundleConfigsFolder );
 
         $initTemplate = "<?php
 
-Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', BUNDLES_FOLDER . '{$this->name}');";
+Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', \\Get::Config('CORE.BUNDLES_FOLDER') . '{$this->name}');";
 
-        $this->createFile($this->bundleFolder . "/Resources/Configs/{$this->name}.Config.php", $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleConfigsFolder . "{$this->name}.Config.php", $initTemplate);
 
         return $this;
     }
 
     private function createEntity(){
 
-        mkdir($this->bundleFolder . '/Model');
-        mkdir($this->bundleFolder . '/Model/Entities');
-        mkdir($this->bundleFolder . '/Model/Repositories');
+        mkdir($this->bundleFolder . $this->bundleDatabaseFolder);
+        mkdir($this->bundleFolder . $this->bundleDatabaseFolder . 'Entities');
+        mkdir($this->bundleFolder . $this->bundleDatabaseFolder . 'Repositories');
 
         $initEntity = "<?php
 
@@ -194,7 +220,7 @@ final class {$this->name}Entity extends ApplicationEntity {
 }
 ";
 
-        $this->createFile($this->bundleFolder . "/Model/Entities/{$this->name}Entity.php", $initEntity);
+        $this->createFile($this->bundleFolder . $this->bundleDatabaseFolder . "Entities/{$this->name}Entity.php", $initEntity);
 
         $initRepository = "<?php
 
@@ -213,7 +239,7 @@ final class {$this->name}Repository extends ApplicationRepository implements {$t
 }
               ";
 
-        $this->createFile($this->bundleFolder . "/Model/Repositories/{$this->name}Repository.php", $initRepository);
+        $this->createFile($this->bundleFolder . $this->bundleDatabaseFolder . "Repositories/{$this->name}Repository.php", $initRepository);
 
         return $this;
     }
@@ -257,27 +283,27 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Model/{$this->name}Model.php", $Model);
+        $this->createFile($this->bundleFolder . $this->bundleDatabaseFolder . "{$this->name}Model.php", $Model);
 
         return $this;
     }
 
     private function createViews(){
 
-        mkdir($this->bundleFolder . '/Resources/Views');
-        mkdir($this->bundleFolder . '/Resources/Views/ControllerViews');
+        mkdir($this->bundleFolder . $this->bundleViewsFolder);
+        mkdir($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews');
 
         $initTemplate = "<?=\$this->IncludeTemplate(':Header.html.php', \$params)?>
 <?=\$this->setAsset('{$this->name}:{$this->name}.css')?>
 ";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/' . 'Header.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'Header.html.php', $initTemplate);
 
         $initTemplate = "<?=\$this->setAsset('{$this->name}:{$this->name}.js')?>
 <?=\$this->IncludeTemplate(':Footer.html.php', \$params)?>
 ";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/' . 'Footer.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'Footer.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -289,7 +315,7 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/list.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/list.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -301,7 +327,7 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/view.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/view.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -313,7 +339,7 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/create.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/create.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -325,14 +351,14 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . '/Resources/Views/ControllerViews/edit.html.php', $initTemplate);
+        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/edit.html.php', $initTemplate);
 
         return $this;
     }
 
     private function createInterface(){
 
-        mkdir($this->bundleFolder . '/Interfaces');
+        mkdir($this->bundleFolder . $this->bundleInterfacesFolder);
 
         $initControllerInterface = "<?php
 
@@ -357,6 +383,17 @@ interface {$this->name}ControllerInterface {
      *
      */
     public function indexAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    public function listAction();
 
     /**
      *
@@ -407,7 +444,7 @@ interface {$this->name}ControllerInterface {
 }
 ";
 
-        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Controller.Interface.php", $initControllerInterface);
+        $this->createFile($this->bundleFolder . $this->bundleInterfacesFolder . "{$this->name}Controller.Interface.php", $initControllerInterface);
 
         $initControllerInterface = "<?php
 
@@ -426,7 +463,7 @@ interface {$this->name}RepositoryInterface {
 }
 ";
 
-        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Repository.Interface.php", $initControllerInterface);
+        $this->createFile($this->bundleFolder . $this->bundleInterfacesFolder . "{$this->name}Repository.Interface.php", $initControllerInterface);
 
         $initControllerInterface = "<?php
 
@@ -477,14 +514,14 @@ interface {$this->name}ModelInterface {
 }
 ";
 
-        $this->createFile($this->bundleFolder . "/Interfaces/{$this->name}Model.Interface.php", $initControllerInterface);
+        $this->createFile($this->bundleFolder . $this->bundleInterfacesFolder . "{$this->name}Model.Interface.php", $initControllerInterface);
 
         return $this;
     }
 
     private function createController(){
 
-        mkdir($this->bundleFolder . '/Controllers');
+        mkdir($this->bundleFolder . $this->bundleControllersFolder);
 
         $initController = "<?php
 
@@ -712,7 +749,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
 ";
 
-        $this->createFile($this->bundleFolder . "/Controllers/{$this->name}Controller.php", $initController);
+        $this->createFile($this->bundleFolder . $this->bundleControllersFolder . "{$this->name}Controller.php", $initController);
 
         $initController = "<?php
 
@@ -732,14 +769,14 @@ class {$this->name}BundleController extends ApplicationController{
 
 ";
 
-        $this->createFile($this->bundleFolder . "/Controllers/{$this->name}BundleController.php", $initController);
+        $this->createFile($this->bundleFolder . $this->bundleControllersFolder . "{$this->name}BundleController.php", $initController);
 
         return $this;
     }
 
     private function createRoutes(){
 
-        mkdir($this->bundleFolder . '/Resources/Routes');
+        mkdir($this->bundleFolder . $this->bundleRoutesFolder);
 
         $initRoute = "<?php
 
@@ -790,17 +827,17 @@ Set::Route('{$this->name}_Delete', array(
 ));
 ";
 
-        $this->createFile($this->bundleFolder . "/Resources/Routes/{$this->name}.Routes.php", $initRoute);
+        $this->createFile($this->bundleFolder . $this->bundleRoutesFolder . "{$this->name}.Routes.php", $initRoute);
 
         return $this;
     }
 
     private function CreateAssets(){
 
-        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name);
-        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/Images');
-        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/JS');
-        mkdir(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . '/CSS');
+        mkdir($this->bundleAssetsFolder . $this->name);
+        mkdir($this->bundleAssetsFolder . $this->name . '/Images');
+        mkdir($this->bundleAssetsFolder . $this->name . '/JS');
+        mkdir($this->bundleAssetsFolder . $this->name . '/CSS');
 
         $initJs = "/* Javascript for {$this->name} Bundle */
 
@@ -810,7 +847,7 @@ jQuery(document).ready(function(){
 
 ";
 
-        $this->createFile(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . "/JS/{$this->name}.js", $initJs);
+        $this->createFile($this->bundleAssetsFolder . $this->name . "/JS/{$this->name}.js", $initJs);
 
         $initCss= "/* Stylesheet for {$this->name} Bundle */
 
@@ -820,22 +857,22 @@ root{
     color: black;
 }";
 
-        $this->createFile(CONSOLE_BUNDLES_ASSETS_FOLDER . $this->name . "/CSS/{$this->name}.css", $initCss);
+        $this->createFile($this->bundleAssetsFolder . $this->name . "/CSS/{$this->name}.css", $initCss);
 
         return $this;
     }
 
     private function createTests(){
 
-        mkdir($this->bundleFolder . '/Tests');
-        mkdir($this->bundleFolder . '/Tests/Config');
+        mkdir($this->bundleFolder . $this->bundleTestsFolder);
+        mkdir($this->bundleFolder . $this->bundleTestsFolder . 'Config');
 
         $initTests = "<?php
 
 
 Set::Config('{$this->name}Testing', array());";
 
-        $this->createFile($this->bundleFolder . "/Tests/Config/{$this->name}.Test.Config.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Config/{$this->name}.Test.Config.php", $initTests);
 
         mkdir($this->bundleFolder . '/Tests/Scenarios');
 
@@ -843,7 +880,7 @@ Set::Config('{$this->name}Testing', array());";
 
 namespace Bundles\\{$this->name}\\Tests;
 
-require_once '../Config/{$this->name}.Test.Config.php';
+require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
@@ -863,13 +900,13 @@ class Test{$this -> name}Controller extends WebTestCase
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Controller.Test.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Controller.Test.php", $initTests);
 
         $initTests = "<?php
 
 namespace Bundles\\{$this->name}\\Tests;
 
-require_once '../Config/{$this->name}.Test.Config.php';
+require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
@@ -889,13 +926,13 @@ class Test{$this -> name}Entity extends BaseTestingRoutine
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Entity.Test.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Entity.Test.php", $initTests);
 
         $initTests = "<?php
 
 namespace Bundles\\{$this->name}\\Tests;
 
-require_once '../Config/{$this->name}.Test.Config.php';
+require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 use Application\\Console\\BaseTestingRoutine;
@@ -914,13 +951,13 @@ class Test{$this -> name}Repository extends BaseTestingRoutine
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Repository.Test.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Repository.Test.php", $initTests);
 
         $initTests = "<?php
 
 namespace Bundles\\{$this->name}\\Tests;
 
-require_once '../Config/{$this->name}.Test.Config.php';
+require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
@@ -950,13 +987,13 @@ class Test{$this -> name}Templates extends TemplateTestCase
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Templates.Test.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Templates.Test.php", $initTests);
 
         $initTests = "<?php
 
 namespace Bundles\\{$this->name}\\Tests;
 
-require_once '../Config/{$this->name}.Test.Config.php';
+require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
@@ -981,7 +1018,7 @@ class Test{$this -> name}Model extends BaseTestingRoutine
     }
 }";
 
-        $this->createFile($this->bundleFolder . "/Tests/Scenarios/{$this->name}Model.Test.php", $initTests);
+        $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Model.Test.php", $initTests);
 
         return $this;
     }

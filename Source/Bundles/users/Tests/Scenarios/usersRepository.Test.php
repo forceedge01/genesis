@@ -10,8 +10,8 @@ class TestusersRepository extends WebTestCase
 {
     public function testExampleMethod()
     {
-        self::$testClass = new \Bundles\users\Repositories\usersRepository();
-        
+//        self::$testClass = new \Bundles\users\Repositories\usersRepository();
+
         $method = '';
 
         //Checks if the returned value of this function is an integer

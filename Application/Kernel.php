@@ -3,24 +3,22 @@
 namespace Application\Core;
 
 require_once __DIR__ . '/Loader.php';
+require_once __DIR__ . '/Classes/Core/Set.Class.php';
 require_once __DIR__ . '/Resources/Configs/Core/AppDirs.Config.php';
-require_once APPLICATION_CLASSES_FOLDER . 'Core/Set.Class.php';
-require_once APPLICATION_CLASSES_FOLDER . 'Core/Get.Class.php';
+require_once __DIR__ . '/Classes/Core/Get.Class.php';
 
 class AppKernal extends Loader{
 
     public static
             $phpVersion,
             $msyqlVersion,
-            $scriptStartTime,
-            $env;
+            $scriptStartTime;
 
-    public static function Initialize($env) {
+    public static function Initialize() {
 
-        self::$env = $env;
         self::$scriptStartTime = microtime();
         self::CheckDependencies();
-        self::LoadFramework(self::$env);
+        self::LoadFramework();
         $route = new Router();
 
         if(!$route->ForwardRequest()){
@@ -60,4 +58,4 @@ class AppKernal extends Loader{
     }
 }
 
-AppKernal::Initialize('prod');
+AppKernal::Initialize();

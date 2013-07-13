@@ -5,69 +5,44 @@
 // Core folder paths
 
 define('HOST', 'http://localhost/GENESIS/');
-
 define('ROOT', __DIR__ . '/../../../../');
 
-define('APPLICATION_FOLDER', ROOT . 'Application/');
+\Set::Config('CORE', array(
 
-define('APPLICATION_CONSOLE_FOLDER', APPLICATION_FOLDER . 'Console/');
+    'APPLICATION_FOLDER' => ROOT . 'Application/',
+    'APPLICATION_CONSOLE_FOLDER' => ROOT . 'Application/Console/',
+    'APPLICATION_CLASSES_FOLDER' => ROOT . 'Application/Classes/',
+    'APPLICATION_COMPONENTS_FOLDER' => ROOT . 'Application/Classes/Components/',
+    'APPLICATION_RESOURCES_FOLDER' => ROOT . 'Application/Resources/',
+    'APPLICATION_MODELS_FOLDER' => ROOT . 'Application/Model/',
+    'APPLICATION_CONFIGS_FOLDER' => ROOT . 'Application/Resources/Configs/',
+    'APPLICATION_ROUTES_FOLDER' => ROOT . 'Application/Resources/Routes/',
+    'APPLICATION_CONTROLLERS_FOLDER' => ROOT . 'Application/Controllers/',
+    'APPLICATION_TESTS_FOLDER' => ROOT . 'Application/Tests/',
+    'SOURCE_FOLDER' => ROOT . 'Source/',
+    'BUNDLES_FOLDER' => ROOT . 'Source/Bundles/',
+    'CACHE_FOLDER' => ROOT . 'Public/Cache',
 
-define('APPLICATION_CLASSES_FOLDER', APPLICATION_FOLDER . 'Classes/');
+    'TEMPLATING' => array(
+        'TEMPLATES_FOLDER' => ROOT . 'Application/Resources/Views/',
+        'ERRORS_TEMPLATES_FOLDER' => ROOT . 'Application/Resources/Views/Error_Pages/',
+        'PUBLIC_FOLDER' => HOST . 'Public/',
+        'ASSETS_FOLDER' => HOST . 'Public/Assets/',
+        'IMAGES_FOLDER' => HOST . 'Public/Assets/Images/',
+        'CSS_FOLDER' => HOST . 'Public/Assets/CSS/',
+        'JS_FOLDER' => HOST . 'Public/Assets/JS/'
+    ),
 
-define('APPLICATION_COMPONENTS_FOLDER', APPLICATION_CLASSES_FOLDER . 'Components/');
-
-define('APPLICATION_RESOURCES_FOLDER', APPLICATION_FOLDER . 'Resources/');
-
-define('APPLICATION_MODELS_FOLDER', APPLICATION_FOLDER . 'Model/');
-
-define('APPLICATION_CONFIGS_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Configs/');
-
-define('APPLICATION_ROUTES_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Routes/');
-
-define('APPLICATION_CONTROLLERS_FOLDER', APPLICATION_FOLDER . 'Controllers/');
-
-define('APPLICATION_TESTS_FOLDER', APPLICATION_FOLDER . 'Tests/');
-
-define('SOURCE_FOLDER', ROOT . 'Source/');
-
-define('BUNDLES_FOLDER', SOURCE_FOLDER . 'Bundles/');
-
-define('CACHE_FOLDER', ROOT . 'Public/Cache');
-
-
-
-// Templating and public folders
-
-define('TEMPLATES_FOLDER', APPLICATION_RESOURCES_FOLDER . 'Views/');
-
-define('ERRORS_TEMPLATES_FOLDER', TEMPLATES_FOLDER . 'Error_Pages/');
-
-define('PUBLIC_FOLDER', HOST . 'Public/');
-
-define('ASSETS_FOLDER', PUBLIC_FOLDER . 'Assets/');
-
-define('IMAGES_FOLDER', ASSETS_FOLDER . 'Images/');
-
-define('CSS_FOLDER', ASSETS_FOLDER . 'CSS/');
-
-define('JS_FOLDER', ASSETS_FOLDER . 'JS/');
-
-// Bundle structure
-
-define('BUNDLE_CONFIGS', '/Resources/Configs/');
-
-define('BUNDLE_DATABASE_FILES', '/Model/');
-
-define('BUNDLE_INTERFACES', '/Interfaces/');
-
-define('BUNDLE_CONTROLLERS', '/Controllers/');
-
-define('BUNDLE_ROUTES', '/Resources/Routes/');
-
-define('BUNDLE_VIEWS', '/Resources/Views/');
-
-define('BUNDLE_TESTS', '/Tests/');
-
-define('BUNDLE_VIEW_HEADER_FILE', 'Header.html.php');
-
-define('BUNDLE_VIEW_FOOTER_FILE', 'Footer.html.php');
+    'BUNDLES' => array(
+        'BUNDLE_CONFIGS' => '/Resources/Configs/',
+        'BUNDLE_ASSETS_FOLDER' => ROOT . 'Public/Assets/Bundles/',
+        'BUNDLE_DATABASE_FILES' => '/Model/',
+        'BUNDLE_INTERFACES' => '/Interfaces/',
+        'BUNDLE_CONTROLLERS' => '/Controllers/',
+        'BUNDLE_ROUTES' => '/Resources/Routes/',
+        'BUNDLE_VIEWS' => '/Resources/Views/',
+        'BUNDLE_TESTS' => '/Tests/',
+        'BUNDLE_VIEW_HEADER_FILE' => 'Header.html.php',
+        'BUNDLE_VIEW_FOOTER_FILE' => 'Footer.html.php',
+    )
+));

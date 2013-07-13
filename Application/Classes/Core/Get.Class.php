@@ -11,7 +11,7 @@ class Get{
     {
         $keys = func_get_args();
         $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
-
+        
         if($config === null)
         {
             die('<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));

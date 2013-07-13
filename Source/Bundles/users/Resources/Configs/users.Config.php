@@ -1,3 +1,3 @@
 <?php
 
-Set::Config('BUNDLE_USERS_PATH', BUNDLES_FOLDER . 'users');
+Set::Config('BUNDLE_USERS_PATH', \Get::Config('CORE.BUNDLES_FOLDER') . 'users');

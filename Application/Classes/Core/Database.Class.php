@@ -677,7 +677,7 @@ class Database extends Template {
             $params = $this->prepare($id);
 
             if(!$params)
-                $this->setError ('Failed to prepare params '.print_r($id, true).', check if field exists in table');
+                $this->setError ('Failed to prepare params, check if field exists in table');
 
             $this->query .= ' WHERE ' . $params;
 
@@ -749,7 +749,7 @@ class Database extends Template {
             else if (is_array($this->queryTableColumns))
             {
                 $columns = $this->queryTableColumns;
-                $this->queryTableColumns = null;
+                $this->queryColumns = null;
 
                 foreach ($columns as $column)
                     $this->queryColumns .= "{$column->Field}  as '" . str_replace('.', '__', $column->Field) . "',";

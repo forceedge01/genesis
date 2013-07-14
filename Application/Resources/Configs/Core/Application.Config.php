@@ -8,10 +8,12 @@ Set::Config('Application', array(
     'LandingPageRoute' => 'users_List',
     'Environment' => 'production',
     'Session' => array(
-
         'Enabled' => true,
-        'HttpsSecure' => false,
-        'HttpOnly' => true,
+        'Secure' => array(
+            'HttpsSecure' => false,
+            'HttpOnly' => true,
+        ),
+        'UseAuthComponent' => true
     ),
     'Environment' => array(
 

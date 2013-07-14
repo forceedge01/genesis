@@ -59,6 +59,12 @@ class Router extends AppMethods{
         return $this;
     }
 
+    public function GetPatternFromUrl($url)
+    {
+        $pattern = '/^http(s)?:\/\/'.str_replace('/','\\/', getenv('HTTP_HOST').getenv('SCRIPT_NAME')).'/i';
+        return preg_replace($pattern, '', $url);
+    }
+
     /**
      *
      * @return boolean - true on success, false on failure<br />
@@ -87,10 +93,36 @@ class Router extends AppMethods{
             {
                 $this->lastRoute = $key;
 
-                if(isset($value['Method']) and strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
-                    $this
-                        ->SetErrorArgs('Access request denied', 'Router', '0')
-                            ->ThrowException();
+                if(isset($value['Method']))
+                {
+                    $error = false;
+
+                    if(is_array($value['Method']))
+                    {
+                        if(strtoupper($value['Method']['Type']) != getenv('REQUEST_METHOD'))
+                        {
+                            if(isset($value['Method']['Message']))
+                            {
+                                if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
+                                {
+                                    $this->GetCoreObject('Template')->SetError($value['Method']['Message']);
+                                    $this->ForwardTo($this->lastRoute);
+                                }
+                            }
+
+                            $error = true;
+                        }
+                    }
+                    else if(strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
+                    {
+                        $error = true;
+                    }
+
+                    if($error)
+                        $this
+                            ->SetErrorArgs('Access request denied', 'Router', '0')
+                                ->ThrowException();
+                }
 
                 if(isset($value['Requirements']))
                     $this->ValidateVariables($value['Requirements']);
@@ -268,7 +300,8 @@ class Router extends AppMethods{
 
         session_write_close();
 
-        ob_end_flush();
+        if(ob_get_contents())
+            ob_end_flush();
 
         header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 

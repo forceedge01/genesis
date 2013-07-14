@@ -9,6 +9,16 @@ use \Application\Core\Application;
 
 class ApplicationController extends Application{
 
+    public function __construct() {
+        parent::__construct();
+        $this->BeforeControllerHook();
+    }
+
+    public function __destruct() {
+        $this->AfterControllerHook();
+        parent::__destruct();
+    }
+
     public function indexAction(){
 
         $this->ForwardTo(\Get::Config('Application.LandingPageRoute'));
@@ -19,4 +29,8 @@ class ApplicationController extends Application{
         $this->Render(':SiteUnderDevelopment.html.php', 'Site Under Development');
         exit;
     }
+
+    protected function BeforeControllerHook(){}
+
+    protected function AfterControllerHook(){}
 }

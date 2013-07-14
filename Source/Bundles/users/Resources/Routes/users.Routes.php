@@ -9,9 +9,9 @@ Set::Route('users', array(
 
 Set::Route('users_login', array(
 
-      "Controller" => "users:users:login",
-      "Pattern" => "/login/",
-      "Method" => "get"
+    "Controller" => "users:users:login",
+    "Pattern" => "/login/",
+    "Method" => 'get'
 ));
 
 Set::Route('users_logout', array(
@@ -22,8 +22,12 @@ Set::Route('users_logout', array(
 
 Set::Route('users_login_auth', array(
 
-      "Controller" => "users:users:loginAuth",
-      "Pattern" => "/loginAuth/",
+    "Controller" => "users:users:loginAuth",
+    "Pattern" => "/loginAuth/",
+    'Method' => array(
+        'Type' => 'post',
+        'Message' => 'Unable to login'
+    )
 ));
 
 Set::Route('users_List', array(

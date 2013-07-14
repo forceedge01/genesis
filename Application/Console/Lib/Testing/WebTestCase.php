@@ -5,18 +5,18 @@ namespace Application\Console;
 
 
 class WebTestCase extends TemplateTestCase{
-    
+
     public function crawlURL($url, $data = null)
     {
         echo $this ->linebreak(2) . $this -> blue('Initiating URL crawl at '.$url) ;
 
         return $this ->setupCURL($url, urlencode($data)) ;
-    }    
-    
+    }
+
     private function setupCURL($url, $data = null)
     {
         $info = array();
-        
+
         $tuCurl = curl_init();
         curl_setopt($tuCurl, CURLOPT_URL, $url);
         curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
@@ -77,21 +77,32 @@ class WebTestCase extends TemplateTestCase{
             self::RegisterFail($this -> red(__FUNCTION__ . '(); unable to verify URL: '.$url));
         }
     }
-    
+
     public function AssertRedirect($url, $redirectUrl)
     {
         $info = $this->setupCURL($url, false);
-        
+
         if(strtolower($redirectUrl) == strtolower($info['url']))
         {
             $message = __FUNCTION__ . '(); Redirect test '.$url.' => '.$redirectUrl.' passed';
             self::RegisterPass($this->green($message), $info['message']);
-            
+
             return true;
         }
-        
+
         self::RegisterFail($this->red(__FUNCTION__ . '(); Redirect test failed, got '.$url.' => '.$info['url'].' Instead of '.$redirectUrl));
-        
+
         return false;
+    }
+
+    public function AssertFlashMessage($method, $message, $args = null)
+    {
+        session_start();
+        self::$testClass->$method($args);
+
+        if(array_search($message, $_SESSION['FlashMessages']) !== false)
+            return self::RegisterPass ('Flash Message found');
+
+        return self::RegisterFail('Unable to find flash message setup for method: '.$method);
     }
 }

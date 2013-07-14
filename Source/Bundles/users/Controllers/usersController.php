@@ -20,17 +20,14 @@ final class usersController extends usersBundleController implements usersContro
 
     public function loginAction()
     {
-        $this->PageUnderDevelopment();
-
         $this->Render('users:login.html.php', 'Login');
     }
 
     public function loginAuthAction()
     {
-
         if ($this->GetRequestManager()->IsPost('login'))
         {
-            $auth = new \Application\Core\Auth();
+            $auth = $this->GetComponent('Auth');
 
             if ($auth->authenticateUser('Invalid username or password entered'))
             {
@@ -47,8 +44,7 @@ final class usersController extends usersBundleController implements usersContro
 
     public function logoutAction()
     {
-        $auth = new \Application\Core\Auth();
-        $auth->Logout('You have been logged out.');
+        $this->GetComponent('Auth')->Logout('You have been logged out.');
     }
 
     public function listAction()

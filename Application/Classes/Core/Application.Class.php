@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Application extends Template{
+class Application extends Template implements Interfaces\Application{
 
     private
             $Router,
@@ -15,6 +15,8 @@ class Application extends Template{
 
     public function __construct() {
 
+        $this->BeforeApplicationHook();
+
         $this->Request = $this->GetCoreObject('Request');
         $this->Router = $this->GetCoreObject('Router');
         $this->Response = $this ->GetCoreObject('Response');
@@ -23,61 +25,76 @@ class Application extends Template{
         {
             $session = $this->GetCoreObject('Session');
 
-            call_user_func_array(array($session, 'Start'), \Get::Config('Application.Session.HttpsSecure', 'Application.Session.HttpOnly'));
-
-            // Check for login interval expiration and authorized page view
-            if($session->IsSessionKeySet('login_expires'))
+            if(\Get::Config('Application.Session.Secure.HttpsSecure') or \Get::Config('Application.Session.Secure.HttpOnly'))
             {
-                if(time() > $session->Get('login_expires'))
-                {
-                    $session->Destroy()->Start();
-                    $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
-                    $this
-                        ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
-                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
-                }
+                call_user_func_array(array($session, 'StartSecure'), \Get::Config('Application.Session.Secure.HttpsSecure', 'Application.Session.Secure.HttpOnly'));
             }
             else
             {
-                if(!$session->IsSessionKeySet('login_expires') AND $this->checkExceptionRoutes() AND !$session->IsSessionKeySet('route_error'))
-                {
-                    $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
-                    $this
-                        ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
-                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
-                }
-
+                $session->Start('PHPGENESISSESSID_7736298');
             }
 
-            // Populate User object with user defined method
-            if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
+            if(\Get::Config('Application.Session.UseAuthComponent'))
             {
-                $auth = new Auth();
-
-                $this->User = $auth->GetUser();
-
-                $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
-
-                // Prevent Session Hijacking
-                if(isset($this->User->$tableColumn))
+                // Check for login interval expiration and authorized page view
+                if($session->IsSessionKeySet('login_expires'))
                 {
-                    $browser = $this->GetSessionManager()->GetBrowserAgent();
-
-                    $db = new Database();
-
-                    $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))->GetOneRecordBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn));
-
-                    $login_check = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password->password.$browser);
-
-                    if($login_check != $session->Get('login_string'))
+                    if(time() > $session->Get('login_expires'))
                     {
-                        $session->Destroy()->Start();
+                        $session->Destroy()->StartSecure();
                         $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
-                        $this->SetError('For security reasons, you have been logged out.')->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                        $this
+                            ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
+                                ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                    }
+                }
+                else
+                {
+                    if(!$session->IsSessionKeySet('login_expires') AND $this->checkExceptionRoutes() AND !$session->IsSessionKeySet('route_error'))
+                    {
+                        $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                        $this
+                            ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
+                                ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                    }
+
+                }
+
+                // Populate User object with user defined method
+                if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
+                {
+                    $auth = $this->GetComponent('Auth');
+
+                    $this->User = $auth->GetUser();
+
+                    $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
+
+                    // Prevent Session Hijacking
+                    if(isset($this->User->$tableColumn))
+                    {
+                        $browser = $this->GetSessionManager()->GetBrowserAgent();
+
+                        $db = new Database();
+
+                        $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))->GetOneRecordBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn));
+
+                        $login_check = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password->password.$browser);
+
+                        if($login_check != $session->Get('login_string'))
+                        {
+                            $session->Destroy()->StartSecure();
+                            $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                            $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                        }
                     }
                 }
             }
         }
+    }
+
+    public function __destruct()
+    {
+        $this->AfterApplicationHook();
     }
 
     /**
@@ -126,4 +143,8 @@ class Application extends Template{
             die('This page is under development, please check back later');
         }
     }
+
+    protected function BeforeApplicationHook(){}
+
+    protected function AfterApplicationHook(){}
 }

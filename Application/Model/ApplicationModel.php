@@ -14,7 +14,13 @@ class ApplicationModel extends AppMethods implements Model {
 
     public function __construct($entityObject = null)
     {
+        $this->BeforeModelHook();
         $this->entityObject = $entityObject;
+    }
+
+    public function __destruct()
+    {
+        $this->AfterModelHook();
     }
 
     public function dump()
@@ -53,4 +59,8 @@ class ApplicationModel extends AppMethods implements Model {
     {
         return $this->entityObject;
     }
+
+    protected function BeforeModelHook(){}
+
+    protected function AfterModelHook(){}
 }

@@ -19,8 +19,12 @@ class ApplicationRepository extends Database implements Repository {
     public function __construct($params = null) {
 
         parent::__construct($params);
-
+        $this->BeforeRepositoryHook();
         $this->tableName = str_replace('Repository', '', $this->GetClassFromNameSpacedClass(get_called_class()));
+    }
+
+    public function __destruct() {
+        $this->AfterRepositoryHook();
     }
 
     /**
@@ -129,4 +133,6 @@ class ApplicationRepository extends Database implements Repository {
         return $this->Table($this->tableName);
     }
 
+    protected function BeforeRepositoryHook(){}
+    protected function AfterRepositoryHook(){}
 }

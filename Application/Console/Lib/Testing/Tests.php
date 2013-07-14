@@ -123,13 +123,14 @@ class Test extends BaseTestingRoutine{
 
             echo $this ->linebreak(1),' -> ', $this->blue($method), '();';
 
-            ob_end_clean();
-            ob_start();
+            if(ob_get_contents())
+                ob_end_clean();
 
+            ob_start();
             $obj -> $method();
             $content = ob_get_clean();
 
-            if($content)
+            if(!empty($content))
                 echo $content;
             else
                 echo $this->linebreak (1),$this->space (4), '- No tests found';

@@ -28,6 +28,9 @@ Set::Config('Auth', array(
                 'Message' => 'Your account has been locked for trying too many times, try again later',
                 'BlockedCoolDownPeriod' => 10, // 1
             ),
+            'Anti-Hijacking' => array(
+                'Message' => 'For security reasons you have been logged out, please login again.'
+            )
         ),
 
         'Salt' => 'kjahsdjkfhlasjkdfhlajkshdfkjashlfjkhs', // 2

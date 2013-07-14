@@ -16,11 +16,16 @@ class ApplicationEntity extends Database implements Entity{
     public function __construct($params = null) {
 
         parent::__construct($params);
+        $this->BeforeEntityHook();
 
         $this->tableName = str_replace('Entity','', $this->GetClassFromNameSpacedClass(get_called_class()));
 
         if(is_numeric($params))
             $this->Get($params);
+    }
+
+    public function __destruct() {
+        $this->AfterEntityHook();
     }
 
     /**
@@ -55,7 +60,7 @@ class ApplicationEntity extends Database implements Entity{
 
         return $this->Table(str_replace('Entity', '', $entity));
     }
-    
+
     public function SetTableName($table)
     {
         $this->tableName = $table;
@@ -71,7 +76,7 @@ class ApplicationEntity extends Database implements Entity{
 
         if(is_object($params))
             $params = $this->ObjectToArray ($params);
-        
+
         return $this->Table($this->tableName)->QueryOnly($tables)->SaveRecord($params)->GetAffectedRows();
     }
 
@@ -113,4 +118,7 @@ class ApplicationEntity extends Database implements Entity{
     {
         return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
+
+    protected function BeforeEntityHook(){}
+    protected function AfterEntityHook(){}
 }

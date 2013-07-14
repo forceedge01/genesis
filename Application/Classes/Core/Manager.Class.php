@@ -25,7 +25,9 @@ class Manager extends Variable implements ManagerInterface{
                 @$this->$object = new $fullClassPath($args);
             }
             else
-                trigger_error("getOjbect accepts valid class name only, $object class does not exist in ". get_called_class(), E_USER_ERROR);
+            {
+                $this->GetObject($object, $args);
+            }
         }
 
         return $this->$object;
@@ -42,7 +44,7 @@ class Manager extends Variable implements ManagerInterface{
                 @$this->$object = new $fullClassPath($args);
             }
             else
-                return $this->GetComponent ($object, $args);
+                return $this->GetObject ($object, $args);
         }
 
         return $this->$object;
@@ -57,7 +59,11 @@ class Manager extends Variable implements ManagerInterface{
                 @$this->$variable = new $object($args);
             }
             else
-                echo ' Class '.$object.' not found ' . get_called_class();
+            {
+                $this
+                    ->SetErrorArgs(__FUNCTION__ ." accepts valid class name only, $object class does not exist.", get_called_class(), 0)
+                    ->ThrowError();
+            }
         }
 
         return $this->$variable;

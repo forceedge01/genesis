@@ -8,20 +8,30 @@ class Session extends Request{
 
     protected $User;
 
-    public function Start($secure = false, $httponly = true){
+    public function Start($name = null){
 
-        $session_name = 'secure_session_id37736'; // Set a custom session name
-
-        ini_set('session.use_only_cookies', 1); // Forces sessions to only use cookies.
-        $cookieParams = session_get_cookie_params(); // Gets current cookies params.
-        session_set_cookie_params($cookieParams["lifetime"], $cookieParams["path"], $cookieParams["domain"], $secure, $httponly);
-        session_name($session_name); // Sets the session name to the one set above.
-
+        session_name($name);
         session_start();
-//        if(session_id())
-//            session_regenerate_id (true);
-
         return $this;
+    }
+
+    public function StartSecure($httpsSecure = false, $httponly = true)
+    {
+        $name = 'PHPGENESISSECURESESSID_37733627';
+        $this->UseCookiesOnly();
+        $this->SetSessionCookieParams(session_get_cookie_params(), $httpsSecure, $httponly);
+        $this->Start($name);
+        return $this;
+    }
+
+    public function SetSessionCookieParams($cookieParams, $secure, $httponly)
+    {
+        session_set_cookie_params($cookieParams["lifetime"], $cookieParams["path"], $cookieParams["domain"], $secure, $httponly);
+    }
+
+    public function UseCookiesOnly()
+    {
+        ini_set('session.use_only_cookies', 1); // Forces sessions to only use cookies.
     }
 
     public function Save(){

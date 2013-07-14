@@ -28,6 +28,11 @@ class BaseTestingRoutine extends Console{
             self::$passed = self::$failed = self::$assertions = self::$tests = self::$coverage = self::$method = 0;
     }
 
+    /**
+     *
+     * @param type $message
+     * @param type $info
+     */
     protected static function RegisterPass($message = null, $info = null)
     {
         self::$assertions += 1;
@@ -39,8 +44,15 @@ class BaseTestingRoutine extends Console{
             echo $console->linebreak(1), $console->green ($console->space (4).'- '.$message);
         if($info)
             echo $console->linebreak(1), $console->space (6), '- ', $console->blue($info);
+
+        return true;
     }
 
+    /**
+     *
+     * @param type $message
+     * @param type $info
+     */
     protected static function RegisterFail($message = null, $info = null)
     {
         self::$assertions += 1;
@@ -52,6 +64,8 @@ class BaseTestingRoutine extends Console{
             echo $console->linebreak(1), $console->red ($console->space (4) . '- '.$message);
         if($info)
             echo $console->linebreak(1), $console->space (6), '- ', $console->blue($info);
+
+        return false;
     }
 
     // Private Methods //

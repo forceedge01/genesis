@@ -58,7 +58,6 @@ class Loader{
             'Template.Class.php',
             'Application.Class.php',
             'Database.Class.php',
-            'Auth.Class.php',
             'Session.Class.php',
         );
 

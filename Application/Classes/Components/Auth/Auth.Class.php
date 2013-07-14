@@ -1,8 +1,10 @@
 <?php
 
-namespace Application\Core;
+namespace Application\Components;
 
 
+
+use Application\Core\Template;
 
 class Auth extends Template{
 
@@ -27,11 +29,9 @@ class Auth extends Template{
 
     public function Logout($message = null)
     {
-        $this->GetCoreObject('Session')->Destroy()->Start()->RegenerateId(true);
+        $this->GetCoreObject('Session')->Destroy()->StartSecure(\Get::Config('Application.Session.Secure.HttpsSecure') or \Get::Config('Application.Session.Secure.HttpOnly'))->RegenerateId(true);
 
-        $this->SetFlash($message);
-
-        $this->ForwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
+        $this->SetFlash($message)->ForwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
     }
 
     /**

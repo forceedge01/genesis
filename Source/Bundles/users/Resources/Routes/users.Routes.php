@@ -27,7 +27,9 @@ Set::Route('users_login_auth', array(
     'Method' => array(
         'Type' => 'post',
         'Message' => 'Unable to login'
-    )
+    ),
+    'Inject'=>'',
+    'Requirements' => '',
 ));
 
 Set::Route('users_List', array(

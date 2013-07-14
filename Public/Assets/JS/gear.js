@@ -1,4 +1,4 @@
-// Developed by A. Wahhab Qureshi. 
+// Developed by A. Wahhab Qureshi.
 
 (function($){
 
@@ -33,6 +33,23 @@
                         return false
                     }
                 }
+            });
+        },
+
+        ajaxIt: function(){
+
+            $('.ajaxIt').each(function()
+            {
+               $(this).on('click', function()
+               {
+                   var url = $(this).attr('url');
+                   var params = $(this).attr('params');
+                   var container = $(this).attr('container');
+
+                   $.post(url, params, function(data){
+                       $('#'+container).html(data);
+                   });
+               });
             });
         },
 
@@ -472,18 +489,18 @@
 
             $('table').attr('cellspacing', '0').attr('cellpadding', '0');
         },
-        
+
         focusFirstElement: function()
         {
             $('form:not(.filter) :input:visible:enabled:first').focus();
         },
-        
+
         hideAlert: function()
         {
             $(this).delegate('.alert', 'click', function() {
 
                 $(this).hide(200);
-        
+
             });
         }
     };

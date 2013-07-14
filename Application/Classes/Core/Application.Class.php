@@ -143,8 +143,4 @@ class Application extends Template implements Interfaces\Application{
             die('This page is under development, please check back later');
         }
     }
-
-    protected function BeforeApplicationHook(){}
-
-    protected function AfterApplicationHook(){}
 }

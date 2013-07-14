@@ -47,7 +47,7 @@ final class usersController extends usersBundleController implements usersContro
         $this->GetComponent('Auth')->Logout('You have been logged out.');
     }
 
-    public function listAction($id)
+    public function listAction()
     {
         //Used by the HTMLGenerator in the list view.
         $params['table'] = array(

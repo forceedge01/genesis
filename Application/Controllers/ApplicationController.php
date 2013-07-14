@@ -29,8 +29,4 @@ class ApplicationController extends Application{
         $this->Render(':SiteUnderDevelopment.html.php', 'Site Under Development');
         exit;
     }
-
-    protected function BeforeControllerHook(){}
-
-    protected function AfterControllerHook(){}
 }

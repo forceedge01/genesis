@@ -59,8 +59,4 @@ class ApplicationModel extends AppMethods implements Model {
     {
         return $this->entityObject;
     }
-
-    protected function BeforeModelHook(){}
-
-    protected function AfterModelHook(){}
 }

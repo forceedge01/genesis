@@ -118,7 +118,4 @@ class ApplicationEntity extends Database implements Entity{
     {
         return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
-
-    protected function BeforeEntityHook(){}
-    protected function AfterEntityHook(){}
 }

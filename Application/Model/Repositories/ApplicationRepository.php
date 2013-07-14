@@ -132,7 +132,4 @@ class ApplicationRepository extends Database implements Repository {
 
         return $this->Table($this->tableName);
     }
-
-    protected function BeforeRepositoryHook(){}
-    protected function AfterRepositoryHook(){}
 }

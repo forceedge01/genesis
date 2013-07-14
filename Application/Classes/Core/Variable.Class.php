@@ -6,7 +6,7 @@ namespace Application\Core;
  * Author: Wahab Qureshi.
  */
 
-class Variable extends Debugger {
+class Variable extends Hooks {
 
     private
         $variable;

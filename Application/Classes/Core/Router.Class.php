@@ -149,7 +149,6 @@ class Router extends AppMethods{
                     ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable '.$key.'=\''.$this->funcVariables['{'.$key.'}'].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
                         ->ThrowError();
             }
-
         }
     }
 

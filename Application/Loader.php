@@ -48,6 +48,7 @@ class Loader{
         $classes = array(
 
             'Debugger.Class.php',
+            'Hooks.Class.php',
             'Variable.Class.php',
             'Manager.Class.php',
             'AppMethods.Class.php',

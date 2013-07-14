@@ -146,7 +146,7 @@ class Router extends AppMethods{
             if(!preg_match($pattern, $this->funcVariables['{'.$key.'}']))
             {
                 $this
-                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable \'$'.$key.'='.$this->funcVariables[$key].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
+                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable '.$key.'=\''.$this->funcVariables['{'.$key.'}'].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
                         ->ThrowError();
             }
 

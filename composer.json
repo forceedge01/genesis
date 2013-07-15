@@ -1,9 +1,0 @@
-{
-    "autoload" : {
-        "classmap": [
-
-            "Application/Classes"
-
-        ]
-    }
-}

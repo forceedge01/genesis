@@ -1,6 +1,6 @@
 <?php
 
-require_once './Application/Kernel.php';
+require_once './../Application/Kernel.php';
 
 /**
  *

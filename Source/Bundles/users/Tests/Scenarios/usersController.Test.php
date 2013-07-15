@@ -13,7 +13,7 @@ class TestusersController extends WebTestCase
 {
     public function testIndexAction()
     {
-        self::$testClass = new \Bundles\users\Controllers\usersController();
+        @self::$testClass = new \Bundles\users\Controllers\usersController();
 
         $method = 'IndexAction';
 

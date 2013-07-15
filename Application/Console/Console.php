@@ -13,6 +13,8 @@ class Console {
 
         if (!isset($_SERVER['SERVER_NAME'])) {
 
+            passthru('clear');
+
             echo $this ->blue(' =========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<=========') ;
             $this->linebreak(1);
 

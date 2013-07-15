@@ -407,7 +407,7 @@ class BaseTestingRoutine extends Console{
         if(empty($param))
             $param = $output;
 
-        if($params['expected'])
+        if(isset($params['expected']))
         {
             if(strtolower($params['case']) == 'contains')
             {

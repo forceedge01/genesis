@@ -10,7 +10,7 @@ class AuthTest extends WebTestCase {
 
     public function __construct() {
         parent::__construct();
-        self::$testClass = new \Application\Core\Auth();
+        self::$testClass = new \Application\Components\Auth;
     }
 
     public function testMethodIsValidEmail()
@@ -37,7 +37,6 @@ class AuthTest extends WebTestCase {
     public function testMethodForwardToLoginPage()
     {
         $this->AssertFlashMessage('ForwardToLoginPage', 'this is a custom message', 'this is a custom message');
-        $this->AssertMethodRedirect('ForwardToLoginPage', 'http://localhost/GENESIS/index.php/login/');
     }
 
     public function testMethodLogout()

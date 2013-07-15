@@ -77,7 +77,7 @@ class TemplateTestCase extends BaseTestingRoutine{
                 }
             }
 
-            $regex = function($regularExpression) use ($reg){
+            $regex = function($regularExpression = null) use ($reg){
 
                 foreach($reg as $regex)
                     $regularExpression .= $regex;

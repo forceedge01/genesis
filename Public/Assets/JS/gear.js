@@ -537,9 +537,7 @@
         hideAlert: function()
         {
             $(this).delegate('.alert', 'click', function() {
-
                 $(this).hide(200);
-
             });
         }
     };

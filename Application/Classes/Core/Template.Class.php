@@ -9,7 +9,9 @@ class Template extends Router {
     private
             $title,
             $bundle,
-            $html;
+            $html,
+            $header,
+            $footer;
 
     public static
             $cssFiles = array(),
@@ -59,7 +61,13 @@ class Template extends Router {
 
         if(is_file($templateUrl['template'])){
 
+            if($this->header)
+                $this->GetBundleHeader ($this->GetClassFromNameSpacedController(get_called_class()));
+            
             require $templateUrl['template'];
+            
+            if($this->footer)
+                $this->GetBundleFooter ($this->GetClassFromNameSpacedController(get_called_class()));
         }
         else
             $this->ViewNotFound($templateUrl['template']);
@@ -84,6 +92,14 @@ class Template extends Router {
             Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
 
         unset($this->html);
+    }
+    
+    public function IncludeHeaderAndFooter()
+    {
+        $this->header = true;
+        $this->footer = true;
+        
+        return $this;
     }
 
     private function CheckHtmlCacheOptions()
@@ -173,8 +189,18 @@ class Template extends Router {
 
     public function IncludeHeader()
     {
+        $this->header = true;
+        
+        return $this;
+    }
+    
+    protected function GetBundleHeader($bundle = null)
+    {
+        if(! $bundle)
+            $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
+        
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
-                $this->GetClassFromNameSpacedController(get_called_class()).
+                $bundle.
                 '/'.
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE'));
@@ -183,12 +209,24 @@ class Template extends Router {
             require_once $path;
         else
             $this->ViewNotFound ($path);
+        
+        return $this;
     }
 
     public function IncludeFooter()
     {
+        $this->footer = true;
+        
+        return $this;
+    }
+    
+    protected function GetBundleFooter($bundle)
+    {
+        if(! $bundle)
+            $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
+        
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
-                $this->GetClassFromNameSpacedController(get_called_class()).
+                $bundle.
                 '/'.
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE'));
@@ -197,6 +235,8 @@ class Template extends Router {
             require_once $path;
         else
             $this->ViewNotFound ($path);
+        
+        return $this;
     }
 
     /**
@@ -613,12 +653,27 @@ class Template extends Router {
             return false;
     }
 
+    /**
+     * 
+     * @param type $index
+     * @param type $even
+     * @param type $odd
+     * @return type
+     */
     public function Cycle($index, $even = 'even', $odd = 'odd'){
 
         if($this->IsEven($index)) return $even;
         return $odd;
     }
 
+    /**
+     * 
+     * @param type $start
+     * @param type $end
+     * @param type $leap
+     * @param type $selected
+     * @return type
+     */
     public function GenerateNumberOptions($start, $end, $leap = 1, $selected = null){
 
         if($start > $end)
@@ -635,6 +690,13 @@ class Template extends Router {
         return $options;
     }
 
+    /**
+     * 
+     * @param type $value
+     * @param type $label
+     * @param type $selected
+     * @return type
+     */
     public function GenerateOption($value, $label, $selected = null){
 
         $option .= "<option value='$value' ";
@@ -666,5 +728,100 @@ class Template extends Router {
 
         if($value % 2 != 0) return $this;
         return false;
+    }
+    
+    /**
+     * 
+     * @param type $label
+     * @param type $for optional
+     * @param type $params optional
+     * @return type
+     */
+    protected function Label($label, $for = null, $params = null)
+    {
+        if(! $for)
+            $for = $label;
+        
+        return "<label for='{$for}' {$params}>{$label}</label>";
+    }
+    
+    /**
+     * 
+     * @param type $name
+     * @param type $value optional
+     * @param type $element default text
+     * @param type $class optional
+     * @param type $id optional
+     * @return type
+     */
+    protected function Widget($name, $value = null, $element = 'text', $class = null, $id = null)
+    {
+        if(! $id)
+            $id = $name;
+        
+        $htmlgen = $this->GetComponent('HTMLgenerator');
+        $el = array(
+            'type' => $element,
+            'value' => $value,
+            'name' => $name,
+            'class' => $class,
+            'id' => $id
+        );
+        
+        return $htmlgen->generateInput($el);
+    }
+    
+    /**
+     * 
+     * @param type $name
+     * @param type $value
+     * @param type $element
+     * @param type $class
+     * @param type $id
+     * @return type
+     */
+    protected function LabelAndWidget($name, $value = null, $element = 'text', $class = null, $id = null)
+    {
+        if(! $id)
+            $id = $name;
+        
+        $htmlgen = $this->GetComponent('HTMLgenerator');
+        $el = array(
+            'type' => $element,
+            'value' => $value,
+            'name' => $name,
+            'class' => $class,
+            'id' => $id
+        );
+        
+        return "<label for='{$id}' {$class}>{$this->Filter($value, 'FirstToUpper')}</label>" . $htmlgen->generateInput($el);
+    }
+    
+    /**
+     * 
+     * @param type $variable
+     * @param type $filter
+     * @return type
+     */
+    protected function Filter($variable, $filter)
+    {
+        switch($filter)
+        {
+            case 'FirstToUpper':
+            {
+                return $this->Variable($variable)->FirstToUpper()->GetVariableResult();
+                break;
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @param type $message
+     * @return type
+     */
+    protected function Error($message)
+    {
+        return "<div class='error'>$message</div>";
     }
 }

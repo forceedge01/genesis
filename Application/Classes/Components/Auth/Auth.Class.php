@@ -29,9 +29,8 @@ class Auth extends Template{
 
     public function Logout($message = null)
     {
-        $this->GetCoreObject('Session')->Destroy()->StartSecure(\Get::Config('Application.Session.Secure.HttpsSecure') or \Get::Config('Application.Session.Secure.HttpOnly'))->RegenerateId(true);
-
-        $this->SetFlash($message)->ForwardTo(\Get::Config('Auth.Login.LoggedOutDefaultRoute'));
+        $this->GetCoreObject('Session')->Destroy()->StartSecure(\Get::Config('Application.Session.Secure.HttpsSecure'), \Get::Config('Application.Session.Secure.HttpOnly'))->RegenerateId(true);
+        $this->SetFlash($message)->ForwardTo('users_login');
     }
 
     /**

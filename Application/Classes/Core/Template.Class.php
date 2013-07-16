@@ -11,7 +11,8 @@ class Template extends Router {
             $bundle,
             $html,
             $header,
-            $footer;
+            $footer,
+            $divs;
 
     public static
             $cssFiles = array(),
@@ -63,9 +64,9 @@ class Template extends Router {
 
             if($this->header)
                 $this->GetBundleHeader ($this->GetClassFromNameSpacedController(get_called_class()));
-            
+
             require $templateUrl['template'];
-            
+
             if($this->footer)
                 $this->GetBundleFooter ($this->GetClassFromNameSpacedController(get_called_class()));
         }
@@ -93,12 +94,12 @@ class Template extends Router {
 
         unset($this->html);
     }
-    
+
     public function IncludeHeaderAndFooter()
     {
         $this->header = true;
         $this->footer = true;
-        
+
         return $this;
     }
 
@@ -190,15 +191,15 @@ class Template extends Router {
     public function IncludeHeader()
     {
         $this->header = true;
-        
+
         return $this;
     }
-    
+
     protected function GetBundleHeader($bundle = null)
     {
         if(! $bundle)
             $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
-        
+
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
                 $bundle.
                 '/'.
@@ -209,22 +210,22 @@ class Template extends Router {
             require_once $path;
         else
             $this->ViewNotFound ($path);
-        
+
         return $this;
     }
 
     public function IncludeFooter()
     {
         $this->footer = true;
-        
+
         return $this;
     }
-    
+
     protected function GetBundleFooter($bundle)
     {
         if(! $bundle)
             $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
-        
+
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
                 $bundle.
                 '/'.
@@ -235,7 +236,7 @@ class Template extends Router {
             require_once $path;
         else
             $this->ViewNotFound ($path);
-        
+
         return $this;
     }
 
@@ -664,7 +665,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $index
      * @param type $even
      * @param type $odd
@@ -677,7 +678,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $start
      * @param type $end
      * @param type $leap
@@ -701,7 +702,7 @@ class Template extends Router {
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @param type $label
      * @param type $selected
@@ -739,9 +740,9 @@ class Template extends Router {
         if($value % 2 != 0) return $this;
         return false;
     }
-    
+
     /**
-     * 
+     *
      * @param type $label
      * @param type $for optional
      * @param type $params optional
@@ -751,12 +752,12 @@ class Template extends Router {
     {
         if(! $for)
             $for = $label;
-        
+
         return "<label for='{$for}' {$params}>{$label}</label>";
     }
-    
+
     /**
-     * 
+     *
      * @param type $name
      * @param type $value optional
      * @param type $element default text
@@ -768,7 +769,7 @@ class Template extends Router {
     {
         if(! $id)
             $id = $name;
-        
+
         $htmlgen = $this->GetComponent('HTMLgenerator');
         $el = array(
             'type' => $element,
@@ -777,12 +778,86 @@ class Template extends Router {
             'class' => $class,
             'id' => $id
         );
-        
+
         return $htmlgen->generateInput($el);
     }
-    
+
     /**
-     * 
+     *
+     * @param type $name
+     * @param type $value
+     * @param type $element
+     * @param type $class
+     * @param type $id
+     * @param type $decider
+     * @return type
+     */
+    protected function IfWidget($name, $value = null, $element = 'text', $class = null, $id = null, $decider = null)
+    {
+        if($decider === null)
+            $decider = $value;
+
+        if($decider)
+            return $this->Widget($name, $value, $element, $class, $id);
+    }
+
+    /**
+     *
+     * @param type $class
+     * @param type $id
+     * @return type
+     */
+    protected function Div($class = null, $id = null)
+    {
+        $this->divs += 1;
+
+        if($class)
+            $class = "class='$class'";
+
+        if($id)
+            $id = "id='$id'";
+
+        return "<div $class $id>";
+    }
+
+    /**
+     *
+     * @param type $number
+     * @return string
+     */
+    protected function EndDiv($number = 1)
+    {
+        $this->divs -= $number;
+        $divs = null;
+
+        for($i = $number; $i > 0; $i--)
+        {
+            $divs .= '</div>';
+        }
+
+        return $divs;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    protected function EndDivs()
+    {
+        $divs = null;
+
+        for($i = $this->divs; $i > 0; $i--)
+        {
+            $divs .= '</div>';
+        }
+
+        $this->divs = 0;
+
+        return $divs;
+    }
+
+    /**
+     *
      * @param type $name
      * @param type $value
      * @param type $element
@@ -794,7 +869,7 @@ class Template extends Router {
     {
         if(! $id)
             $id = $name;
-        
+
         $htmlgen = $this->GetComponent('HTMLgenerator');
         $el = array(
             'type' => $element,
@@ -803,12 +878,12 @@ class Template extends Router {
             'class' => $class,
             'id' => $id
         );
-        
+
         return "<label for='{$id}' {$class}>{$this->Filter($value, 'FirstToUpper')}</label>" . $htmlgen->generateInput($el);
     }
-    
+
     /**
-     * 
+     *
      * @param type $variable
      * @param type $filter
      * @return type
@@ -824,9 +899,9 @@ class Template extends Router {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @param type $message
      * @return type
      */

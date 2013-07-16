@@ -554,6 +554,16 @@ class Template extends Router {
         }
     }
 
+    public function GetErrors()
+    {
+        return $_SESSION['Errors'];
+    }
+
+    public function GetFlashes()
+    {
+        return $_SESSION['FlashMessages'];
+    }
+
     /**
      * Flash all Flash messages and Errors
      */

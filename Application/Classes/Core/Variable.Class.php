@@ -201,6 +201,12 @@ class Variable extends Hooks {
 
         return $this;
     }
+    
+    protected function FirstToUpper()
+    {
+        $this->variable = strtoupper(substr($this->variable, 0, 1)).substr($this->variable, 1);
+        return $this;
+    }
 
     /**
      *

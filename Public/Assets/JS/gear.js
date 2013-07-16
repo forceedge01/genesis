@@ -9,28 +9,42 @@
 
         },
 
-        hideFormOnSubmit: function( options ){
+        hideOnSubmit: function( options ){
 
             $(this).on('submit', 'form', function(e) {
 
-                $('input[type=submit]').parents('tr').fadeOut(200);
+                var returnVal = false;
+                var form = this;
 
-                $(options.loadingDiv).show();
+                $(form).children('.formRow').each(function(){
+                    $(this).fadeOut(200);
+                });
 
-                if ($(this).hasClass('confirm')) {
+                if(typeof(options) != 'undefined')
+                {
+                    if(typeof(options.loadingDiv) != 'undefined')
+                        $(options.loadingDiv).show();
+                }
 
-                    var answer = confirm($(this).attr('message'));
+                if ($(form).hasClass('confirm')) {
 
-                    if (answer) {
-
+                    var answer = confirm($(form).attr('message'));
+                    
+                    if (answer) 
+                    {
                         return true
                     }
-                    else {
+                    else 
+                    {
+                        if(typeof(options) != 'undefined')
+                        {
+                            if(typeof(options.loadingDiv) != 'undefined')
+                                $(options.loadingDiv).hide();
+                        }
+                        
+                        $(form).children('.formRow').fadeIn(200);
 
-                        $(options.loadingDiv).hide();
-                        $('input[type=submit]').parents('tr').fadeIn(200);
-
-                        return false
+                        return false;
                     }
                 }
             });
@@ -38,17 +52,29 @@
 
         ajaxIt: function(){
 
-            $('.ajaxIt').each(function()
-            {
-               $(this).on('click', function()
-               {
+            $('.ajaxIt').each(function(){
+               $(this).on('click', function(){
+                   
                    var url = $(this).attr('url');
                    var params = $(this).attr('params');
                    var container = $(this).attr('container');
+                   var message = $(this).attr('message');
+                   var answer = true;
 
-                   $.post(url, params, function(data){
-                       $('#'+container).html(data);
-                   });
+                   if(message)
+                   {
+                       var answer = confirm(message);
+                   }
+                   if (answer) {
+
+                        $.post(url, params, function(data){
+                            if(container)
+                                $('#'+container).html(data);
+                        });
+                        
+                        return false;
+                   }
+                   return false;
                });
             });
         },
@@ -427,43 +453,56 @@
 
             $(this).click(function() {
 
-                var answer = confirm($(this).next().val());
+                var answer = confirm($(this).attr('message'));
 
                 if (answer) {
 
-                    $(options.loadingIconDiv).show();
+                    if(typeof(options) != 'undefined')
+                    {
+                        if(typeof(options.loadingDiv) != 'undefined')
+                            $(options.loadingDiv).show();
+                    }
 
-                    $.post($(this).prev().val(), $(this).parent('form').serializeArray(), function(data) {
+                    if($(this).attr('url'))
+                    {
+                        $.post($(this).attr('url'), $(this).parent('form').serializeArray(), function(data) {
 
-                        var chunk = data.split(':');
-                        var Assignclass = null;
+                            var chunk = data.split(':');
+                            var Assignclass = null;
 
-                        if (chunk[0] == 'error')
-                            Assignclass = 'alert error';
-                        else if (chunk[0] == 'success')
-                            Assignclass = 'alert message';
-                        else
-                            alert('Unhandled Exception:' + chunk[0] + chunk[1]);
+                            if (chunk[0] == 'error')
+                                Assignclass = 'alert error';
+                            else if (chunk[0] == 'success')
+                                Assignclass = 'alert message';
+                            else
+                                alert('Unhandled Exception:' + chunk[0] + chunk[1]);
 
-                        $(options.responseDiv).removeClass();
+                            $(options.responseDiv).removeClass();
 
-                        $(options.responseDiv).addClass(Assignclass).html(chunk[1]);
+                            $(options.responseDiv).addClass(Assignclass).html(chunk[1]);
 
-                        if (chunk[0] == 'success') {
+                            if (chunk[0] == 'success') {
 
-                            if ($(this).hasClass('remove'))
-                                $(this).parent().parent().parent().remove();
-                        }
+                                if ($(this).hasClass('remove'))
+                                    $(this).parent().parent().parent().remove();
+                            }
 
-                        $(options.loadingIconDiv).hide();
+                            $(options.loadingIconDiv).hide();
 
-                    });
+                        });
+                    }
+                    
+                    return true;
                 }
+                
+                return false;
 
             });
         },
 
         defaultValues: function (){
+            
+            var CurrentLabel = '';
 
             $('input[type=text]').on('focus', function() {
 
@@ -490,7 +529,7 @@
             $('table').attr('cellspacing', '0').attr('cellpadding', '0');
         },
 
-        focusFirstElement: function()
+        focusFirst: function()
         {
             $('form:not(.filter) :input:visible:enabled:first').focus();
         },
@@ -498,9 +537,7 @@
         hideAlert: function()
         {
             $(this).delegate('.alert', 'click', function() {
-
                 $(this).hide(200);
-
             });
         }
     };

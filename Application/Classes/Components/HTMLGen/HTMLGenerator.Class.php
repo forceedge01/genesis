@@ -260,124 +260,168 @@ class HTMLGenerator extends Router {
         $i = 0;
 
         $element = null;
+        
+        if(isset($params['value']))
+            $value = "value='{$params['value']}'";
+            
+        if(isset($params['class']))
+            $class = "class='{$params['class']} {$params['validation']}'";
+            
+        if(isset($params['id']))
+            $id = "id='{$params['id']}'";
+            
+        if(isset($params['name']))
+            $name = "name='{$params['name']}'";
+            
+        if(isset($params['type']))
+            $type = "type='{$params['type']}'";
+            
+        if(isset($params['disabled']))
+            $disabled = "disabled='{$params['disabled']}'";
+            
+        if(isset($params['buttonValue']))
+            $buttonValue = "value='{$params['buttonValue']}'";
+            
+        if(isset($params['buttonStyle']))
+            $buttonStyle = "style='{$params['buttonStyle']}'";
+            
+        if(isset($params['buttonId']))
+            $buttonId = "id='='{$params['buttonId']}''";
+            
+        if(isset($params['buttonClass']))
+            $buttonClass = "class='{$params['buttonClass']}'";
+            
+        if(isset($params['style']))
+            $style = "style='{$params['style']}'";
+            
+        if(isset($params['rows']))
+            $rows = "rows='{$params['rows']}'";
+            
+        if(isset($params['cols']))
+            $cols = "cols='{$params['cols']}'";
+            
+        if(isset($params['requiredText']))
+            $requiredText = "<option value=''>{$params['requiredtext']}</option>";
+            
+        if(isset($params['multiple']))
+            $multiple = "multiple='{$params['multiple']}'";
+            
+        if(isset($params['append']))
+            $append = $params['append'];
+        
+        if(isset($params['prepend']))
+            $prepend = $params['prepend'];
+        
+        if(isset($params['align']))
+            $align = "align='{$params['align']}";
+            
+        if(isset($params['src']))
+            $src = "src='{$params['src']}'";
+            
+        if(isset($params['title']))
+            $title = "title='{$params['title']}'";
+            
+        if(isset($params['alt']))
+            $alt = "alt='{$params['alt']}'";
+            
+        if(isset($params['href']))
+            $href = "href='{$params['href']}'";
+            
+        if(isset($params['target']))
+            $target = "target='{$params['target']}'";
+            
+        if(isset($params['size']))
+            $size = "size='{$params['size']}'";
+            
+        if(isset($params['valid']))
+            $valid = $params['valid'];
+        
+        if(isset($params['icon']))
+            $icon = $params['icon'];
+        
+        if(isset($params['icontext']))
+            $iconText = "title='{$params['icontext']}";
+        
+        $option = function($label, $value = null, $selected = null, $params = null) use ($append, $prepend)
+        {
+            return "<option value='$value' ".($selected == $value ? "selected='selected'" : '')." $params >{$append}{$label}{$prepend}</option>";
+        };
 
-        switch ($params['type']) {
+        switch (strtolower($params['type'])) {
 
-            case 'text': {
-                    $element .= '
-                            <!-- input -->
-                            <input type="text" class="' . @$params['class'] . '"';
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= ' value="' . @$params['value'] . '" name="' . $params['name'] . '"
-                            id="' . @$params['id'] . '">
-                            <!-- end input -->
-                            ';
+            case 'text':
+            case 'password':
+            case 'submit':
+            case 'reset':
+            case 'file':
+            case 'button':
+                {
+                    $element .= "<input $type $class $disabled $value $name $id >";
                     break;
                 }
 
-            case 'textarea': {
-                    $element .= '
-                            <!-- textarea -->
-                            <textarea cols="" rows="" class="' . @$params['class'];
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= ' name="' . $params['name'] . '"
-                            id="' . @$params['id'] . '">' . @$params['value'] . '</textarea>
-                            <!-- end textarea -->
-                            ';
+            case 'textarea': 
+                {
+                    $element .= "<textarea $cols $rows $class $id $name $disabled $style>{$params['value']}</textarea>";
                     break;
                 }
 
             case 'imageUpload': {
-                    $element .= '
-                            <!-- input -->
-                            <input type="text" class="fittosize ' . @$params['class'] . ' ' . @$params['validation'] . '"';
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= ' value="' . @$params['value'] . '" name="' . $params['name'] . '"
-                            id="' . @$params['id'] . '">
-                            <input type="button" value="' . @$params['buttonvalue'] . '" style="' . @$params['buttonstyle'] . '" id="' . @$params['buttonid'] . '" class="' . @$params['buttonclass'] . '" >
-                            </div>
-                            <!-- end input -->
-                            ';
+                    $element .= "<input type='text' class='fittosize {$params['class']} {$params['validation']}' $disabled $value $name $id>
+                                <input type='button' $buttonValue $buttonStyle $buttonId $buttonClass>";
                     break;
                 }
 
             case 'select': {
+                
                     $elements = explode(',', @$params['value']);
-                    $element .= '
-                            <!-- select elemenet -->
-                            <select name="' . $params['name'] . '" id="' . @$params['id'] . '"  class="' . @$params['class'] . '"';
-                    if (isset($params['multiple']))
-                        $element .= ' multiple="multiple" ';
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= '">';
+                    $element .= "<select $class $name $id $multiple $disabled>";
+                    
                     if (isset($params['requiredtext']))
-                        $element .= '<option value="">' . @$params['requiredtext'] . '</option>';
-                    if (is_numeric($elements[0])) {
-                        if ($elements[0] < $elements[1]) {
-                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2]) {
-                                $element .= '<option value="' . $j . '" ';
-                                if (isset($params['selected']) && @$params['selected'] == $j)
-                                    $element .= ' selected="selected" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= '>' . @$params['prepend'] . $j . @$params['append'] . '</option>';
+                    {
+                        $element .= $requiredText;
+                    }
+                    if (is_numeric($elements[0])) 
+                    {
+                        if ($elements[0] < $elements[1]) 
+                        {
+                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2]) 
+                            {
+                                $element .= $option($j,$j, @$params['selected'], $disabled.$selected, $append, $prepend);
                             }
                         }
-                        else {
-                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2]) {
-                                $element .= '<option value="' . $j . '" ';
-                                if (isset($params['selected']) && @$params['selected'] == $j)
-                                    $element .= ' selected="selected" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= '>' . @$params['prepend'] . $j . @$params['append'] . '</option>';
+                        else 
+                        {
+                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2]) 
+                            {
+                                $element .= $option($j,$j, @$params['selected'], $disabled.$selected, $append, $prepend);
                             }
                         }
                     }
-                    else {
-                        foreach ($elements as $elementname) {
-                            $element .= '<option value="' . str_replace(' ', '_', $elementname) . '" ';
-                            if (isset($params['selected']) && @$params['selected'] == $elementname)
-                                $element .= ' selected="selected" ';
-                            if (isset($params['disabled']))
-                                $element .= ' disabled="disabled" ';
-                            $element .= '>' . @$params['prepend'] . $elementname . @$params['append'] . '</option>';
+                    else 
+                    {
+                        foreach ($elements as $elementname) 
+                        {
+                            $element .= $option($elementname, str_replace(' ', '_', $elementname), @$params['selected'], $disabled.$selected, $append, $prepend);
                         }
                     }
-                    $element .= '</select>
-                            <!-- end select type -->
-                            ';
+                    $element .= '</select>';
                     break;
                 }
 
             case 'image': {
-                    $element .= '
-                            <img align = "' . @$params['align'] . '" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" src = "' . @$params['src'] . '" title = "' . @$params['title'] . '" alt = "' . @$params['alt'] . '" />
-                            <!-- end image -->
-                            ';
+                    $element .= "<img $align $class $id $src $title $alt />";
                     break;
                 }
 
             case 'linkedImage': {
-                    $element .= '
-                            <!-- linkedImage -->
-                            <a href="' . @$params['href'] . '" target = "' . @$params['target'] . '"><img class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" align = "' . @$params['align'] . '" src = "' . @$params['src'] . '" title = "' . @$params['title'] . '" alt = "' . @$params['alt'] . '"></a>
-                            <!-- end linkedImage -->
-                            ';
+                    $element .= "<a $href $target><img $class $id $align $src $title $alt></a>";
                     break;
                 }
 
             case 'href':
             case 'link': {
-                    $element .= '
-                            <!-- link -->
-                            <a href="' . @$params['href'] . '" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" target = "' . @$params['target'] . '">' . @$params['title'] . '</a>
-                            <!-- end link -->
-                            ';
+                    $element .= "<a $href $class $id $target>$label</a>";
                     break;
                 }
 
@@ -464,61 +508,45 @@ class HTMLGenerator extends Router {
 
             case 'slider': {
                     $elements = explode(',', @$params['value']);
-                    $element .= '
-                            <!-- slider code -->
-                            <script>
-                            jQuery(document).ready(function(){
-                            $(\'#' . $params['name'] . 'slider\').slider({
-                            min: ' . $elements[0] . ',
-                            max: ' . $elements[1] . ',
-                            step: ' . $elements[2] . ',
+                    $element .= "
+                        <script>
+                        jQuery(document).ready(function(){
+                            $('#{$params['name']}slider').slider({
+                            min: {$elements[0]},
+                            max: {$elements[1]},
+                            step: {$elements[2]},
                             animate: true,
-                            slide: function( event, ui ) {
-                                    var $input = $(this).parent().prev().children(\'input\');
-                                    $($input).val( ui.value );
-                            }
+                                slide: function( event, ui ) {
+                                        var \$input = $(this).parent().prev().children(\'input\');
+                                        $(\$input).val( ui.value );
+                                }
                             });
-                            });
-                            </script>
+                        });
+                        </script>
 
-                            <input type="text"';
-                    if (isset($params['size']))
-                        $element .= ' size="' . @$params['size'] . '" ';
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= ' class="' . @$params['class'] . ' digit bb_valuedinput" value="0" name="' . $params['name'] . '"
-                            id="' . @$params['id'] . '">
-                            </div>
-                            <div class="bb_slidercontainer" id="">
-                            <div class="" id="' . $params['name'] . 'slider"></div>
-                            </div>
-                            <!-- slider code end -->
-                            ';
+                        <input type='text' $size $disabled class='{$params['class']} digit bb_valuedinput' value='0' $name $id>
+                        </div>
+                        <div class='bb_slidercontainer'>
+                        <div id='{$params['name']}slider'></div>
+                        </div>
+                        ";
                     break;
                 }
 
             case 'datepicker': {
-                    $element .= '
-                            <!-- datepicker with class date -->
+                    $element .= "
                             <script>
                             jQuery(document).ready(function(){
-                            $(\'input[name=' . $params['name'] . ']\').datepicker({
-                                    dateFormat: "dd/mm/yy",
+                                $('input[name={$params['name']}]').datepicker({
+                                    dateFormat: 'dd/mm/yy',
                                     onSelect: function(){
-                                    $( this ).parents(\'.bb_inputbox\').switchClass( \'error\', \'tick\', 0 );
+                                        $( this ).parents('.bb_inputbox').switchClass( 'error', 'tick', 0 );
                                     return true;
                                     }
-                            });
+                                });
                             });
                             </script>
-
-                            <input type="text" class="datepicker ' . @$params['class'] . ' date" value="" ';
-                    if (isset($params['disabled']))
-                        $element .= ' disabled="disabled" ';
-                    $element .= ' name="' . $params['name'] . '" id="' . @$params['id'] . '">
-                            </div>
-                            <!-- end datepicker -->
-                            ';
+                            <input type='text' class='datepicker {$params['class']} date' value='' $disabled $name $id></div>";
                     break;
                 }
 
@@ -568,74 +596,22 @@ class HTMLGenerator extends Router {
                     break;
                 }
 
-            case 'hidden': {
-                    $element .= '
-                            <!-- hidden element -->
-                            <input type="hidden" id="' . @$params['id'] . '" value="' . @$params['value'] . '" name="' . $params['name'] . '">
-                            <!-- end button -->
-                            ';
-                    break;
-                }
-
-            case 'button': {
-                    $element .= '
-                            <!-- button -->
-                            <input type="button" value="' . @$params['value'] . '" id="' . @$params['id'] . '" class="' . @$params['class'] . '" >
-                            <!-- end button -->
-                            ';
-                    break;
-                }
-
             case 'postcode': {
-                    $element .= '
-                            <!-- postcode -->
-                                    ' . @$params['htmlprepend'] . '
-                                            <div class="bb_inputbox' . @$params['valid'] . ' ' . @$params['icon'] . '" id="">
-                                                    <div title = "' . @$params['icontext'] . '" class="bb_inputverify" id="" style="display: none;"></div>
-                                                    <input style="display: none;" type="text" class="postcodeinput ' . @$params['class'] . '" value="' . @$params['value'] . '"
-                                                            name="' . $params['name'] . '" id="postcode"> <label for="postcode"
-                                                            class="bb_inputheading inputpositioner" id="">' . $params['title'] . '<span>' . @$params['required'] . '</span>
-                                                    </label>
-                                            </div>
-                                    ' . @$params['htmlappend'] . '
-                            <!-- end postcode -->
-                            ';
-                    break;
-                }
-
-            case 'submit': {
-                    $element .= '
-                            <!-- SUBMIT BUTTON -->
-                            <input type = "submit" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . @$params['name'] . '" value = "' . @$params['value'] . '">
-                            <!-- END SUBMIT BUTTON -->
-                            ';
-                    break;
-                }
-
-            case 'reset': {
-                    $element .= '
-                            <!-- RESET BUTTON -->
-                            <input type = "reset" class = "' . @$params['class'] . '" id = "' . @$params['id'] . '" name = "' . @$params['name'] . '" value = "' . @$params['value'] . '">
-                            <!-- END Reset BUTTON -->
-                            ';
-                    break;
-                }
-
-            case 'file': {
-                    $element .= '
-                            <!-- FILE UPLOAD -->
-                            <input type = "file" class = "' . @$params['class'] . '" id = "' . @$params['class'] . '" name = "' . $params['name'] . '" value = "' . @$params['value'] . '">
-                            <!-- END FILE UPLOAD -->
-                            ';
+                    $element .= "
+                        $prepend
+                            <div class='bb_inputbox' $valid $icon'>
+                                    <div $iconText class='bb_inputverify' $id style='display: none;'></div>
+                                    <input style='display: none;' type='text' class='postcodeinput {$params['class']}' $value
+                                            $name id='postcode'> <label for='postcode'
+                                            class='bb_inputheading inputpositioner'>$label<span>$requiredText</span>
+                                    </label>
+                            </div>
+                        $append";
                     break;
                 }
 
             case 'iframe': {
-                    $element .= '
-                            <!-- START IFRAME -->
-                                    <iframe frameborder="0" src="' . $params['src'] . '" id="' . $params['id'] . '"></iframe>
-                            <!-- END IFRAME CODE -->
-                            ';
+                    $element .= "<iframe frameborder='0' $src $id $style></iframe>";
                 }
 
             default: {

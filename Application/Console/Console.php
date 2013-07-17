@@ -425,6 +425,12 @@ class Console {
         fclose($handle);
     }
 
+    /**
+     * 
+     * @param type $readMessage
+     * @param type $htmlDefault
+     * @return type
+     */
     public function decide($readMessage, $htmlDefault)
     {
         return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);

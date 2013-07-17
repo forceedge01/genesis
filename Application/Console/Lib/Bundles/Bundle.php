@@ -28,7 +28,9 @@ class Bundle extends Console {
             $bundleRoutesFolder,
             $bundleHeaderFileName,
             $bundleFooterFileName,
-            $bundleNamespace;
+            $bundleNamespace,
+            $bundleDirInAssets;
+            
 
     public function __construct($type) {
 
@@ -56,7 +58,7 @@ class Bundle extends Console {
 
             echo $this->blue('Enter namespace of the bundle you want to create (Use "/" instead of "\\". If you are using a database with this application, this is usually the singular form of your table name): ');
 
-            $this->bundle = preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle';
+            $this->bundle = trim(preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle','/');
             $this->name = $this->singular = preg_replace('/bundle/i', '', $this->bundle);
 
             if(substr($this->name, -1) == 's' || substr($this->name, -1) == 'S')
@@ -68,7 +70,7 @@ class Bundle extends Console {
         $nameChunks = explode('/', $this->name);
         $this->name = end($nameChunks);
 
-        if ($this->CreateBundleDirs($this->bundleNamespace))
+        if ($this->CreateBundleDirs($this->bundleNamespace, $this->bundleSourceFolder))
         {
             $this->bundleNamespace = 'Bundles\\'.$this->bundleNamespace;
             $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests();
@@ -78,32 +80,36 @@ class Bundle extends Console {
 
             if($ans == 'yes')
             {
+                $this->bundleDirInAssets = str_replace('\\', '/', str_replace('Bundles\\','', $this->bundleNamespace));
                 $this->CreateAssets();
                 echo $this->green("Assets for bundle {$this->bundleNamespace} were successfully created.");
             }
 
-            echo $this->green('Please add the following in the Application/Loader.php FetchAllBundles() method: ').$this->blue($this->bundleNamespace);
+            echo $this->linebreak(1);
+            echo $this->green('Please add the following in the Application/Loader.php FetchAllBundles() method: ').$this->blue("'".str_replace('Bundles\\','', $this->bundleNamespace)."',");
             echo $this->linebreak(2);
         }
         else
             echo $this->red('Aborting bundle creation for bundle'.$this->name);
     }
     
-    private function CreateBundleDirs($bundle)
+    private function CreateBundleDirs($bundle, $prependDir)
     {
         $bundleDirs = explode('/', str_replace('//','/', str_replace('\\', '/', $bundle)));
-        $createDir = $this->bundleSourceFolder;
+        $createDir = $prependDir;
         
         foreach($bundleDirs as $bundle)
         {
             $createDir .= '/'.$bundle;
             
-            echo $createDir;
-            if(!mkdir(str_replace('//','/', $createDir)))
+            if(!is_dir($createDir))
             {
-                echo $this->red('Unable to create directory '.$createDir);
-                echo $this->linebreak(1);
-                return false;
+                if(!mkdir(str_replace('//','/', $createDir)))
+                {
+                    echo $this->red('Unable to create directory '.$createDir);
+                    echo $this->linebreak(1);
+                    return false;
+                }
             }
         }
         
@@ -123,7 +129,7 @@ class Bundle extends Console {
             $this->readBundles(false);
             $this->linebreak(1);
 
-            $bundleName = $this->readUser($this->blue('Enter name of the bundle you want to delete: '));
+            $bundleName = $this->readUser($this->blue('Enter bundle you want to delete: '));
             $this->linebreak(1);
 
             do
@@ -187,14 +193,23 @@ class Bundle extends Console {
         echo $this->linebreak(2);
 
     }
+    
+    private function ReplaceBackslashes($string)
+    {
+        return str_replace('\\','/', $string);
+    }
 
     public function readBundles($return) {
-
-        $bundles = scandir($this->bundleSourceFolder);
+        
+        require_once __DIR__ . '/../../../Loader.php';
+        
+        $bundles = \Application\Core\Loader::AppBundles();
 
         $bundlesArray = array();
 
         foreach ($bundles as $bundle) {
+            
+            $bundle = $this->ReplaceBackslashes($bundle);
 
             if (is_dir($this->bundleSourceFolder . $bundle)) {
 
@@ -861,36 +876,6 @@ Set::Route('{$this->name}_Delete', array(
         return $this;
     }
 
-    private function CreateAssets(){
-
-        mkdir($this->bundleAssetsFolder . $this->name);
-        mkdir($this->bundleAssetsFolder . $this->name . '/Images');
-        mkdir($this->bundleAssetsFolder . $this->name . '/JS');
-        mkdir($this->bundleAssetsFolder . $this->name . '/CSS');
-
-        $initJs = "/* Javascript for {$this->name} Bundle */
-
-jQuery(document).ready(function(){
-
-});
-
-";
-
-        $this->createFile($this->bundleAssetsFolder . $this->name . "/JS/{$this->name}.js", $initJs);
-
-        $initCss= "/* Stylesheet for {$this->name} Bundle */
-
-root{
-    font-size: 12px;
-    font-family: verdana;
-    color: black;
-}";
-
-        $this->createFile($this->bundleAssetsFolder . $this->name . "/CSS/{$this->name}.css", $initCss);
-
-        return $this;
-    }
-
     private function createTests(){
 
         mkdir($this->bundleFolder . $this->bundleTestsFolder);
@@ -920,7 +905,7 @@ class Test{$this -> name}Controller extends WebTestCase
 {
     public function testIndexAction()
     {
-        self::\$testClass = new {$this->namespace}\\Controllers\\{$this->name}Controller();
+        self::\$testClass = new {$this->bundleNamespace}\\Controllers\\{$this->name}Controller();
 
         \$method = 'IndexAction';
 
@@ -1050,6 +1035,42 @@ class Test{$this -> name}Model extends BaseTestingRoutine
         $this->createFile($this->bundleFolder . $this->bundleTestsFolder . "Scenarios/{$this->name}Model.Test.php", $initTests);
 
         return $this;
+    }
+    
+    private function CreateAssets(){
+
+        if($this->CreateBundleDirs($this->bundleDirInAssets, $this->bundleAssetsFolder))
+        {
+            $fullPath = $this->bundleAssetsFolder.$this->bundleDirInAssets;
+            
+            mkdir($fullPath . '/Images');
+            mkdir($fullPath . '/JS');
+            mkdir($fullPath . '/CSS');
+
+            $initJs = "/* Javascript for {$this->name} Bundle */
+
+jQuery(document).ready(function(){
+
+});
+
+";
+
+            $this->createFile($fullPath . "/JS/{$this->name}.js", $initJs);
+
+            $initCss= "/* Stylesheet for {$this->name} Bundle */
+
+root{
+    font-size: 12px;
+    font-family: verdana;
+    color: black;
+}";
+
+            $this->createFile($fullPath . "/CSS/{$this->name}.css", $initCss);
+
+            return $this;
+        }
+        else
+            echo $this->linebreak (2) , $this->red ('Unable to create assets in folder: '.$this->bundleAssetsFolder);
     }
 
 }

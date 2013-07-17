@@ -435,4 +435,15 @@ class Console {
     {
         return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);
     }
+    
+    public function AddBreaks($string)
+    {
+        return $this->linebreak(1). $string. $this->linebreak(1);
+    }
+    
+    private function is_dir_empty($dir) {
+        
+        if (!is_readable($dir)) return NULL; 
+        return (count(scandir($dir)) == 2);
+    }
 }

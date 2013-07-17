@@ -22,16 +22,22 @@ class Loader{
     public static
             $environment,
             $appConfiguration;
+    
+    public static function AppBundles()
+    {
+        return array(
+
+            'Welcome',
+            'users',
+            'Product\Ajax',
+        );
+    }
 
     public static function FetchAllBundles(){
 
         // Include your bundles here
 
-        $bundles = array(
-
-            'Welcome',
-            'users',
-        );
+        $bundles = $this->AppBundles();
 
         // Do not edit below this line
 
@@ -39,7 +45,7 @@ class Loader{
 
         foreach($bundles as $bundle){
 
-            self::$bundles[] = $bundlesDIR . $bundle;
+            self::$bundles[] = $bundlesDIR . str_replace('\\', '/', $bundle);
         }
     }
 

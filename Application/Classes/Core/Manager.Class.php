@@ -94,7 +94,7 @@ class Manager extends Variable implements ManagerInterface{
         if($bundle[0] == null)
             $namespace = '\\Application\\Repositories\\';
         else
-            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle[0]).'\\Repositories\\';
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
 
@@ -114,7 +114,7 @@ class Manager extends Variable implements ManagerInterface{
         if($bundle[0] == null)
             $namespace = '\\Application\\Models\\';
         else
-            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle[0]).'\\Models\\';
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Models\\';
 
         $bundle[1] .= 'Model';
 
@@ -134,7 +134,7 @@ class Manager extends Variable implements ManagerInterface{
         if($bundle[0] == null)
             $namespace = '\\Application\\Entities\\';
         else
-            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle[0]).'\\Entities\\';
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Entities\\';
 
         $bundle[1] .= 'Entity';
 

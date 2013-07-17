@@ -27,8 +27,7 @@ class Bundle extends Console {
             $bundleInterfacesFolder,
             $bundleRoutesFolder,
             $bundleHeaderFileName,
-            $bundleFooterFileName,
-            $bundleNamespace;
+            $bundleFooterFileName;
 
     public function __construct($type) {
 
@@ -45,7 +44,6 @@ class Bundle extends Console {
         $this->bundleRoutesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES');
         $this->bundleHeaderFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
         $this->bundleFooterFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
-        $this->bundleNamespace = null;
     }
 
     public function createBundle() {
@@ -54,7 +52,7 @@ class Bundle extends Console {
 
             echo $this->linebreak(1);
 
-            echo $this->blue('Enter namespace of the bundle you want to create (Use "/" instead of "\\". If you are using a database with this application, this is usually the singular form of your table name): ');
+            echo $this->blue('Enter name of the bundle you want to create (If you are using a database with this application, this is usually the singular form of your table name): ');
 
             $this->bundle = preg_replace('/bundle/i', '', $this->readUser()) . 'Bundle';
             $this->name = $this->singular = preg_replace('/bundle/i', '', $this->bundle);
@@ -63,51 +61,24 @@ class Bundle extends Console {
                   $this->singular = substr($this->name, 0, -1);
         }
 
-        $this->bundleFolder = str_replace('//', '/', $this->bundleSourceFolder . $this->name);
-        $this->bundleNamespace = str_replace('\\\\', '\\', str_replace('/','\\', $this->name));
-        $nameChunks = explode('/', $this->name);
-        $this->name = end($nameChunks);
+        $this->bundleFolder = $this->bundleSourceFolder . $this->name;
 
-        if ($this->CreateBundleDirs($this->bundleNamespace))
+        if (mkdir($this->bundleFolder))
         {
-            $this->bundleNamespace = 'Bundles\\'.$this->bundleNamespace;
             $this->createConfig()->createRoutes()->createInterface()->createController()->createEntity()->createModel()->createViews() -> createTests();
-            
-            echo $this->green("Bundle {$this->bundleNamespace} has been created successfully."), $this->linebreak(2);
-            $ans = $this->decide($this->blue('Do you want to create assets for this bundle? [yes/no]: '), 'yes');
-
-            if($ans == 'yes')
-            {
-                $this->CreateAssets();
-                echo $this->green("Assets for bundle {$this->bundleNamespace} were successfully created.");
-            }
-
-            echo $this->green('Please add the following in the Application/Loader.php FetchAllBundles() method: ').$this->blue($this->bundleNamespace);
-            echo $this->linebreak(2);
         }
-        else
-            echo $this->red('Aborting bundle creation for bundle'.$this->name);
-    }
-    
-    private function CreateBundleDirs($bundle)
-    {
-        $bundleDirs = explode('/', str_replace('//','/', str_replace('\\', '/', $bundle)));
-        $createDir = $this->bundleSourceFolder;
-        
-        foreach($bundleDirs as $bundle)
+
+        echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
+
+        $ans = $this->decide($this->blue('Do you want to create assets for this bundle? [yes/no]: '), 'yes');
+
+        if($ans == 'yes')
         {
-            $createDir .= '/'.$bundle;
-            
-            echo $createDir;
-            if(!mkdir(str_replace('//','/', $createDir)))
-            {
-                echo $this->red('Unable to create directory '.$createDir);
-                echo $this->linebreak(1);
-                return false;
-            }
+            $this->CreateAssets();
+            echo $this->green("Assets for bundle {$this->name} were successfully created.");
         }
-        
-        return true;
+
+        echo $this->linebreak(2);
     }
 
     public function deleteBundle() {
@@ -236,7 +207,7 @@ Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', \\Get::Config('CORE.BUNDL
 
         $initEntity = "<?php
 
-namespace Bundles\\{$this->bundleNamespace}\\Entities;
+namespace Bundles\\{$this->name}\\Entities;
 
 
 
@@ -253,7 +224,7 @@ final class {$this->name}Entity extends ApplicationEntity {
 
         $initRepository = "<?php
 
-namespace Bundles\\{$this->bundleNamespace}\\Repositories;
+namespace Bundles\\{$this->name}\\Repositories;
 
 
 
@@ -277,11 +248,11 @@ final class {$this->name}Repository extends ApplicationRepository implements {$t
 
         $Model = "<?php
 
-namespace {$this->bundleNamespace}\\Models;
+namespace Bundles\\{$this->name}\\Models;
 
 
 
-use \\{$this->bundleNamespace}\\Interfaces\\{$this->name}ModelInterface;
+use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ModelInterface;
 
 // Model represents the logic of {$this->name} table with the application
 
@@ -391,7 +362,7 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
 
         $initControllerInterface = "<?php
 
-namespace {$this->bundleNamespace}\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 /**
@@ -477,7 +448,7 @@ interface {$this->name}ControllerInterface {
 
         $initControllerInterface = "<?php
 
-namespace {$this->bundleNamespace}\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 
@@ -496,7 +467,7 @@ interface {$this->name}RepositoryInterface {
 
         $initControllerInterface = "<?php
 
-namespace {$this->bundleNamespace}\\Interfaces;
+namespace Bundles\\{$this->name}\\Interfaces;
 
 
 
@@ -554,13 +525,13 @@ interface {$this->name}ModelInterface {
 
         $initController = "<?php
 
-namespace {$this->bundleNamespace}\\Controllers;
+namespace Bundles\\{$this->name}\\Controllers;
 
 
 
-use \\{$this->bundleNamespace}\\Entities\\{$this->name}Entity;
-use \\{$this->bundleNamespace}\\Models\\{$this->name}Model;
-use \\{$this->bundleNamespace}\\Interfaces\\{$this->name}ControllerInterface;
+use \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity;
+use \\Bundles\\{$this->name}\\Models\\{$this->name}Model;
+use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ControllerInterface;
 
 // Controller is responsible for the interactions between a model and a template
 
@@ -782,7 +753,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
         $initController = "<?php
 
-namespace {$this->bundleNamespace}\\Controllers;
+namespace Bundles\\{$this->name}\\Controllers;
 
 
 
@@ -907,7 +878,7 @@ Set::Config('{$this->name}Testing', array());";
 
         $initTests = "<?php
 
-namespace {$this->bundleNamespace}\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -920,7 +891,7 @@ class Test{$this -> name}Controller extends WebTestCase
 {
     public function testIndexAction()
     {
-        self::\$testClass = new {$this->namespace}\\Controllers\\{$this->name}Controller();
+        self::\$testClass = new \\Bundles\\{$this->name}\\Controllers\\{$this->name}Controller();
 
         \$method = 'IndexAction';
 
@@ -933,7 +904,7 @@ class Test{$this -> name}Controller extends WebTestCase
 
         $initTests = "<?php
 
-namespace {$this->bundleNamespace}\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -959,7 +930,7 @@ class Test{$this -> name}Entity extends BaseTestingRoutine
 
         $initTests = "<?php
 
-namespace {$this->bundleNamespace}\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -984,7 +955,7 @@ class Test{$this -> name}Repository extends BaseTestingRoutine
 
         $initTests = "<?php
 
-namespace {$this->bundleNamespace}\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -1020,7 +991,7 @@ class Test{$this -> name}Templates extends TemplateTestCase
 
         $initTests = "<?php
 
-namespace {$this->bundleNamespace}\\Tests;
+namespace Bundles\\{$this->name}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 

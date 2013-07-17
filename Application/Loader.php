@@ -23,7 +23,7 @@ class Loader{
             $environment,
             $appConfiguration;
 
-    private static function FetchAllBundles(){
+    public static function FetchAllBundles(){
 
         // Include your bundles here
 

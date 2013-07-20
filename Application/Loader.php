@@ -22,14 +22,14 @@ class Loader{
     public static
             $environment,
             $appConfiguration;
-    
+
     public static function AppBundles()
     {
         return array(
 
             'Welcome',
             'users',
-            'Product\Ajax',
+            'Authentication/users',
         );
     }
 

@@ -5,6 +5,7 @@ namespace Application\Core;
 class Database extends Template {
 
     private
+        $threadId,
         $host,
         $username,
         $password,
@@ -76,11 +77,19 @@ class Database extends Template {
                     ->SetErrorArgs('Connect Error ' . $this->activeConnection->connect_error, 'Database.Config.php', '0',$this->activeConnection->connect_errno)
                     ->ThrowError();
             }
+            
+            $this->activeConnection->set_charset('utf8');
 
         } catch (Exception $e) {
 
             trigger_error('Error connecting to MySQL Database on INIT: ' . $e->GetMessage());
         }
+    }
+    
+    public function __destruct() {
+        $this->threadId = $this->activeConnection->thread_id;
+        $this->activeConnection->close();
+        $this->activeConnection->kill($this->threadId);
     }
 
     public function GetConnection ( )
@@ -149,9 +158,9 @@ class Database extends Template {
                             {
                                 $this->queryResult[] = $row;
                             }
-
-                            $result->CallMethod('close');
                         }
+                        
+                        $result->CallMethod('free');
                     }
 
                     $this->rowsAffected = $this->activeConnection->affected_rows;

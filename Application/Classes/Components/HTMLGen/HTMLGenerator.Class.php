@@ -15,10 +15,15 @@ class HTMLGenerator extends Router {
     private $host, $database, $username, $password, $link;
 
     function __construct($params = null) {
-        $this->formname = $this->name = $params['name'];
+
+        $this->init($params);
+    }
+
+    public function Form($name, array $params = array())
+    {
+        $this->formname = $this->name = $name;
         $this->method = $params['method'];
         $this->action = $params['action'];
-        $this->init($params);
         $this->form = "<form method='$#method' " . (@$params['enctype'] == true ? "enctype='multipart/form-data'" : null) . " name='$#name' action='$#action' id = '" . @$params['id'] . "' class='" . @$params['class'] . "' style='" . (@$params['align'] == 'center' ? 'margin:0px auto;' : (@$params['align'] == 'right' ? 'float: right;' : (@$params[''] == 'left' ? 'float:left;' : null))) . " " . (isset($params['width']) ? 'width: ' . $params['width'] . ';' : null) . " " . @$params['style'] . "'>";
         $this->color = 'red';
     }
@@ -259,89 +264,90 @@ class HTMLGenerator extends Router {
     function add($params) {//this function should store data in an array so that they can be re-arranged or modified individually.
         $i = 0;
 
-        $element = null;
-        
         if(isset($params['value']))
             $value = "value='{$params['value']}'";
-            
+
         if(isset($params['class']))
             $class = "class='{$params['class']} {$params['validation']}'";
-            
+
         if(isset($params['id']))
             $id = "id='{$params['id']}'";
-            
+
         if(isset($params['name']))
             $name = "name='{$params['name']}'";
-            
+
         if(isset($params['type']))
             $type = "type='{$params['type']}'";
-            
+
         if(isset($params['disabled']))
             $disabled = "disabled='{$params['disabled']}'";
-            
+
         if(isset($params['buttonValue']))
             $buttonValue = "value='{$params['buttonValue']}'";
-            
+
         if(isset($params['buttonStyle']))
             $buttonStyle = "style='{$params['buttonStyle']}'";
-            
+
         if(isset($params['buttonId']))
             $buttonId = "id='='{$params['buttonId']}''";
-            
+
         if(isset($params['buttonClass']))
             $buttonClass = "class='{$params['buttonClass']}'";
-            
+
         if(isset($params['style']))
             $style = "style='{$params['style']}'";
-            
+
         if(isset($params['rows']))
             $rows = "rows='{$params['rows']}'";
-            
+
         if(isset($params['cols']))
             $cols = "cols='{$params['cols']}'";
-            
+
         if(isset($params['requiredText']))
             $requiredText = "<option value=''>{$params['requiredtext']}</option>";
-            
+
         if(isset($params['multiple']))
             $multiple = "multiple='{$params['multiple']}'";
-            
+
         if(isset($params['append']))
             $append = $params['append'];
-        
+
         if(isset($params['prepend']))
             $prepend = $params['prepend'];
-        
+
         if(isset($params['align']))
             $align = "align='{$params['align']}";
-            
+
         if(isset($params['src']))
             $src = "src='{$params['src']}'";
-            
+
         if(isset($params['title']))
             $title = "title='{$params['title']}'";
-            
+
         if(isset($params['alt']))
             $alt = "alt='{$params['alt']}'";
-            
+
         if(isset($params['href']))
             $href = "href='{$params['href']}'";
-            
+
         if(isset($params['target']))
             $target = "target='{$params['target']}'";
-            
+
         if(isset($params['size']))
             $size = "size='{$params['size']}'";
-            
+
         if(isset($params['valid']))
             $valid = $params['valid'];
-        
+
         if(isset($params['icon']))
             $icon = $params['icon'];
-        
+
         if(isset($params['icontext']))
             $iconText = "title='{$params['icontext']}";
-        
+
+        if(isset($params['for']))
+            $for = "for='{$params['for']}";
+
         $option = function($label, $value = null, $selected = null, $params = null) use ($append, $prepend)
         {
             return "<option value='$value' ".($selected == $value ? "selected='selected'" : '')." $params >{$append}{$label}{$prepend}</option>";
@@ -356,11 +362,15 @@ class HTMLGenerator extends Router {
             case 'file':
             case 'button':
                 {
-                    $element .= "<input $type $class $disabled $value $name $id >";
-                    break;
+                    return "<input $type $class $disabled $value $name $id >";
                 }
 
-            case 'textarea': 
+            case 'label':
+            {
+                return "<label $for>{$params['label']}</label>";
+            }
+
+            case 'textarea':
                 {
                     $element .= "<textarea $cols $rows $class $id $name $disabled $style>{$params['value']}</textarea>";
                     break;
@@ -373,34 +383,34 @@ class HTMLGenerator extends Router {
                 }
 
             case 'select': {
-                
+
                     $elements = explode(',', @$params['value']);
                     $element .= "<select $class $name $id $multiple $disabled>";
-                    
+
                     if (isset($params['requiredtext']))
                     {
                         $element .= $requiredText;
                     }
-                    if (is_numeric($elements[0])) 
+                    if (is_numeric($elements[0]))
                     {
-                        if ($elements[0] < $elements[1]) 
+                        if ($elements[0] < $elements[1])
                         {
-                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2]) 
+                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2])
                             {
                                 $element .= $option($j,$j, @$params['selected'], $disabled.$selected, $append, $prepend);
                             }
                         }
-                        else 
+                        else
                         {
-                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2]) 
+                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2])
                             {
                                 $element .= $option($j,$j, @$params['selected'], $disabled.$selected, $append, $prepend);
                             }
                         }
                     }
-                    else 
+                    else
                     {
-                        foreach ($elements as $elementname) 
+                        foreach ($elements as $elementname)
                         {
                             $element .= $option($elementname, str_replace(' ', '_', $elementname), @$params['selected'], $disabled.$selected, $append, $prepend);
                         }
@@ -427,38 +437,39 @@ class HTMLGenerator extends Router {
 
             case 'radio': {
                     $elements = explode(',', @$params['value']);
-                    if (is_numeric($elements[0])) {
-                        if ($elements[0] < $elements[1]) {
-                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2]) {
-                                $element .= '<input id="' . @$params['id'] . '_' . $i . '"  class="' . @$params['class'] . '" ';
+                    if (is_numeric($elements[0]))
+                    {
+                        if ($elements[0] < $elements[1])
+                        {
+                            for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2])
+                            {
+                                $element .= "<input id='{$params['id']}_$i' $class";
                                 if (isset($params['selected']) && @$params['selected'] == $j)
                                     $element .= ' checked="checked" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= ' type="radio" name="' . $params['name'] . '[]" value="' . $j . '">';
+                                $element .= "$disabled $type  name='{$params['name']}[]' value='$j'>";
                                 $i++;
                             }
                         }
-                        else {
-                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2]) {
-                                $element .= '<input id="' . @$params['id'] . '_' . $i . '"  class="' . @$params['class'] . '" ';
+                        else
+                        {
+                            for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2])
+                            {
+                                $element .= "<input id='{$params['id']}_$i' $class";
                                 if (isset($params['selected']) && @$params['selected'] == $j)
                                     $element .= ' checked="checked" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= ' type="radio" name="' . $params['name'] . '[]" value="' . $j . '">';
+                                $element .= "$disabled $type  name='{$params['name']}[]' value='$j'>";
                                 $i++;
                             }
                         }
                     }
-                    else {
-                        foreach ($elements as $elementname) {
-                            $element .= '<input id="' . @$params['id'] . '_' . $i . '" class="' . @$params['class'] . '"';
+                    else
+                    {
+                        foreach ($elements as $elementname)
+                        {
+                            $element .= "<input id='{$params['id']}_$i' $class";
                             if (isset($params['selected']) && @$params['selected'] == $elementname)
                                 $element .= ' checked="checked" ';
-                            if (isset($params['disabled']))
-                                $element .= ' disabled="disabled" ';
-                            $element .= ' type="radio" name="' . $params['name'] . '[]" value="' . str_replace(' ', '_', $elementname) . '">';
+                            $element .= "$disabled $type  name='{$params['name']}[]' value='".str_replace(' ', '_', $elementname)."'>";
                             $i++;
                         }
                     }
@@ -471,35 +482,29 @@ class HTMLGenerator extends Router {
                     if (is_numeric($elements[0])) {
                         if ($elements[0] < $elements[1]) {
                             for ($j = $elements[0]; $j <= $elements[1]; $j += $elements[2]) {
-                                $element .= '<input id="' . @$params['id'] . '_' . $i . '" type="checkbox"  class="' . @$params['class'] . '" ';
+                                $element .= "<input id='{$params['id']}_$i' $type $class";
                                 if (isset($params['selected']) && @$params['selected'] == $j)
                                     $element .= ' checked="checked" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= 'name="' . $params['name'] . '[]" value="' . $j . '">';
+                                $element .= "$disabled name='{$params['name']}[]' value='$j'>";
                                 $i++;
                             }
                         }
                         else {
                             for ($j = $elements[1]; $j >= $elements[0]; $j -= $elements[2]) {
-                                $element .= '<input id="' . @$params['id'] . '_' . $i . '" type="checkbox"  class="' . @$params['class'] . '" ';
+                                $element .= "<input id='{$params['id']}_$i' $type $class";
                                 if (isset($params['selected']) && @$params['selected'] == $j)
                                     $element .= ' checked="checked" ';
-                                if (isset($params['disabled']))
-                                    $element .= ' disabled="disabled" ';
-                                $element .= 'name="' . $params['name'] . '[]" value="' . $j . '">';
+                                $element .= "$disabled name='{$params['name']}[]' value='$j'>";
                                 $i++;
                             }
                         }
                     }
                     else {
                         foreach ($elements as $elementname) {
-                            $element .= '<input id="' . @$params['id'] . '_' . $i . '" type="checkbox"  class="' . @$params['class'] . '" ';
+                            $element .= "<input id='{$params['id']}_$i' $type $class";
                             if (isset($params['selected']) && @$params['selected'] == $elementname)
                                 $element .= ' checked="checked" ';
-                            if (isset($params['disabled']))
-                                $element .= ' disabled="disabled" ';
-                            $element .= 'name="' . $params['name'] . '[]" value="' . $elementname . '">';
+                            $element .= "$disabled name='{$params['name']}[]' value='$elementname'>";
                             $i++;
                         }
                     }
@@ -620,15 +625,14 @@ class HTMLGenerator extends Router {
         }
 
         return $element;
-//    $this->form .= $element.' </div>';
     }
 
     function submit() {
-        
+
     }
 
     function validate() {
-        
+
     }
 
     public function dump($var = null) {
@@ -920,15 +924,15 @@ class HTMLGenerator extends Router {
         $index = 1;
 
         $rows = null;
-        
+
         $objectCopy = null;
 
-        if (count($array['tbody']) != 0) 
+        if (count($array['tbody']) != 0)
         {
             $rows = '<tbody>';
 
-            foreach ($array['tbody'] as $arr) 
-            {   
+            foreach ($array['tbody'] as $arr)
+            {
                 if(is_object($arr))
                 {
                     $objectCopy = clone $arr;
@@ -937,7 +941,7 @@ class HTMLGenerator extends Router {
                 {
                     $objectCopy = $arr;
                 }
-                
+
                 if ($index % 2 == 0)
                 {
                     $rows .= '<tr id="record_' . $index . '" class="even">';
@@ -947,16 +951,16 @@ class HTMLGenerator extends Router {
                     $rows .= '<tr id="record_' . $index . '" class="odd">';
                 }
 
-                if (is_array($arr) || is_object($arr)) 
+                if (is_array($arr) || is_object($arr))
                 {
-                    
+
                     // Rendering functions
-                    
+
                     $body = function($rows = null) use ($arr, $array){
-                      
-                        if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) 
-                        {                        
-                            foreach ($array['ignoreFields'] as $ignore) 
+
+                        if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0)
+                        {
+                            foreach ($array['ignoreFields'] as $ignore)
                             {
                                 if(is_object($arr))
                                 {
@@ -969,52 +973,52 @@ class HTMLGenerator extends Router {
                             }
                         }
 
-                        foreach ($arr as $item) 
+                        foreach ($arr as $item)
                         {
                             $rows .= '<td>' . $item . '</td>';
                         }
-                        
+
                         return $rows;
                     };
-                    
+
                     $actions = function($rows = null) use ($objectCopy, $array, $index) {
-                      
-                        if (isset($array['actions'])) 
+
+                        if (isset($array['actions']))
                         {
                             $rows .= '<td class="actions"><div class="settings"></div><div class="settingsMenu">';
 
-                            foreach ($array['actions'] as $key => $action) 
+                            foreach ($array['actions'] as $key => $action)
                             {
-                                if (isset($action['message'])) 
-                                {                                    
+                                if (isset($action['message']))
+                                {
                                     $rows .= '<input type="hidden" value="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($objectCopy) ? $objectCopy->$action['dataParam'] : $objectCopy[$action['dataParam']] ))) : $action['url'] ) . '">';
 
                                     $rows .= ' <span class="confirmAction ' . @$action['class'] . '" id="' . $key . '_' . $index . '">' . $key . '</span> ';
 
                                     $rows .= '<input type="hidden" value="' . $action['message'] . '">';
-                                } 
-                                else 
+                                }
+                                else
                                 {
                                     $rows .= ' <a id="' . $key . '_' . $index . '" target="' . @$action['target'] . '" class="' . @$action['class'] . '" href="' . @(isset($action['route']) ? $this->setRoute($action['route'], array($action['routeParam'] => (is_object($objectCopy) ? $objectCopy->$action['dataParam'] : $objectCopy[$action['dataParam']] ))) : @$action['url'] ) . '">' . $key . '</a> ';
                                 }
 
                                 $rows .= '<br />';
                             }
-                        }  
-                        
+                        }
+
                         $rows .= '</div></td>';
-                        
+
                         return $rows;
                     };
-                    
+
                     // End of Rendering functions
-                    
-                    
+
+
                     // Execution of functions
-                    
+
                     $rows .= $body();
                     $rows .= $actions() ;
-                    
+
                     // End of Execution
                 }
                 else
@@ -1059,7 +1063,7 @@ class HTMLGenerator extends Router {
 
                     if (isset($array['tfoot']))
                     {
-                        foreach ($array['tfoot'] as $arr) 
+                        foreach ($array['tfoot'] as $arr)
                         {
                             $row .= '<td>' . $arr . '</td>';
                         }
@@ -1089,7 +1093,7 @@ class HTMLGenerator extends Router {
 
         $tableTitles = function ($rows = null, $objectCopy = null) use ($array) {
 
-                    if (isset($array['thead']) && $this->isLoopable($array['thead'])) 
+                    if (isset($array['thead']) && $this->isLoopable($array['thead']))
                     {
 
                         foreach ($array['thead'] as $arr) {
@@ -1098,27 +1102,27 @@ class HTMLGenerator extends Router {
                         }
 
                         $rows .= '</tr></thead>';
-                    } 
-                    else 
+                    }
+                    else
                     {
 
-                        if (is_array($array['tbody'])) 
+                        if (is_array($array['tbody']))
                         {
 
-                            foreach ($array['tbody'] as $arr) 
+                            foreach ($array['tbody'] as $arr)
                             {
 
-                                if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0) 
+                                if (is_array($array['ignoreFields']) && count($array['ignoreFields']) != 0)
                                 {
-                                    
+
                                     if(is_object($arr))
                                         $objectCopy = clone $arr;
                                     else
                                         $objectCopy = $arr;
 
-                                    foreach ($array['ignoreFields'] as $ignore) 
+                                    foreach ($array['ignoreFields'] as $ignore)
                                     {
-                                        
+
                                         if(is_object($objectCopy))
                                         {
                                             unset($objectCopy -> $ignore);

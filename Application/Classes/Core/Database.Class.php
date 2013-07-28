@@ -118,7 +118,7 @@ class Database extends Template {
 
                     if (\Get::Config('Errors.mailDBErrors'))
                     {
-                        $mail = new Mail();
+                        $mail = new \Application\Components\Mailer();
 
                         $params['to'] = \Get::Config('Application.Admin_Email');
                         $params['from_name'] = 'Multisites sql error';

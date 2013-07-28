@@ -27,6 +27,11 @@ Set::Config('Auth', array(
                 'MaxLoginAttempts' => 3,
                 'Message' => 'Your account has been locked for trying too many times, try again later',
                 'BlockedCoolDownPeriod' => 10, // 1
+                'MailUserOnBlock' => array(
+                    'Enabled' => false,
+                    'Body' => 'Your account has been blocked due to too many login attempts, please check with us as soon as possible.',
+                    'Subject' => 'Your account has been blocked.'
+                ), // 6
             ),
             'Anti-Hijacking' => array(
                 'Message' => 'For security reasons you have been logged out, please login again.'
@@ -63,4 +68,5 @@ Set::Config('Auth', array(
  * 3. Used for password encryption and authentication
  * 4. User defined method fired before user is logged out
  * 5. User defined method fired after user is logged out
+ * 6. User will be emailed on blocking there account, the username field will be taken as the email
  */

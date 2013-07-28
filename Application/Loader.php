@@ -28,7 +28,6 @@ class Loader{
         return array(
 
             'Welcome',
-            'users',
             'Authentication/users',
         );
     }
@@ -37,7 +36,7 @@ class Loader{
 
         // Include your bundles here
 
-        $bundles = $this->AppBundles();
+        $bundles = self::AppBundles();
 
         // Do not edit below this line
 
@@ -165,6 +164,26 @@ class Loader{
             }
         }
 
+    }
+
+    public static function LoadBundle($bundle)
+    {
+        if(is_dir($bundle))
+        {
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
+            self::LoadFilesFromDir($bundle, array('php'), false);
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
+        }
+        else
+        {
+            $params['Backtrace'] = debug_backtrace();
+            $message = ' not found in kernel::LoadBundles()';
+            require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
+            trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
+            die();
+        }
     }
 
     protected static function LoadFilesFromDir($directory, array $extensions, $subdirectories = true){

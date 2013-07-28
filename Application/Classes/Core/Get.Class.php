@@ -10,11 +10,34 @@ class Get{
     public static function Config()
     {
         $keys = func_get_args();
+        $matches = array();
+        $replacement = null;
         $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
-        
+
         if($config === null)
         {
             die('<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
+        }
+
+        if(preg_match_all('/({{.+?}})/', $config, $matches))
+        {
+            foreach($matches[0] as $match)
+            {
+
+                $replacement = self::Config (
+                        str_replace(
+                            '{{',
+                            '',
+                            str_replace(
+                                '}}',
+                                '',
+                                $match
+                            )
+                        )
+                    );
+
+                $config = str_replace($match,$replacement, $config);
+            }
         }
 
         return $config;

@@ -18,6 +18,8 @@ function getOptions() {
         'Bundles' => array(
             'bundle:create',
             'bundle:delete',
+            'bundle:assets:create',
+            'bundle:assets:delete'
         ),
         'Tests' => array(
             'test:routes',

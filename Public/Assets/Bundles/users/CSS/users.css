@@ -1,1 +1,7 @@
- root{ font-size: 12px; font-family: verdana; color: black; }
+/* Stylesheet for users Bundle */
+
+root{
+    font-size: 12px;
+    font-family: verdana;
+    color: black;
+}

@@ -1,4 +1,4 @@
-/* Javascript for creation Bundle */
+/* Javascript for users Bundle */
 
 jQuery(document).ready(function(){
 

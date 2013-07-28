@@ -30,7 +30,7 @@ class Template extends Router {
         if ($templateParams[0] != null) {
 
             return array(
-                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('CORE.BUNDLES_FOLDER') . $templateParams[0] . \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS') .'ControllerViews/' . $templateParams[1])),
+                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('CORE.BUNDLES_FOLDER') . $this->GetBundleFromName($templateParams[0]) . \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS') .'ControllerViews/' . $templateParams[1])),
                 'path' => $this->refactorUrl(\Get::Config('CORE.BUNDLES_FOLDER') . $templateParams[0] . \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS'))
             );
         }
@@ -201,7 +201,7 @@ class Template extends Router {
             $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
 
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
-                $bundle.
+                $this->GetBundleFromName($bundle).
                 '/'.
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE'));
@@ -227,7 +227,7 @@ class Template extends Router {
             $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
 
         $path = $this->RefactorUrl(\Get::Config('CORE.BUNDLES_FOLDER').
-                $bundle.
+                $this->GetBundleFromName($bundle).
                 '/'.
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS').
                 \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE'));
@@ -758,6 +758,25 @@ class Template extends Router {
 
     /**
      *
+     * @param type $label
+     * @param type $decider
+     * @param type $for
+     * @param type $params
+     * @return type
+     */
+    protected function IfLabel($label, $decider = null, $for = null, $params = null)
+    {
+        if(! $decider)
+            return false;
+
+        if(! $for)
+            $for = $label;
+
+        return "<label for='{$for}' {$params}>{$label}</label>";
+    }
+
+    /**
+     *
      * @param type $name
      * @param type $value optional
      * @param type $element default text
@@ -765,21 +784,20 @@ class Template extends Router {
      * @param type $id optional
      * @return type
      */
-    protected function Widget($name, $value = null, $element = 'text', $class = null, $id = null)
+    protected function Widget($name, $value = null, $element = 'text', array $params = array())
     {
-        if(! $id)
-            $id = $name;
+        if(! isset($params['id']))
+            $params['id'] = $name;
 
         $htmlgen = $this->GetComponent('HTMLgenerator');
+
         $el = array(
             'type' => $element,
             'value' => $value,
             'name' => $name,
-            'class' => $class,
-            'id' => $id
         );
 
-        return $htmlgen->generateInput($el);
+        return $htmlgen->generateInput(array_merge($el , $params));
     }
 
     /**
@@ -792,13 +810,13 @@ class Template extends Router {
      * @param type $decider
      * @return type
      */
-    protected function IfWidget($name, $value = null, $element = 'text', $class = null, $id = null, $decider = null)
+    protected function IfWidget($name, $value = null, $element = 'text', array $params = array(), $decider = null)
     {
         if($decider === null)
             $decider = $value;
 
         if($decider)
-            return $this->Widget($name, $value, $element, $class, $id);
+            return $this->Widget($name, $value, $element, $params);
     }
 
     /**
@@ -871,6 +889,7 @@ class Template extends Router {
             $id = $name;
 
         $htmlgen = $this->GetComponent('HTMLgenerator');
+
         $el = array(
             'type' => $element,
             'value' => $value,
@@ -905,8 +924,11 @@ class Template extends Router {
      * @param type $message
      * @return type
      */
-    protected function Error($message)
+    protected function Error($message, $class = null , $id = null)
     {
-        return "<div class='error'>$message</div>";
+        if($id)
+            $id = "id='$id'";
+
+        return "<div class='error $class' $id>$message</div>";
     }
 }

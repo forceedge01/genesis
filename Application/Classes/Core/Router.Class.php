@@ -193,7 +193,7 @@ class Router extends AppMethods{
         if($controllerAction[0] == null)
             return '\\Application\\Controllers\\'.$controllerAction[1] . 'Controller';
         else
-            return '\\Bundles\\'.$controllerAction[0].'\\Controllers\\' . $controllerAction[1] . 'Controller';
+            return '\\Bundles\\'.$this->GetBundleNameSpace ($controllerAction[0]).'\\Controllers\\' . $controllerAction[1] . 'Controller';
     }
 
     /**
@@ -322,7 +322,7 @@ class Router extends AppMethods{
 
         if(!class_exists($objectName))
         {
-            echo 'Error: '.$objectName;
+            echo 'Error calling object: '.$objectName;
 
             $error = array(
 

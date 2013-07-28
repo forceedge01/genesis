@@ -71,6 +71,18 @@ class Manager extends Variable implements ManagerInterface{
 
     /**
      *
+     * @param string $type entity or repository
+     * @param string $bundleColonEntity
+     * @return Object
+     */
+    protected function Get($type, $name)
+    {
+        $type = 'Get'.$type;
+        return $this->$type($name);
+    }
+
+    /**
+     *
      * @param type $bundleColonEntityName
      * @return \Application\Repositories\ApplicationRepository returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
@@ -82,9 +94,29 @@ class Manager extends Variable implements ManagerInterface{
         if($bundle[0] == null)
             $namespace = '\\Application\\Repositories\\';
         else
-            $namespace = '\\Bundles\\'.$bundle[0].'\\Repositories\\';
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
+
+        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
+    }
+
+    /**
+     *
+     * @param type $bundleColonEntityName
+     * @return \Application\Repositories\ApplicationRepository returns an entity object
+     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
+     */
+    public function GetModel($bundleColonEntityName){
+
+        $bundle = explode(':', $bundleColonEntityName);
+
+        if($bundle[0] == null)
+            $namespace = '\\Application\\Models\\';
+        else
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Models\\';
+
+        $bundle[1] .= 'Model';
 
         return $this->GetObject($namespace.$bundle[1], $bundle[1]);
     }
@@ -100,9 +132,9 @@ class Manager extends Variable implements ManagerInterface{
         $bundle = explode(':', $bundleColonEntityName);
 
         if($bundle[0] == null)
-            $namespace = '\\Application\\Core\\Entities\\';
+            $namespace = '\\Application\\Entities\\';
         else
-            $namespace = '\\Bundles\\'.$bundle[0].'\\Entities\\';
+            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Entities\\';
 
         $bundle[1] .= 'Entity';
 
@@ -229,5 +261,22 @@ class Manager extends Variable implements ManagerInterface{
     public static function GetConfigs()
     {
         return Loader::$appConfiguration;
+    }
+
+    protected function GetBundleFromName($bundle)
+    {
+        foreach(\Application\Core\Loader::AppBundles() as $bundlePath)
+        {
+            $ch = explode('/', $bundlePath);
+            $bundleName = end($ch);
+
+            if($bundleName == $bundle)
+                return $bundlePath;
+        }
+    }
+
+    protected function GetBundleNameSpace($bundle)
+    {
+        return str_replace('/','\\', $this->GetBundleFromName($bundle));
     }
 }

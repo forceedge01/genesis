@@ -164,6 +164,12 @@ class Auth extends Template{
             if($session->Get('BruteForceAttempt') >= \Get::Config('Auth.Security.Session.BruteForce.MaxLoginAttempts'))
             {
                 $session->Set('Blocked.'.$this->username, time());
+
+                if(\Get::Config('Auth.Security.Session.BruteForce.MailUserOnBlock.Enabled') AND $this->IsValidEmail($this->username))
+                    $this
+                        ->GetComponent('Mailer')
+                            ->send($this->username, \Get::Config('Auth.Security.Session.BruteForce.MailUserOnBlock.Subject'), \Get::Config('Auth.Security.Session.BruteForce.MailUserOnBlock.Body'));
+
                 return false;
             }
         }

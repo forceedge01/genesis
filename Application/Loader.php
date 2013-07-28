@@ -23,15 +23,20 @@ class Loader{
             $environment,
             $appConfiguration;
 
-    private static function FetchAllBundles(){
+    public static function AppBundles()
+    {
+        return array(
+
+            'Welcome',
+            'Authentication/users',
+        );
+    }
+
+    public static function FetchAllBundles(){
 
         // Include your bundles here
 
-        $bundles = array(
-
-            'Welcome',
-            'users',
-        );
+        $bundles = self::AppBundles();
 
         // Do not edit below this line
 
@@ -39,7 +44,7 @@ class Loader{
 
         foreach($bundles as $bundle){
 
-            self::$bundles[] = $bundlesDIR . $bundle;
+            self::$bundles[] = $bundlesDIR . str_replace('\\', '/', $bundle);
         }
     }
 
@@ -159,6 +164,26 @@ class Loader{
             }
         }
 
+    }
+
+    public static function LoadBundle($bundle)
+    {
+        if(is_dir($bundle))
+        {
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
+            self::LoadFilesFromDir($bundle, array('php'), false);
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
+        }
+        else
+        {
+            $params['Backtrace'] = debug_backtrace();
+            $message = ' not found in kernel::LoadBundles()';
+            require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
+            trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
+            die();
+        }
     }
 
     protected static function LoadFilesFromDir($directory, array $extensions, $subdirectories = true){

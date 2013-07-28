@@ -9,38 +9,37 @@ class Console {
     private
             $object;
 
-    public function init(){
-
-        if (!isset($_SERVER['SERVER_NAME'])) {
-
-            passthru('clear');
-
-            echo $this ->blue(' =========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<=========') ;
-            $this->linebreak(1);
-
-            while (true) {
-
-                if(isset($_SERVER['argv'][1]))
-                {
-                    $this->switchOption(str_replace('--', '', $_SERVER['argv'][1]));
-                    exit;
-                }
-
-                $this->showAllOptions(getOptions());
-
-                echo 'Enter choice: ';
-
-                $line = $this->readUser();
-
-                $args = explode('--', $line);
-
-                $this->switchOption($args[0]);
+    protected function persistOptions()
+    {
+        while (true)
+        {
+            if(isset($_SERVER['argv'][1]))
+            {
+                $this->switchOption(str_replace('--', '', $_SERVER['argv'][1]));
+                exit;
             }
-        } else {
 
-            echo '
-            <title>Simplify</title>
-            <style>
+            $this->showAllOptions(getOptions());
+            $line = $this->readUser('Enter choice: ');
+            $args = explode('--', $line);
+            $this->switchOption($args[0]);
+        }
+    }
+
+    public function init()
+    {
+        if (!isset($_SERVER['SERVER_NAME']))
+        {
+            echo $this->AddBreaks($this->blue('=========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<========='));
+
+            $this->persistOptions();
+        }
+        else
+        {
+
+            $title = '<title>Simplify</title>';
+            $heading = '<div class="mainHeading">Welcome to Genesis Simplify Engine.</div>';
+            $style = '<style>
 
             .mainHeading
             {
@@ -91,26 +90,21 @@ class Console {
                 color: orange;
             }
 
-            </style>
-            ';
+            </style>';
 
-            echo '<div class="mainHeading">Welcome to Genesis Simplify Engine.</div>';
-
+            echo $title, $style, $heading;
             $options = getOptions();
-
             $bundle = new Libraries\Bundle('html');
 
-            if (isset($_POST['submitOption'])) {
-
+            if (isset($_POST['submitOption']))
+            {
                 $option = $_POST['option'];
-
                 $this->switchOption($option[0]);
             }
 
             echo '<form method="post" class="form">';
-
-            foreach ($options as $key => $option) {
-
+            foreach ($options as $key => $option)
+            {
                 echo "<div class='subHeading'>$key</div>";
 
                 foreach($option as $opt)
@@ -120,17 +114,14 @@ class Console {
             }
 
             echo '<div class="heading">List of bundles installed</div>';
-
             $bundles = $bundle->readBundles(true);
 
-            foreach ($bundles as $bundle) {
-
+            foreach ($bundles as $bundle)
+            {
                 echo "<div class='option'><input type='radio' id='$bundle' ".($_POST['bundleName'][0] == $bundle ? 'checked=checked' : '')." name='bundleName[]' value='$bundle'> <label for='$bundle'>$bundle</label></div><br />";
             }
 
-            echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';
-
-            echo '<input type="submit" name="submitOption"></form>';
+            echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br /><input type="submit" name="submitOption"></form>';
         }
     }
 
@@ -138,13 +129,9 @@ class Console {
 
         echo 'Unknown option!';
 
-        $this->showAllOptions();
-
-        $message = 'Enter option: ';
-
-        $option = $this->readUser($message);
-
-        return $option;
+        return $this
+                ->showAllOptions()
+                    ->readUser('Enter option: ');
     }
 
     public function readUser($message = null) {
@@ -155,7 +142,6 @@ class Console {
         if (!isset($_SERVER['SERVER_NAME'])) {
 
             $handle = fopen('php://stdin', 'r');
-
             $line = trim(fgets($handle));
 
             return $line;
@@ -171,15 +157,19 @@ class Console {
 
     public function showAllOptions($options) {
 
-        foreach ($options as $key => $option) {
-
-            echo $this->green($key).$this->linebreak(1);
+        foreach ($options as $key => $option)
+        {
+            echo $this->linebreak(1), $this->green($key);
 
             foreach($option as $opt)
+            {
                 echo $this->linebreak(1).' '.$opt;
+            }
         }
 
-        $this->linebreak(2);
+        echo $this->linebreak(2);
+
+        return $this;
     }
 
     protected function removeDirectory($directory) {
@@ -195,13 +185,14 @@ class Console {
 
                         $absolutePath = $directory . '/' . $file;
 
-                        if (is_dir($absolutePath)) {
-                            echo 'Entring direcotry';
-                            $this->linebreak(1);
+                        if (is_dir($absolutePath))
+                        {
+                            echo $this->linebreak(), '.. ';
                             $this->removeDirectory($absolutePath);
-                        } else {
-                            echo 'deleting file: ' . $absolutePath;
-                            $this->linebreak(1);
+                        }
+                        else
+                        {
+                            echo '. ';
                             unlink($absolutePath);
                         }
                     }
@@ -222,30 +213,38 @@ class Console {
         }
     }
 
-    public function linebreak($val)
+    public function linebreak($val = 1)
     {
-        for ($i = 0; $i < $val; $i++) {
+        $linebreak = $break = null;
 
-            if (!isset($_SERVER['SERVER_NAME']))
-                echo chr(10) . chr(13);
-            else
-                echo '<br />';
+        if (!isset($_SERVER['SERVER_NAME']))
+            $break = chr(10) . chr(13);
+        else
+            $break = '<br />';
+
+        for ($i = 0; $i < $val; $i++)
+        {
+            $linebreak .= $break;
         }
+
+        return $linebreak;
     }
 
     public function space($num)
     {
-        $space = null;
+        $spaces = $space = null;
 
-        for ($i = 0; $i < $num; $i++) {
+        if (!isset($_SERVER['SERVER_NAME']))
+            $space = ' ';
+        else
+            $space = '&nbsp;';
 
-            if (!isset($_SERVER['SERVER_NAME']))
-                $space .= ' ';
-            else
-                $space .= '&nbsp;';
+        for ($i = 0; $i < $num; $i++)
+        {
+            $spaces .= $space;
         }
 
-        return $space;
+        return $spaces;
     }
 
     function switchOption($switch) {
@@ -276,6 +275,18 @@ class Console {
                     case 'delete':
                     {
                         $bundle->deleteBundle();
+                        break;
+                    }
+                    case 'assets':
+                    {
+                        if($args[2] == 'create')
+                        {
+                            $bundle->InitCreateAssets();
+                        }
+                        else if($args[2] == 'delete')
+                        {
+                            $bundle->DeleteAssets();
+                        }
                         break;
                     }
                     case '0':
@@ -369,13 +380,20 @@ class Console {
                 break;
             }
 
-            default:
+            case 'exit':
             {
                 echo 'Exiting';
                 exit;
-                break;
             }
         }
+
+        $this->flushOptions();
+        $this->persistOptions();
+    }
+
+    protected function flushOptions()
+    {
+        unset($_SERVER['argv'][1]);
     }
 
     public function green($string)
@@ -426,7 +444,7 @@ class Console {
     }
 
     /**
-     * 
+     *
      * @param type $readMessage
      * @param type $htmlDefault
      * @return type
@@ -434,5 +452,27 @@ class Console {
     public function decide($readMessage, $htmlDefault)
     {
         return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);
+    }
+
+    public function AddBreaks($string, $breaks = 1)
+    {
+        return $this->linebreak($breaks). $string. $this->linebreak($breaks);
+    }
+
+    private function is_dir_empty($dir) {
+
+        if (!is_readable($dir)) return NULL;
+        return (count(scandir($dir)) == 2);
+    }
+
+    public function Choice($message, $defaultHtml = 'yes')
+    {
+        $ans = $this->decide($this->blue($message.' [yes/no]: '), $defaultHtml);
+        if($ans == 'yes')
+            return true;
+        else if($ans == 'no')
+            return false;
+        else
+            return $this->Choice ($message, $defaultHtml);
     }
 }

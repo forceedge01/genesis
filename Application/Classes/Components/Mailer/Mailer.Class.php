@@ -4,7 +4,7 @@ namespace Application\Components;
 
 
 
-class Mail{
+class Mailer{
 
     private
             $phpmailer,
@@ -68,19 +68,19 @@ class Mail{
      *  'html' => boolean, default false
      * );
      */
-    public function send($params){
+    public function send($to, $subject, $body, array $params = array()){
 
         try{
 
-            $this->phpmailer->AddAddress($params['to']);
+            $this->phpmailer->AddAddress($to);
 
-            $this->phpmailer->Subject = $params['subject'];
+            $this->phpmailer->Subject = $subject;
 
             $this->phpmailer->From = $params['from'];
 
             $this->phpmailer->FromName = (!isset($params['from_name']) ? $params['html'] : \Get::Config('Application.Name') );
 
-            $this->phpmailer->MsgHTML($params['message']);
+            $this->phpmailer->MsgHTML($body);
 
             $this->phpmailer->IsHTML((!@isset($params['html']) ? $params['html'] : false ));
 

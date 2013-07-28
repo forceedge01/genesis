@@ -132,6 +132,8 @@ class Router extends AppMethods{
 
                 $controllerAction = explode(':', $value['Controller']);
 
+                Loader::LoadBundle($this->GetBundleFromName($controllerAction[0]));
+
                 $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
             }
         }

@@ -6,7 +6,7 @@ namespace Application\Interfaces\Entities;
 
 interface Entity{
 
-    function Get($id = null);
+    function Find($id = null);
 
     function Save($params = array());
 

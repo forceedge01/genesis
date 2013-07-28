@@ -71,18 +71,6 @@ class Manager extends Variable implements ManagerInterface{
 
     /**
      *
-     * @param string $type entity or repository
-     * @param string $bundleColonEntity
-     * @return Object
-     */
-    protected function Get($type, $name)
-    {
-        $type = 'Get'.$type;
-        return $this->$type($name);
-    }
-
-    /**
-     *
      * @param type $bundleColonEntityName
      * @return \Application\Repositories\ApplicationRepository returns an entity object
      * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();

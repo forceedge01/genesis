@@ -32,16 +32,21 @@ class Variable extends Hooks {
     public function Has(array $list) {
 
         if($this->isLoopable($list)){
-            foreach ($list as $value) {
+            foreach ($list as $value)
+            {
 
                 if($this->isLoopable($value))
+                {
                     $this->IsContainedBy ($value);
+                }
                 else
-                    if (strstr($this->variable, $value))
+                {   if ($this->variable == $value)
                         return $this;
+                }
             }
         }
-        else{
+        else
+        {
             return strstr($this->variable, $list);
         }
 
@@ -201,7 +206,7 @@ class Variable extends Hooks {
 
         return $this;
     }
-    
+
     protected function FirstToUpper()
     {
         $this->variable = strtoupper(substr($this->variable, 0, 1)).substr($this->variable, 1);

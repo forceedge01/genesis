@@ -33,8 +33,8 @@ class ApplicationEntity extends Database implements Entity{
      * @param Mixed $id Can be the primary key value or an array of column and values
      * @return mixed Returns the matching data set from the database.
      */
-    public function Get($id = null) {
-
+    public function Find($id = null) {
+        
         if (!$id)
             $id = $this->id;
 

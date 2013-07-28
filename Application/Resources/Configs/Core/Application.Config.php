@@ -6,7 +6,6 @@ Set::Config('Application', array(
     'Admin_Email' => 'wahab.qureshi@digitalanimal.com',
     'Base_Route_Name' => 'Application',
     'LandingPageRoute' => 'users_List',
-    'Environment' => 'production',
     'Session' => array(
         'Enabled' => true,
         'Secure' => array(
@@ -24,7 +23,7 @@ Set::Config('Application', array(
             'Controller' => ':Application:UnderDevelopment',
             'ExemptIPs' => array(
 
-                '::1',
+                '::',
             ),
         )
 

@@ -143,20 +143,17 @@ class Loader{
 
             if(is_dir($bundle)){
 
-//                if(self::$environment == 'development')
-//                    self::LoadConfigFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
-//                else
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
+//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
                 self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES'), array('php'));
-                self::LoadFilesFromDir($bundle, array('php'), false);
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
+//                self::LoadFilesFromDir($bundle, array('php'), false);
+//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
+//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
+//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
             }
             else{
 
                 $params['Backtrace'] = debug_backtrace();
-                $message = ' not found in kernel::LoadBundles()';
+                $message = ' not found in Loader::LoadBundles()';
                 require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
                 die();
@@ -168,6 +165,8 @@ class Loader{
 
     public static function LoadBundle($bundle)
     {
+        $bundle = str_replace('//', '/', \Get::Config('CORE.BUNDLES_FOLDER') . $bundle);
+
         if(is_dir($bundle))
         {
             self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
@@ -179,7 +178,7 @@ class Loader{
         else
         {
             $params['Backtrace'] = debug_backtrace();
-            $message = ' not found in kernel::LoadBundles()';
+            $message = ' not found in Loader::LoadBundle()';
             require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
             trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
             die();

@@ -22,7 +22,8 @@ class DatabaseManager extends Database{
         $queryTablePrimaryKey,
         $queryTableColumns,
         $foreignKeys = array(),
-        $queryParameters = array();
+        $queryParameters = array(),
+        $query;
 
     public function __construct($params = null) {
         parent::__construct($params);
@@ -277,7 +278,11 @@ class DatabaseManager extends Database{
         if($this->queryLimit)
             $query.= ' LIMIT ' . $this->queryLimit;
 
-        $this -> placeParameters ( )->SetQuery($query);
+        $this->query = $query;
+
+        $this
+            ->placeParameters()
+               ->SetQuery($query);
 
         return $this;
     }

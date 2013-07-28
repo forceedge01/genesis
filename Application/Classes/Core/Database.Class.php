@@ -57,7 +57,12 @@ class Database extends Template {
             if ($this->activeConnection->connect_error)
             {
                 $this
-                    ->SetErrorArgs('Connect Error ' . $this->activeConnection->connect_error, 'Database.Config.php', '0',$this->activeConnection->connect_errno)
+                    ->SetErrorArgs(
+                            'Connect Error ' . $this->activeConnection->connect_error,
+                            'Database.Config.php',
+                            '0',
+                            $this->activeConnection->connect_errno
+                        )
                     ->ThrowError();
             }
 

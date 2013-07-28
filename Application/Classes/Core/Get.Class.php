@@ -10,8 +10,6 @@ class Get{
     public static function Config()
     {
         $keys = func_get_args();
-        $matches = array();
-        $replacement = null;
         $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
 
         if($config === null)
@@ -19,28 +17,50 @@ class Get{
             die('<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
         }
 
-        if(preg_match_all('/({{.+?}})/', $config, $matches))
-        {
-            foreach($matches[0] as $match)
+        $checkConfig = function($config){
+
+            if(preg_match_all('/({{.+?}})/', $config, $matches))
             {
+                if(count($matches[0]) > 0)
+                {
+                    foreach($matches[0] as $match)
+                    {
 
-                $replacement = self::Config (
-                        str_replace(
-                            '{{',
-                            '',
-                            str_replace(
-                                '}}',
-                                '',
-                                $match
-                            )
-                        )
-                    );
+                        $replacement = self::Config (
+                                str_replace(
+                                    '{{',
+                                    '',
+                                    str_replace(
+                                        '}}',
+                                        '',
+                                        $match
+                                    )
+                                )
+                            );
 
-                $config = str_replace($match,$replacement, $config);
+                        $config = str_replace($match,$replacement, $config);
+                    }
+                }
             }
-        }
 
-        return $config;
+            return $config;
+        };
+
+        if(is_array($config))
+        {
+            $newArray = array();
+
+            foreach($config as $key => $conf)
+            {
+                $newArray[$key] = $checkConfig($conf);
+            }
+
+            return $newArray;
+        }
+        else
+        {
+            return $checkConfig($config);
+        }
     }
 
     /**

@@ -3,12 +3,12 @@
 namespace Application\Entities;
 
 
-use Application\Core\Database;
+use Application\Core\DatabaseManager;
 
 use Application\Interfaces\Entities\Entity;
 
 
-class ApplicationEntity extends Database implements Entity{
+class ApplicationEntity extends DatabaseManager implements Entity{
 
     protected $tableName;
     public $id;
@@ -34,7 +34,7 @@ class ApplicationEntity extends Database implements Entity{
      * @return mixed Returns the matching data set from the database.
      */
     public function Find($id = null) {
-        
+
         if (!$id)
             $id = $this->id;
 

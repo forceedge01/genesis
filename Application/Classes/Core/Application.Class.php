@@ -74,7 +74,7 @@ class Application extends Template implements Interfaces\Application{
                     {
                         $browser = $this->GetSessionManager()->GetBrowserAgent();
 
-                        $db = new Database();
+                        $db = $this->GetDatabaseManager();
 
                         $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))->GetOneRecordBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn));
 

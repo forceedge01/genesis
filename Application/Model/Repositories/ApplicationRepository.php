@@ -4,12 +4,12 @@ namespace Application\Repositories;
 
 
 
-use Application\Core\Database;
+use Application\Core\DatabaseManager;
 
 use Application\Interfaces\Repositories\Repository;
 
 
-class ApplicationRepository extends Database implements Repository {
+class ApplicationRepository extends DatabaseManager implements Repository {
 
     protected
             $id,

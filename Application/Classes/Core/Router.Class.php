@@ -97,7 +97,7 @@ class Router extends AppMethods{
                 {
                     $error = false;
 
-                    if(is_array($value['Method']))
+                    if($this->IsLoopable($value['Method']))
                     {
                         if(strtoupper($value['Method']['Type']) != getenv('REQUEST_METHOD'))
                         {
@@ -143,13 +143,16 @@ class Router extends AppMethods{
 
     private function ValidateVariables($requirement)
     {
-        foreach($requirement as $key => $pattern)
+        if($this->IsLoopable($requirement))
         {
-            if(!preg_match($pattern, $this->funcVariables['{'.$key.'}']))
+            foreach($requirement as $key => $pattern)
             {
-                $this
-                    ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable '.$key.'=\''.$this->funcVariables['{'.$key.'}'].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
-                        ->ThrowError();
+                if(!preg_match($pattern, $this->funcVariables['{'.$key.'}']))
+                {
+                    $this
+                        ->SetErrorArgs('Route \''.$this->lastRoute.'\' expects variable '.$key.'=\''.$this->funcVariables['{'.$key.'}'].'\' to match \''.$pattern.'\' pattern', 'Route file', 'unknown')
+                            ->ThrowError();
+                }
             }
         }
     }
@@ -358,7 +361,7 @@ class Router extends AppMethods{
         if(\Get::Config('Cache.html.enabled'))
             Cache::CheckForCachedFile($this->GetPattern());
 
-        if(count($this->ObjectArguments) != 0)
+        if($this->IsLoopable($this->ObjectArguments))
         {
             foreach($this->ObjectArguments as $variable => $object){
 

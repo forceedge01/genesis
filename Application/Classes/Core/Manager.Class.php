@@ -41,7 +41,7 @@ class Manager extends Variable implements ManagerInterface{
 
             if (class_exists($fullClassPath)) {
 
-                @$this->$object = new $fullClassPath($args);
+                $this->$object = new $fullClassPath($args);
             }
             else
                 return $this->GetObject ($object, $args);
@@ -158,11 +158,11 @@ class Manager extends Variable implements ManagerInterface{
 
     /**
      *
-     * @return Database
+     * @return DatabaseManager
      */
     public function GetDatabaseManager ( )
     {
-        return $this ->GetCoreObject('Database');
+        return $this ->GetCoreObject('DatabaseManager');
     }
 
     /**

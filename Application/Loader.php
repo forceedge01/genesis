@@ -64,6 +64,7 @@ class Loader{
             'Template.Class.php',
             'Application.Class.php',
             'Database.Class.php',
+            'DatabaseManager.Class.php',
             'Session.Class.php',
         );
 

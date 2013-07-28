@@ -24,9 +24,9 @@ Set::Config('Auth', array(
             'Interval' => 60*60, // 1
             'ExpireMessage' => 'Your session has expired, please login again.',
             'BruteForce' => array(
-                'MaxLoginAttempts' => 3,
+                'MaxLoginAttempts' => 5,
                 'Message' => 'Your account has been locked for trying too many times, try again later',
-                'BlockedCoolDownPeriod' => 10, // 1
+                'BlockedCoolDownPeriod' => 1, // 1
                 'MailUserOnBlock' => array(
                     'Enabled' => false,
                     'Body' => 'Your account has been blocked due to too many login attempts, please check with us as soon as possible.',

@@ -37,10 +37,10 @@ class DatabaseManager extends Database{
      */
     protected function GetPrimaryKey($table = null) {
 
-        if ($table == null)
+        if (!$table)
             $table = $this->queryTable;
 
-        $this->Query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
+        $this->Query("SHOW KEYS FROM {$table} WHERE Key_name = 'PRIMARY'");
         $this->queryTablePrimaryKey = "`{$table}`.`{$this->queryResult[0]->Column_name}`";
 
         return $this;
@@ -58,19 +58,20 @@ class DatabaseManager extends Database{
         if ($table == null)
             $table = $this->queryTable;
 
-        $this->Query("SELECT
-            table_name as 'TABLE_NAME',
-            column_name as 'COLUMN_NAME',
-            referenced_table_name as 'REFERENCED_TABLE_NAME',
-            referenced_column_name as 'REFERENCED_COLUMN_NAME'
-        FROM
-            information_schema.key_column_usage
-        WHERE
-            referenced_table_name is not null
-        AND
-            TABLE_SCHEMA = '".\Get::Config('Database.name')."'
-        AND
-            table_name = '$table'");
+        $this->Query("
+            SELECT
+                table_name AS 'TABLE_NAME',
+                column_name AS 'COLUMN_NAME',
+                referenced_table_name AS 'REFERENCED_TABLE_NAME',
+                referenced_column_name AS 'REFERENCED_COLUMN_NAME'
+            FROM
+                information_schema.key_column_usage
+            WHERE
+                referenced_table_name IS NOT NULl
+            AND
+                TABLE_SCHEMA = '".\Get::Config('Database.name')."'
+            AND
+                table_name = '$table'");
 
         if ($this->isLoopable($this->queryResult))
             foreach ($this->queryResult as $key)
@@ -166,6 +167,12 @@ class DatabaseManager extends Database{
         return $this;
     }
 
+    /**
+     *
+     * @param type $table
+     * @param type $params
+     * @return type
+     */
     public function prepareForTable($table, $params)
     {
         $array = array();
@@ -193,13 +200,13 @@ class DatabaseManager extends Database{
             {
                 $this->Table($key);
                 $params = $this->prepareForInsert($table);
-                $queries[] = 'INSERT INTO ' . $key . ' (' . $params['keys'] . ') VALUES (' . $params['values'] . ')';
+                $queries[] = "INSERT INTO {$key} ({$params['keys']}) VALUES ({$params['values']})";
             }
         }
         else
         {
             $params = $this->prepareForInsert($params);
-            $queries[] = 'INSERT INTO ' . $this->queryTable . ' (' . $params['keys'] . ') VALUES (' . $params['values'] . ')';
+            $queries[] = "INSERT INTO {$this->queryTable} ({$params['keys']}) VALUES ({$params['values']})";
         }
 
         $this->queries = $queries;
@@ -221,6 +228,20 @@ class DatabaseManager extends Database{
             ->buildRelationsShipsQuery()
             ->createColumnList();
 
+        $extras = $this->GenerateExtras();
+        $where = $this->GenerateWhereClause($id);
+        $limit = $this->GenerateLimitClause($params);
+        $orderBy = $this->GenerateOrderByClause();
+
+        $this
+            ->SetQuery("SELECT {$extras} {$this->queryColumns} FROM {$this->queryTable} {$this->queryJoinClause} {$where} {$limit} {$orderBy}")
+                ->placeParameters();
+
+        return $this;
+    }
+
+    private function GenerateExtras()
+    {
         $extras = null;
 
         if(is_array($this -> queryExtra))
@@ -231,31 +252,19 @@ class DatabaseManager extends Database{
             }
         }
 
-        $query= "SELECT {$extras} {$this->queryColumns} FROM {$this->queryTable} {$this->queryJoinClause}";
+        return $extras;
+    }
 
-        if (is_array($id))
-        {
-            $params = $this->prepare($id);
+    private function GenerateOrderByClause()
+    {
+        if($this->queryOrderBy)
+            return ' ORDER BY ' . $this->queryOrderBy;
 
-            if(!$params)
-                $this->setError ('Failed to prepare params, check if field exists in table');
+        return null;
+    }
 
-            $query.= ' WHERE ' . $params;
-
-        }
-        else if (is_int($id))
-        {
-            $query.= ' WHERE ' . $this->queryTablePrimaryKey . ' = ' . $id;
-        }
-        else if($this->queryWhere)
-        {
-            $query.= ' WHERE ';
-
-            $params = $this->prepare($this->queryWhere);
-
-            $query.= $params;
-        }
-
+    private function GenerateLimitClause($params)
+    {
         if ($this->isLoopable($params))
         {
             $where = $limit = null;
@@ -272,19 +281,34 @@ class DatabaseManager extends Database{
             $query.= $where . $limit;
         }
 
-        if($this->queryOrderBy)
-            $query.= ' ORDER BY ' . $this->queryOrderBy;
-
         if($this->queryLimit)
             $query.= ' LIMIT ' . $this->queryLimit;
 
-        $this->query = $query;
+        return $query;
+    }
 
-        $this
-            ->placeParameters()
-               ->SetQuery($query);
+    private function GenerateWhereClause($id = null)
+    {
+        if (is_array($id))
+        {
+            $params = $this->prepare($id);
 
-        return $this;
+            if(!$params)
+                $this->setError ('Failed to prepare params, check if field exists in table');
+
+            $query.= ' WHERE ' . $params;
+
+        }
+        else if (is_int($id))
+        {
+            $query.= ' WHERE ' . $this->queryTablePrimaryKey . ' = ' . $id;
+        }
+        else if($this->queryWhere)
+        {
+            $query.= ' WHERE '.$this->prepare($this->queryWhere);
+        }
+
+        return $query;
     }
 
 
@@ -423,6 +447,7 @@ class DatabaseManager extends Database{
     private function placeParameters ( )
     {
         $this -> query = $this ->Variable ($this -> query) ->Replace ($this -> queryParameters) ->GetVariableResult ();
+
         return $this;
     }
 
@@ -447,7 +472,7 @@ class DatabaseManager extends Database{
 
                     if (is_int($value))
                     {
-                        $values .= $this ->filterParam ($value) . ',';
+                        $values .= $value . ',';
                     }
                     else
                     {
@@ -471,14 +496,12 @@ class DatabaseManager extends Database{
      */
     public function Delete($params) {
 
-        $params = $this->prepare($params);
-
-        $sql = 'DELETE FROM `' . $this->queryTable . '` WHERE ' . $params;
+        $sql = 'DELETE FROM `' . $this->queryTable . '` WHERE ' . $this->prepare($params);
 
         if ($this->Query($sql))
             return $this->rowsAffected;
-        else
-            return false;
+
+        return false;
     }
 
     /**
@@ -497,7 +520,7 @@ class DatabaseManager extends Database{
 
         $unquotedString = $this->Variable($this->queryTablePrimaryKey)->Replace( array('`' => '') );
 
-        if (!isset($params[$unquotedString->Replace( array('.' => '__') )]) && !isset($params[$unquotedString->Replace( array('.' => '') )]))
+        if (!isset($params[$unquotedString->Replace( array('.' => '__') )->GetVariableResult()]) && !isset($params[$unquotedString->Replace( array('.' => '') )->GetVariableResult()]))
             return $this->CreateRecord($params);
 
         else

@@ -6,7 +6,7 @@ namespace Application\Core;
  * Author: Wahab Qureshi.
  */
 
-class Variable extends Hooks {
+abstract class Variable extends Hooks {
 
     private
         $variable;
@@ -181,6 +181,20 @@ class Variable extends Hooks {
     public function RemoveDoubleOccuranceOf(array $list) {
 
         foreach ($list as $char) $this->variable = str_replace($char . $char, $char, $this->variable);
+
+        return $this;
+    }
+
+    public function RemoveValue($value)
+    {
+        for($i = 0; $i < count($this->variable); $i++)
+        {
+            if($this->variable[$i] == $value)
+            {
+                unset($this->variable[$i]);
+                $this->variable = array_values($this->variable);
+            }
+        }
 
         return $this;
     }

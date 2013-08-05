@@ -293,7 +293,10 @@ class Bundle extends Console {
 
         $initTemplate = "<?php
 
-Set::Config('BUNDLE_".strtoupper($this->name)."_PATH', \\Get::Config('CORE.BUNDLES_FOLDER') . '{$this->name}');";
+Set::Config('".strtoupper($this->name)."', array(
+    'Path' => \Get::Config('CORE.BUNDLES_FOLDER') . '".strtoupper($this->name)."',
+    'ModelObservers' => array()
+));";
 
         $this->createFile($this->bundleFolder . $this->bundleConfigsFolder . "{$this->name}.Config.php", $initTemplate);
 

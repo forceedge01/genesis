@@ -10,7 +10,11 @@ Set::Route('Error_Route_Not_Found', array(
 Set::Route('Class_Not_Found', array(
 
     'Controller' => ':Errors:ClassNotFound',
-    'Pattern' => '/ClassNotFound/'
+    'Pattern' => '/ClassNotFound/',
+    'Observers' => array(
+        ':Application:Index',
+        ':Application:LogUser'
+    )
 
 ));
 

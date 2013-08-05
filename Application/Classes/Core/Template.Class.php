@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Template extends Router {
+abstract class Template extends Router {
 
     private
             $title,
@@ -591,8 +591,38 @@ class Template extends Router {
                 echo '<div class="error alert">' . $error . '</div>';
             }
 
-            unset($_SESSION['Errors']);
+            $this->ClearErrors();
         }
+    }
+
+    /**
+     * flash all messages set by SetFlash
+     */
+    public function Flashes() {
+
+        if (!empty($_SESSION['FlashMessages']))
+        {
+            foreach ($_SESSION['FlashMessages'] as $message)
+            {
+                echo '<div class="message alert">'  . $message . '</div>';
+            }
+
+            $this->ClearFlashes();
+        }
+    }
+
+    public function ClearFlashes()
+    {
+        unset($_SESSION['FlashMessages']);
+
+        return $this;
+    }
+
+    public function ClearErrors()
+    {
+        unset($_SESSION['Errors']);
+
+        return $this;
     }
 
     public function GetErrors()
@@ -613,22 +643,6 @@ class Template extends Router {
         $this->Errors();
 
         $this->Flashes();
-    }
-
-    /**
-     * flash all messages set by SetFlash
-     */
-    public function Flashes() {
-
-        if (!empty($_SESSION['FlashMessages']))
-        {
-            foreach ($_SESSION['FlashMessages'] as $message)
-            {
-                echo '<div class="message alert">'  . $message . '</div>';
-            }
-
-            unset($_SESSION['FlashMessages']);
-        }
     }
 
     /**

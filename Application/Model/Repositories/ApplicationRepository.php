@@ -9,7 +9,7 @@ use Application\Core\DatabaseManager;
 use Application\Interfaces\Repositories\Repository;
 
 
-class ApplicationRepository extends DatabaseManager implements Repository {
+abstract class ApplicationRepository extends DatabaseManager implements Repository {
 
     protected
             $id,

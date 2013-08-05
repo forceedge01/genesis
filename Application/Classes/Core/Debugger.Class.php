@@ -2,7 +2,7 @@
 
 namespace Application\Core;
 
-class Debugger {
+abstract class Debugger {
 
     private $message, $file, $line, $errorNumber;
 

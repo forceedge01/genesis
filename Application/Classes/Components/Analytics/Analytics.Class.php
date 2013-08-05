@@ -6,9 +6,9 @@ namespace Application\Components;
  * Author: Wahab Qureshi.
  */
 
-use Application\Core\Manager;
+use Application\Core\ObjectManager;
 
-class Analytics extends Manager {
+class Analytics extends ObjectManager {
 
     private
             $connection,
@@ -55,7 +55,7 @@ class Analytics extends Manager {
      * Records a track (visit) from a user.
      */
     public function RecordTrack($OptionalReferenceId = null) {
-        
+
         $this -> setTimedCookie();
 
         if (ANALYTICS_IGNORE_IP_ADDRESS)
@@ -128,11 +128,11 @@ class Analytics extends Manager {
 
         return false;
     }
-    
+
     private function setTimedCookie()
     {
         $session = $this ->GetSessionManager();
-        
+
         if(!$session->GetCookie('VisitAt'))
         {
             $session ->SetCookie('VisitAt', time());
@@ -142,13 +142,13 @@ class Analytics extends Manager {
             $this->resetTime();
         }
     }
-    
+
     private function resetTime()
     {
         $session = $this ->GetSessionManager();
-        
+
         $timeCheck = ANALYTICS_RESET_INTERVAL + $session ->GetCookie('VisistAt');
-        
+
         if($timeCheck > time())
         {
             $session ->SetCookie('VisitAt', time());

@@ -8,7 +8,7 @@ use Application\Core\DatabaseManager;
 use Application\Interfaces\Entities\Entity;
 
 
-class ApplicationEntity extends DatabaseManager implements Entity{
+abstract class ApplicationEntity extends DatabaseManager implements Entity{
 
     protected $tableName;
     public $id;

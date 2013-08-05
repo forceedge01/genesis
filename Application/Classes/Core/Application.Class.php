@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Application extends Template implements Interfaces\Application{
+abstract class Application extends Template implements Interfaces\Application{
 
     private
             $Router,
@@ -36,6 +36,8 @@ class Application extends Template implements Interfaces\Application{
 
             if(\Get::Config('Application.Session.UseAuthComponent'))
             {
+                $auth = $this->GetComponent('Auth');
+
                 // Check for login interval expiration and authorized page view
                 if($session->IsSessionKeySet('login_expires'))
                 {
@@ -63,8 +65,6 @@ class Application extends Template implements Interfaces\Application{
                 // Populate User object with user defined method
                 if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
                 {
-                    $auth = $this->GetComponent('Auth');
-
                     $this->User = $auth->GetUser();
 
                     $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');

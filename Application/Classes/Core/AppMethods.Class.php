@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class AppMethods extends Manager{
+abstract class AppMethods extends ObjectManager{
 
     /**
      *
@@ -186,21 +186,6 @@ class AppMethods extends Manager{
         else $array = $this->DeleteIndex ($array , $key-1);
 
         return $array;
-    }
-
-    public function GetClassFromNameSpacedClass($namespacedClass){
-
-        return substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1);
-    }
-
-    public function GetClassFromNameSpacedController($namespacedClass){
-
-        return str_replace('Controller', '', substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1));
-    }
-
-    public function GetTableNameFromNameSpacedEntity($namespacedClass){
-
-        return str_replace('Repository', '', str_replace('Entity', '', $this->GetClassFromNameSpacedClass($namespacedClass)));
     }
 
     public function ReturnFalse(){

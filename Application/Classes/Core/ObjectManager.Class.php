@@ -3,9 +3,9 @@
 namespace Application\Core;
 
 
-use \Application\Interfaces\Manager as ManagerInterface;
+use \Application\Interfaces\ObjectManager as ObjectManagerInterface;
 
-class Manager extends Variable implements ManagerInterface{
+abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     /**
      *
@@ -13,16 +13,19 @@ class Manager extends Variable implements ManagerInterface{
      * @param mixed $args
      * @return object $this
      * Returns an existing object or creates a new one if it does not exist in the current scope
+     * Loads components config files in Application/Resources/Config folder
      */
     public function GetComponent($object, $args = null) {
 
-        $fullClassPath = '\\Application\\Components\\'.$object;
+        $classNamespace = '\\Application\\Components\\'.$object;
+
+        Loader::LoadComponent($object);
 
         if (!isset($this->$object)) {
 
-            if (class_exists($fullClassPath)) {
-
-                @$this->$object = new $fullClassPath($args);
+            if (class_exists($classNamespace))
+            {
+                @$this->$object = new $classNamespace($args);
             }
             else
             {
@@ -52,18 +55,9 @@ class Manager extends Variable implements ManagerInterface{
 
     public function GetObject($object, $variable, $args = null) {
 
-        if (!isset($this->$variable)) {
-
-            if (class_exists($object)) {
-
-                @$this->$variable = new $object($args);
-            }
-            else
-            {
-                $this
-                    ->SetErrorArgs(__FUNCTION__ ." accepts valid class name only, $object class does not exist.", get_called_class(), 0)
-                    ->ThrowError();
-            }
+        if (!isset($this->$variable))
+        {
+            @$this->$variable = new $object($args);
         }
 
         return $this->$variable;
@@ -185,20 +179,11 @@ class Manager extends Variable implements ManagerInterface{
 
     /**
      *
-     * @return Auth
-     */
-    public function GetAuthManager ( )
-    {
-        return $this ->GetCoreObject('Auth');
-    }
-
-    /**
-     *
      * @return \Application\Components\HTMLGenerator
      */
     public function GetHTMLGenerator ( )
     {
-        return $this ->GetComponent('Variable');
+        return $this ->GetComponent('HTMLGenerator');
     }
 
     /**
@@ -225,7 +210,7 @@ class Manager extends Variable implements ManagerInterface{
      */
     public function GetMailer ( )
     {
-        return $this ->GetComponent('Mail');
+        return $this ->GetComponent('Mailer');
     }
 
     /**
@@ -266,5 +251,25 @@ class Manager extends Variable implements ManagerInterface{
     protected function GetBundleNameSpace($bundle)
     {
         return str_replace('/','\\', $this->GetBundleFromName($bundle));
+    }
+
+    protected function GetClassFromNameSpacedClass($namespacedClass){
+
+        return substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1);
+    }
+
+    protected function GetClassFromNameSpacedController($namespacedClass){
+
+        return str_replace('Controller', '', substr($namespacedClass, (strrpos($namespacedClass, '\\'))+1));
+    }
+
+    protected function GetTableNameFromNameSpacedEntity($namespacedClass){
+
+        return str_replace('Repository', '', str_replace('Entity', '', $this->GetClassFromNameSpacedClass($namespacedClass)));
+    }
+
+    protected function GetClassFromNameSpacedModel($namespacedClass){
+
+        return str_replace('Model', '', $this->GetClassFromNameSpacedClass($namespacedClass));
     }
 }

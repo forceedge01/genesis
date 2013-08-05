@@ -2,7 +2,7 @@
 
 namespace Application\Core;
 
-class Database extends Template {
+abstract class Database extends Template {
 
     private
         $threadId,
@@ -88,6 +88,8 @@ class Database extends Template {
     protected function SetQuery($query)
     {
         $this->query = $query;
+
+        return $this;
     }
 
     /**

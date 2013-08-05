@@ -16,7 +16,8 @@ class Router extends AppMethods{
             $params,
             $Router,
             $ObjectArguments = array(),
-            $pattern;
+            $pattern,
+            $observers;
 
     public static $Route = array(), $LastRoute;
 
@@ -65,6 +66,70 @@ class Router extends AppMethods{
         return preg_replace($pattern, '', $url);
     }
 
+    private function CheckIfUnderDevelopment()
+    {
+        if(\Get::Config('Application.Environment.UnderDevelopmentPage.State'))
+        {
+            if(!$this->Variable(getenv('REMOTE_ADDR'))->Has(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
+            {
+                $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
+                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
+            }
+        }
+
+        return $this;
+    }
+
+    private function CheckRouteMethod($method)
+    {
+        if($method)
+        {
+            $error = false;
+
+            if($this->IsLoopable($method))
+            {
+                if(strtoupper($method['Type']) != getenv('REQUEST_METHOD'))
+                {
+                    if(isset($method['Message']))
+                    {
+                        if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
+                        {
+                            $this->GetCoreObject('Template')->SetError($method['Message']);
+                            $this->ForwardTo($this->lastRoute);
+                        }
+                    }
+
+                    $error = true;
+                }
+            }
+            else if(strtoupper($method) != getenv('REQUEST_METHOD'))
+            {
+                $error = true;
+            }
+
+            if($error)
+                $this
+                    ->SetErrorArgs('Access request denied', 'Router', '0')
+                        ->ThrowException();
+        }
+
+        return $this;
+    }
+
+    private function CheckRouteRequirements($requirements)
+    {
+        $this->ValidateVariables($requirements);
+
+        return $this;
+    }
+
+    private function CheckRouteInjections($inject)
+    {
+        $this->ObjectArguments = $inject;
+
+        return $this;
+    }
+
     /**
      *
      * @return boolean - true on success, false on failure<br />
@@ -74,14 +139,7 @@ class Router extends AppMethods{
 
         $value = array();
 
-        if(\Get::Config('Application.Environment.UnderDevelopmentPage.State'))
-        {
-            if(!$this->Variable(getenv('REMOTE_ADDR'))->Has(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
-            {
-                $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
-                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
-            }
-        }
+        $this->CheckIfUnderDevelopment();
 
         $this->funcVariables = array();
 
@@ -94,41 +152,16 @@ class Router extends AppMethods{
                 $this->lastRoute = $key;
 
                 if(isset($value['Method']))
-                {
-                    $error = false;
-
-                    if($this->IsLoopable($value['Method']))
-                    {
-                        if(strtoupper($value['Method']['Type']) != getenv('REQUEST_METHOD'))
-                        {
-                            if(isset($value['Method']['Message']))
-                            {
-                                if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
-                                {
-                                    $this->GetCoreObject('Template')->SetError($value['Method']['Message']);
-                                    $this->ForwardTo($this->lastRoute);
-                                }
-                            }
-
-                            $error = true;
-                        }
-                    }
-                    else if(strtoupper($value['Method']) != getenv('REQUEST_METHOD'))
-                    {
-                        $error = true;
-                    }
-
-                    if($error)
-                        $this
-                            ->SetErrorArgs('Access request denied', 'Router', '0')
-                                ->ThrowException();
-                }
+                    $this->CheckRouteMethod($value['Method']);
 
                 if(isset($value['Requirements']))
-                    $this->ValidateVariables($value['Requirements']);
+                    $this->CheckRouteRequirements ($value['requirements']);
 
                 if(isset($value['Inject']))
-                    $this->ObjectArguments = $value['Inject'];
+                    $this->CheckRouteInjections ($value['Inject']);
+
+                if(isset($value['Observers']))
+                    $this->CheckRouteObservers ($value['Observers']);
 
                 $controllerAction = explode(':', $value['Controller']);
 
@@ -139,6 +172,13 @@ class Router extends AppMethods{
         }
 
         return false;
+    }
+
+    private function CheckRouteObservers($observers)
+    {
+        $this->observers = $observers;
+
+        return $this;
     }
 
     private function ValidateVariables($requirement)
@@ -322,6 +362,8 @@ class Router extends AppMethods{
      */
     private function CallAction($objectName, $objectAction, array $variable = array())
     {
+        $return = $controller = null;
+
         if(!empty($variable))
             $this->funcVariables = $variable;
 
@@ -371,16 +413,27 @@ class Router extends AppMethods{
 
         if(sizeof($this->funcVariables) != 0)
         {
-            call_user_func_array (array($controller, $objectAction) , $this->funcVariables);
+            $return = call_user_func_array (array($controller, $objectAction) , $this->funcVariables);
         }
         else
         {
-            call_user_func (array($controller, $objectAction));
+            $return = call_user_func (array($controller, $objectAction));
         }
+
+        $this->NotifyObservers($return);
 
         unset($controller);
 
         die();
+    }
+
+    private function NotifyObservers($callBackReturn)
+    {
+        if($this->IsLoopable($this->observers))
+            foreach($this->observers as $observer)
+            {
+
+            }
     }
 
     /**

@@ -62,6 +62,12 @@ class Loader{
         );
     }
 
+    public static function LoadEvents($class)
+    {
+        $bundle = \Get::Config('CORE.BUNDLES_FOLDER') . trim(str_replace('\\', '/', $class), '/');
+        self::LoadFilesFromDir($bundle.'/Events');
+    }
+
     public static function FetchAllBundles(){
 
         // Include your bundles here
@@ -87,6 +93,7 @@ class Loader{
             'Variable.Class.php',
             'ObjectManager.Class.php',
             'AppMethods.Class.php',
+            'EventHandler.Class.php',
             'Request.Class.php',
             'Response.Class.php',
             'Router.Class.php',
@@ -96,6 +103,7 @@ class Loader{
             'Database.Class.php',
             'DatabaseManager.Class.php',
             'Session.Class.php',
+            'EventDispatcher.Class.php'
         );
 
         foreach($classes as $class){

@@ -5,10 +5,10 @@ namespace Application\Models;
 
 
 use Application\Interfaces\Models\Model;
-use Application\Core\AppMethods;
+use Application\Core\EventHandler;
 
 
-abstract class ApplicationModel extends AppMethods implements Model{
+abstract class ApplicationModel extends EventHandler implements Model{
 
     protected $entityObject, $observers;
 
@@ -17,32 +17,6 @@ abstract class ApplicationModel extends AppMethods implements Model{
         $this->BeforeModelHook();
         $this->entityObject = $entityObject;
         $this->observers = \Get::Config($this->GetClassFromNameSpacedModel(get_called_class()).'.ModelObservers');
-    }
-
-    protected function Attach($observer)
-    {
-        $this->observers[] = (is_object($observer)) ? get_class($observer) : $observer;
-    }
-
-    protected function Detach($observer)
-    {
-        $unset = (is_object($observer)) ? get_class($observer) : $observer;
-        $this->observers = $this->Variable($this->observers)->RemoveValue($unset)->GetVariableResult();
-
-        return $this;
-    }
-
-    protected function Nofity($event, $args = null)
-    {
-        $event .= 'Handler';
-
-        foreach($this->observers as $observer)
-        {
-            $model = $this->GetModel($observer);
-            (method_exists($model, $event)) ? $model->$event($args) : null;
-        }
-
-        return $this;
     }
 
     protected function __destruct()

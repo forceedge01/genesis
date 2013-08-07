@@ -176,7 +176,7 @@ class Router extends AppMethods{
 
     private function CheckRouteObservers($observers)
     {
-        $this->observers = $observers;
+        EventDispatcher::$observers = $observers;
 
         return $this;
     }

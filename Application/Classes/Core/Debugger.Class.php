@@ -15,7 +15,7 @@ abstract class Debugger {
      * @param void $var - variable you want to dump to screen
      * Will dump the variable on screen in readable format.
      */
-    public function pre() {
+    public static function pre() {
 
         $args = func_get_args();
         echo '<pre>';
@@ -29,7 +29,7 @@ abstract class Debugger {
      * @param void $var - variable you want to dump to screen
      * Will dump the variable on screen in readable format and then stop execution.
      */
-    public function prex() {
+    public static function prex() {
 
         $args = func_get_args();
         foreach ($args as $var)
@@ -241,7 +241,7 @@ abstract class Debugger {
     public function SetErrorArgs($message, $file, $line, $errorNumber = 0)
     {
         $this->message = $message;
-        $this->file = $file;
+        $this->file = ($file) ? $file : get_called_class();
         $this->line = $line;
         $this->errorNumber = $errorNumber;
 

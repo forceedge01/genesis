@@ -272,4 +272,28 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
         return str_replace('Model', '', $this->GetClassFromNameSpacedClass($namespacedClass));
     }
+
+    public static function GetNamespaceFromFilePath($filePath)
+    {
+        $replace = array(
+            \Get::Config('CORE.SOURCE_FOLDER') => '\\',
+            '/' => '\\',
+            '.php' => ''
+        );
+
+        foreach($replace as $key => $re)
+            $filePath = str_replace($key, $re, $filePath);
+
+        return $filePath;
+    }
+
+    public static function GetNamespaceFromMultipleFiles($files)
+    {
+        $result = array();
+
+        foreach($files as $file)
+            $result[] = self::GetNamespaceFromFilePath ($file);
+
+        return $result;
+    }
 }

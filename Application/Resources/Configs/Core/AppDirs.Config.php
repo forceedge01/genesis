@@ -41,6 +41,7 @@ define('ROOT', __DIR__ . '/../../../../');
         'BUNDLE_CONTROLLERS' => '/Controllers/',
         'BUNDLE_ROUTES' => '/Resources/Routes/',
         'BUNDLE_VIEWS' => '/Resources/Views/',
+        'BUNDLE_EVENTS' => '/Events/',
         'BUNDLE_TESTS' => '/Tests/',
         'BUNDLE_VIEW_HEADER_FILE' => 'Header.html.php',
         'BUNDLE_VIEW_FOOTER_FILE' => 'Footer.html.php',

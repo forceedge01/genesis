@@ -6,6 +6,9 @@ namespace Application\Core;
 
 class Cache extends AppMethods{
 
+    private function __construct() {}
+    private function __clone() {}
+
     public static function CheckForCachedFile($pattern)
     {
         $file = str_replace('//', '/', \Get::Config('CORE.CACHE_FOLDER') . $pattern . '/index.html');

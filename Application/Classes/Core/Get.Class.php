@@ -2,6 +2,9 @@
 
 class Get{
 
+    private function __construct() {}
+    private function __clone() {}
+
     /**
      *
      * @param mixed any number of params

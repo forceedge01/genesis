@@ -11,19 +11,20 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
 
     public static $observers;
 
-    public static function Dispatch($event, $args, $class)
+    public static function Dispatch($event, $args, $bundle)
     {
-        Loader::LoadEvents(get_class($class));
+        $events = self::GetNamespaceFromMultipleFiles(Loader::LoadEvents($bundle));
+        self::$observers = (is_array(self::$observers)) ? array_merge(self::$observers, $events) : $events;
         $eventHandler = $event.'Handler';
 
         foreach(self::$observers as $observer)
         {
             if(!class_exists($observer))
-                $this->SetErrorArgs ("Class $observer does not exist, cannot run event.", '', __LINE__)->ThrowError();
+                echo "Class $observer does not exist, cannot run event.", __CLASS__.'::'.__FUNCTION__, __LINE__;
 
             if(method_exists($observer, $eventHandler))
             {
-                $event = new $observer;
+                $event = new $observer();
                 $event->$eventHandler($args);
             }
         }

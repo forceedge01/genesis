@@ -62,10 +62,16 @@ class Loader{
         );
     }
 
-    public static function LoadEvents($class)
+    public static function LoadEvents($bundle)
     {
-        $bundle = \Get::Config('CORE.BUNDLES_FOLDER') . trim(str_replace('\\', '/', $class), '/');
-        self::LoadFilesFromDir($bundle.'/Events');
+        $bundle = \Get::Config('CORE.BUNDLES_FOLDER') . $bundle;
+        return self::LoadFilesFromDir($bundle.'/Events');
+    }
+
+    public static function LoadEvent($class)
+    {
+        $event = \Get::Config('CORE.BUNDLES_FOLDER') . trim(str_replace('\\', '/', $class));
+        require_once $event;
     }
 
     public static function FetchAllBundles(){
@@ -233,6 +239,8 @@ class Loader{
      */
     protected static function LoadFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
+        $loadedFiles = array();
+
         if(is_dir($directory)){
 
             $files = scandir($directory);
@@ -243,7 +251,7 @@ class Loader{
 
                 if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
-                    self::$LoadedFiles[] = $filepath;
+                    $loadedFiles[] = self::$LoadedFiles[] = $filepath;
                     require $filepath;
                 }
                 else if($subdirectories)
@@ -256,7 +264,7 @@ class Loader{
             }
         }
 
-        return true;
+        return $loadedFiles;
     }
 
     /**

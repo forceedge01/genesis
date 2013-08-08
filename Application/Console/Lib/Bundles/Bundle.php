@@ -28,6 +28,7 @@ class Bundle extends Console {
             $bundleRoutesFolder,
             $bundleHeaderFileName,
             $bundleFooterFileName,
+            $bundleEventsFolder,
             $bundleNamespace,
             $bundleDirInAssets;
 
@@ -44,6 +45,7 @@ class Bundle extends Console {
         $this->bundleConfigsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS');
         $this->bundleInterfacesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES');
         $this->bundleRoutesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES');
+        $this->bundleEventsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_EVENTS');
         $this->bundleHeaderFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
         $this->bundleFooterFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
     }
@@ -133,6 +135,7 @@ class Bundle extends Console {
                 ->createController()
                 ->createEntity()
                 ->createModel()
+                ->createEvent()
                 ->createViews()
                 ->createTests();
 
@@ -311,7 +314,7 @@ Set::Config('".strtoupper($this->name)."', array(
 
         $initEntity = "<?php
 
-namespace Bundles\\{$this->name}\\Entities;
+namespace Bundles\\{$this->bundleNamespace}\\Entities;
 
 
 
@@ -328,7 +331,7 @@ final class {$this->name}Entity extends ApplicationEntity {
 
         $initRepository = "<?php
 
-namespace Bundles\\{$this->name}\\Repositories;
+namespace Bundles\\{$this->bundleNamespace}\\Repositories;
 
 
 
@@ -352,7 +355,7 @@ final class {$this->name}Repository extends ApplicationRepository implements {$t
 
         $Model = "<?php
 
-namespace Bundles\\{$this->name}\\Models;
+namespace Bundles\\{$this->bundleNamespace}\\Models;
 
 
 
@@ -390,6 +393,34 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
         $this->createFile($this->bundleFolder . $this->bundleDatabaseFolder . "{$this->name}Model.php", $Model);
 
         return $this;
+    }
+
+    private function createEvent()
+    {
+        $event = "<?php
+
+namespace Bundles\\{$this->bundleNamespace}\\Events;
+
+
+
+/**
+ * Events provide an elegant way of placing decoupled code. Using these are highly recommended.
+ */
+class {$this->name}Events{
+
+    /**
+     * This method will fire if the EventHandlers Notify method is fires with the event being {$this->name}
+     */
+    public function {$this->name}Handler()
+    {
+
+    }
+}";
+
+        $this->createFile($this->bundleFolder . $this->bundleEventsFolder . "{$this->name}Event.php", $event);
+
+        return $this;
+
     }
 
     private function createViews(){
@@ -466,7 +497,7 @@ final class {$this->name}Model implements {$this->name}ModelInterface{
 
         $initControllerInterface = "<?php
 
-namespace Bundles\\{$this->name}\\Interfaces;
+namespace Bundles\\{$this->bundleNamespace}\\Interfaces;
 
 
 /**
@@ -552,7 +583,7 @@ interface {$this->name}ControllerInterface {
 
         $initControllerInterface = "<?php
 
-namespace Bundles\\{$this->name}\\Interfaces;
+namespace Bundles\\{$this->bundleNamespace}\\Interfaces;
 
 
 
@@ -571,7 +602,7 @@ interface {$this->name}RepositoryInterface {
 
         $initControllerInterface = "<?php
 
-namespace Bundles\\{$this->name}\\Interfaces;
+namespace Bundles\\{$this->bundleNamespace}\\Interfaces;
 
 
 
@@ -629,13 +660,13 @@ interface {$this->name}ModelInterface {
 
         $initController = "<?php
 
-namespace Bundles\\{$this->name}\\Controllers;
+namespace Bundles\\{$this->bundleNamespace}\\Controllers;
 
 
 
-use \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity;
-use \\Bundles\\{$this->name}\\Models\\{$this->name}Model;
-use \\Bundles\\{$this->name}\\Interfaces\\{$this->name}ControllerInterface;
+use \\Bundles\\{$this->bundleNamespace}\\Entities\\{$this->name}Entity;
+use \\Bundles\\{$this->bundleNamespace}\\Models\\{$this->name}Model;
+use \\Bundles\\{$this->bundleNamespace}\\Interfaces\\{$this->name}ControllerInterface;
 
 // Controller is responsible for the interactions between a model and a template
 
@@ -857,7 +888,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
         $initController = "<?php
 
-namespace Bundles\\{$this->name}\\Controllers;
+namespace Bundles\\{$this->bundleNamespace}\\Controllers;
 
 
 
@@ -952,7 +983,7 @@ Set::Config('{$this->name}Testing', array());";
 
         $initTests = "<?php
 
-namespace Bundles\\{$this->name}\\Tests;
+namespace Bundles\\{$this->bundleNamespace}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -978,7 +1009,7 @@ class Test{$this -> name}Controller extends WebTestCase
 
         $initTests = "<?php
 
-namespace Bundles\\{$this->name}\\Tests;
+namespace Bundles\\{$this->bundleNamespace}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -1004,7 +1035,7 @@ class Test{$this -> name}Entity extends BaseTestingRoutine
 
         $initTests = "<?php
 
-namespace Bundles\\{$this->name}\\Tests;
+namespace Bundles\\{$this->bundleNamespace}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -1029,7 +1060,7 @@ class Test{$this -> name}Repository extends BaseTestingRoutine
 
         $initTests = "<?php
 
-namespace Bundles\\{$this->name}\\Tests;
+namespace Bundles\\{$this->bundleNamespace}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
@@ -1065,7 +1096,7 @@ class Test{$this -> name}Templates extends TemplateTestCase
 
         $initTests = "<?php
 
-namespace Bundles\\{$this->name}\\Tests;
+namespace Bundles\\{$this->bundleNamespace}\\Tests;
 
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 

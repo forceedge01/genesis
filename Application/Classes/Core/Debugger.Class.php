@@ -6,7 +6,8 @@ abstract class Debugger {
 
     private $message, $file, $line, $errorNumber;
 
-    public function __construct() {
+    private function __construct()
+    {
         ini_set('error_reporting', E_ALL);
     }
 
@@ -33,7 +34,7 @@ abstract class Debugger {
 
         $args = func_get_args();
         foreach ($args as $var)
-            $this->pre($var);
+            self::pre($var);
         exit;
     }
 
@@ -246,5 +247,10 @@ abstract class Debugger {
         $this->errorNumber = $errorNumber;
 
         return $this;
+    }
+
+    public static function ThrowStaticError($message, $file, $line)
+    {
+        $this->SetErrorArgs($message, $file, $line)->ThrowError();
     }
 }

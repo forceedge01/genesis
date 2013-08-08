@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Router extends AppMethods{
+class Router extends EventHandler{
 
     private
             $url,

@@ -11,12 +11,6 @@ abstract class Variable extends Hooks {
     private
         $variable;
 
-    public function __construct($variable = null) {
-
-        $this -> variable = $variable;
-        return $this;
-    }
-
     public function Variable($var) {
 
         $this->variable = $var;

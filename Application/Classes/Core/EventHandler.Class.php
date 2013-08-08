@@ -22,8 +22,9 @@ abstract class EventHandler extends AppMethods implements EventHandlerInterface{
         return $this;
     }
 
-    public function Notify($event, $args)
+    public function Notify($event, $args = null)
     {
-        EventDispatcher::Dispatch($event, $args, get_called_class());
+        $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController(get_called_class()));
+        EventDispatcher::Dispatch($event, $args, $bundle);
     }
 }

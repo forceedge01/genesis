@@ -109,7 +109,8 @@ class Loader{
             'Database.Class.php',
             'DatabaseManager.Class.php',
             'Session.Class.php',
-            'EventDispatcher.Class.php'
+            'EventDispatcher.Class.php',
+            'Events.Class.php'
         );
 
         foreach($classes as $class){

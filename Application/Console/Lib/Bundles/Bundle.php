@@ -403,10 +403,12 @@ namespace Bundles\\{$this->bundleNamespace}\\Events;
 
 
 
+use Application\Core\AppMethods;
+
 /**
  * Events provide an elegant way of placing decoupled code. Using these are highly recommended.
  */
-class {$this->name}Events{
+class {$this->name}Events extends AppMethods{
 
     /**
      * This method will fire if the EventHandlers Notify method is fires with the event being {$this->name}

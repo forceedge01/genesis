@@ -13,8 +13,7 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
 
     public static function Dispatch($event, $args, $bundle)
     {
-        $events = self::GetNamespaceFromMultipleFiles(Loader::LoadEvents($bundle));
-        self::$observers = (is_array(self::$observers)) ? array_merge(self::$observers, $events) : $events;
+        self::$observers = self::GetObservers($bundle);
         $eventHandler = $event.'Handler';
 
         foreach(self::$observers as $observer)
@@ -28,5 +27,11 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
                 $event->$eventHandler($args);
             }
         }
+    }
+
+    public static function GetObservers($bundle)
+    {
+        $events = self::GetNamespaceFromMultipleFiles(Loader::LoadEvents($bundle));
+        return (is_array(self::$observers)) ? array_merge(self::$observers, $events) : $events;
     }
 }

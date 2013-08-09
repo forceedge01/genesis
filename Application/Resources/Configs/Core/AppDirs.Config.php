@@ -4,7 +4,7 @@
 
 // Core folder paths
 
-define('HOST', 'http://localhost/GENESIS/');
+define('HOST', 'http://localhost:8765/');
 define('ROOT', __DIR__ . '/../../../../');
 
 \Set::Config('CORE', array(

@@ -35,19 +35,19 @@ class Bundle extends Console {
     public function __construct($type) {
 
         $this->renderMethod = $type;
-        $this->bundleSourceFolder = \Get::Config('CORE.BUNDLES_FOLDER');
-        $this->AssetsFolder = \Get::Config('CORE.TEMPLATING.ASSETS_FOLDER');
-        $this->bundleAssetsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ASSETS_FOLDER');
-        $this->bundleTestsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_TESTS');
-        $this->bundleViewsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS');
-        $this->bundleControllersFolder = \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS');
-        $this->bundleDatabaseFolder = \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES');
-        $this->bundleConfigsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS');
-        $this->bundleInterfacesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES');
-        $this->bundleRoutesFolder = \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES');
-        $this->bundleEventsFolder = \Get::Config('CORE.BUNDLES.BUNDLE_EVENTS');
-        $this->bundleHeaderFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
-        $this->bundleFooterFileName = \Get::Config('CORE.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
+        $this->bundleSourceFolder = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER');
+        $this->AssetsFolder = \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER');
+        $this->bundleAssetsFolder = \Get::Config('APPDIRS.BUNDLES.ASSETS_FOLDER');
+        $this->bundleTestsFolder = \Get::Config('APPDIRS.BUNDLES.TESTS');
+        $this->bundleViewsFolder = \Get::Config('APPDIRS.BUNDLES.VIEWS');
+        $this->bundleControllersFolder = \Get::Config('APPDIRS.BUNDLES.CONTROLLERS');
+        $this->bundleDatabaseFolder = \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES');
+        $this->bundleConfigsFolder = \Get::Config('APPDIRS.BUNDLES.CONFIG');
+        $this->bundleInterfacesFolder = \Get::Config('APPDIRS.BUNDLES.INTERFACES');
+        $this->bundleRoutesFolder = \Get::Config('APPDIRS.BUNDLES.ROUTES');
+        $this->bundleEventsFolder = \Get::Config('APPDIRS.BUNDLES.EVENTS');
+        $this->bundleHeaderFileName = \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
+        $this->bundleFooterFileName = \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
     }
 
     private function createConsoleInit()
@@ -297,8 +297,8 @@ class Bundle extends Console {
         $initTemplate = "<?php
 
 Set::Config('".strtoupper($this->name)."', array(
-    'Path' => \Get::Config('CORE.BUNDLES_FOLDER') . '".strtoupper($this->name)."',
-    'ModelObservers' => array()
+    'Path' => \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . '".strtoupper($this->name)."',
+    'Observers' => array()
 ));";
 
         $this->createFile($this->bundleFolder . $this->bundleConfigsFolder . "{$this->name}.Config.php", $initTemplate);

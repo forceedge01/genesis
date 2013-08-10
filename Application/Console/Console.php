@@ -351,8 +351,8 @@ class Console {
 
             case 'cache':
             {
-                require_once \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Core/Debugger.Class.php';
-                require_once \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER') . 'Directory/Directory.Class.php';
+                require_once \Get::Config('APPDIRS.CORE.LIB_FOLDER') . 'Debugger.Class.php';
+                require_once \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER') . 'Directory/Directory.Class.php';
 
                 $cache = new Cache();
                 switch($args[1])

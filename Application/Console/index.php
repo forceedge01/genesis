@@ -1,9 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../Loader.php';
-require_once __DIR__ . '/../Classes/Core/Set.Class.php';
-require_once __DIR__ . '/../Classes/Core/Get.Class.php';
-require_once __DIR__ . '/../Resources/Configs/Console/Console.Config.php';
+require_once __DIR__ . '/../Core/Lib/Set.Class.php';
+require_once __DIR__ . '/../Core/Lib/Get.Class.php';
+require_once __DIR__ . '/Config/Console.Config.php';
 
 if(!\Get::Config('Console.ALLOW_CONSOLE_FROM_BROWSER') and isset($_SERVER['SERVER_NAME']))
 {

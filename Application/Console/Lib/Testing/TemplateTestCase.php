@@ -13,11 +13,11 @@ class TemplateTestCase extends BaseTestingRoutine{
 
         if ($templateParams[0] != null)
         {
-            return str_replace('//', '/', \Get::Config('CORE.BUNDLES_FOLDER') . $templateParams[0] . \Get::Config('CORE.BUNDLES.BUNDLE_VIEWS') .'ControllerViews/' . $templateParams[1]);
+            return str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $templateParams[0] . \Get::Config('APPDIRS.BUNDLES.VIEWS') .'ControllerViews/' . $templateParams[1]);
         }
         else
         {
-            return str_replace('//', '/', \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . $templateParams[1] );
+            return str_replace('//', '/', \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . $templateParams[1] );
         }
     }
 

@@ -3,9 +3,9 @@
 namespace Application\Core;
 
 require_once __DIR__ . '/Loader.php';
-require_once __DIR__ . '/Classes/Core/Set.Class.php';
-require_once __DIR__ . '/Resources/Configs/Core/AppDirs.Config.php';
-require_once __DIR__ . '/Classes/Core/Get.Class.php';
+require_once __DIR__ . '/Core/Lib/Set.Class.php';
+require_once __DIR__ . '/Core/Config/AppDirs.Config.php';
+require_once __DIR__ . '/Core/Lib/Get.Class.php';
 
 class AppKernal extends Loader{
 

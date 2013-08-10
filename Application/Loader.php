@@ -25,7 +25,7 @@ class Loader{
 
     public static function LoadClass($class)
     {
-        $path = \Get::Config('CORE.SOURCE_FOLDER') . str_replace('\\','/', $class) . '.php';
+        $path = \Get::Config('APPDIRS.SOURCE_FOLDER') . str_replace('\\','/', $class) . '.php';
 
         if(is_file($path))
         {
@@ -39,13 +39,13 @@ class Loader{
 
     public static function LoadComponent($component)
     {
-        self::LoadOnceFromDir(\Get::Config('CORE.APPLICATION_CONFIGS_FOLDER') . 'Components/' . $component, array('php'));
-
-        $loaderFile = \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER') . $component . '/Loader.php';
+        $baseFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
+        self::LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
+        $loaderFile = $baseFolder . $component . '/Loader.php';
 
         if(is_file($loaderFile))
         {
-            require_once \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER') . $component . '/Loader.php';
+            require_once $baseFolder . $component . '/Loader.php';
         }
         else
         {
@@ -64,13 +64,13 @@ class Loader{
 
     public static function LoadEvents($bundle)
     {
-        $bundle = \Get::Config('CORE.BUNDLES_FOLDER') . $bundle;
+        $bundle = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle;
         return self::LoadFilesFromDir($bundle.'/Events');
     }
 
     public static function LoadEvent($class)
     {
-        $event = \Get::Config('CORE.BUNDLES_FOLDER') . trim(str_replace('\\', '/', $class));
+        $event = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . trim(str_replace('\\', '/', $class));
         require_once $event;
     }
 
@@ -82,7 +82,7 @@ class Loader{
 
         // Do not edit below this line
 
-        $bundlesDIR = \Get::Config('CORE.BUNDLES_FOLDER');
+        $bundlesDIR = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER');
 
         foreach($bundles as $bundle){
 
@@ -110,7 +110,6 @@ class Loader{
             'DatabaseManager.Class.php',
             'Session.Class.php',
             'EventDispatcher.Class.php',
-            'Events.Class.php'
         );
 
         foreach($classes as $class){
@@ -131,9 +130,9 @@ class Loader{
         self::$files = array();
 
         if($staticVar == 'classes')
-            self::$$staticVar = self::FetchAllClasses ($dir);
+            self::$$staticVar = array_merge(self::$$staticVar, self::FetchAllClasses ($dir));
         else
-            self::$$staticVar = self::FetchAll($dir);
+            self::$$staticVar = array_merge(self::$$staticVar, self::FetchAll($dir));
 
         foreach(self::$$staticVar as $file)
             require_once $file;
@@ -188,9 +187,9 @@ class Loader{
         foreach(self::$bundles as $bundle){
 
             if(is_dir($bundle)){
-
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_ROUTES'), array('php'));
+                
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONFIG'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.ROUTES'), array('php'));
 //                self::LoadFilesFromDir($bundle, array('php'), false);
 //                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
 //                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
@@ -200,7 +199,7 @@ class Loader{
 
                 $params['Backtrace'] = debug_backtrace();
                 $message = ' not found in Loader::LoadBundles()';
-                require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
+                require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
                 die();
 
@@ -211,21 +210,20 @@ class Loader{
 
     public static function LoadBundle($bundle)
     {
-        $bundle = str_replace('//', '/', \Get::Config('CORE.BUNDLES_FOLDER') . $bundle);
+        $bundle = str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
 
         if(is_dir($bundle))
         {
-//            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONFIGS'), array('php'));
             self::LoadFilesFromDir($bundle, array('php'), false);
-            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
-            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
-            self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
+            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
         }
         else
         {
             $params['Backtrace'] = debug_backtrace();
             $message = ' not found in Loader::LoadBundle()';
-            require \Get::Config('CORE.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
+            require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
             trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
             die();
         }
@@ -356,19 +354,15 @@ class Loader{
 
     public static function LoadFramework()
     {
-//        self::$environment = $environment;
-
-//        if($environment == 'development')
-//            self::LoadDevelopment('configs', \Get::Config('CORE.APPLICATION_CONFIGS_FOLDER'));
-//        else
-        self::Load('configs', \Get::Config('CORE.APPLICATION_CONFIGS_FOLDER').'Core/');
-        self::Load('interfaces', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Interfaces/');
-        self::Load('traits', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Traits/');
-        self::Load('classes', \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Core/');
+        self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
+        self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
+        self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
+        self::Load('classes', \Get::Config('APPDIRS.CORE.LIB_FOLDER'));
 //        self::Load('components', \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER'));
-        self::Load('routes', \Get::Config('CORE.APPLICATION_ROUTES_FOLDER'));
-        self::Load('models', \Get::Config('CORE.APPLICATION_MODELS_FOLDER'));
-        self::Load('controllers', \Get::Config('CORE.APPLICATION_CONTROLLERS_FOLDER'));
+        self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
+        self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
+        self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
+        self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
         self::LoadBundles();
     }
 
@@ -391,7 +385,7 @@ class Loader{
     public static function LoadClassesAndComponentsTestFiles()
     {
         self::$LoadedFiles = array();
-        self::LoadFilesFromDir(\Get::Config('CORE.APPLICATION_TESTS_FOLDER'), array('php')) ;
+        self::LoadFilesFromDir(\Get::Config('APPDIRS.APPLICATION_TESTS_FOLDER'), array('php')) ;
 
         return self::$LoadedFiles;
     }
@@ -405,7 +399,7 @@ class Loader{
             if(is_dir($bundle)){
 
                 $testBundles[] = $bundle;
-                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_TESTS'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.TESTS'), array('php'));
             }
         }
 

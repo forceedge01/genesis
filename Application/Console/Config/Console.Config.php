@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Core/Config/AppDirs.Config.php';
+require_once __DIR__ . '/../../Core/Config/AppDirs.Config.php';
 
 \Set::Config('Console', array(
     'ROOT' => \Get::Config('APPDIRS.APPLICATION_FOLDER') . 'Console',

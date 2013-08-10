@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-abstract class Template extends Router {
+class Template extends Router {
 
     private
             $title,

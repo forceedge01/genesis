@@ -95,8 +95,12 @@ class Router extends EventHandler{
                     {
                         if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
                         {
-                            $this->GetCoreObject('Template')->SetError($method['Message']);
-                            $this->ForwardTo($this->lastRoute);
+                            $this->GetCoreObject('Template')->SetError($method['Message'])->ForwardTo($this->lastRoute);
+                        }
+
+                        if(isset($method['Fallback']))
+                        {
+                            $this->GetCoreObject('Template')->SetError($method['Message'])->ForwardTo($method['FallbackRoute']);
                         }
                     }
 
@@ -156,7 +160,7 @@ class Router extends EventHandler{
                     $this->CheckRouteMethod($value['Method']);
 
                 if(isset($value['Requirements']))
-                    $this->CheckRouteRequirements ($value['requirements']);
+                    $this->CheckRouteRequirements ($value['Requirements']);
 
                 if(isset($value['Inject']))
                     $this->CheckRouteInjections ($value['Inject']);

@@ -6,7 +6,7 @@ namespace Application\Core;
 
 class Loader{
 
-    protected static
+    public static
             $classes = array() ,
             $configs = array() ,
             $controllers = array() ,
@@ -186,17 +186,19 @@ class Loader{
 
         foreach(self::$bundles as $bundle){
 
-            if(is_dir($bundle)){
-                
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONFIG'), array('php'));
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.ROUTES'), array('php'));
-//                self::LoadFilesFromDir($bundle, array('php'), false);
-//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_INTERFACES'), array('php'));
-//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_CONTROLLERS'), array('php'));
-//                self::LoadFilesFromDir($bundle . \Get::Config('CORE.BUNDLES.BUNDLE_DATABASE_FILES'), array('php'));
+            if(is_dir($bundle))
+            {
+                self::$configs = array_merge(
+                        self::$configs,
+                        self::LoadFilesFromDir(self::RemoveDoubleSlash($bundle . \Get::Config('APPDIRS.BUNDLES.CONFIG')), array('php'))
+                        );
+                self::$routes = array_merge(
+                        self::$routes,
+                        self::LoadFilesFromDir(self::RemoveDoubleSlash($bundle . \Get::Config('APPDIRS.BUNDLES.ROUTES')), array('php'))
+                        );
             }
-            else{
-
+            else
+            {
                 $params['Backtrace'] = debug_backtrace();
                 $message = ' not found in Loader::LoadBundles()';
                 require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
@@ -206,6 +208,11 @@ class Loader{
             }
         }
 
+    }
+
+    protected static function RemoveDoubleSlash($string)
+    {
+        return str_replace('//', '/', $string);
     }
 
     public static function LoadBundle($bundle)

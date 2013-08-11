@@ -523,25 +523,21 @@ class Router extends EventHandler{
         else
             $this->SetPattern ();
 
-        foreach(self::$Route as $routeKey => $routes){
+        foreach(self::$Route as $routeKey => $routes)
+        {
+            if($this->ExtractVariable($routes['Pattern']) == $this->pattern)
+            {
+                $this->route = $routeKey;
+                $this->routePattern = $pattern;
+                unset($_SESSION['routeError']);
 
-                if($routes['Pattern'] == $this->pattern){
-
-                    $this->route = $routeKey;
-
-                    $this->routePattern = $pattern;
-
-                    unset($_SESSION['routeError']);
-
-                    return $this->route;
-                }
+                return $this->route;
+            }
         }
 
         $error = array(
-
             'Pattern' => $this->pattern,
             'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
-
         );
 
         $this->ForwardToController('Error_Route_Not_Found', $error);

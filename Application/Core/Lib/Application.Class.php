@@ -140,7 +140,7 @@ abstract class Application extends Template implements Interfaces\Application{
     {
         if($this->Variable(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs'))->Search(getenv('REMOTE_ADDR')) === false)
         {
-            die('This page is under development, please check back later');
+            $this->Render(':UnderDevelopment/PageUnderDevelopment.html.php', 'This page is temporarily unavailable');
         }
     }
 }

@@ -26,7 +26,7 @@ class ApplicationController extends Application{
 
     public function UnderDevelopmentAction()
     {
-        $this->Render(':SiteUnderDevelopment.html.php', 'Site Under Development');
+        $this->Render(':UnderDevelopment/SiteUnderDevelopment.html.php', 'Site Under Development');
         exit;
     }
 }

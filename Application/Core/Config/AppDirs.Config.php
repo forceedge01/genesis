@@ -1,13 +1,11 @@
 <?php
 
-
-
 // Core folder paths
 
-define('HOST', 'http://localhost:8765/');
-define('ROOT', __DIR__ . '/../../../');
+define('HOST', (isset($_SERVER['HTTP_HOST'])) ? "http://{$_SERVER['HTTP_HOST']}/" : '');
+define('ROOT', (!empty($_SERVER['DOCUMENT_ROOT'])) ? "{$_SERVER['DOCUMENT_ROOT']}/" : __DIR__ . '/../../../');
 
-\Set::Config('APPDIRS', array(
+Set::Config('APPDIRS', array(
 
     'APPLICATION_FOLDER' => ROOT . 'Application/',
     'SOURCE_FOLDER' => ROOT . 'Source/',
@@ -42,19 +40,20 @@ define('ROOT', __DIR__ . '/../../../');
     ),
 
     'TEMPLATING' => array(
-        'TEMPLATES_FOLDER' => ROOT . 'Application/Struct/Resources/Views/',
-        'ERRORS_TEMPLATES_FOLDER' => ROOT . 'Application/Struct/Resources/Views/Error_Pages/',
-        'PUBLIC_FOLDER' => HOST . 'Public/',
-        'ASSETS_FOLDER' => HOST . 'Public/Assets/',
-        'IMAGES_FOLDER' => HOST . 'Public/Assets/Images/',
-        'CSS_FOLDER' => HOST . 'Public/Assets/CSS/',
-        'JS_FOLDER' => HOST . 'Public/Assets/JS/'
+        'TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/',
+        'ERRORS_TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/Error_Pages/',
+
+        'PUBLIC_FOLDER' => HOST . trim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/',
+        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/',
+        'IMAGES_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/Images/',
+        'CSS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/CSS/',
+        'JS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/JS/'
     ),
 
     'BUNDLES' => array(
         'BASE_FOLDER' => '{{APPDIRS.SOURCE_FOLDER}}/Bundles/',
         'CONFIG' => '/Resources/Config/',
-        'ASSETS_FOLDER' => ROOT . 'Public/Assets/Bundles/',
+        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.ASSETS_FOLDER}}Bundles/',
         'DATABASE_FILES' => '/Model/',
         'INTERFACES' => '/Interfaces/',
         'CONTROLLERS' => '/Controllers/',

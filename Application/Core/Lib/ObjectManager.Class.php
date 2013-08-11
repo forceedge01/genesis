@@ -17,14 +17,14 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetComponent($object, $args = null) {
 
-        $classNamespace = '\\Application\\Components\\'.$object;
-        Loader::LoadComponent($object);
-
         if (!isset($this->$object))
         {
+            $classNamespace = '\\Application\\Components\\'.$object;
+            Loader::LoadComponent($object);
+
             if (class_exists($classNamespace))
             {
-                @$this->$object = new $classNamespace($args);
+                $this->$object = new $classNamespace($args);
             }
             else
             {
@@ -37,10 +37,10 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     public function GetCoreObject($object, $args = null){
 
-        $fullClassPath = '\\Application\\Core\\'.$object;
-
         if (!isset($this->$object))
         {
+            $fullClassPath = '\\Application\\Core\\'.$object;
+            
             if (class_exists($fullClassPath))
             {
                 $this->$object = new $fullClassPath($args);
@@ -74,9 +74,9 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
         $bundle = explode(':', $bundleColonEntityName);
 
-        if($bundle[0] == null)
-            $namespace = '\\Application\\Repositories\\';
-        else
+//        if($bundle[0] == null)
+//            $namespace = '\\Application\\Repositories\\';
+//        else
             $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Repositories\\';
 
         $bundle[1] .= 'Repository';
@@ -94,9 +94,9 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
         $bundle = explode(':', $bundleColonEntityName);
 
-        if($bundle[0] == null)
-            $namespace = '\\Application\\Models\\';
-        else
+//        if($bundle[0] == null)
+//            $namespace = '\\Application\\Models\\';
+//        else
             $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Models\\';
 
         $bundle[1] .= 'Model';
@@ -114,9 +114,9 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
         $bundle = explode(':', $bundleColonEntityName);
 
-        if($bundle[0] == null)
-            $namespace = '\\Application\\Entities\\';
-        else
+//        if($bundle[0] == null)
+//            $namespace = '\\Application\\Entities\\';
+//        else
             $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Entities\\';
 
         $bundle[1] .= 'Entity';
@@ -266,7 +266,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     public function GetTableNameFromNameSpacedEntity($namespacedClass){
 
-        return str_replace('Repository', '', str_replace('Entity', '', $this->GetClassFromNameSpacedClass($namespacedClass)));
+        return str_replace(array('Repository', 'Entity'), '', $this->GetClassFromNameSpacedClass($namespacedClass));
     }
 
     public function GetClassFromNameSpacedModel($namespacedClass){
@@ -276,16 +276,17 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     public static function GetNamespaceFromFilePath($filePath)
     {
-        $replace = array(
-            \Get::Config('APPDIRS.SOURCE_FOLDER') => '\\',
-            '/' => '\\',
-            '.php' => ''
-        );
+//        $replace = array(
+//            \Get::Config('APPDIRS.SOURCE_FOLDER') => '\\',
+//            '/' => '\\',
+//            '.php' => ''
+//        );
 
-        foreach($replace as $key => $re)
-            $filePath = str_replace($key, $re, $filePath);
+        $search = array(\Get::Config('APPDIRS.SOURCE_FOLDER'), '/', '.php');
+        $replace = array('\\', '\\');
 
-        return $filePath;
+//        foreach($replace as $key => $re)
+        return str_replace($search, $replace, $filePath);
     }
 
     public static function GetNamespaceFromMultipleFiles($files)
@@ -296,5 +297,10 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
             $result[] = self::GetNamespaceFromFilePath ($file);
 
         return $result;
+    }
+
+    public function DirectoryToNamespace($dir)
+    {
+        return str_replace('/', '\\', $dir);
     }
 }

@@ -803,7 +803,7 @@ class Template extends Router {
         if(! isset($params['id']))
             $params['id'] = $name;
 
-        $htmlgen = $this->GetComponent('HTMLgenerator');
+        $htmlgen = $this->GetComponent('HTMLGenerator');
 
         $el = array(
             'type' => $element,
@@ -902,7 +902,7 @@ class Template extends Router {
         if(! $id)
             $id = $name;
 
-        $htmlgen = $this->GetComponent('HTMLgenerator');
+        $htmlgen = $this->GetComponent('HTMLGenerator');
 
         $el = array(
             'type' => $element,

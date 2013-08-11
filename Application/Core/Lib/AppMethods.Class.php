@@ -62,46 +62,6 @@ abstract class AppMethods extends ObjectManager{
 
     /**
      *
-     * @param type $bundleColonEntityName
-     * @return \Application\Core\Repositories\ApplicationRepository
-     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
-     */
-    public function GetRepository($bundleColonEntityName){
-
-        $bundle = explode(':', $bundleColonEntityName);
-
-        if($bundle[0] == null)
-            $namespace = '\\Application\\Core\\Repositories\\';
-        else
-            $namespace = '\\Bundles\\'.$bundle[0].'\\Repositories\\';
-
-        $bundle[1] .= 'Repository';
-
-        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
-    }
-
-    /**
-     *
-     * @param type $bundleColonEntityName
-     * @return \bundle returns an entity object
-     * @example $this->getBundleEntity('WelcomeBundle:Welcome')->GetAll();
-     */
-    public function GetEntity($bundleColonEntityName){
-
-        $bundle = explode(':', $bundleColonEntityName);
-
-        if($bundle[0] == null)
-            $namespace = '\\Application\\Core\\Entities\\';
-        else
-            $namespace = '\\Bundles\\'.$bundle[0].'\\Entities\\';
-
-        $bundle[1] .= 'Entity';
-
-        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
-    }
-
-    /**
-     *
      * @return type
      * Gets the type of the variable
      */

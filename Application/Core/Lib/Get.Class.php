@@ -49,20 +49,7 @@ class Get{
                 {
                     foreach($matches[0] as $match)
                     {
-
-                        $replacement = self::Config (
-                                str_replace(
-                                    '{{',
-                                    '',
-                                    str_replace(
-                                        '}}',
-                                        '',
-                                        $match
-                                    )
-                                )
-                            );
-
-                        $config = str_replace($match,$replacement, $config);
+                        $config = str_replace($match, self::Config (trim($match, '{}')), $config);
                     }
                 }
             }

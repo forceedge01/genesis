@@ -25,4 +25,33 @@ class Set extends Application\Core\Loader{
     {
         Application\Core\Router::$Route[$key] = $routeParams;
     }
+
+    public static function OverwriteConfig($stringKey, $value)
+    {
+        $result = array();
+
+        $keys = strpos($stringKey, '.') !== false ? explode('.', $stringKey) : array($stringKey);
+        $ptr = &$result;
+
+        foreach ($keys as $key)
+        {
+            if (!isset($ptr[$key]))
+            {
+                $ptr[$key] = array();
+            }
+            
+            $ptr = &$ptr[$key];
+        }
+
+        if (empty($ptr))
+        {
+            $ptr = $value;
+        }
+        else
+        {
+            $ptr[] = $value;
+        }
+
+        self::$appConfiguration = array_replace_recursive(self::$appConfiguration, $result);
+    }
 }

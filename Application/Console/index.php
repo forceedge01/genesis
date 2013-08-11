@@ -21,6 +21,10 @@ function getOptions() {
             'bundle:assets:create',
             'bundle:assets:delete'
         ),
+        'Components' => array(
+            'component:create',
+            'component:delete'
+        ),
         'Tests' => array(
             'test:routes',
             'test:classes',

@@ -249,143 +249,9 @@ class Console {
 
     function switchOption($switch) {
 
-        $args = explode(':', $switch);
+        require_once __DIR__ . '/initializer.php';
 
-        switch (strtolower($args[0]))
-        {
-            case 'bundle':
-            {
-                if (isset($_SERVER['SERVER_NAME']))
-                {
-                    $bundle = new Libraries\Bundle('html');
-                    $bundle->name = ucfirst(str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] ))));
-                }
-                else
-                {
-                    $bundle = new Libraries\Bundle('console');
-                }
-
-                switch ($args[1])
-                {
-                    case 'create':
-                    {
-                        $bundle->createBundle();
-                        break;
-                    }
-                    case 'delete':
-                    {
-                        $bundle->deleteBundle();
-                        break;
-                    }
-                    case 'assets':
-                    {
-                        if($args[2] == 'create')
-                        {
-                            $bundle->InitCreateAssets();
-                        }
-                        else if($args[2] == 'delete')
-                        {
-                            $bundle->DeleteAssets();
-                        }
-                        break;
-                    }
-                    case '0':
-                    case 'exit':
-                    {
-                        exit(0);
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'test':
-            {
-                $this->object = New Test();
-
-                switch($args[1])
-                {
-                    case 'routes':
-                    {
-                        $this->object->RunTests('route');
-                        break;
-                    }
-
-                    case 'classes':
-                    {
-                        $this->object->RunTests('class');
-                        break;
-                    }
-
-                    case 'methods':
-                    {
-                        $this->object->RunTests('method');
-                        break;
-                    }
-
-                    case 'templates':
-                    {
-                        $this->object->RunTests('template');
-                        break;
-                    }
-
-                    case 'models':
-                    {
-                        $this->object->RunTests('model');
-                        break;
-                    }
-
-                    case 'all':
-                    {
-                        if(!is_object($this->object))
-                            $this->object = new Test();
-
-                        $this->object->RunTests();
-
-                        $this->object->clearResults();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'cache':
-            {
-                require_once \Get::Config('APPDIRS.CORE.LIB_FOLDER') . 'Debugger.Class.php';
-                require_once \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER') . 'Directory/Directory.Class.php';
-
-                $cache = new Cache();
-                switch($args[1])
-                {
-                    case 'clear':
-                    {
-                        $cache->Clear();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'automate':
-            {
-                switch($args[1])
-                {
-                    case 'testing':
-                    {
-                        $watcher = new Watcher($args[2], 'test:all');
-                        $watcher ->automate();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'exit':
-            {
-                echo 'Exiting';
-                exit;
-            }
-        }
+        Initializer::init($switch);
 
         $this->flushOptions();
         $this->persistOptions();
@@ -438,9 +304,19 @@ class Console {
 
     public function createFile($filePath, $content)
     {
-        $handle = fopen($filePath, 'w+');
-        fwrite($handle, $content);
-        fclose($handle);
+        try
+        {
+            $handle = fopen($filePath, 'w+');
+            fwrite($handle, $content);
+            fclose($handle);
+
+            return true;
+        }
+        catch(Exception $e)
+        {
+            trigger_error($e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -474,5 +350,16 @@ class Console {
             return false;
         else
             return $this->Choice ($message, $defaultHtml);
+    }
+
+    public function ShowFormattedArray(array $array, $increment = 0)
+    {
+        foreach($array as $key => $value)
+        {
+            if(is_numeric($key))
+                $key += $increment;
+
+            echo '[ ',$this->green($key), ' ]: ', $value, $this->linebreak();
+        }
     }
 }

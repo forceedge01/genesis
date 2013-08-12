@@ -410,14 +410,14 @@ namespace {$this->bundleNamespace}\\Events;
 
 
 
-use Application\Core\AppMethods;
+use \\Application\\Core\\ApplicationEvents;
 
 use \\{$this->bundleNamespace}\\Interfaces\\{$this->name}EventsInterface;
 
 /**
  * Events provide an elegant way of placing decoupled code. Using these are highly recommended.
  */
-final class {$this->name}Events extends AppMethods implements {$this->name}EventsInterface{
+final class {$this->name}Events extends ApplicationEvents implements {$this->name}EventsInterface{
 
     /**
      * This method will fire if the EventHandlers Notify method is fires with the event being {$this->name}

@@ -15,11 +15,6 @@ class Get{
         $keys = func_get_args();
         $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
 
-        if($config === null)
-        {
-            die('<pre>Key '.print_r($keys, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
-        }
-
         if(is_array($config))
         {
             $newArray = array();
@@ -39,7 +34,7 @@ class Get{
 
     private static function placeConfig($config)
     {
-        if(!is_array($config))
+        if(!is_array($config) or !empty($config))
         {
             $matches = array();
 
@@ -52,6 +47,11 @@ class Get{
                         $config = str_replace($match, self::Config (trim($match, '{}')), $config);
                     }
                 }
+            }
+
+            if($config === null)
+            {
+                die('<pre>Key '.print_r($config, true).' not found</b><br /><br /><pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
             }
 
             if(strpos($config, '{{') !== false)

@@ -19,46 +19,93 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
         if (!isset($this->$object))
         {
-            $classNamespace = '\\Application\\Components\\'.$object;
+            $classNamespace = $this->DirectoryToNamespace(\Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER')).$object;
             Loader::LoadComponent($object);
 
-            if (class_exists($classNamespace))
+            $dependencies = \Get::Config("$object.Dependencies");
+
+            if($args)
+                $dependencies[] = $args;
+
+            if (class_exists($classNamespace, false))
             {
-                $this->$object = new $classNamespace($args);
+                $this->$object = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, $dependencies);
             }
             else
             {
-                $this->GetObject($object, $args);
+                return false;
             }
         }
 
         return $this->$object;
     }
 
+    /**
+     *
+     * @param type $obj
+     * @param type $args
+     * @return \Application\Core\obj
+     */
+    public function InstantiateObject($obj, $args = null)
+    {
+        return new $obj($args);
+    }
+
+    /**
+     *
+     * @param type $object
+     * @param type $args
+     * @param type $return
+     * @return boolean
+     */
     public function GetCoreObject($object, $args = null){
 
         if (!isset($this->$object))
         {
-            $fullClassPath = '\\Application\\Core\\'.$object;
-            
-            if (class_exists($fullClassPath))
+            $fullClassPath = $this->DirectoryToNamespace(\Get::Config('APPDIRS.CORE.BASE_FOLDER')).$object;
+
+            if (class_exists($fullClassPath, false))
             {
-                $this->$object = new $fullClassPath($args);
+                $this->$object = $this->InstantiateObject($fullClassPath, $args);
             }
             else
             {
-                return $this->GetObject ($object, $args);
+                return false;
             }
         }
 
         return $this->$object;
     }
 
-    public function GetObject($object, $variable, $args = null) {
+    /**
+     *
+     * @param type $object
+     * @param type $args
+     * @return boolean
+     */
+    public function GetObject($object, $args = null) {
+
+        $variable = $this->ExplodeAndGetLastChunk($object, '\\');
 
         if (!isset($this->$variable))
         {
-            @$this->$variable = new $object($args);
+            $this->GetCoreObject($variable);
+
+            if(!isset($this->$variable))
+            {
+                $this->GetComponent($variable);
+
+                if(!isset($this->$variable))
+                {
+                    if(class_exists($object, false))
+                    {
+                        $this->$variable = $this->InstantiateObject($object, $args);
+                    }
+
+                    if(!isset($this->$variable))
+                        return false;
+                }
+            }
         }
 
         return $this->$variable;
@@ -301,6 +348,23 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     public function DirectoryToNamespace($dir)
     {
-        return str_replace('/', '\\', $dir);
+        return str_replace(array(ROOT ,'/'), '\\', $dir);
+    }
+
+    /**
+     *
+     * @param type $variable
+     * @param type $separator
+     * @return mixed
+     * Returns value at last index if $separator is found in string, if not then returns the string itself
+     */
+    public function ExplodeAndGetLastChunk($variable, $separator)
+    {
+        $chunks = explode($separator, $variable);
+
+        if(!$chunks)
+            return $variable;
+
+        return end($chunks);
     }
 }

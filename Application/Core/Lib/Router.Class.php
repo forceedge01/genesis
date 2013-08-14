@@ -15,9 +15,8 @@ class Router extends EventHandler{
             $route,
             $params,
             $Router,
-            $ObjectArguments = array(),
             $pattern,
-            $observers;
+            $ControllerDependencies = array();
 
     public static $Route = array(), $LastRoute;
 
@@ -26,6 +25,54 @@ class Router extends EventHandler{
         $this->url = $_SERVER['PHP_SELF'];
 
         $this->SetPattern()->SetParams();
+    }
+
+    /**
+     *
+     * @return boolean - true on success, false on failure<br />
+     * <br />Forwards the request to the appropriate controller once the params are read.
+     */
+    public function ForwardRequest(){
+
+        $value = array();
+
+        $this->CheckIfUnderDevelopment();
+
+        $this->funcVariables = array();
+
+        // Should the value contain a regular expression?
+        // Render the right controller;
+        foreach(self::$Route as $key => $value)
+        {
+            if($this->ExtractVariable($value['Pattern']) == $this->pattern)
+            {
+                $this->lastRoute = $key;
+
+                if(isset($value['Method']))
+                    $this->CheckRouteMethod($value['Method']);
+
+                if(isset($value['Requirements']))
+                    $this->CheckRouteRequirements ($value['Requirements']);
+
+                if(isset($value['Dependencies']))
+                    $this->CheckControllerDependencies ($value['Dependencies']);
+
+                $controllerAction = explode(':', $value['Controller']);
+
+                Loader::LoadBundle($this->GetBundleFromName($controllerAction[0]));
+
+                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
+            }
+        }
+
+        return false;
+    }
+
+    private function CheckControllerDependencies($inject)
+    {
+        $this->ControllerDependencies = $inject;
+
+        return $this;
     }
 
     public function GetPattern(){
@@ -127,64 +174,6 @@ class Router extends EventHandler{
 
         return $this;
     }
-
-    private function CheckRouteInjections($inject)
-    {
-        $this->ObjectArguments = $inject;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return boolean - true on success, false on failure<br />
-     * <br />Forwards the request to the appropriate controller once the params are read.
-     */
-    public function ForwardRequest(){
-
-        $value = array();
-
-        $this->CheckIfUnderDevelopment();
-
-        $this->funcVariables = array();
-
-        // Should the value contain a regular expression?
-        // Render the right controller;
-        foreach(self::$Route as $key => $value)
-        {
-            if($this->ExtractVariable($value['Pattern']) == $this->pattern)
-            {
-                $this->lastRoute = $key;
-
-                if(isset($value['Method']))
-                    $this->CheckRouteMethod($value['Method']);
-
-                if(isset($value['Requirements']))
-                    $this->CheckRouteRequirements ($value['Requirements']);
-
-                if(isset($value['Inject']))
-                    $this->CheckRouteInjections ($value['Inject']);
-
-//                if(isset($value['Observers']))
-//                    $this->CheckRouteObservers ($value['Observers']);
-
-                $controllerAction = explode(':', $value['Controller']);
-
-                Loader::LoadBundle($this->GetBundleFromName($controllerAction[0]));
-
-                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
-            }
-        }
-
-        return false;
-    }
-
-//    private function CheckRouteObservers($observers)
-//    {
-//        EventDispatcher::$observers = $observers;
-//
-//        return $this;
-//    }
 
     private function ValidateVariables($requirement)
     {
@@ -388,7 +377,7 @@ class Router extends EventHandler{
             $this->ForwardToController ('Class_Not_Found', $error);
         }
 
-        $controller = new $objectName();
+        $controller = $this->GetCoreObject('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
 
         if(!method_exists($objectName, $objectAction)){
 
@@ -408,12 +397,9 @@ class Router extends EventHandler{
         if(\Get::Config('Cache.html.enabled'))
             Cache::CheckForCachedFile($this->GetPattern());
 
-        if($this->IsLoopable($this->ObjectArguments))
+        if($this->IsLoopable($this->ObjectDependencies))
         {
-            foreach($this->ObjectArguments as $variable => $object){
-
-                $controller->$variable = new $object;
-            }
+            $this->GetCoreObject('DependencyInjector')->Inject($controller, $this->ControllerDependencies);
         }
 
         if(sizeof($this->funcVariables) != 0)
@@ -425,21 +411,10 @@ class Router extends EventHandler{
             $return = call_user_func (array($controller, $objectAction));
         }
 
-//        $this->NotifyObservers($return);
-
         unset($controller);
 
         die();
     }
-
-//    private function NotifyObservers($callBackReturn)
-//    {
-//        if($this->IsLoopable($this->observers))
-//            foreach($this->observers as $observer)
-//            {
-//
-//            }
-//    }
 
     /**
      *

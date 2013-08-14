@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Loader{
+class Loader extends Debugger{
 
     public static
             $classes = array() ,
@@ -23,34 +23,72 @@ class Loader{
             $environment,
             $appConfiguration;
 
+    /**
+     *
+     * @param type $class
+     * Registered autoloader
+     */
     public static function LoadClass($class)
     {
-        $path = \Get::Config('APPDIRS.SOURCE_FOLDER') . str_replace('\\','/', $class) . '.php';
+        $dir = str_replace('\\','/', $class);
+        $className = explode('/', $dir);
 
-        if(is_file($path))
+        $path = ROOT . $dir . '/'.end($className);
+
+        if(is_file($path.'.Class.php'))
         {
-            require_once $path;
+            require_once $path.'.Class.php';
+        }
+        else if(is_file($path.'.Component.php'))
+        {
+            require_once $path.'.Component.php';
+        }
+        else if(is_file($path.'.php'))
+        {
+            require_once $path.'.php';
         }
         else
         {
-            echo "Class '<b>$class</b>' was not found, tried including file with " . __FUNCTION__ ."() from {$path} but file was not found.";
+            Debugger::ThrowStaticError("Class '<b>$class</b>' was not found, tried including file with " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found.");
         }
+    }
+
+    public static function LoadFramework()
+    {
+        self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
+        self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
+        self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
+        self::Load('classes', \Get::Config('APPDIRS.CORE.LIB_FOLDER'));
+//        self::Load('components', \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER'));
+        self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
+        self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
+        self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
+        self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
+        self::GetComponents();
+        self::LoadBundles();
     }
 
     public static function LoadComponent($component)
     {
-        $baseFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-        self::LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
-        $loaderFile = $baseFolder . $component . '/Loader.php';
+        if(in_array($component, self::$components))
+        {
+            $baseFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
+            self::LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
+            $loaderFile = $baseFolder . $component . '/Loader.php';
 
-        if(is_file($loaderFile))
-        {
-            require_once $baseFolder . $component . '/Loader.php';
+            if(is_file($loaderFile))
+            {
+                require_once $baseFolder . $component . '/Loader.php';
+            }
+            else
+            {
+                Debugger::ThrowStaticError("Could not load $component, '<b>$loaderFile</b>' file for this component was not found.", __FILE__, __LINE__);
+            }
+
+            return true;
         }
-        else
-        {
-            die("Could not load $component, '<b>$loaderFile</b>' file for this component was not found.");
-        }
+
+        return false;
     }
 
     public static function AppBundles()
@@ -99,6 +137,7 @@ class Loader{
             'Variable.Class.php',
             'ObjectManager.Class.php',
             'AppMethods.Class.php',
+            'DependencyInjector.Class.php',
             'EventHandler.Class.php',
             'Request.Class.php',
             'Response.Class.php',
@@ -359,18 +398,15 @@ class Loader{
         return $exists;
     }
 
-    public static function LoadFramework()
+    private static function GetComponents()
     {
-        self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
-        self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
-        self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
-        self::Load('classes', \Get::Config('APPDIRS.CORE.LIB_FOLDER'));
-//        self::Load('components', \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER'));
-        self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
-        self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
-        self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
-        self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
-        self::LoadBundles();
+        $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
+        $components = scandir($base);
+        foreach($components as $component)
+        {
+            if($component != '.' and $component != '..')
+                self::$components[] = $component;
+        }
     }
 
     private static function FetchAll($dir){

@@ -249,8 +249,8 @@ abstract class Debugger {
         return $this;
     }
 
-    public static function ThrowStaticError($message, $file, $line)
+    public static function ThrowStaticError($message, $file = __FILE__, $line = __LINE__)
     {
-        $this->SetErrorArgs($message, $file, $line)->ThrowError();
+        die($message);
     }
 }

@@ -4,22 +4,16 @@ namespace Application\Core;
 
 
 
-abstract class Application extends Template implements Interfaces\Application{
+class Application extends Template implements Interfaces\Application{
 
-    private
-            $Router,
-            $Request,
-            $Response;
     public
-            $User;
+        $Request,
+        $User;
 
     public function __construct() {
 
         $this->BeforeApplicationHook();
-
         $this->Request = $this->GetCoreObject('Request');
-        $this->Router = $this->GetCoreObject('Router');
-        $this->Response = $this ->GetCoreObject('Response');
 
         if(\Get::Config('Application.Session.Enabled'))
         {

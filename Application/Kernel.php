@@ -2,6 +2,7 @@
 
 namespace Application\Core;
 
+require_once __DIR__ . '/Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/Loader.php';
 require_once __DIR__ . '/Core/Lib/Set.Class.php';
 require_once __DIR__ . '/Core/Config/AppDirs.Config.php';
@@ -19,12 +20,13 @@ class AppKernal extends Loader{
         self::$scriptStartTime = microtime();
         self::CheckDependencies();
         self::LoadFramework();
-        $route = new Router();
 
-        if(!$route->ForwardRequest()){
+        $app = new Application();
 
+        if(!$app->ForwardRequest())
+        {
             header( 'HTTP/1.1 404 Not Found', true, 404 );
-            die('<h4>Pattern: ' . $route->GetPattern() . ' Not Found, <a href="javascript:history.back();">go back to last page</a>.</h4>');
+            die('<h4>Pattern: ' . $app->GetPattern() . ' Not Found, <a href="javascript:history.back();">go back to last page</a>.</h4>');
         }
     }
 

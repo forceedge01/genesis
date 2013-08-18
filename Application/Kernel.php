@@ -40,7 +40,7 @@ class AppKernal extends Loader{
         if(version_compare(phpversion(), $version, '>='))
             self::$phpVersion = phpversion();
         else
-            die('You need to update your php version, GENESIS needs atleast php '.$version);
+            die('You need to update your php version, GENESIS requires atleast php '.$version);
     }
 
     /**

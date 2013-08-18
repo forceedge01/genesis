@@ -54,13 +54,13 @@ class Router extends EventHandler{
                 if(isset($value['Requirements']))
                     $this->CheckRouteRequirements ($value['Requirements']);
 
-                if(isset($value['Dependencies']))
-                    $this->CheckControllerDependencies ($value['Dependencies']);
-
                 $controllerAction = explode(':', $value['Controller']);
+                $dependencies = \Get::Config($controllerAction[0].'.Dependencies');
+
+                if($dependencies)
+                    $this->CheckControllerDependencies ($dependencies);
 
                 Loader::LoadBundle($this->GetBundleFromName($controllerAction[0]));
-
                 $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
             }
         }

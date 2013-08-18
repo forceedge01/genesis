@@ -4,3 +4,7 @@ namespace Application\Traits;
 
 
 
+trait methodologies{
+
+    
+}

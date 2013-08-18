@@ -25,8 +25,7 @@ class DependencyInjector extends AppMethods{
 
         foreach($injectObject as $inject)
         {
-            $dependency = $this->ExplodeAndGetLastChunk($inject, '\\');
-            $dependencies[] = $this->GetObject($dependency);
+            $dependencies[] = $this->GetObject($inject);
 
             if(!end($dependencies))
                 $this->SetErrorArgs('Unable to inject dependency: '.$inject.' for object '. get_class($injectObject) . ', make sure the class exists', __FILE__, __LINE__)->ThrowError();

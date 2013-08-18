@@ -4,7 +4,9 @@ namespace Application\Core;
 
 
 
-class Request extends AppMethods{
+use Application\Interfaces\Request as RequestInterface;
+
+class Request extends AppMethods implements RequestInterface{
 
     public
             $post,

@@ -8,7 +8,7 @@ class DependencyInjector extends AppMethods{
 
     public function __construct() {}
 
-    public function Inject($injectSubject, $injectObject)
+    public function Inject($injectSubject, array $injectObject)
     {
         $reflection = new \ReflectionClass($injectSubject);
 

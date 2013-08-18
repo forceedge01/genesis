@@ -4,10 +4,12 @@ namespace Application\Console;
 
 
 
-class Console {
+class Console extends \Application\Core\Debugger {
 
     private
             $object;
+
+    public function __construct() {}
 
     protected function persistOptions()
     {
@@ -176,11 +178,12 @@ class Console {
 
         try {
 
-            if (is_dir($directory)) {
-
+            if (is_dir($directory))
+            {
                 $files = scandir($directory);
 
-                foreach ($files as $file) {
+                foreach ($files as $file)
+                {
                     if (($file != '.' && $file != '..')) {
 
                         $absolutePath = $directory . '/' . $file;
@@ -188,7 +191,8 @@ class Console {
                         if (is_dir($absolutePath))
                         {
                             echo $this->linebreak(), '.. ';
-                            $this->removeDirectory($absolutePath);
+                            if(!$this->removeDirectory($absolutePath))
+                                return false;
                         }
                         else
                         {
@@ -205,11 +209,11 @@ class Console {
             }
             else
                 return false;
-        } catch (Exception $e) {
 
+        }
+        catch (Exception $e)
+        {
             echo $e->getMessage();
-
-            return false;
         }
     }
 

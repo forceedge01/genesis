@@ -15,6 +15,9 @@ class AppKernal extends Loader{
             $msyqlVersion,
             $scriptStartTime;
 
+    /**
+     * Initializes an instance of the application
+     */
     public static function Initialize() {
 
         self::$scriptStartTime = microtime();
@@ -40,6 +43,12 @@ class AppKernal extends Loader{
             die('You need to update your php version, GENESIS needs atleast php '.$version);
     }
 
+    /**
+     *
+     * @param type $fileType
+     * @return type
+     * Gets info on file types loaded
+     */
     public static function Get($fileType = null){
 
         if(emtpy($fileType))

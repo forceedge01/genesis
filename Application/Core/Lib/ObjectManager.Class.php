@@ -286,7 +286,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     protected function GetBundleFromName($bundle)
     {
-        foreach(\Application\Core\Loader::AppBundles() as $bundlePath)
+        foreach(Loader::AppBundles() as $bundlePath)
         {
             $ch = explode('/', $bundlePath);
             $bundleName = end($ch);

@@ -25,6 +25,23 @@ class Loader extends Debugger{
 
     /**
      *
+     * @return type
+     * Returns list of bundles included in app
+     */
+    public static function AppBundles()
+    {
+        return array(
+
+            'Welcome',
+            'Authentication/users',
+            'rock/solid',
+            'monkey/banana',
+            'selenium/jazz'
+        );
+    }
+
+    /**
+     *
      * @param type $class
      * Registered autoloader
      */
@@ -53,6 +70,9 @@ class Loader extends Debugger{
         }
     }
 
+    /**
+     * Loads the framework - consider making protected
+     */
     public static function LoadFramework()
     {
         self::LoadCore();
@@ -75,6 +95,12 @@ class Loader extends Debugger{
         self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
     }
 
+    /**
+     *
+     * @param type $component
+     * @return boolean
+     * Loads a component
+     */
     public static function LoadComponent($component)
     {
         if(in_array($component, self::$components))
@@ -98,27 +124,34 @@ class Loader extends Debugger{
         return false;
     }
 
-    public static function AppBundles()
-    {
-        return array(
-
-            'Welcome',
-            'Authentication/users',
-        );
-    }
-
+    /**
+     *
+     * @param string $bundle
+     * @return type
+     * Loads events for a bundle
+     * Consider making protected
+     */
     public static function LoadEvents($bundle)
     {
         $bundle = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle;
         return self::LoadFilesFromDir($bundle.'/Events');
     }
 
+    /**
+     *
+     * @param type $class
+     * Legacy
+     */
     public static function LoadEvent($class)
     {
         $event = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . trim(str_replace('\\', '/', $class));
         require_once $event;
     }
 
+    /**
+     * Fetches bundles for inclusion in app.
+     * Consider making protected
+     */
     public static function FetchAllBundles(){
 
         // Include your bundles here
@@ -135,6 +168,11 @@ class Loader extends Debugger{
         }
     }
 
+    /**
+     *
+     * @param type $classDir
+     * @return type
+     */
     private static function FetchAllClasses($classDir){
 
         $classes = array(
@@ -171,6 +209,12 @@ class Loader extends Debugger{
         return self::$classes;
     }
 
+    /**
+     *
+     * @param type $staticVar
+     * @param type $dir
+     * Loads files for use for the app
+     */
     protected static function Load($staticVar, $dir){
 
         self::$files = array();
@@ -184,6 +228,12 @@ class Loader extends Debugger{
             require_once $file;
     }
 
+    /**
+     *
+     * @param type $staticVar
+     * @param type $dir
+     * Deprecated
+     */
     protected static function LoadDevelopment($staticVar, $dir){
 
         self::$files = array();
@@ -200,7 +250,7 @@ class Loader extends Debugger{
     }
 
     /**
-     * Dev env method
+     * Depricated
      */
     private static function FetchAllConfigs($dir)
     {
@@ -226,6 +276,9 @@ class Loader extends Debugger{
         return self::$files;
     }
 
+    /**
+     * Loads config and routes of all registered bundles for usage throughout the app.
+     */
     protected static function LoadBundles(){
 
         self::FetchAllBundles();

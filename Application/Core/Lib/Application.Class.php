@@ -38,7 +38,7 @@ class Application extends Template implements Interfaces\Application{
                     if(time() > $session->Get('login_expires'))
                     {
                         $session->Destroy()->StartSecure();
-                        $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                        $session->Set('AccessedRoute', $this->getRouteFromPattern());
                         $this
                             ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
                                 ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
@@ -48,7 +48,7 @@ class Application extends Template implements Interfaces\Application{
                 {
                     if(!$session->IsSessionKeySet('login_expires') AND !$this->IsPageAllowed() AND !$session->IsSessionKeySet('route_error'))
                     {
-                        $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                        $session->Set('AccessedRoute', $this->getRouteFromPattern());
                         $this
                             ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
                                 ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
@@ -77,7 +77,7 @@ class Application extends Template implements Interfaces\Application{
                         if($login_check != $session->Get('login_string'))
                         {
                             $session->Destroy()->StartSecure();
-                            $session->Set('AccessedRoute', $this->Router->getRouteFromPattern());
+                            $session->Set('AccessedRoute', $this->getRouteFromPattern());
                             $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                         }
                     }

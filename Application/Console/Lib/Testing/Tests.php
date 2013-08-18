@@ -11,6 +11,9 @@ class Test extends BaseTestingRoutine{
             $testClassesAndComponents,
             $type;
 
+    public static
+            $output;
+
     public function __construct($type = null) {
 
         parent::__construct();

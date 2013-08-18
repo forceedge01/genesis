@@ -170,6 +170,7 @@ class Initializer{
     private static function TestOptions($args)
     {
         $this->object = New Test();
+        Test::$output = $_SERVER['argv'][2];
 
         switch($args[1])
         {

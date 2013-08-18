@@ -264,10 +264,13 @@ class Console {
 
     public function green($string)
     {
-        if (!isset($_SERVER['SERVER_NAME']))
-            return "\033[32m".$string."\033[37m";
-        else
-            return "<font color='#339933'>$string</font>";
+        if(test::$output != 'Failures')
+        {
+            if (!isset($_SERVER['SERVER_NAME']))
+                return "\033[32m".$string."\033[37m";
+            else
+                return "<font color='#339933'>$string</font>";
+        }
     }
 
     public function red($string)

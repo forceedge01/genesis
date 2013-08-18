@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Console;
+namespace Application\Console\Lib;
 
 
 

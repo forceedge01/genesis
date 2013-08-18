@@ -1,10 +1,12 @@
 <?php
 
-namespace Application\Console;
+namespace Application\Console\Lib;
 
 
 
-class Schema extends Console {
+use Application\Console\Console;
+
+abstract class SchemaAPI extends Console {
 
     private $connection, $tables, $database;
 
@@ -13,7 +15,7 @@ class Schema extends Console {
         $this->connection = new \Application\Core\DatabaseManager();
     }
 
-    public function exportDefinition($database = null)
+    protected function exportDefinition($database = null)
     {
         $this->database = ($database) ? $database : \Get::Config('Database.name');
 
@@ -40,7 +42,7 @@ class Schema extends Console {
             $file = \Get::Config('Console_Schema.Filename').'.sql';
 
             if($this->createFile($path.$file, $export))
-                echo $this->green ('Export file generation successful: '.$this->blue($file) . " in $path"), $this->linebreak(2);
+                return $path.$file;
             else
                 echo $this->red('Unable to generate export file! Aborting'), $this->linebreak(2);
         }
@@ -73,7 +75,7 @@ class Schema extends Console {
         return $TableDefsString;
     }
 
-    public function exportData($table)
+    private function exportData($table)
     {
 
         $data = $this->connection->Query("SELECT * FROM $table")->GetResultSet();
@@ -165,7 +167,7 @@ class Schema extends Console {
         return $ValueRecords;
     }
 
-    public function import($file)
+    protected function importSQL($file)
     {
         $path = realpath($file);
 
@@ -177,7 +179,10 @@ class Schema extends Console {
 
         try
         {
-            $this->connection->multiQuery();
+            if($this->connection->multiQuery())
+                return $this;
+
+            return false;
         }
         catch(Exception $e)
         {
@@ -195,5 +200,19 @@ class Schema extends Console {
         array_walk(&$queries, 'trim');
 
         return $queries;
+    }
+
+    protected function DropDB($database = null)
+    {
+        $this->database = ($database) ? $database : \Get::Config('Database.name');
+
+        echo $this->linebreak();
+
+        if($this->connection->DropDatabase($database))
+        {
+            return $this;
+        }
+
+        echo $this->red("Unable to drop database $database, make sure it exists."), $this->linebreak();
     }
 }

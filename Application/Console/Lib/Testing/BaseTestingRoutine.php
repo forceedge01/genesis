@@ -1,8 +1,10 @@
 <?php
 
-namespace Application\Console;
+namespace Application\Console\Lib;
 
 
+
+use Application\Console\Console;
 
 class BaseTestingRoutine extends Console{
 

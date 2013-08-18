@@ -499,11 +499,13 @@ abstract class Database extends Template {
 
         foreach ($tables as $table)
         {
-            $this->Query("DROP TABLE IF EXISTS `$table`");
+            $this->queries[] = "DROP TABLE IF EXISTS `$table`";
         }
 
-        if ($this->query("DROP DATABASE $dbname"))
-            return true;
+        $this->queries[] = "DROP DATABASE `$dbname`";
+
+        if ($this->multiQuery())
+            return $this;
         else
             return false;
     }

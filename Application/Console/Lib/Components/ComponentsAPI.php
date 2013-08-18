@@ -1,12 +1,14 @@
 <?php
 
-namespace Application\Console;
+namespace Application\Console\Lib;
 
 
 
-class Components extends Console{
+use Application\Console\Console;
 
-    private $componentName, $componentsFolder;
+abstract class ComponentsAPI extends Console{
+
+    protected $componentName, $componentsFolder;
 
     public function __construct() {
         error_reporting(E_ALL);
@@ -14,12 +16,9 @@ class Components extends Console{
         $this->componentsFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
     }
 
-    public function Create()
+    protected function CreateComponent()
     {
         $error = false;
-
-        // Get Component name from user
-        $this->componentName = $this->readUser('Enter name of the component you want to build (Unique): ');
 
         // Create Component Dirs
         if(!mkdir("{$this->componentsFolder}{$this->componentName}"))
@@ -42,7 +41,7 @@ class Components extends Console{
 
 
     use Application\Core\AppMethods;
-    
+
     use Application\Core\Debugger;
 
     class {$this->componentName} extends AppMethods{
@@ -66,7 +65,7 @@ class Components extends Console{
         echo $this->linebreak ();
 
         if(!$error)
-            echo $this->green ('Component Created Successfully.');
+            return $this;
         else
         {
             if($error == 1)
@@ -78,40 +77,15 @@ class Components extends Console{
         echo $this->linebreak();
     }
 
-    public function Delete()
+    protected function DeleteComponent()
     {
-        $components = $this->ReadComponents();
-
-        echo $this->linebreak();
-        echo $this->blue('List of components in your application: ');
-        echo $this->linebreak();
-        $this->ShowFormattedArray($components, 1);
-        echo $this->linebreak();
-
-        $componentIndex = $this->readUser('Enter component number you want to delete: ');
-        $componentName = $components[$componentIndex-1];
-
-        $surity = $this->Choice("Are you sure you want to delete `$componentName` component?", 'Yes');
-
-        echo $this->linebreak ();
-
-        if($surity)
-        {
-            if($this->DeleteComponent($componentName))
-                echo $this->green ("Component {$componentName} Deleted Successfully.");
-            else
-                echo $this->red('Unable to delete component');
-
-            echo $this->linebreak();
-        }
+        if($this->RemoveComponent($this->componentName))
+            return $this;
+        else
+            return false;
     }
 
-    public function Reset()
-    {
-
-    }
-
-    private function DeleteComponent($name)
+    private function RemoveComponent($name)
     {
         if($this->removeDirectory($this->componentsFolder.$name))
             return true;
@@ -119,7 +93,7 @@ class Components extends Console{
         return false;
     }
 
-    private function ReadComponents()
+    protected function ReadComponents()
     {
         $dir = scandir($this->componentsFolder);
 

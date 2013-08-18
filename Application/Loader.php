@@ -34,9 +34,6 @@ class Loader extends Debugger{
 
             'Welcome',
             'Authentication/users',
-            'rock/solid',
-            'monkey/banana',
-            'selenium/jazz'
         );
     }
 

@@ -1,23 +1,20 @@
 <?php
 
-namespace Application\Console\Libraries;
+namespace Application\Console\Lib;
 
 
 use Application\Console\Console;
 
-Class BundleBuilder extends Console{
+abstract Class BundleAPI extends Console{
 
-    public
+    protected
             $name,
             $bundle,
             $singular,
-            $renderMethod,
-            $bundleFolder;
-
-    private
+            $bundleFolder,
+            $bundleSourceFolder,
             $AssetsFolder,
             $bundleAssetsFolder,
-            $bundleSourceFolder,
             $bundleTestsFolder,
             $bundleViewsFolder,
             $bundleDatabaseFolder,
@@ -48,21 +45,23 @@ Class BundleBuilder extends Console{
         $this->bundleFooterFileName = \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
     }
 
-    public function SetBundle($name)
+    protected function SetBundle($name = null)
     {
-        $this->name = $name;
+        if(!empty($name))
+            $this->name = $name;
+
         $this->bundleFolder = str_replace('//', '/', $this->bundleSourceFolder . $this->name);
         $this->bundleNamespace = str_replace(array('/', '\\\\'), array('\\', '\\'), $this->name);
 
         $nameChunks = explode('/', $this->name);
-        $this->name = end($nameChunks);
         $this->singular = preg_replace('/s$/i', '', end($nameChunks));
-        $this->bundleDirInAssets = str_replace('\\', '/', str_replace('Bundles\\','', $name));
+        $this->bundleDirInAssets = str_replace('\\', '/', str_replace('Bundles\\','', $this->name));
+        $this->name = end($nameChunks);
 
         return $this;
     }
 
-    public function CreateBundle()
+    protected function CreateBundleFiles()
     {
         if($this->CreateBundleDirs($this->bundleNamespace, $this->bundleSourceFolder))
         {
@@ -103,7 +102,7 @@ Class BundleBuilder extends Console{
             {
                 if(!mkdir(str_replace('//','/', $createDir)))
                 {
-                    echo $this->red('Unable to create directory '.realpath($createDir)), $this->linebreak();
+                    echo $this->red('Unable to create directory "'.realpath($createDir).'"'), $this->linebreak();
                     return false;
                 }
             }
@@ -112,7 +111,7 @@ Class BundleBuilder extends Console{
         return $this;
     }
 
-    public function DeleteBundle($bundleName) {
+    protected function DeleteBundleFiles($bundleName) {
 
         if ($this->removeDirectory($this->bundleSourceFolder . $bundleName))
         {
@@ -123,7 +122,7 @@ Class BundleBuilder extends Console{
 
     }
 
-    public function DeleteAsset($bundleName)
+    protected function DeleteAssetFiles($bundleName)
     {
         if(is_dir($this->bundleAssetsFolder .  $bundleName))
         {
@@ -223,7 +222,7 @@ use \\{$this->bundleNamespace}\\Interfaces\\{$this->name}ModelInterface;
 
 final class {$this->name}Model extends ApplicationModel implements {$this->name}ModelInterface{
 
-    public function Create{$this->singular}()
+    protected function Create{$this->singular}()
     {
         if (\$this->GetEntityObject()->Save(\$this->entityObject))
             return true;
@@ -231,7 +230,7 @@ final class {$this->name}Model extends ApplicationModel implements {$this->name}
         return false;
     }
 
-    public function Update{$this->singular}()
+    protected function Update{$this->singular}()
     {
         if (\$this->GetEntityObject()->Save())
             return true;
@@ -239,7 +238,7 @@ final class {$this->name}Model extends ApplicationModel implements {$this->name}
         return false;
     }
 
-    public function Delete{$this->singular}()
+    protected function Delete{$this->singular}()
     {
         if (\$this->GetEntityObject()->Delete())
             return true;
@@ -275,7 +274,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
     /**
      * This method will fire if the EventHandlers Notify method is fires with the event being {$this->name}
      */
-    public function {$this->name}Handler()
+    protected function {$this->name}Handler()
     {
 
     }
@@ -387,7 +386,7 @@ interface {$this->name}ControllerInterface {
      * @example path description
      *
      */
-    public function indexAction();
+    protected function indexAction();
 
     /**
      *
@@ -398,19 +397,7 @@ interface {$this->name}ControllerInterface {
      * @example path description
      *
      */
-    public function listAction();
-
-    /**
-     *
-     * @author <Above>
-     *
-     * @param type \$id Description
-     * @return type Description
-     *
-     * @example path description
-     *
-     */
-    public function viewAction(\$id);
+    protected function listAction();
 
     /**
      *
@@ -422,18 +409,7 @@ interface {$this->name}ControllerInterface {
      * @example path description
      *
      */
-    public function editAction(\$id);
-
-    /**
-     *
-     * @author <Above>
-     *
-     * @return type Description
-     *
-     * @example path description
-     *
-     */
-    public function createAction();
+    protected function viewAction(\$id);
 
     /**
      *
@@ -445,7 +421,30 @@ interface {$this->name}ControllerInterface {
      * @example path description
      *
      */
-    public function deleteAction(\$id);
+    protected function editAction(\$id);
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    protected function createAction();
+
+    /**
+     *
+     * @author <Above>
+     *
+     * @param type \$id Description
+     * @return type Description
+     *
+     * @example path description
+     *
+     */
+    protected function deleteAction(\$id);
 }
 ";
 
@@ -506,7 +505,7 @@ interface {$this->name}ModelInterface {
      * @example path description
      *
      */
-    public function Create{$this->singular}();
+    protected function Create{$this->singular}();
 
     /**
      *
@@ -517,7 +516,7 @@ interface {$this->name}ModelInterface {
      * @example path description
      *
      */
-    public function Update{$this->singular}();
+    protected function Update{$this->singular}();
 
     /**
      *
@@ -528,7 +527,7 @@ interface {$this->name}ModelInterface {
      * @example path description
      *
      */
-    public function Delete{$this->singular}();
+    protected function Delete{$this->singular}();
 }
 ";
 
@@ -576,15 +575,15 @@ use \\{$this->bundleNamespace}\\Interfaces\\{$this->name}ControllerInterface;
 
 final class {$this->name}Controller extends {$this->name}BundleController implements {$this->name}ControllerInterface{
 
-    public
+    protected
           \$htmlgen;
 
-    public function indexAction()
+    protected function indexAction()
     {
         \$this->forwardToController('{$this->name}_List');
     }
 
-    public function listAction()
+    protected function listAction()
     {
         //Used by the HTMLGenerator in the list view.
         \$params['table'] = array(
@@ -630,7 +629,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
     }
 
-    public function viewAction(\$id)
+    protected function viewAction(\$id)
     {
         \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
@@ -658,7 +657,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         \$this->Render('{$this->name}:view.html.php', 'View {$this->singular}', \$params);
     }
 
-    public function createAction()
+    protected function createAction()
     {
         \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
@@ -717,7 +716,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         \$this->Render('{$this->name}:create.html.php', 'Create new {$this->singular}', \$params);
     }
 
-    public function editAction(\$id)
+    protected function editAction(\$id)
     {
         \${$this->name}Model = new {$this->name}Model();
         \${$this->name}Model->SetEntity('{$this->name}:{$this->name}');
@@ -767,7 +766,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
      * By default is ajax controlled.
      *
      */
-    public function deleteAction(\$id)
+    protected function deleteAction(\$id)
     {
         if(\$this->GetRequestManager()->isAjax())
         {
@@ -898,7 +897,7 @@ use Application\\Console\\WebTestCase;
 
 class Test{$this -> name}Controller extends WebTestCase
 {
-    public function testIndexAction()
+    protected function testIndexAction()
     {
         self::\$testClass = new {$this->bundleNamespace}\\Controllers\\{$this->name}Controller();
 
@@ -924,7 +923,7 @@ use Application\\Console\\BaseTestingRoutine;
 
 class Test{$this -> name}Entity extends BaseTestingRoutine
 {
-    public function testExampleMethod()
+    protected function testExampleMethod()
     {
         self::\$testClass = new \\Bundles\\{$this->name}\\Entities\\{$this->name}Entity();
 
@@ -949,7 +948,7 @@ use Application\\Console\\BaseTestingRoutine;
 
 class Test{$this -> name}Repository extends BaseTestingRoutine
 {
-    public function testExampleMethod()
+    protected function testExampleMethod()
     {
         self::\$testClass = new \\Bundles\\{$this->name}\\Repositories\\{$this->name}Repository();
 
@@ -975,22 +974,22 @@ use Application\\Console\\TemplateTestCase;
 
 class Test{$this -> name}Templates extends TemplateTestCase
 {
-    public function testTemplateList()
+    protected function testTemplateList()
     {
         \$this->AssertTemplate('{$this->name}:list.html.php');
     }
 
-    public function testTemplateCreate()
+    protected function testTemplateCreate()
     {
         \$this->AssertTemplate('{$this->name}:create.html.php');
     }
 
-    public function testTemplateEdit()
+    protected function testTemplateEdit()
     {
         \$this->AssertTemplate('{$this->name}:edit.html.php');
     }
 
-    public function testTemplateView()
+    protected function testTemplateView()
     {
         \$this->AssertTemplate('{$this->name}:view.html.php');
     }
@@ -1011,17 +1010,17 @@ use Application\\Console\\BaseTestingRoutine;
 
 class Test{$this -> name}Model extends BaseTestingRoutine
 {
-    public function testModelCreate{$this->singular}Method()
+    protected function testModelCreate{$this->singular}Method()
     {
 
     }
 
-    public function testModelUpdate{$this->singular}Method()
+    protected function testModelUpdate{$this->singular}Method()
     {
 
     }
 
-    public function testModelDelete{$this->singular}Method()
+    protected function testModelDelete{$this->singular}Method()
     {
 
     }
@@ -1032,7 +1031,7 @@ class Test{$this -> name}Model extends BaseTestingRoutine
         return $this;
     }
 
-    public function CreateAssets(){
+    protected function CreateAssetFiles(){
 
         if($this->CreateBundleDirs($this->bundleDirInAssets, $this->bundleAssetsFolder))
         {

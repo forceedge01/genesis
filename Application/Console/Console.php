@@ -4,7 +4,9 @@ namespace Application\Console;
 
 
 
-class Console extends \Application\Core\Debugger {
+use Application\Core\Debugger;
+
+class Console extends Debugger {
 
     private
             $object;
@@ -268,7 +270,7 @@ class Console extends \Application\Core\Debugger {
 
     public function green($string)
     {
-        if(test::$output != 'Failures')
+        if(Lib\Test::$output != 'Failures')
         {
             if (!isset($_SERVER['SERVER_NAME']))
                 return "\033[32m".$string."\033[37m";
@@ -337,6 +339,12 @@ class Console extends \Application\Core\Debugger {
         return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);
     }
 
+    /**
+     *
+     * @param type $string
+     * @param type $breaks
+     * @return type
+     */
     public function AddBreaks($string, $breaks = 1)
     {
         return $this->linebreak($breaks). $string. $this->linebreak($breaks);
@@ -383,5 +391,30 @@ class Console extends \Application\Core\Debugger {
         "\r\n".
         ' - Example command: component:create OR schema:export:YourSchemaName'.
         "\r\n");
+    }
+
+    public static function HowToUse()
+    {
+        echo self::blue("\r\n".
+        "You can execute commands by typing in an option from the menu or directory passing the option from the command line as an argument e.g\r\n".
+        "Application/simplify --create:bundle would take you to the create bundle menu directly.\r\n"
+        );
+    }
+
+    public function IsDirectoryEmpty($dir)
+    {
+        if(count(scandir($dir)) < 3)
+            return $this;
+
+        return false;
+    }
+
+    public function OutputMessages(array $messages)
+    {
+        foreach($messages as $key => $message)
+        {
+            foreach($message as $msg)
+                echo $this->$key($msg), $this->linebreak();
+        }
     }
 }

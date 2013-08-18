@@ -36,12 +36,6 @@ class Initializer{
                 break;
             }
 
-            case 'automate':
-            {
-                self::AutomateOptions($args);
-                break;
-            }
-
             case 'component':
             {
                 self::ComponentsOptions($args);
@@ -50,6 +44,7 @@ class Initializer{
 
             case 'help':
             {
+                Console::HowToUse();
                 Console::Legend();
                 break;
             }
@@ -64,12 +59,18 @@ class Initializer{
 
     private static function SchemaOptions($args)
     {
-        $schema = new Schema();
+        $schema = new Lib\SchemaUI();
 
         switch($args[1])
         {
-            case 'create':
+            case 'drop':
             {
+                $database = null;
+                if(isset($args[2]))
+                    $database = $args[2];
+
+                $schema->Drop($args[2]);
+                break;
             }
 
             case 'export':
@@ -92,7 +93,7 @@ class Initializer{
 
     private static function ComponentsOptions($args)
     {
-        $component = new Components();
+        $component = new Lib\ComponentsUI();
 
         switch($args[1])
         {
@@ -109,29 +110,16 @@ class Initializer{
         }
     }
 
-    private static function AutomateOptions($args)
-    {
-        switch($args[1])
-        {
-            case 'testing':
-            {
-                $watcher = new Watcher($args[2], 'test:all');
-                $watcher ->automate();
-                break;
-            }
-        }
-    }
-
     private static function BundleOptions($args)
     {
         if (isset($_SERVER['SERVER_NAME']))
         {
-            $bundle = new Libraries\Bundle('html');
+            $bundle = new Lib\BundleUI('html');
             $bundle->name = ucfirst(str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] ))));
         }
         else
         {
-            $bundle = new Libraries\Bundle('console');
+            $bundle = new Lib\BundleUI('console');
         }
 
         switch ($args[1])
@@ -158,6 +146,11 @@ class Initializer{
                 }
                 break;
             }
+            case 'verify':
+            {
+                $bundle->Check();
+                break;
+            }
             case '0':
             case 'exit':
             {
@@ -169,8 +162,8 @@ class Initializer{
 
     private static function TestOptions($args)
     {
-        $this->object = New Test();
-        Test::$output = $_SERVER['argv'][2];
+        $this->object = New Lib\Test();
+        Lib\Test::$output = $_SERVER['argv'][2];
 
         switch($args[1])
         {
@@ -222,7 +215,7 @@ class Initializer{
         require_once \Get::Config('APPDIRS.CORE.LIB_FOLDER') . 'Debugger.Class.php';
         require_once \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER') . 'Directory/Directory.Class.php';
 
-        $cache = new Cache();
+        $cache = new Lib\CacheUI();
         switch($args[1])
         {
             case 'clear':

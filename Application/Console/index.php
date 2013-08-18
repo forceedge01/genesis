@@ -20,7 +20,8 @@ function getOptions() {
             'bundle:create',
             'bundle:delete',
             'bundle:assets:create',
-            'bundle:assets:delete'
+            'bundle:assets:delete',
+            'bundle:verify'
         ),
         'Components' => array(
             'component:create',
@@ -28,7 +29,8 @@ function getOptions() {
         ),
         'Schema' => array(
             'schema:export[:{database}::'.Get::Config('Database.name').']',
-            'schema:import:{file}'
+            'schema:import:{file}',
+            'schema:drop[:{database}::'.Get::Config('Database.name').']'
         ),
         'Tests' => array(
             'test:routes',
@@ -42,7 +44,6 @@ function getOptions() {
             'cache:clear'
         ),
         'Other' => array(
-            'automate:testing-(beta)',
             'help',
             'exit'
         )

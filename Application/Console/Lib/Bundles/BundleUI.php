@@ -1,27 +1,18 @@
 <?php
 
-namespace Application\Console\Libraries;
+namespace Application\Console\Lib;
 
 
 
-use Application\Console\Console;
-
-class Bundle extends Console {
+class BundleUI extends BundleAPI {
 
     public
-            $name,
-            $bundle,
-            $singular,
-            $renderMethod,
-            $bundleFolder;
-
-    private
-            $bundleSourceFolder;
+            $renderMethod;
 
     public function __construct($type) {
 
+        parent::__construct();
         $this->renderMethod = $type;
-        $this->bundleSourceFolder = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER');
     }
 
     private function createConsoleInit()
@@ -57,10 +48,9 @@ class Bundle extends Console {
 
         if($this->Choice('Are you sure you want to create assets for bundle \''.$bundle.'\'?'))
         {
-            $bundleBuilder = new BundleBuilder();
-            $bundleBuilder->SetBundle($bundle);
+            $this->SetBundle($bundle);
 
-            if($bundleBuilder->CreateAssets())
+            if($this->CreateAssets())
                 echo $this->green ("Assets for bundle '$bundle' have been created successfully.");
             else
                 echo $this->red('Unable to create assets of bundle '.$bundle);
@@ -78,8 +68,7 @@ class Bundle extends Console {
 
         if($this->Choice('Are you sure you want to delete assets of bundle \''.$choice.'\'?'))
         {
-            $bundleBuilder = new BundleBuilder();
-            if($bundleBuilder->DeleteAsset($choice))
+            if($this->DeleteAsset($choice))
                 echo $this->linebreak (1), $this->green ("Assets for bundle '$choice' have been deleted successfully.");
             else
                 echo $this->linebreak (1), $this->red('Unable to delete assets of bundle '.$choice);
@@ -92,16 +81,14 @@ class Bundle extends Console {
 
         $this->createConsoleInit();
 
-        $bundleBuilder = new BundleBuilder();
-
-        if ($bundleBuilder->SetBundle($this->name)->CreateBundle())//$this->CreateBundleDirs($this->bundleNamespace, $this->bundleSourceFolder))
+        if ($this->SetBundle()->CreateBundleFiles())//$this->CreateBundleDirs($this->bundleNamespace, $this->bundleSourceFolder))
         {
 
             echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
 
             if($this->Choice('Do you want to create assets for this bundle?'))
             {
-                if($bundleBuilder->CreateAssets())
+                if($this->CreateAssetFiles())
                 {
                     echo $this->green("Assets for bundle {$this->name} were successfully created.");
                 }
@@ -118,29 +105,7 @@ class Bundle extends Console {
         return $this;
     }
 
-    private function CreateBundleDirs($bundle, $prependDir)
-    {
-        $bundleDirs = explode('/', str_replace(array('\\', '//'), array('//', '/'), $bundle));
-        $createDir = $prependDir;
-
-        foreach($bundleDirs as $bundle)
-        {
-            $createDir .= '/'.$bundle;
-
-            if(!is_dir($createDir))
-            {
-                if(!mkdir(str_replace('//','/', $createDir)))
-                {
-                    echo $this->red('Unable to create directory '.$createDir), $this->linebreak();
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public function deleteBundle() {
+    public function DeleteBundle() {
 
         if(!isset($_SERVER['SERVER_NAME'])){
 
@@ -169,9 +134,7 @@ class Bundle extends Console {
             {
                 echo '... ',$this->linebreak();
 
-                $bundleBuilder = new BundleBuilder();
-
-                if ($bundleBuilder->DeleteBundle($bundleName))
+                if ($this->DeleteBundleFiles($bundleName))
                 {
                     echo $this->green("Bundle {$bundleName} has been deleted successfully."),$this->linebreak(2);
 
@@ -187,7 +150,7 @@ class Bundle extends Console {
                     {
                         echo '... '.$this->linebreak();
 
-                        if($bundleBuilder->DeleteAsset($bundleName))
+                        if($this->DeleteAssetFiles($bundleName))
                         {
                             echo $this->green("Assets of bundle {$bundleName} deleted successfully.");
                         }
@@ -233,10 +196,121 @@ class Bundle extends Console {
             }
             else
             {
-                echo $this->red("Bundle '$bundle' is registered in loader but was not found in the application structure"), $this->linebreak();
+                echo $this->red("Bundle '$bundle' is registered in class Loader::AppBundles() but was not found in the application structure"), $this->linebreak();
             }
         }
 
         return $bundlesArray;
+    }
+
+    public function Check()
+    {
+        ob_start();
+        $bundles = $this->readBundles();
+        $content = ob_get_clean();
+
+        if(!$content)
+        {
+            echo $this->green ('All bundles registered in Loader were found in the app structure.'), $this->linebreak(2);
+
+            foreach($bundles as $bundle)
+            {
+                $this->OutputMessages($this->CheckBundleStructure($bundle));
+            }
+        }
+        else
+            echo $content;
+    }
+
+    protected function CheckBundleStructure($bundle)
+    {
+        $bundleBase = str_replace('//','/', $this->bundleSourceFolder.$bundle);
+        $messages = array();
+
+        $messages['blue'][] = "Verifying structure of '$bundle' Bundle";
+
+        $dir = $bundleBase.$this->bundleConfigsFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleConfigsFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleConfigsFolder}' for bundle '$bundle', required.";
+
+
+        $dir = $bundleBase.$this->bundleControllersFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleControllersFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleControllersFolder}' for bundle '$bundle', required.";
+
+
+        $dir = $bundleBase.$this->bundleDatabaseFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleDatabaseFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleDatabaseFolder}' for bundle '$bundle', Optional: needed only if database is used.";
+
+
+        $dir = $bundleBase.$this->bundleEventsFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleEventsFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleEventsFolder}' for bundle '$bundle', Optional: needed only if using observer pattern.";
+
+
+        $dir = $bundleBase.$this->bundleViewsFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleViewsFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleViewsFolder}' for bundle '$bundle', required.";
+
+
+        $dir = $bundleBase.$this->bundleRoutesFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleRoutesFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleRoutesFolder}' for bundle '$bundle', required.";
+
+
+        $dir = $bundleBase.$this->bundleInterfacesFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleInterfacesFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleInterfacesFolder}' for bundle '$bundle', Optional: Choice of OOP design.";
+
+
+        $dir = $bundleBase.$this->bundleTestsFolder;
+        if(is_dir($dir))
+        {
+            if($this->IsDirectoryEmpty($dir))
+                $messages['red'][] = "Directory has no content: {$this->bundleTestsFolder}";
+        }
+        else
+            $messages['red'][] = "Directory not found: '{$this->bundleTestsFolder}' for bundle '$bundle', Optional: needed only when testing with simplify.";
+
+        if(count($messages) == 1)
+            $messages['green'][] = "'$bundle' Bundle structure OK.";
+
+        return $messages;
     }
 }

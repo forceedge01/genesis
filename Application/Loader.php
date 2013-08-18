@@ -55,17 +55,21 @@ class Loader extends Debugger{
 
     public static function LoadFramework()
     {
+        self::LoadCore();
+        self::GetComponents();
+        self::LoadBundles();
+    }
+
+    public static function LoadCore()
+    {
         self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
         self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
         self::Load('classes', \Get::Config('APPDIRS.CORE.LIB_FOLDER'));
-//        self::Load('components', \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER'));
         self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
         self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
         self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
-        self::GetComponents();
-        self::LoadBundles();
     }
 
     public static function LoadComponent($component)

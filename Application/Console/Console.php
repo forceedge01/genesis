@@ -362,4 +362,19 @@ class Console {
             echo '[ ',$this->green($key), ' ]: ', $value, $this->linebreak();
         }
     }
+
+    public static function Legend()
+    {
+        echo self::blue("\r\n".
+        ' - [...] specifies an optional part of a command.'.
+        "\r\n".
+        ' - {...} specifies a variable to be replaced by a value by the user.'.
+        "\r\n".
+        ' - {...}::{value} shows the default value that is going to be used if the variable value is not provided.'.
+        "\r\n".
+        ' - Instructions will be given as you proceed with your choice'.
+        "\r\n".
+        ' - Example command: component:create OR schema:export:YourSchemaName'.
+        "\r\n");
+    }
 }

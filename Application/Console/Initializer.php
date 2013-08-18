@@ -18,6 +18,12 @@ class Initializer{
                 break;
             }
 
+            case 'schema':
+            {
+                self::SchemaOptions($args);
+                break;
+            }
+
             case 'test':
             {
                 self::TestOptions($args);
@@ -42,10 +48,44 @@ class Initializer{
                 break;
             }
 
+            case 'help':
+            {
+                Console::Legend();
+                break;
+            }
+
             case 'exit':
             {
                 echo 'Exiting';
                 exit;
+            }
+        }
+    }
+
+    private static function SchemaOptions($args)
+    {
+        $schema = new Schema();
+
+        switch($args[1])
+        {
+            case 'create':
+            {
+            }
+
+            case 'export':
+            {
+                $database = null;
+                if(isset($args[2]))
+                    $database = $args[2];
+
+                $schema->exportDefinition($database);
+                break;
+            }
+
+            case 'import':
+            {
+                $schema->import($args[2]);
+                break;
             }
         }
     }

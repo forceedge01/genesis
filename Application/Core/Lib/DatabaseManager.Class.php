@@ -829,4 +829,17 @@ class DatabaseManager extends Database{
         $this -> queryJoins[] = $table .' AS '.$alias.' ON '.$predicament;
         return $this;
     }
+
+    public function GetTables($database = null)
+    {
+        if($database)
+            $this->Query("use `$database`");
+
+        $tables = $this->Query('SHOW TABLES')->GetResultSet();
+
+        if($database)
+            $this->Query("use `".\Get::Config('Database.name')."`");
+
+        return $tables;
+    }
 }

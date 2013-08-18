@@ -511,9 +511,12 @@ abstract class Database extends Template {
     /**
      *
      * @return boolein
-     * Process multiple queries at once stored in $queries[]
+     * Process multiple queries at once stored in $queries[],
+     * Is transactions safe
      */
     public function multiQuery() {
+
+        $this->BeginTransaction();
 
         try
         {
@@ -529,13 +532,15 @@ abstract class Database extends Template {
                         $this->queriesResult[] = $this->queryResult;
                 }
 
+                $this->Commit();
                 unset($this->queries);
             }
 
-            return true;
+            return $this;
         }
         catch (Exception $e)
         {
+            $this->RollBack();
             $this->SetErrorArgs($e->GetMessage(),'Database:MultiQuery','0','4')->ThrowException();
         }
     }

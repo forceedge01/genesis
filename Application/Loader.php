@@ -60,6 +60,9 @@ class Loader extends Debugger{
         self::LoadBundles();
     }
 
+    /**
+     * Loads framework core library
+     */
     public static function LoadCore()
     {
         self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
@@ -402,6 +405,9 @@ class Loader extends Debugger{
         return $exists;
     }
 
+    /**
+     * Gets a list of components available in the application.
+     */
     private static function GetComponents()
     {
         $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
@@ -409,7 +415,12 @@ class Loader extends Debugger{
         foreach($components as $component)
         {
             if($component != '.' and $component != '..')
-                self::$components[] = $component;
+            {
+                if(is_file($base.'/'.$component.'/Loader.php'))
+                    self::$components[] = $component;
+                else
+                    self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
+            }
         }
     }
 

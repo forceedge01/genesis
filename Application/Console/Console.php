@@ -381,6 +381,8 @@ class Console extends Debugger {
     public static function Legend()
     {
         echo self::blue("\r\n".
+        ' - [NUMBER] specifies an index option for you to choose from'.
+        "\r\n".
         ' - [...] specifies an optional part of a command.'.
         "\r\n".
         ' - {...} specifies a variable to be replaced by a value by the user.'.
@@ -397,7 +399,7 @@ class Console extends Debugger {
     {
         echo self::blue("\r\n".
         "You can execute commands by typing in an option from the menu or directory passing the option from the command line as an argument e.g\r\n".
-        "Application/simplify --create:bundle would take you to the create bundle menu directly.\r\n"
+        "$ Application/simplify --create:bundle would take you to the create bundle menu directly.\r\n"
         );
     }
 

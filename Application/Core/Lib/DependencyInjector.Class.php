@@ -8,6 +8,12 @@ class DependencyInjector extends AppMethods{
 
     public function __construct() {}
 
+    /**
+     *
+     * @param type $injectSubject
+     * @param array $injectObject
+     * @return type
+     */
     public function Inject($injectSubject, array $injectObject)
     {
         $reflection = new \ReflectionClass($injectSubject);

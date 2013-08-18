@@ -29,7 +29,10 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
             if (class_exists($classNamespace, false))
             {
-                $this->$object = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, $dependencies);
+                if(is_array($dependencies))
+                    $this->$object = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, $dependencies);
+                else
+                    $this->$object = $this->InstantiateObject ($classNamespace, $args);
             }
             else
             {

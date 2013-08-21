@@ -4,7 +4,9 @@ namespace Application\Core;
 
 
 
-abstract class AppMethods extends ObjectManager{
+use Application\Core\Interfaces\AppMethods as AppMethodsInterface;
+
+abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
 
     /**
      *

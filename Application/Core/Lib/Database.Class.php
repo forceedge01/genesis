@@ -2,7 +2,10 @@
 
 namespace Application\Core;
 
-abstract class Database extends Template {
+
+use Application\Core\Interfaces\Database as DatabaseInterface;
+
+abstract class Database extends Template implements DatabaseInterface{
 
     private
         $threadId,

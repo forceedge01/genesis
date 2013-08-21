@@ -53,27 +53,7 @@ class Template extends Router {
 
         $this->title = $pageTitle;
 
-        extract($params);
-        unset($params);
-
-        $templateUrl = $this->GetView($template);
-
-        ob_start();
-
-        if(is_file($templateUrl['template'])){
-
-            if($this->header)
-                $this->GetBundleHeader ($this->GetClassFromNameSpacedController(get_called_class()));
-
-            require $templateUrl['template'];
-
-            if($this->footer)
-                $this->GetBundleFooter ($this->GetClassFromNameSpacedController(get_called_class()));
-        }
-        else
-            $this->ViewNotFound($templateUrl['template']);
-
-        $this->html = ob_get_clean();
+        $this->ProcessOutput($this->GetView($template), $params);
 
         $this->CheckJsCacheOptions();
         $this->CheckCssCacheOptions();
@@ -87,12 +67,43 @@ class Template extends Router {
             $this->GetComponent('ValidationEngine')->validateHTML ($this->html);
         }
 
-        echo $this->html;
+        echo $this->GetOutput();
 
         if(\Get::Config('Cache.html.enabled'))
             Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
 
-        unset($this->html);
+//        unset($this->html);
+    }
+
+    private function ProcessOutput($templateUrl, $params)
+    {
+        extract($params, EXTR_OVERWRITE);
+        ob_start();
+
+        if(is_file($templateUrl['template']))
+        {
+            if($this->header)
+                $this->GetBundleHeader ($this->GetClassFromNameSpacedController(get_called_class()));
+
+            require $templateUrl['template'];
+
+            if($this->footer)
+                $this->GetBundleFooter ($this->GetClassFromNameSpacedController(get_called_class()));
+        }
+        else
+            $this->ViewNotFound($templateUrl['template']);
+
+        $this->EndOutput();
+    }
+
+    public function EndOutput()
+    {
+        $this->html = ob_get_clean();
+    }
+
+    public function GetOutput()
+    {
+        return $this->html;
     }
 
     public function IncludeHeaderAndFooter()

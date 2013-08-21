@@ -3,7 +3,7 @@
 namespace Application\Core;
 
 
-use \Application\Interfaces\ObjectManager as ObjectManagerInterface;
+use \Application\Core\Interfaces\ObjectManager as ObjectManagerInterface;
 
 abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
@@ -88,30 +88,44 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetObject($object, $args = null) {
 
-        $variable = $this->ExplodeAndGetLastChunk($object, '\\');
+        list($object, $type) = $this->ExplodeAndGetLastChunk($object, '\\');
 
-        if (!isset($this->$variable))
+        if((!isset($this->$object)))
         {
-            $this->GetCoreObject($variable);
-
-            if(!isset($this->$variable))
+            if($type)
             {
-                $this->GetComponent($variable);
-
-                if(!isset($this->$variable))
+                if($type == 'Core')
                 {
-                    if(class_exists($object, false))
-                    {
-                        $this->$variable = $this->InstantiateObject($object, $args);
-                    }
+                    $this->$object = $this->GetCoreObject($object, $args);
+                }
+                else
+                {
+                    $this->$object = $this->GetComponent($object, $args);
+                }
+            }
+            else
+            {
+                $this->GetCoreObject($object);
 
-                    if(!isset($this->$variable))
-                        return false;
+                if(!isset($this->$object))
+                {
+                    $this->GetComponent($object);
+
+                    if(!isset($this->$object))
+                    {
+                        if(class_exists($object, false))
+                        {
+                            $this->$object = $this->InstantiateObject($object, $args);
+                        }
+
+                        if(!isset($this->$object))
+                            return false;
+                    }
                 }
             }
         }
 
-        return $this->$variable;
+        return $this->$object;
     }
 
     /**
@@ -368,6 +382,6 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         if(!$chunks)
             return $variable;
 
-        return end($chunks);
+        return explode(':', end($chunks));
     }
 }

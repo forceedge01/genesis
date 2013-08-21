@@ -7,7 +7,7 @@ namespace Application\Components;
  */
 use Application\Core\Router;
 
-class HTMLGenerator extends Router {
+class HTMLGenerator extends Router{
 
     private $formname; //used for saving and retrieving form from database
     private $form, $errors = array(), $errorColor, $elements = array(), $element = array();

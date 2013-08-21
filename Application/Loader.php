@@ -63,7 +63,7 @@ class Loader extends Debugger{
         }
         else
         {
-            Debugger::ThrowStaticError("Class '<b>$class</b>' was not found, tried including file with " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found.");
+            Debugger::ThrowStaticError("Class '<b>$class</b>' was not found, tried including file with " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found, called from ".  get_called_class());
         }
     }
 
@@ -85,7 +85,7 @@ class Loader extends Debugger{
         self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
         self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
-        self::Load('classes', \Get::Config('APPDIRS.CORE.LIB_FOLDER'));
+        self::RequireAllClasses(\Get::Config('APPDIRS.CORE.LIB_FOLDER'));
         self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
         self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
@@ -117,6 +117,8 @@ class Loader extends Debugger{
 
             return true;
         }
+        else
+            self::ThrowStaticError('Component: '.$component. ' was not found!', __FILE__, __LINE__);
 
         return false;
     }
@@ -151,16 +153,11 @@ class Loader extends Debugger{
      */
     public static function FetchAllBundles(){
 
-        // Include your bundles here
-
         $bundles = self::AppBundles();
-
-        // Do not edit below this line
-
         $bundlesDIR = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER');
 
-        foreach($bundles as $bundle){
-
+        foreach($bundles as $bundle)
+        {
             self::$bundles[] = $bundlesDIR . str_replace('\\', '/', $bundle);
         }
     }
@@ -170,7 +167,7 @@ class Loader extends Debugger{
      * @param type $classDir
      * @return type
      */
-    private static function FetchAllClasses($classDir){
+    private static function RequireAllClasses($classDir){
 
         $classes = array(
 
@@ -193,17 +190,14 @@ class Loader extends Debugger{
             'EventDispatcher.Class.php',
         );
 
-        foreach($classes as $class){
-
+        foreach($classes as $class)
+        {
             if(is_file($classDir . $class)){
-
-                self::$classes[] = $classDir . $class;
+                require_once $classDir . $class;
             }
             else
-                echo '<h1>Class '.$classDir.$class.' not found in kernel::FetchAllClasses</h1>';
+                die('<h1>Class '.$classDir.$class.' not found in kernel::FetchAllClasses</h1>');
         }
-
-        return self::$classes;
     }
 
     /**
@@ -215,62 +209,9 @@ class Loader extends Debugger{
     protected static function Load($staticVar, $dir){
 
         self::$files = array();
-
-        if($staticVar == 'classes')
-            self::$$staticVar = array_merge(self::$$staticVar, self::FetchAllClasses ($dir));
-        else
-            self::$$staticVar = array_merge(self::$$staticVar, self::FetchAll($dir));
-
+        self::$$staticVar = array_merge(self::$$staticVar, self::FetchAll ($dir));
         foreach(self::$$staticVar as $file)
             require_once $file;
-    }
-
-    /**
-     *
-     * @param type $staticVar
-     * @param type $dir
-     * Deprecated
-     */
-    protected static function LoadDevelopment($staticVar, $dir){
-
-        self::$files = array();
-
-        if($staticVar == 'classes')
-            self::$$staticVar = self::FetchAllClasses ($dir);
-        else if($staticVar == 'configs')
-            self::$$staticVar = self::FetchAllConfigs($dir);
-        else
-            self::$$staticVar = self::FetchAll($dir);
-
-        foreach(self::$$staticVar as $file)
-            require_once $file;
-    }
-
-    /**
-     * Depricated
-     */
-    private static function FetchAllConfigs($dir)
-    {
-        $directory = $dir;
-        $files = scandir($directory);
-
-        foreach($files as $file){
-
-            if(is_file($directory . str_replace('.php','_dev.php', $file)) && self::FileExtensionIs($directory . $file, array('php')))
-            {
-                self::$files[] = $directory .str_replace('.php','_dev.php', $file);
-            }
-            else if($file != '.' && $file != '..' && is_dir($directory . $file))
-            {
-                self::FetchAllConfigs ($directory . $file . '/');
-            }
-            else if(is_file($directory.$file) && self::FileExtensionIs($directory . $file, array('php')))
-            {
-                self::$files[] = $directory . $file;
-            }
-        }
-
-        return self::$files;
     }
 
     /**
@@ -279,6 +220,8 @@ class Loader extends Debugger{
     protected static function LoadBundles(){
 
         self::FetchAllBundles();
+        $bundleConfigDir = \Get::Config('APPDIRS.BUNDLES.CONFIG');
+        $bundleRoutesDir = \Get::Config('APPDIRS.BUNDLES.ROUTES');
 
         foreach(self::$bundles as $bundle){
 
@@ -286,11 +229,11 @@ class Loader extends Debugger{
             {
                 self::$configs = array_merge(
                         self::$configs,
-                        self::LoadFilesFromDir(self::RemoveDoubleSlash($bundle . \Get::Config('APPDIRS.BUNDLES.CONFIG')), array('php'))
+                        self::LoadFilesFromDir($bundle . $bundleConfigDir, array('php'))
                         );
                 self::$routes = array_merge(
                         self::$routes,
-                        self::LoadFilesFromDir(self::RemoveDoubleSlash($bundle . \Get::Config('APPDIRS.BUNDLES.ROUTES')), array('php'))
+                        self::LoadFilesFromDir($bundle . $bundleRoutesDir, array('php'))
                         );
             }
             else
@@ -337,7 +280,7 @@ class Loader extends Debugger{
      * @param type $directory
      * @param array $extensions - default php
      * @param type $subdirectories - default true
-     * @return boolean
+     * @return array Returns files included, uses require
      */
     protected static function LoadFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
@@ -349,7 +292,7 @@ class Loader extends Debugger{
 
             foreach($files as $file){
 
-                $filepath = str_replace('//', '/', $directory . '/' . $file);
+                $filepath = $directory . '/' . $file;
 
                 if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
@@ -370,11 +313,10 @@ class Loader extends Debugger{
     }
 
     /**
-     *
      * @param type $directory
      * @param array $extensions - default php
      * @param type $subdirectories - default true
-     * @return boolean
+     * @return boolean Requires all files in the current directory along with files in subdirectories<br /> presedence of files in subdirectory
      */
     public static function LoadOnceFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
@@ -386,17 +328,14 @@ class Loader extends Debugger{
 
                 $filepath = str_replace('//', '/', $directory . '/' . $file);
 
-                if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
+                if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
+                {
+                    self::LoadOnceFromDir ($filepath, $extensions, $subdirectories);
+                }
+                else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
                     self::$LoadedFiles[] = $filepath;
                     require_once $filepath;
-                }
-                else if($subdirectories)
-                {
-                    if($file != '.' && $file != '..' && is_dir($filepath))
-                    {
-                        self::LoadFilesFromDir ($filepath, $extensions);
-                    }
                 }
             }
         }
@@ -407,7 +346,7 @@ class Loader extends Debugger{
     /**
      * Dev env method
      */
-    protected static function LoadConfigFilesFromDir($directory, array $extensions, $subdirectories = true){
+    protected static function LoadConfigFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
         if(is_dir($directory)){
 
@@ -442,17 +381,15 @@ class Loader extends Debugger{
 
     protected static function FileExtensionIs($file, array $extensions){
 
-        $exists = false;
-
-        foreach($extensions as $extensions){
-
-            if(pathinfo($file, PATHINFO_EXTENSION) == $extensions){
-                $exists = true;
-                break;
+        foreach($extensions as $extension)
+        {
+            if(pathinfo($file, PATHINFO_EXTENSION) == $extension)
+            {
+                return true;
             }
         }
 
-        return $exists;
+        return false;
     }
 
     /**

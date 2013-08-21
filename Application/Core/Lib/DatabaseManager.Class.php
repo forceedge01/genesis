@@ -4,7 +4,9 @@ namespace Application\Core;
 
 
 
-class DatabaseManager extends Database{
+use Application\Core\Interfaces\DatabaseManager as DatabaseManagerInterface;
+
+class DatabaseManager extends Database implements DatabaseManagerInterface{
 
     private
         $queryTables,

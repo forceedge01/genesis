@@ -4,7 +4,7 @@ Set::Config('Cache', array(
 
     'html' => array(
 
-        'enabled' => false,
+        'enabled' => true,
         'minify' => false,
         'compress' => array(
             'enabled' => false,

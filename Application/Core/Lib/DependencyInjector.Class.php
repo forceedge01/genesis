@@ -4,7 +4,10 @@ namespace Application\Core;
 
 
 
-class DependencyInjector extends AppMethods{
+use Application\Core\Interfaces\DependencyInjector as DependencyInjectorInterface;
+
+
+class DependencyInjector extends AppMethods implements DependencyInjectorInterface{
 
     public function __construct() {}
 
@@ -14,23 +17,33 @@ class DependencyInjector extends AppMethods{
      * @param array $injectObject
      * @return type
      */
-    public function Inject($injectSubject, array $injectObject)
+    public function Inject($dependent, array $dependencies)
     {
-        $reflection = new \ReflectionClass($injectSubject);
+        $reflection = new \ReflectionClass($dependent);
 
-        if(!$this->IsLoopable($injectObject))
+        if(!$this->IsLoopable($dependencies))
             return $reflection->newInstance ();
 
-        $dependencies = array();
-
-        foreach($injectObject as $inject)
-        {
-            $dependencies[] = $this->GetObject($inject);
-
-            if(!end($dependencies))
-                $this->SetErrorArgs('Unable to inject dependency: '.$inject.' for object '. get_class($injectObject) . ', make sure the class exists', __FILE__, __LINE__)->ThrowError();
-        }
+        $dependencies = $this->ResolveDependencies($dependencies);
 
         return $reflection->newInstanceArgs($dependencies);
+    }
+
+    public function ResolveDependencies(array $dependencies)
+    {
+        if(!$this->IsLoopable($dependencies))
+            return array();
+
+        $dependenciesObjects = array();
+
+        foreach($dependencies as $inject)
+        {
+            $dependenciesObjects[] = $this->GetObject($inject);
+
+            if(!end($dependenciesObjects))
+                $this->SetErrorArgs('Unable to inject dependency: '.$inject.' for object '. get_class($dependenciesObjects) . ', make sure the class exists', __FILE__, __LINE__)->ThrowError();
+        }
+
+        return $dependenciesObjects;
     }
 }

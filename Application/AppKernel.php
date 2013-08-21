@@ -2,6 +2,7 @@
 
 namespace Application\Core;
 
+require_once __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
 require_once __DIR__ . '/Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/Loader.php';
 require_once __DIR__ . '/Core/Lib/Set.Class.php';
@@ -20,7 +21,7 @@ class AppKernal extends Loader{
      */
     public static function Initialize() {
 
-        self::$scriptStartTime = microtime();
+        self::$scriptStartTime = microtime(true);
         self::CheckDependencies();
         self::LoadFramework();
 
@@ -37,9 +38,7 @@ class AppKernal extends Loader{
 
         $version = '5.3.0';
 
-        if(version_compare(phpversion(), $version, '>='))
-            self::$phpVersion = phpversion();
-        else
+        if(!version_compare(phpversion(), $version, '>='))
             die('You need to update your php version, GENESIS requires atleast php '.$version);
     }
 
@@ -67,8 +66,19 @@ class AppKernal extends Loader{
 
         return self::$$fileType;
     }
+
+    /**
+     *
+     * @param string Append text
+     * @return mixed Returns execution time in Milliseconds
+     */
+    public static function GetExecutionTime($text = 'Milliseconds')
+    {
+        if($text)
+            $text = ' '.$text;
+
+        return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
+    }
 }
 
 spl_autoload_register(__NAMESPACE__ . '\Loader::LoadClass');
-
-AppKernal::Initialize();

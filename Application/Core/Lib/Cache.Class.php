@@ -30,18 +30,17 @@ class Cache extends AppMethods{
 
     public static function WriteCacheFile($pattern, $content)
     {
-        $folderChunks = explode('/', $pattern);
-
+        $folderChunks = explode('/', trim($pattern,'/'));
         $patt = \Get::Config('APPDIRS.CACHE_FOLDER');
 
         foreach($folderChunks as $f)
         {
-            $dir = $patt . '/' . $f;
+            $dir = $patt . $f . '/';
 
             if(!is_dir($dir))
                 mkdir($dir);
 
-            $patt .= '/'.$f;
+            $patt .= $f . '/';
         }
 
         $file = str_replace('//', '/', $patt . '/index.html');

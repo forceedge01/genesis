@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-use Application\Interfaces\Request as RequestInterface;
+use Application\Core\Interfaces\Request as RequestInterface;
 
 class Request extends AppMethods implements RequestInterface{
 

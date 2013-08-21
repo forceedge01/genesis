@@ -2,7 +2,12 @@
 
 namespace Application\Core;
 
-abstract class Debugger {
+
+
+use \Application\Core\Interfaces\Debugger as DebuggerInterface;
+
+
+abstract class Debugger implements DebuggerInterface{
 
     private $message, $file, $line, $errorNumber;
 

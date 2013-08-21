@@ -4,7 +4,9 @@ namespace Application\Core;
 
 
 
-class Router extends EventHandler{
+use Application\Core\Interfaces\Router as RouterInterface;
+
+class Router extends EventHandler implements RouterInterface{
 
     private
             $url,
@@ -16,7 +18,8 @@ class Router extends EventHandler{
             $params,
             $Router,
             $pattern,
-            $ControllerDependencies = array();
+            $ControllerDependencies = array(),
+            $ActionDependencies = array();
 
     public static $Route = array(), $LastRoute;
 
@@ -34,11 +37,12 @@ class Router extends EventHandler{
      */
     public function ForwardRequest(){
 
-        $value = array();
-
         $this->CheckIfUnderDevelopment();
 
-        $this->funcVariables = array();
+        if(\Get::Config('Cache.html.enabled'))
+            Cache::CheckForCachedFile($this->GetPattern());
+
+        $value = $this->funcVariables = array();
 
         // Should the value contain a regular expression?
         // Render the right controller;
@@ -54,23 +58,102 @@ class Router extends EventHandler{
                 if(isset($value['Requirements']))
                     $this->CheckRouteRequirements ($value['Requirements']);
 
-                $controllerAction = explode(':', $value['Controller']);
-                $dependencies = \Get::Config($controllerAction[0].'.Dependencies');
+                list($bundle, $controller, $action) = explode(':', $value['Controller']);
 
-                if($dependencies)
-                    $this->CheckControllerDependencies ($dependencies);
-
-                Loader::LoadBundle($this->GetBundleFromName($controllerAction[0]));
-                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $this->funcVariables);
+                Loader::LoadBundle($this->GetBundleFromName($bundle));
+                $this->CheckDependencies ($bundle, $controller, $action);
+                $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
             }
         }
 
         return false;
     }
 
-    private function CheckControllerDependencies($inject)
+    /**
+     *
+     * @param type $objectName
+     * @param type $objectAction
+     * @param type $variable<br />
+     * Calls an action of a controller.
+     */
+    private function CallAction($objectName, $action, array $variable = array())
     {
-        $this->ControllerDependencies = $inject;
+        if(!method_exists($objectName, $action))
+        {
+            $error = array(
+                'Action' => $action,
+                'Class' => $objectName,
+                'Controller' => $objectName  . ':' . str_replace('Action','',$action),
+                'Route' => $this->lastRoute,
+                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
+            );
+
+            $this->ForwardToController('Action_Not_Found', $error);
+        }
+
+        if(!empty($variable))
+            $this->funcVariables = $variable;
+
+        $controller = $this->InstantiateController($objectName);
+
+        $this->CallControllerAction($controller, $action);
+
+        // Ouput execution time of the whole script
+        echo \Application\Core\AppKernal::GetExecutionTime();
+
+        die();
+    }
+
+    private function CallControllerAction($controller, $action)
+    {
+        if(count($this->ActionDependencies))
+            $this->funcVariables = array_merge(
+                    $this->funcVariables,
+                    $this->GetCoreObject('DependencyInjector')->ResolveDependencies($this->ActionDependencies)
+                );
+
+        if(count($this->funcVariables))
+        {
+            return call_user_func_array (array($controller, $action) , $this->funcVariables);
+        }
+        else
+        {
+            return call_user_func (array($controller, $action));
+        }
+    }
+
+    private function InstantiateController($objectName)
+    {
+//        if(!class_exists($objectName, false))
+//        {
+//            echo 'Error calling object: '.$objectName;
+//
+//            $error = array(
+//                'Class' => $objectName,
+//                'Controller' => $objectName,
+//                'Route' => $this->lastRoute,
+//                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
+//            );
+//
+//            $this->ForwardToController ('Class_Not_Found', $error);
+//        }
+
+        if(count($this->ControllerDependencies))
+            return $this->InstantiateObject($objectName);
+        else
+            return $this->GetCoreObject('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
+    }
+
+    private function CheckDependencies($bundle, $controller, $action)
+    {
+        $this->ControllerDependencies = \Get::Config("{$bundle}.{$controller}.Dependencies");
+        $this->ActionDependencies = \Get::Config("{$bundle}.{$controller}.{$action}.Dependencies");
+
+        if(!$this->ControllerDependencies)
+            $this->ControllerDependencies = array();
+
+        if(!$this->ActionDependencies)
+            $this->ActionDependencies = array();
 
         return $this;
     }
@@ -119,9 +202,9 @@ class Router extends EventHandler{
         {
             if(!$this->Variable(getenv('REMOTE_ADDR'))->IsIn(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
             {
-                $controllerAction = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
+                list($bundle, $controller, $action) = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));
 
-                $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action');
+                $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action');
             }
         }
 
@@ -200,15 +283,12 @@ class Router extends EventHandler{
 
         if(strpos($route,'{'))
         {
-            $pattern = '(\\{.*?\\})';
-
             $routeParams = explode('/', $route);
-
             $index = 0;
 
             foreach($routeParams as $param)
             {
-                if(preg_match($pattern, $param))
+                if(preg_match('(\\{.*?\\})', $param))
                 {
                     if(isset($this->params[$index]))
                     {
@@ -217,7 +297,6 @@ class Router extends EventHandler{
                 }
 
                 $routeParams[$index] = $param;
-
                 $index++;
             }
 
@@ -227,12 +306,12 @@ class Router extends EventHandler{
         return $route;
     }
 
-    private function GetControllerNamespace($controllerAction){
+    private function GetControllerNamespace($bundle, $controller){
 
-        if($controllerAction[0] == null)
-            return '\\Application\\Controllers\\'.$controllerAction[1] . 'Controller';
+        if($bundle == null)
+            return '\\Application\\Controllers\\'.$controller . 'Controller';
         else
-            return '\\Bundles\\'.$this->GetBundleNameSpace ($controllerAction[0]).'\\Controllers\\' . $controllerAction[1] . 'Controller';
+            return '\\Bundles\\'.$this->GetBundleNameSpace ($bundle).'\\Controllers\\' . $controller . 'Controller';
     }
 
     /**
@@ -349,75 +428,6 @@ class Router extends EventHandler{
 
     /**
      *
-     * @param type $objectName
-     * @param type $objectAction
-     * @param type $variable<br />
-     * Calls an action of a controller.
-     */
-    private function CallAction($objectName, $objectAction, array $variable = array())
-    {
-        $return = $controller = null;
-
-        if(!empty($variable))
-            $this->funcVariables = $variable;
-
-        if(!class_exists($objectName))
-        {
-            echo 'Error calling object: '.$objectName;
-
-            $error = array(
-
-                'Class' => $objectName,
-                'Controller' => $objectName  . ':' . str_replace('Action','',$objectAction),
-                'Route' => $this->lastRoute,
-                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
-
-            );
-
-            $this->ForwardToController ('Class_Not_Found', $error);
-        }
-
-        $controller = $this->GetCoreObject('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
-
-        if(!method_exists($objectName, $objectAction)){
-
-            $error = array(
-
-                'Action' => $objectAction,
-                'Class' => $objectName,
-                'Controller' => $objectName  . ':' . str_replace('Action','',$objectAction),
-                'Route' => $this->lastRoute,
-                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
-
-            );
-
-            $this->ForwardToController('Action_Not_Found', $error);
-        }
-
-        if(\Get::Config('Cache.html.enabled'))
-            Cache::CheckForCachedFile($this->GetPattern());
-
-        if($this->IsLoopable($this->ObjectDependencies))
-        {
-            $this->GetCoreObject('DependencyInjector')->Inject($controller, $this->ControllerDependencies);
-        }
-
-        if(sizeof($this->funcVariables) != 0)
-        {
-            $return = call_user_func_array (array($controller, $objectAction) , $this->funcVariables);
-        }
-        else
-        {
-            $return = call_user_func (array($controller, $objectAction));
-        }
-
-        unset($controller);
-
-        die();
-    }
-
-    /**
-     *
      * @param type $route
      * @param type $variable
      * <br />
@@ -425,11 +435,9 @@ class Router extends EventHandler{
      */
     public function ForwardToController($route, array $variables = array())
     {
-        $controller = $this->GetController($route);
+        list($bundle, $controller, $action) = explode(':', $this->GetController($route));
 
-        $controllerAction = explode(':', $controller);
-
-        $this->CallAction($this->GetControllerNamespace($controllerAction), $controllerAction[2] . 'Action', $variables);
+        $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $variables);
     }
 
     /**

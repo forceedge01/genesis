@@ -31,4 +31,9 @@ class SchemaUI extends SchemaApi {
             echo $this->green("Database '$db' dropped successfully."), $this->linebreak(2);
         }
     }
+
+    public function execute($query)
+    {
+        $this->ExecuteQuery(($query));
+    }
 }

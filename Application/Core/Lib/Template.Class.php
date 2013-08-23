@@ -75,6 +75,16 @@ class Template extends Router {
 //        unset($this->html);
     }
 
+    public function Render404Response()
+    {
+        $this->ForwardToController('404');
+    }
+
+    public function Render500Response()
+    {
+        $this->ForwardToController('500');
+    }
+
     private function ProcessOutput($templateUrl, $params)
     {
         extract($params, EXTR_OVERWRITE);

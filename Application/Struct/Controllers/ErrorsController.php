@@ -65,11 +65,13 @@ class ErrorsController extends Application implements Error{
 
     public function NotFoundError404Action(){
 
+        $this->GetResponseManager()->SetNotFound();
         $this->Render(':Errors/error404.html.php', array('pageTitle' => 'Error 404: Page not found'));
     }
 
     public function ServerError500Action(){
 
+        $this->GetResponseManager()->SetInternalServerError();
         $this->Render(':Errors/error500.html.php', array('pageTitle' => 'Error 500: Internal server error'));
     }
 }

@@ -15,6 +15,14 @@ abstract class SchemaAPI extends Console {
         $this->connection = new \Application\Core\DatabaseManager();
     }
 
+    protected function ExecuteQuery($query)
+    {
+        $result = $this->connection->Query($query)->GetResultSet();
+
+        if(is_array($result))
+            print_r($result);
+    }
+
     protected function exportDefinition($database = null)
     {
         $this->database = ($database) ? $database : \Get::Config('Database.name');

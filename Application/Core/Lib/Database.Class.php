@@ -120,7 +120,8 @@ abstract class Database extends Template implements DatabaseInterface{
                 {
                     if (\Get::Config('Errors.showDBErrors'))
                     {
-                        $this->SetErrorArgs('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' . $sql ,'Ref backtrace','0','2')->ThrowError();
+                        if(isset($_SERVER['SERVER_NAME']))
+                            $this->SetErrorArgs('There was a database failure: ' . $this->activeConnection->error . ', SQL query: ' . $sql ,'Ref backtrace','0','2')->ThrowError();
                     }
 
                     if (\Get::Config('Errors.mailDBErrors'))
@@ -167,8 +168,8 @@ abstract class Database extends Template implements DatabaseInterface{
                     return $this;
                 }
             }
-
-            $this->SetErrorArgs('Empty query given to execute', 'Database', '0', '3')->ThrowError();
+            else
+                $this->SetErrorArgs('Empty query given to execute', 'Database', '0', '3')->ThrowError();
 
         } catch (Exception $e) {
 

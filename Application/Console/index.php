@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../Core/Interfaces/Debugger.Interface.php';
 require_once __DIR__ . '/../Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/../Loader.php';
 require_once __DIR__ . '/../Core/Lib/Set.Class.php';
@@ -30,7 +31,8 @@ function getOptions() {
         'Schema' => array(
             'schema:export[:{database}::'.Get::Config('Database.name').']',
             'schema:import:{file}',
-            'schema:drop[:{database}::'.Get::Config('Database.name').']'
+            'schema:drop[:{database}::'.Get::Config('Database.name').']',
+            'schema:execute:{query}'
         ),
         'Tests' => array(
             'test:routes',

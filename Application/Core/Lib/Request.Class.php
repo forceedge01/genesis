@@ -274,4 +274,9 @@ class Request extends AppMethods implements RequestInterface{
 
         return false;
     }
+
+    public function GetStatus()
+    {
+        return $_SERVER["REDIRECT_STATUS"];
+    }
 }

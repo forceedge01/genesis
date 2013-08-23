@@ -88,6 +88,11 @@ class Initializer{
                 $schema->import($args[2]);
                 break;
             }
+
+            case 'execute':
+            {
+                $schema->execute($args[2]);
+            }
         }
     }
 

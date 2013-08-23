@@ -7,7 +7,7 @@ Set::Config('Application', array(
     'Base_Route_Name' => 'Application',
     'LandingPageRoute' => 'users_List',
     'Session' => array(
-        'Enabled' => true,
+        'Enabled' => false,
         'Secure' => array(
             'HttpsSecure' => false,
             'HttpOnly' => true,

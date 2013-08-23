@@ -12,6 +12,8 @@ class Application extends Template implements Interfaces\Application{
 
     public function __construct() {
 
+        parent::__construct();
+
         $this->BeforeApplicationHook();
         $this->Request = $this->GetCoreObject('Request');
 

@@ -1,0 +1,305 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Version Update
+ * @Author Wahab Qureshi.
+ * @version 1.0.13
+ */
+
+class updateVersion
+{
+    private static
+            $path,
+            $pattern,
+            $patchLimit,
+            $minorLimit,
+            $version,
+            $versionSeparator;
+
+    public static function Initialize()
+    {
+        if(@preg_match('/^--help$/i', $_SERVER['argv'][1]))
+            self::Help();
+
+        self::SetConfigs();
+        $response = self::ProcessFile();
+        die("$response\r\n\r\n");
+    }
+
+    private static function SetConfigs()
+    {
+        // ------------------------------- Config, do not edit below this section -------------------------------- //
+
+        // The file that holds the version
+        self::$path = __DIR__ . '/Public/index.php';
+
+        // The line pattern that holds the version details
+        self::$pattern = '/^\s*\*\s*Version:\s*.+$/i';
+
+        // The separator between the word version and the version number in the file
+        self::$versionSeparator = ':';
+
+        // The patch limit by which the minor is incremented
+        self::$patchLimit = 50;
+
+        // The minor limit by which the major is updated
+        self::$minorLimit = 50;
+
+        // ------------------------------------------- End of Config --------------------------------------------- //
+    }
+
+    private static function ProcessFile()
+    {
+        if(!is_file(self::$path))
+            return self::red ('Version file not found! '.self::$path);
+
+        // Get file contents as an array
+        $file = file(self::$path);
+
+        if(count($file)>0)
+        {
+            // Write updated content
+            try
+            {
+                $response = self::UpdateFile($file);
+
+                if(!is_array($response))
+                    die($response."\r\n\r\n");
+
+                return self::WriteUpdatedFile($response);
+            }
+            catch(Exception $e)
+            {
+                die($e->getMessage());
+            }
+        }
+        else
+            return self::red ('File trying to update is empty!!');
+    }
+
+    private static function UpdateFile($file)
+    {
+        // Find version and update it
+        $index = 0;
+        $match = array();
+
+        foreach($file as $line)
+        {
+            if(strpos($line, 'Version:') !== false)
+            {
+                preg_match(self::$pattern, $line, $match);
+
+                if(@$_SERVER['argv'][1] == '--version')
+                {
+                    if(isset($match[0]))
+                        return self::blue ($match[0]);
+                    else
+                        return self::red ('No version info found in file! Check regular expression set. Current Regex: '.self::$pattern);
+                }
+
+                @list($title, $version) = explode(self::$versionSeparator, $match[0]);
+
+                if(!$version)
+                    return self::red('Invalid separator provided for version! Separator set: \''.self::$versionSeparator).'\' for version line: \''.$match[0].'\'';
+
+                self::$version = self::getVersion(trim($version), self::$minorLimit, self::$patchLimit);
+
+                if(strpos(self::$version, '.') !== false)
+                {
+                    $file[$index] = preg_replace(self::$pattern, $title.self::$versionSeparator.self::$version, $line);
+                    break;
+                }
+                else
+                    return self::red ('Invalid version type given!!');
+            }
+
+            $index++;
+        }
+
+        return $file;
+    }
+
+    private static function WriteUpdatedFile($file)
+    {
+        if($content = self::ArrayToString($file))
+        {
+            if(self::WriteFile(self::$path, $content))
+                return self::green ("File has been updated to version: '".self::$version."'!");
+        }
+        else
+            return self::red ('No content to write!!');
+    }
+
+    private static function Help()
+    {
+        echo("\r\n");
+        self::OutputLine(self::green(' - Use this file to update a version for a configured file, this versioning follows the semantic versioning mechanism, which you can read about on ').self::blue('http://semver.org/'));
+        echo("\r\n");
+        self::OutputLine(" - Just running the file will automatically increment the version in the file configured e.g \r\n   ".self::blue('$_ php updateVersion'));
+        self::OutputLine(" - You can provide a version number which will be set, the build will still be automatically updated, eg run \r\n   ".self::blue('$_ php updateVersion 1.10.14'));
+        self::OutputLine(" - You can revert the version number, this will follow the same convention as an auto update in version number. If the version was set manually it will only decrease the numbers, the build will be decreased as well, eg run \r\n   ".self::blue('$_ php updateVersion --revert'));
+        self::OutputLine(" - The major, minor and patch versions can be incremented without using the limits, the build will be increased each time, eg run \r\n   ".self::blue('$_ php updateVersion --major || --minor || --patch'));
+        self::OutputLine( " - You can get the current version specified in the file by adding a parameter as such e.g \r\n   ".self::blue('$_ php updateVersion --version'));
+        self::OutputLine( " - After you have setup the configs in this file, run the --version command to see if everything is setup right, if it is it will show the version line of the target file e.g \r\n   ".self::blue('$_ php updateVersion --version'));
+        die("\r\n\r\n");
+    }
+
+    private static function OutputLine($message)
+    {
+        echo $message, "\r\n";
+    }
+
+    public static function green($string)
+    {
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[32m".$string."\033[37m";
+        else
+            return "<font color='#339933'>$string</font>";
+    }
+
+    private static function red($string)
+    {
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[31m".$string."\033[37m";
+        else
+            return "<font color='#B80000'>$string</font>";
+    }
+
+    private static function blue($string)
+    {
+        if (!isset($_SERVER['SERVER_NAME']))
+            return "\033[34m".$string."\033[37m";
+        else
+            return "<font color='steelblue'>$string</font>";
+    }
+
+    private static function getVersion($currentVersion, $minorLimit = 50, $patchLimit = 50)
+    {
+        list($version, $build) = explode('-', $currentVersion);
+
+        @list($major, $minor, $patch) = explode('.', $version);
+
+        if(isset($_SERVER['argv'][1]))
+        {
+            switch($_SERVER['argv'][1])
+            {
+                case '--revert':
+                    return self::revertVersion($version, $patchLimit, $minorLimit).'-'.($build-1);
+                case '--major':
+                    return self::updateMajor($major, $minor, $patch).'-'.($build+1);
+                case '--minor':
+                    return self::updateMinor($major, $minor, $patch).'-'.($build+1);
+                case '--patch':
+                    return self::updatePatch($major, $minor, $patch).'-'.($build+1);
+                default:
+                {
+                    $version = $_SERVER['argv'][1];
+
+                    if(!preg_match('/^\d+\.\d+.*/', $version))
+                    {
+                        echo(self::red ("Invalid option given!\r\n\r\n")); die();
+                    }
+
+                    return $_SERVER['argv'][1].'-'.($build+1);
+                }
+            }
+        }
+
+        return self::updateVersionNumber($version, $patchLimit, $minorLimit).'-'.($build+1);
+    }
+
+    private static function updateMajor($major, $minor, $patch)
+    {
+        $major += 1;
+        return "{$major}.{$minor}.{$patch}";
+    }
+
+    private static function updateMinor($major, $minor, $patch)
+    {
+        $minor += 1;
+        return "{$major}.{$minor}.{$patch}";
+    }
+
+    private static function updatePatch($major, $minor, $patch)
+    {
+        $patch += 1;
+        return "{$major}.{$minor}.{$patch}";
+    }
+
+    private static function updateVersionNumber($version, $patchLimit, $minorLimit)
+    {
+        list($major, $minor, $patch) = explode('.', $version);
+
+        $patch +=1;
+
+        if($patch >= $patchLimit)
+        {
+            $minor += 1;
+            $patch = 0;
+        }
+
+        if($minor >= $minorLimit)
+        {
+            $major += 1;
+            $minor = 0;
+            $patch = 0;
+        }
+
+        return $major.'.'.$minor.'.'.$patch;
+    }
+
+    private static function revertVersion($version, $patchLimit, $minorLimit)
+    {
+        list($major, $minor, $patch) = explode('.', $version);
+
+        $patch -=1;
+
+        if($patch < 0)
+        {
+            $minor -= 1;
+            $patch = $patchLimit-1;
+        }
+
+        if($minor < 0)
+        {
+            $major -= 1;
+            $minor = $minorLimit-1;
+            $patch = $patchLimit-1;
+        }
+
+        return $major.'.'.$minor.'.'.$patch;
+    }
+
+    // Converts an array to a string with line breaks
+    private static function ArrayToString(array $array)
+    {
+        $string = null;
+        foreach($array as $line)
+        {
+            $string .= $line;
+        }
+        return $string;
+    }
+
+    // Writes contents to a file
+    private static function WriteFile($path, $content)
+    {
+        try{
+            if(!$content)
+                return false;
+
+            $handle = fopen($path, 'w+');
+            fwrite($handle, $content);
+            fclose($handle);
+
+            return true;
+        }
+        catch(Exception $e)
+        {
+            die($e->getMessage());
+        }
+    }
+}
+
+updateVersion::Initialize();

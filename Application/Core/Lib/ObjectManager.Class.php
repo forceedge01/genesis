@@ -136,16 +136,13 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetRepository($bundleColonEntityName){
 
-        $bundle = explode(':', $bundleColonEntityName);
+        list($bundle, $repository) = explode(':', $bundleColonEntityName);
+        $namespace = '\\'.$this->GetBundleNameSpace($bundle).'\\Repositories\\'.$repository.'Repository';
 
-//        if($bundle[0] == null)
-//            $namespace = '\\Application\\Repositories\\';
-//        else
-            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Repositories\\';
+        if(!class_exists($namespace))
+            Loader::LoadBundle($bundle);
 
-        $bundle[1] .= 'Repository';
-
-        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
+        return $this->InstantiateObject($namespace);
     }
 
     /**
@@ -156,16 +153,13 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetModel($bundleColonEntityName){
 
-        $bundle = explode(':', $bundleColonEntityName);
+        list($bundle, $model) = explode(':', $bundleColonEntityName);
+        $namespace = '\\'.$this->GetBundleNameSpace($bundle).'\\Models\\'.$model.'Model';
 
-//        if($bundle[0] == null)
-//            $namespace = '\\Application\\Models\\';
-//        else
-            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Models\\';
+        if(!class_exists($namespace))
+            Loader::LoadBundle($bundle);
 
-        $bundle[1] .= 'Model';
-
-        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
+        return $this->InstantiateObject($namespace);
     }
 
     /**
@@ -176,16 +170,13 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetEntity($bundleColonEntityName){
 
-        $bundle = explode(':', $bundleColonEntityName);
+        list($bundle, $entity) = explode(':', $bundleColonEntityName);
+        $namespace = '\\'.$this->GetBundleNameSpace($bundle).'\\Entities\\'.$entity.'Entity';
 
-//        if($bundle[0] == null)
-//            $namespace = '\\Application\\Entities\\';
-//        else
-            $namespace = '\\'.$this->GetBundleNameSpace($bundle[0]).'\\Entities\\';
+        if(!class_exists($namespace))
+            Loader::LoadBundle($bundle);
 
-        $bundle[1] .= 'Entity';
-
-        return $this->GetObject($namespace.$bundle[1], $bundle[1]);
+        return $this->InstantiateObject($namespace);
     }
 
     /**
@@ -212,7 +203,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetVariableManager ( )
     {
-        return $this ->GetComponent('Variable');
+        return $this ->GetCoreObject('Variable');
     }
 
     /**
@@ -340,16 +331,9 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
     public static function GetNamespaceFromFilePath($filePath)
     {
-//        $replace = array(
-//            \Get::Config('APPDIRS.SOURCE_FOLDER') => '\\',
-//            '/' => '\\',
-//            '.php' => ''
-//        );
-
         $search = array(\Get::Config('APPDIRS.SOURCE_FOLDER'), '/', '.php');
         $replace = array('\\', '\\');
 
-//        foreach($replace as $key => $re)
         return str_replace($search, $replace, $filePath);
     }
 

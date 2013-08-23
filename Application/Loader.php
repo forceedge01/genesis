@@ -243,7 +243,6 @@ class Loader extends Debugger{
                 require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
                 trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
                 die();
-
             }
         }
 
@@ -404,9 +403,9 @@ class Loader extends Debugger{
             if($component != '.' and $component != '..')
             {
                 if(is_file($base.'/'.$component.'/Loader.php'))
-                    self::$components[] = $component;
-                else
-                    self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
+                    self::$components[] = $component; continue;
+
+                self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
             }
         }
     }

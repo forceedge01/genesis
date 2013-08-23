@@ -188,10 +188,10 @@ class Auth extends Template{
             $userObject = \Get::Config('Auth.Login.EntityRepository');
             $object = null;
 
-            if(class_exists($userObject))
+            if(class_exists($userObject, false))
             {
                 $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
-                $object = new $userObject();
+                $object = $this->GetRepository($userObject.':'.$userObject);
 
                 if($objectMethod)
                 {

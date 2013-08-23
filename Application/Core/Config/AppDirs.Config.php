@@ -3,7 +3,7 @@
 // Core folder paths
 
 define('HOST', (isset($_SERVER['HTTP_HOST'])) ? "http://{$_SERVER['HTTP_HOST']}/" : '');
-define('ROOT', (!empty($_SERVER['DOCUMENT_ROOT'])) ? "{$_SERVER['DOCUMENT_ROOT']}/" : __DIR__ . '/../../../');
+define('ROOT', (!empty($_SERVER['DOCUMENT_ROOT'])) ? "{$_SERVER['DOCUMENT_ROOT']}/../" : __DIR__ . '/../../../');
 
 Set::Config('APPDIRS', array(
 

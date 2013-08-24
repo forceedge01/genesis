@@ -33,7 +33,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
      * @return object
      * Find one record
      */
-    public function find($id, array $tables = array()){
+    public function Find($id, array $tables = array()){
 
         $entity = $this
                 ->Table($this->tableName);
@@ -55,12 +55,11 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
      * @return object
      * Find record by array of params
      */
-    public function findOneBy(array $params){
+    public function FindOneBy(array $params){
 
         return $this
                 ->Table($this->tableName)
-                ->GetRecordBy($params)
-                    ->GetResultSet();
+                ->GetOneRecordBy($params);
     }
 
     /**
@@ -69,7 +68,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
      * @return object
      * Find all records, optional parameters for filtering data
      */
-    public function findAll(array $params = array(), $tables = array()){
+    public function FindAll(array $params = array(), $tables = array()){
 
         $entity = $this
                 ->Table($this->tableName, $this->tableColumns);
@@ -120,16 +119,5 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
                 ->Count($column, $predicament)
                 ->Execute()
                     ->GetResultSet();
-    }
-
-    /**
-     *
-     * @param type $repository
-     * @return object
-     * Gets table for further query processing
-     */
-    private function GetTableForRepository($repository){
-
-        return $this->Table($this->tableName);
     }
 }

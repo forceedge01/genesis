@@ -17,7 +17,8 @@ class Loader extends Debugger{
             $traits = array() ,
             $interfaces = array(),
             $files = array(),
-            $LoadedFiles = array();
+            $LoadedFiles = array(),
+            $LoadedBundles = array();
 
     public static
             $environment,
@@ -118,7 +119,7 @@ class Loader extends Debugger{
             return true;
         }
         else
-            self::ThrowStaticError('Component: '.$component. ' was not found!', __FILE__, __LINE__);
+            self::ThrowStaticError('Component: '.$component. ' not found! Components found: <pre>'.print_r(Loader::$components, true).'</pre>', __FILE__, __LINE__);
 
         return false;
     }
@@ -255,22 +256,26 @@ class Loader extends Debugger{
 
     public static function LoadBundle($bundle)
     {
-        $bundle = str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
+        if(!in_array($bundle, self::$LoadedBundles))
+        {
+            self::$LoadedBundles[] = $bundle;
+            $bundle = str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
 
-        if(is_dir($bundle))
-        {
-            self::LoadFilesFromDir($bundle, array('php'), false);
-            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'), array('php'));
-            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
-            self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
-        }
-        else
-        {
-            $params['Backtrace'] = debug_backtrace();
-            $message = ' not found in Loader::LoadBundle()';
-            require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
-            trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
-            die();
+            if(is_dir($bundle))
+            {
+                self::LoadFilesFromDir($bundle, array('php'), false);
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
+            }
+            else
+            {
+                $params['Backtrace'] = debug_backtrace();
+                $message = ' not found in Loader::LoadBundle()';
+                require \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/BundleNotFound.html.php';
+                trigger_error ('Unable to locate Bunlde:'. $bundle, E_USER_ERROR);
+                die();
+            }
         }
     }
 
@@ -403,7 +408,9 @@ class Loader extends Debugger{
             if($component != '.' and $component != '..')
             {
                 if(is_file($base.'/'.$component.'/Loader.php'))
+                {
                     self::$components[] = $component; continue;
+                }
 
                 self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
             }

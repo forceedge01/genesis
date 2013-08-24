@@ -185,26 +185,19 @@ class Auth extends Template{
 
         if($username)
         {
-            $userObject = \Get::Config('Auth.Login.EntityRepository');
-            $object = null;
 
-            if(class_exists($userObject, false))
+            $userEntity = \Get::Config('Auth.Login.EntityRepository');
+            $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
+
+            $repo = $this->GetRepository($userEntity);
+
+            if(method_exists($repo, $objectMethod))
             {
-                $objectMethod = \Get::Config('Auth.Login.UserPopulateMethod');
-                $object = $this->GetRepository($userObject.':'.$userObject);
-
-                if($objectMethod)
-                {
-                    return $object->$objectMethod();
-                }
-                else
-                {
-                    return $object->FindBy(array($this->authField => $username));
-                }
+                return $repo->$objectMethod();
             }
             else
             {
-                $this->ForwardToController ('Class_Not_Found', array( 'controller' => $userObject, 'line' => __LINE__ ));
+                return $repo->findOneBy(array($this->authField => $username));
             }
         }
     }

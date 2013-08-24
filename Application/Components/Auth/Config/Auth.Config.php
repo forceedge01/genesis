@@ -51,8 +51,8 @@ Set::Config('Auth', array(
     ),
 
     'Login' => array(
-        'EntityRepository' => '\\Bundles\\users\\Entities\\usersEntity',
-        'UserPopulateMethod' => false,
+        'EntityRepository' => 'users:users',
+        'UserPopulateMethod' => false,//'populateUser',
 
         'LoginRoute' => 'users_login',
         'LoginAuthRoute' => 'users_login_auth',

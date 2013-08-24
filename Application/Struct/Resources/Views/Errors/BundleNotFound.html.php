@@ -1,3 +1,5 @@
+<?=$this->IncludeView(':Header.html.php');?>
+
 <div class="errorPage">
 
     <h4>Bundle:: <span>'<?=$bundle?>'</span> <?=$message?></h4>

@@ -1,3 +1,5 @@
+<?=$this->IncludeView(':Header.html.php');?>
+
 <div class="errorPage">
 
     <h1>Class::<span><?=$Error['Controller']?></span> not found  for method call <?=$Error['Class']?> as defined in Routes ['<span><?=$Error['Route']?></span>'], Line: <?=$Error['line']?></h1>

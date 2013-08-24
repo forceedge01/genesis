@@ -1,3 +1,5 @@
+<?=$this->IncludeView(':Header.html.php');?>
+
 <div class="errorPage">
 
     <h1>Route: '<span><?=$Error['Route'];?></span>' was not found, please check if the specified route exists.</h1>

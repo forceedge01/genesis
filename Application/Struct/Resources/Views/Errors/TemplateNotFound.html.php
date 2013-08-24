@@ -1,3 +1,5 @@
+<?=$this->IncludeView(':Header.html.php');?>
+
 <div class="errorPage">
 
     <h1>Template:: <span><?=$template?></span> <?=$message?> Not Found</h1>

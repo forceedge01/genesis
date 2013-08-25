@@ -371,16 +371,21 @@ class Console extends Debugger {
     {
         foreach($array as $key => $value)
         {
-            if(is_numeric($key))
-                $key += $increment;
+            if($increment !== false)
+            {
+                if(is_numeric($key))
+                    $key += $increment;
 
-            echo '[ ',$this->green($key), ' ]: ', $value, $this->linebreak();
+                echo '[ ',$this->green($key), ' ]:';
+            }
+
+            echo ' ', $value, $this->linebreak();
         }
     }
 
     public static function Legend()
     {
-        echo self::blue("\r\n".
+        echo ("\r\n".
         ' - [NUMBER] specifies an index option for you to choose from'.
         "\r\n".
         ' - [...] specifies an optional part of a command.'.

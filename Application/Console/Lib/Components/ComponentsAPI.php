@@ -101,7 +101,15 @@ abstract class ComponentsAPI extends Console{
         foreach($dir as $directory)
         {
             if(is_dir($this->componentsFolder.$directory) and $directory != '.' and $directory != '..')
+            {
+                if(!is_file($this->componentsFolder.$directory.'/Loader.php'))
+                {
+                    $clean[] = $directory . $this->red(' (Broken: Loader.php not found for this component)');
+                    continue;
+                }
+
                 $clean[] = $directory;
+            }
         }
 
         return $clean;

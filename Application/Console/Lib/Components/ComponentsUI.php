@@ -6,7 +6,7 @@ namespace Application\Console\Lib;
 
 class ComponentsUI extends ComponentsAPI{
 
-    
+
     public function Create()
     {
         // Get Component name from user
@@ -50,5 +50,11 @@ class ComponentsUI extends ComponentsAPI{
 
             echo $this->linebreak(2);
         }
+    }
+
+    public function ListAll()
+    {
+        echo $this->blue("\r\n List of components in your application:\r\n\r\n");
+        $this->ShowFormattedArray($this->ReadComponents(), 1);
     }
 }

@@ -25,6 +25,7 @@ function getOptions() {
             'bundle:verify'
         ),
         'Components' => array(
+            'component:list',
             'component:create',
             'component:delete'
         ),

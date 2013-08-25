@@ -112,6 +112,11 @@ class Initializer{
                 $component->Delete();
                 break;
             }
+            case 'list':
+            {
+                $component->ListAll();
+                break;
+            }
         }
     }
 

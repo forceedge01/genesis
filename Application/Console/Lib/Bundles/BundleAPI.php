@@ -43,6 +43,9 @@ abstract Class BundleAPI extends Console{
         $this->bundleEventsFolder = \Get::Config('APPDIRS.BUNDLES.EVENTS');
         $this->bundleHeaderFileName = \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
         $this->bundleFooterFileName = \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
+
+        if(!is_dir($this->bundleSourceFolder))
+            mkdir($this->bundleSourceFolder, 0777, true);
     }
 
     protected function SetBundle($name = null)

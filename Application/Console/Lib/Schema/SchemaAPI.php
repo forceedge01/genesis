@@ -43,7 +43,7 @@ abstract class SchemaAPI extends Console {
         $export .= "-- Export for database: '$database';\r\n\r\n";
         $export .= "CREATE DATABASE IF NOT EXISTS `$database`;\r\nUSE `$database`;\r\n";
         $export .= $this->GetTableDefinitionsAsString($tableDefinition);
-        $path = realpath(\Get::Config('Console_Schema.DocsFolder')).'/';
+        $path = \Get::Config('Console_Schema.DocsFolder').'/';
 
         if(is_dir($path))
         {

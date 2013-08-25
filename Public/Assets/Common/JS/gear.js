@@ -9,7 +9,7 @@
 
         },
 
-        hideOnSubmit: function( options ){
+        hideFormOnSubmit: function( options ){
 
             $(this).on('submit', 'form', function(e) {
 
@@ -20,6 +20,9 @@
                     $(this).fadeOut(200);
                 });
 
+                if(typeof(options.loading))
+                    $(options.loading).fadeIn(100);
+
                 if(typeof(options) != 'undefined')
                 {
                     if(typeof(options.loadingDiv) != 'undefined')
@@ -29,19 +32,19 @@
                 if ($(form).hasClass('confirm')) {
 
                     var answer = confirm($(form).attr('message'));
-                    
-                    if (answer) 
+
+                    if (answer)
                     {
                         return true
                     }
-                    else 
+                    else
                     {
                         if(typeof(options) != 'undefined')
                         {
                             if(typeof(options.loadingDiv) != 'undefined')
                                 $(options.loadingDiv).hide();
                         }
-                        
+
                         $(form).children('.formRow').fadeIn(200);
 
                         return false;
@@ -54,7 +57,7 @@
 
             $('.ajaxIt').each(function(){
                $(this).on('click', function(){
-                   
+
                    var url = $(this).attr('url');
                    var params = $(this).attr('params');
                    var container = $(this).attr('container');
@@ -71,7 +74,7 @@
                             if(container)
                                 $('#'+container).html(data);
                         });
-                        
+
                         return false;
                    }
                    return false;
@@ -82,6 +85,21 @@
         accordian: function (){
 
             alert('accordian');
+        },
+
+        BindKeyEvents: function(options){
+            $(this).on('keyup', function(event){
+                jQuery.each(options, function(index, value){
+                    if(event.keyCode === Number(index))
+                    {
+                        var answer = confirm(value.message);
+                        if(answer)
+                        {
+                            location.href = 'http://'+document.domain+value.url;
+                        }
+                    }
+                });
+            });
         },
 
         sections: function( options ){
@@ -491,17 +509,17 @@
 
                         });
                     }
-                    
+
                     return true;
                 }
-                
+
                 return false;
 
             });
         },
 
         defaultValues: function (){
-            
+
             var CurrentLabel = '';
 
             $('input[type=text]').on('focus', function() {

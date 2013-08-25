@@ -55,7 +55,6 @@ class Application extends Template implements Interfaces\Application{
                             ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
                                 ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                     }
-
                 }
 
                 // Populate User object with user defined method

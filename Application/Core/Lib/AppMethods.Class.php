@@ -19,6 +19,11 @@ abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
         return hash(\Get::Config('Auth.Security.PasswordEncryption'), $password);
     }
 
+    public function AbsolutePathToUrl($path)
+    {
+        return str_replace(array('//', $_SERVER['DOCUMENT_ROOT']), array('/',HOST), $this->RefactorUrl($path));
+    }
+
     /**
      *
      * @param int $length: length of the string to generate.

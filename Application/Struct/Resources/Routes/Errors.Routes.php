@@ -1,6 +1,6 @@
 <?php
 
-Set::Route('Error_Route_Not_Found', array(
+Set::Route('Route_Not_Found', array(
 
     'Controller' => ':Errors:RouteNotFound',
     'Pattern' => '/RouteNotFound/'
@@ -11,10 +11,6 @@ Set::Route('Class_Not_Found', array(
 
     'Controller' => ':Errors:ClassNotFound',
     'Pattern' => '/ClassNotFound/',
-    'Observers' => array(
-        ':Application:Index',
-        ':Application:LogUser'
-    )
 
 ));
 
@@ -22,6 +18,13 @@ Set::Route('Action_Not_Found', array(
 
     'Controller' => ':Errors:ActionNotFound',
     'Pattern' => '/ActionNotFound/',
+
+));
+
+Set::Route('Template_Not_Found', array(
+
+    'Controller' => ':Errors:TemplateNotFound',
+    'Pattern' => '/TemplateNotFound/',
 
 ));
 

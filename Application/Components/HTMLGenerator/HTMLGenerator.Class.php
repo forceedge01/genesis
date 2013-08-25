@@ -93,11 +93,30 @@ class HTMLGenerator extends Router{
         return $this;
     }
 
+    /**
+     *
+     * @param type $element
+     * @return type
+     */
     public function generateInput($element) {
 
         $element = $this->add($element);
 
         return $element;
+    }
+
+    /**
+     *
+     * @param type $elements
+     */
+    public function generateInputs($elements)
+    {
+        $html = null;
+
+        foreach($elements as $element)
+            $html .= $this->add($element);
+
+        return $html;
     }
 
     public function generateForm($input) {
@@ -367,7 +386,7 @@ class HTMLGenerator extends Router{
 
             case 'label':
             {
-                return "<label $for>{$params['label']}</label>";
+                return "<label $for $class>{$params['label']}</label>";
             }
 
             case 'textarea':

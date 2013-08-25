@@ -13,7 +13,11 @@ abstract class Debugger implements DebuggerInterface{
 
     private function __construct()
     {
+        // Set error reporting on
         ini_set('error_reporting', E_ALL);
+
+        // Enable garbage collector
+        gc_enable();
     }
 
     /**

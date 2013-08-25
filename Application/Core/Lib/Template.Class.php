@@ -25,19 +25,19 @@ class Template extends Router {
      */
     private function GetView($template){
 
-        $templateParams = explode(':', $template);
+        list($bundle, $template) = explode(':', $template);
 
-        if ($templateParams[0] != null) {
+        if ($bundle) {
 
             return array(
-                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $this->GetBundleFromName($templateParams[0]) . \Get::Config('APPDIRS.BUNDLES.VIEWS') .'ControllerViews/' . $templateParams[1])),
-                'path' => $this->refactorUrl(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $templateParams[0] . \Get::Config('APPDIRS.BUNDLES.VIEWS'))
+                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $this->GetBundleFromName($bundle) . \Get::Config('APPDIRS.BUNDLES.VIEWS') .'ControllerViews/' . $template)),
+                'path' => $this->refactorUrl(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle . \Get::Config('APPDIRS.BUNDLES.VIEWS'))
             );
         }
         else{
 
             return array(
-                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . $templateParams[1] )),
+                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . $template )),
                 'path' => $this->refactorUrl(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER'))
             );
         }
@@ -196,17 +196,13 @@ class Template extends Router {
      */
     private function ViewNotFound($template){
 
-        $params['Backtrace'] = debug_backtrace();
-
         $params['Error'] = array(
 
-          'Template' => $template
+          'Template' => $template,
+          'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
-        require_once \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Header.html.php';
-        require_once \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Errors/TemplateNotFound.html.php';
-        require_once \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . 'Footer.html.php';
-
+        $this->ForwardToController('Template_Not_Found', $params);
     }
 
     public function IncludeHeader()
@@ -312,16 +308,9 @@ class Template extends Router {
      */
     public function IncludeCSS($css, $params = null) {
 
-        $source = null;
+        self::$cssFiles[] = $css;
 
-        if($this->associateAssetBundle($css))
-            $source =  $this->bundle[0] . 'CSS/' . $this->bundle[1];
-        else
-            $source = \Get::Config('APPDIRS.TEMPLATING.CSS_FOLDER') . $css;
-
-        self::$cssFiles[] = $source;
-
-        echo "<link rel='stylesheet' type='text/css' href='{$source}' {$params}/>";
+        echo "<link rel='stylesheet' type='text/css' href='{$css}' {$params}/>";
     }
 
     /**
@@ -332,16 +321,9 @@ class Template extends Router {
      */
     public function IncludeJS($js, $params = null) {
 
-        $source = null;
+        self::$jsFiles[] = $js;
 
-        if($this->associateAssetBundle($js))
-            $source =  $this->bundle[0] . 'JS/' . $this->bundle[1];
-        else
-            $source = \Get::Config('APPDIRS.TEMPLATING.JS_FOLDER') . $js;
-
-        self::$jsFiles[] = $source;
-
-        echo "<script type='text/javascript' src='{$source}' {$params}></script>";
+        echo "<script type='text/javascript' src='{$js}' {$params}></script>";
     }
 
     /**
@@ -352,18 +334,14 @@ class Template extends Router {
      */
     public function IncludeImage($image, $params = null) {
 
-        if($this->associateAssetBundle($image))
-            $image = '<img src="' . $this->bundle[0] . 'Images/' . $this->bundle[1] . '" ' . $params . ' />';
-        else
-            $image = '<img src="' . \Get::Config('APPDIRS.TEMPLATING.IMAGES_FOLDER') . $image . '" ' . $params . ' />';
-
-        echo $image;
+        echo '<img src="' . $image . '" ' . $params . ' />';
     }
 
     /**
      *
      * @param type $asset
      * @return string Returns asset url.
+     * @deprecated since version 1.0.0
      *
      */
     public function Asset($asset) {
@@ -397,19 +375,21 @@ class Template extends Router {
      */
     public function SetAsset($asset, $params = null) {
 
-        $chunks = explode('.', $asset);
+        $extension = pathinfo($asset, PATHINFO_EXTENSION);
+        $asset = $this->associateAssetBundle($asset);
 
-        $identifier = end($chunks);
+        if ($extension) {
 
-        if ($identifier != false) {
-
-            if ($identifier == 'js')
+            if ($extension == 'js')
                 $this->includeJS($asset, $params);
-
-            else if ($identifier == 'css')
+            else if ($extension == 'css')
                 $this->includeCSS($asset, $params);
-
-            else if ($identifier == 'png' || $identifier == 'bmp' || $identifier == 'jpg' || $identifier == 'jpeg' || $identifier == 'gif' || $identifier == 'tiff')
+            else if ($extension == 'png' ||
+                    $extension == 'bmp' ||
+                    $extension == 'jpg' ||
+                    $extension == 'jpeg' ||
+                    $extension == 'gif' ||
+                    $extension == 'tiff')
                 $this->includeImage($asset, $params);
             else
                 $this->Asset($asset);
@@ -437,6 +417,7 @@ class Template extends Router {
     private function IncludeAssetDir($bundle, $assetType, $dir, $exclusions = array(), $append = null)
     {
         $assets = scandir($dir);
+        $url = $this->AbsolutePathToUrl($dir);
         foreach($assets as $asset)
         {
             if($asset != '.' and $asset != '..' and !$this->Variable($exclusions)->Search($asset))
@@ -454,7 +435,7 @@ class Template extends Router {
                             if($append)
                                 $append .= '/';
 
-                            $this->includeCSS ($bundle.':'.$append.$asset);
+                            $this->includeCSS ($url.'/'.$asset);
                         }
                         break;
                     }
@@ -468,7 +449,7 @@ class Template extends Router {
                             if($append)
                                 $append .= '/';
 
-                            $this->includeJS ($bundle.':'.$append.$asset);
+                            $this->includeJS ($url.'/'.$asset);
                         }
                         break;
                     }
@@ -686,17 +667,12 @@ class Template extends Router {
 
     private function associateAssetBundle($param){
 
-        $chunks = explode(':', $param);
+        list($bundle, $asset) = explode(':', $param);
 
-        if(isset($chunks[1])){
+        if($bundle)
+            return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $bundle . '/'.$asset;
 
-            $this->bundle[0] = \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $chunks[0] . '/';
-            $this->bundle[1] = $chunks[1];
-
-            return true;
-        }
-        else
-            return false;
+        return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Common/' .$asset;
     }
 
     /**
@@ -930,7 +906,9 @@ class Template extends Router {
             'value' => $value,
             'name' => $name,
             'class' => $class,
-            'id' => $id
+            'id' => $id,
+            'label' => $this->Filter($value, 'FirstToUpper'),
+            'for' => $id
         );
 
         return "<label for='{$id}' {$class}>{$this->Filter($value, 'FirstToUpper')}</label>" . $htmlgen->generateInput($el);

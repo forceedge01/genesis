@@ -13,3 +13,4 @@
             <?=$this->FlashAll();?>
             <div id="JSEvent"></div>
         </div>
+        <?=$this->SetAsset(':Images/Animated/loading.gif');?>

@@ -16,7 +16,9 @@ class Request extends AppMethods implements RequestInterface{
             $time,
             $uri,
             $remoteIp,
-            $self;
+            $self,
+            $scheme,
+            $domain;
 
     public function __construct() {
 
@@ -25,9 +27,21 @@ class Request extends AppMethods implements RequestInterface{
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->time = $_SERVER['REQUEST_TIME'];
         $this->uri = $_SERVER['REQUEST_URI'];
-        $this->remoteIp = $_SERVER['REMOTE_ADDR'];
+        $this->remoteIp = $this->RemoteAddress();
         $this->self = $_SERVER['PHP_SELF'];
         $this->server = $_SERVER;
+        $this->scheme = 'http' . ($_SERVER['HTTPS'] ? 's' : '');
+        $this->domain = HOST;
+    }
+
+    public function GetDomain()
+    {
+        return $this->domain;
+    }
+
+    public function GetScheme()
+    {
+        return $this->scheme;
     }
 
     /**

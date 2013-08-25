@@ -26,7 +26,6 @@ class Router extends EventHandler implements RouterInterface{
     public function __construct() {
 
         $this->url = $_SERVER['PHP_SELF'];
-
         $this->SetPattern()->SetParams();
     }
 
@@ -46,6 +45,9 @@ class Router extends EventHandler implements RouterInterface{
 
         // Should the value contain a regular expression?
         // Render the right controller;
+//        $route = $this->GetRouteFromPattern();
+//        \Get::Route($route);
+//        $routeInfo = self::$Route[$route];
         foreach(self::$Route as $key => $value)
         {
             if($this->ExtractVariable($value['Pattern']) == $this->pattern)
@@ -60,7 +62,9 @@ class Router extends EventHandler implements RouterInterface{
 
                 list($bundle, $controller, $action) = explode(':', $value['Controller']);
 
-                Loader::LoadBundle($this->GetBundleFromName($bundle));
+                if($bundle)
+                    Loader::LoadBundle($this->GetBundleFromName($bundle));
+
                 $this->CheckDependencies ($bundle, $controller, $action);
                 $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
             }
@@ -124,24 +128,14 @@ class Router extends EventHandler implements RouterInterface{
 
     private function InstantiateController($objectName)
     {
-//        if(!class_exists($objectName, false))
-//        {
-//            echo 'Error calling object: '.$objectName;
-//
-//            $error = array(
-//                'Class' => $objectName,
-//                'Controller' => $objectName,
-//                'Route' => $this->lastRoute,
-//                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
-//            );
-//
-//            $this->ForwardToController ('Class_Not_Found', $error);
-//        }
-
         if(count($this->ControllerDependencies))
-            return $this->InstantiateObject($objectName);
-        else
+        {
             return $this->GetCoreObject('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
+        }
+        else
+        {
+            return $this->InstantiateObject($objectName);
+        }
     }
 
     private function CheckDependencies($bundle, $controller, $action)
@@ -308,10 +302,10 @@ class Router extends EventHandler implements RouterInterface{
 
     private function GetControllerNamespace($bundle, $controller){
 
-        if($bundle == null)
-            return '\\Application\\Controllers\\'.$controller . 'Controller';
-        else
+        if($bundle)
             return '\\Bundles\\'.$this->GetBundleNameSpace ($bundle).'\\Controllers\\' . $controller . 'Controller';
+
+        return '\\Application\\Controllers\\'.$controller . 'Controller';
     }
 
     /**
@@ -328,7 +322,10 @@ class Router extends EventHandler implements RouterInterface{
         if(!empty($variable))
             $this->ExtractAndReplaceVariable();
 
-        return $this->lastURL = $this->Variable(getenv('SCRIPT_NAME'). $this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
+        if(strpos($_SERVER['REQUEST_URI'], $_SERVER['SCRIPT_NAME']) === 0)
+            $this->routePattern = $_SERVER['SCRIPT_NAME'] . $this->routePattern;
+
+        return $this->lastURL = $this->Variable($this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
     }
 
     /**
@@ -367,7 +364,7 @@ class Router extends EventHandler implements RouterInterface{
 
         ob_clean();
 
-        $this->ForwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardToController('Route_Not_Found', $error);
     }
 
     /**
@@ -398,7 +395,7 @@ class Router extends EventHandler implements RouterInterface{
 
         );
 
-        $this->ForwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardToController('Route_Not_Found', $error);
     }
 
     /**
@@ -432,10 +429,14 @@ class Router extends EventHandler implements RouterInterface{
      * @param type $variable
      * <br />
      * Forward control from one controller to another without redirecting.
+     * Will not check for security bypass
      */
     public function ForwardToController($route, array $variables = array())
     {
         list($bundle, $controller, $action) = explode(':', $this->GetController($route));
+
+        if($bundle)
+            Loader::LoadBundle($this->GetBundleFromName($bundle));
 
         $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $variables);
     }
@@ -523,7 +524,7 @@ class Router extends EventHandler implements RouterInterface{
             'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
-        $this->ForwardToController('Error_Route_Not_Found', $error);
+        $this->ForwardTo('404', $this->pattern);
     }
 
     /**

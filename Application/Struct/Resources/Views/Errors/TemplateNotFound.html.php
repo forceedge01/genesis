@@ -2,7 +2,7 @@
 
 <div class="errorPage">
 
-    <h1>Template:: <span><?=$template?></span> <?=$message?> Not Found</h1>
+    <h1>Template:: <span><?=$Template?></span> <?=$message?> Not Found</h1>
 
     <p>Error Originated from:</p>
 

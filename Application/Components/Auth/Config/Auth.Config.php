@@ -45,7 +45,12 @@ Set::Config('Auth', array(
         'Bypass' => array(
             '^/$',
             '^/Login/$',
-            '^/loginAuth/$'
+            '^/loginAuth/$',
+            '^/500/$',
+            '^/404/$',
+            '^/RouteNotFound/$',
+            '^/ClassNotFound/$',
+            '^/ActionNotFound/$',
         ),
         'AccessDeniedMessage' => 'You need to login to access this page.'
     ),

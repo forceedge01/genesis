@@ -29,8 +29,7 @@ class AppKernal extends Loader{
 
         if(!$app->ForwardRequest())
         {
-            header( 'HTTP/1.1 404 Not Found', true, 404 );
-            die('<h4>Pattern: ' . $app->GetPattern() . ' Not Found, <a href="javascript:history.back();">Go back to last page</a>.</h4>');
+            $app->ForwardToController('404', array('pattern'=> $app->GetPattern()));
         }
     }
 

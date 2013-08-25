@@ -1,1 +1,1 @@
-<?=$this->IncludeCSS('genesis.css');?>
+<?=$this->SetAsset(':/CSS/genesis.css');?>

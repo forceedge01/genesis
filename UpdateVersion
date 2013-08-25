@@ -4,7 +4,7 @@
 /**
  * Version Update
  * @Author Wahab Qureshi.
- * @version 1.0.13
+ * @version 1.0.14
  */
 
 class updateVersion
@@ -16,16 +16,6 @@ class updateVersion
             $minorLimit,
             $version,
             $versionSeparator;
-
-    public static function Initialize()
-    {
-        if(@preg_match('/^--help$/i', $_SERVER['argv'][1]))
-            self::Help();
-
-        self::SetConfigs();
-        $response = self::ProcessFile();
-        die("$response\r\n\r\n");
-    }
 
     private static function SetConfigs()
     {
@@ -47,6 +37,16 @@ class updateVersion
         self::$minorLimit = 50;
 
         // ------------------------------------------- End of Config --------------------------------------------- //
+    }
+
+    public static function Initialize()
+    {
+        if(@preg_match('/^--help$/i', $_SERVER['argv'][1]))
+            self::Help();
+
+        self::SetConfigs();
+        $response = self::ProcessFile();
+        die("$response\r\n\r\n");
     }
 
     private static function ProcessFile()
@@ -141,7 +141,7 @@ class updateVersion
         self::OutputLine(" - You can revert the version number, this will follow the same convention as an auto update in version number. If the version was set manually it will only decrease the numbers, the build will be decreased as well, eg run \r\n   ".self::blue('$_ php updateVersion --revert'));
         self::OutputLine(" - The major, minor and patch versions can be incremented without using the limits, the build will be increased each time, eg run \r\n   ".self::blue('$_ php updateVersion --major || --minor || --patch'));
         self::OutputLine( " - You can get the current version specified in the file by adding a parameter as such e.g \r\n   ".self::blue('$_ php updateVersion --version'));
-        self::OutputLine( " - After you have setup the configs in this file, run the --version command to see if everything is setup right, if it is it will show the version line of the target file e.g \r\n   ".self::blue('$_ php updateVersion --version'));
+        self::OutputLine( " - After you have setup the configs in this file, run the --version command to see if everything is setup right, if it is it will show the version line of the target file e.g \r\n   ".self::blue('$_ php updateVersion --version '."\r\n   Version: 1.1.12-322"));
         die("\r\n\r\n");
     }
 

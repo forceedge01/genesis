@@ -28,7 +28,7 @@ class updateVersion
         self::$pattern = '/^\s*\*\s*Version:\s*.+$/i';
 
         // The separator between the word version and the version number in the file
-        self::$versionSeparator = ':';
+        self::$versionSeparator = ': ';
 
         // The patch limit by which the minor is incremented
         self::$patchLimit = 50;

@@ -18,8 +18,8 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
 
         foreach(self::$observers as $observer)
         {
-            if(!class_exists($observer))
-                echo "Class $observer does not exist, cannot run event.", __CLASS__.'::'.__FUNCTION__, __LINE__;
+            if(!class_exists($observer, false))
+                $this->SetErrorArgs ("Class $observer does not exist, cannot run event.", __CLASS__.'::'.__FUNCTION__, __FILE__, __LINE__)->ThrowError();
 
             if(method_exists($observer, $eventHandler))
             {

@@ -16,6 +16,7 @@ class Loader extends Debugger{
             $components = array() ,
             $traits = array() ,
             $interfaces = array(),
+            $events = array(),
             $files = array(),
             $LoadedFiles = array(),
             $LoadedBundles = array();
@@ -89,6 +90,7 @@ class Loader extends Debugger{
         self::RequireAllClasses(\Get::Config('APPDIRS.CORE.LIB_FOLDER'));
         self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
+        self::Load('events', \Get::Config('APPDIRS.STRUCT.EVENTS_FOLDER'));
         self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
         self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
     }
@@ -254,19 +256,21 @@ class Loader extends Debugger{
         return str_replace('//', '/', $string);
     }
 
+    /**
+     *
+     * @param type $bundle
+     */
     public static function LoadBundle($bundle)
     {
         if(!in_array($bundle, self::$LoadedBundles))
         {
             self::$LoadedBundles[] = $bundle;
-            $bundle = str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
+            $bundle = self::GetBundleAbsolutePath($bundle);
 
             if(is_dir($bundle))
             {
                 self::LoadFilesFromDir($bundle, array('php'), false);
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'), array('php'));
                 self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
             }
             else
             {
@@ -277,6 +281,41 @@ class Loader extends Debugger{
                 die();
             }
         }
+    }
+
+    private static function GetBundleAbsolutePath($bundle)
+    {
+        return str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
+    }
+
+    /**
+     *
+     * @param type $bundle
+     * @return type
+     */
+    public static function LoadBundleEntities($bundle)
+    {
+        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Entities', array('php'));
+    }
+
+    /**
+     *
+     * @param type $bundle
+     * @return type
+     */
+    public static function LoadBundleRepositories($bundle)
+    {
+        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Repositories', array('php'));
+    }
+
+    /**
+     *
+     * @param type $bundle
+     * @return type
+     */
+    public static function LoadBundleModel($bundle)
+    {
+        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
     }
 
     /**

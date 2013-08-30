@@ -139,7 +139,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Repositories\\'.$repository.'Repository';
 
         if(!class_exists($namespace, false))
-            Loader::LoadBundle($this->GetBundleFromName ($bundle));
+            Loader::LoadBundleRepositories($this->GetBundleFromName ($bundle));
 
         return $this->InstantiateObject($namespace);
     }
@@ -155,8 +155,8 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         list($bundle, $model) = explode(':', $bundleColonEntityName);
         $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Models\\'.$model.'Model';
 
-        if(!class_exists($namespace))
-            Loader::LoadBundle($this->GetBundleFromName ($bundle));
+        if(!class_exists($namespace, false))
+            Loader::LoadBundleModel($this->GetBundleFromName ($bundle));
 
         return $this->InstantiateObject($namespace);
     }
@@ -172,8 +172,8 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         list($bundle, $entity) = explode(':', $bundleColonEntityName);
         $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Entities\\'.$entity.'Entity';
 
-        if(!class_exists($namespace))
-            Loader::LoadBundle($this->GetBundleFromName ($bundle));
+        if(!class_exists($namespace, false))
+            Loader::LoadBundleEntities($this->GetBundleFromName ($bundle));
 
         return $this->InstantiateObject($namespace);
     }

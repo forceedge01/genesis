@@ -10,7 +10,7 @@ use Application\Core\EventHandler;
 
 abstract class ApplicationModel extends EventHandler implements Model{
 
-    protected $entityObject, $observers;
+    private $entityObject, $observers;
 
     public function __construct($entityObject = null)
     {

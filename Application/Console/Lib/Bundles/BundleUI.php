@@ -15,16 +15,49 @@ class BundleUI extends BundleAPI {
         $this->renderMethod = $type;
     }
 
+    public function createBundle() {
+
+        $this->createConsoleInit();
+
+        if ($this->SetBundle()->CreateBundleFiles())
+        {
+            echo $this->green("Bundle {$this->bundle} has been created successfully."), $this->linebreak(2);
+
+            if($this->Choice('Do you want to create assets for this bundle?'))
+            {
+                if($this->CreateAssetFiles())
+                {
+                    echo $this->green("Assets for bundle {$this->bundle} were successfully created.");
+                }
+            }
+
+            $greenMessage = 'Please add the following in the Application/Loader.php FetchAllBundles() method: ';
+            echo $this->AddBreaks($this->green($greenMessage).$this->blue("'{$this->bundle}'"), 2);
+        }
+        else
+            echo $this->red('Aborting bundle creation for bundle '.$this->bundle.', please check if it already exists!');
+
+        echo $this->linebreak(2);
+
+        return $this;
+    }
+
     private function createConsoleInit()
     {
         if(!isset($_SERVER['SERVER_NAME'])){
 
-            $message = 'Enter namespace of the bundle you want to create (Use "/" instead of "\\". If you are using a database with this application, this is usually the singular form of your table name): ';
+            $message = 'Enter namespace of the bundle you want to create (Use "/" instead of "\\". If you are going to use a database table with this bundle, this is usually the singular form of your table name): ';
 
             echo $this->linebreak(1), $this->blue($message);
 
-            $this->bundle = preg_replace('/bundle/i', '', trim($this->readUser(), '/')) . 'Bundle';
+            $this->bundle = preg_replace('/bundle/i', '', trim($this->readUser(), '/'));// . 'Bundle';
             $this->name = $this->singular = preg_replace('/bundle/i', '', $this->bundle);
+
+            $this->eventsFolder = $this->Choice('Do you want to create Events for this bundle');
+            $this->modelFolder = $this->Choice('Do you want to create a Model for this bundle');
+
+            if(!$this->Choice('Are you sure you want to create this bundle?'))
+                exit;
         }
 
         return $this;
@@ -75,34 +108,6 @@ class BundleUI extends BundleAPI {
         }
 
         echo $this->linebreak(2);
-    }
-
-    public function createBundle() {
-
-        $this->createConsoleInit();
-
-        if ($this->SetBundle()->CreateBundleFiles())//$this->CreateBundleDirs($this->bundleNamespace, $this->bundleSourceFolder))
-        {
-
-            echo $this->green("Bundle {$this->name} has been created successfully."), $this->linebreak(2);
-
-            if($this->Choice('Do you want to create assets for this bundle?'))
-            {
-                if($this->CreateAssetFiles())
-                {
-                    echo $this->green("Assets for bundle {$this->name} were successfully created.");
-                }
-            }
-
-            $greenMessage = 'Please add the following in the Application/Loader.php FetchAllBundles() method: ';
-            echo $this->AddBreaks($this->green($greenMessage).$this->blue("'{$this->name}'"), 2);
-        }
-        else
-            echo $this->red('Aborting bundle creation for bundle '.$this->name.', please check if it already exists!');
-
-        echo $this->linebreak(2);
-
-        return $this;
     }
 
     public function DeleteBundle() {

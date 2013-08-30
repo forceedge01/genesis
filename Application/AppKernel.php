@@ -80,4 +80,4 @@ class AppKernal extends Loader{
     }
 }
 
-spl_autoload_register(__NAMESPACE__ . '\Loader::LoadClass');
+//spl_autoload_register(__NAMESPACE__ . '\Loader::LoadClass');

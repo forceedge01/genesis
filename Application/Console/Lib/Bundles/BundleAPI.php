@@ -26,7 +26,9 @@ abstract Class BundleAPI extends Console{
             $bundleFooterFileName,
             $bundleEventsFolder,
             $bundleNamespace,
-            $bundleDirInAssets;
+            $bundleDirInAssets,
+            $eventsFolder = false,
+            $modelFolder = false;
 
     public function __construct() {
 
@@ -51,14 +53,14 @@ abstract Class BundleAPI extends Console{
     protected function SetBundle($name = null)
     {
         if(!empty($name))
-            $this->name = $name;
+            $this->bundle = $name;
 
-        $this->bundleFolder = str_replace('//', '/', $this->bundleSourceFolder . $this->name);
-        $this->bundleNamespace = str_replace(array('/', '\\\\'), array('\\', '\\'), $this->name);
+        $this->bundleFolder = str_replace('//', '/', $this->bundleSourceFolder . $this->bundle);
+        $this->bundleNamespace = str_replace(array('/', '\\\\'), array('\\', '\\'), $this->bundle);
 
-        $nameChunks = explode('/', $this->name);
+        $nameChunks = explode('/', $this->bundle);
         $this->singular = preg_replace('/s$/i', '', end($nameChunks));
-        $this->bundleDirInAssets = str_replace('\\', '/', str_replace('Bundles\\','', $this->name));
+        $this->bundleDirInAssets = str_replace('\\', '/', str_replace('Bundles\\','', $this->bundle));
         $this->name = end($nameChunks);
 
         return $this;
@@ -75,11 +77,16 @@ abstract Class BundleAPI extends Console{
                 ->createRoutes()
                 ->createInterface()
                 ->createController()
-                ->createModel()
-                ->createEntity()
-                ->createEvent()
                 ->createViews()
                 ->createTests();
+
+            if($this->modelFolder)
+                $this
+                    ->createModel()
+                    ->createEntity();
+
+            if($this->eventsFolder)
+                $this->createEvent();
 
             return $this;
         }
@@ -152,8 +159,14 @@ abstract Class BundleAPI extends Console{
 
         $initTemplate = "<?php
 
+// {$this->name} bundle configuration
+
 Set::Config('".strtoupper($this->name)."', array(
-    'Path' => \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . '".strtoupper($this->name)."'
+    'Path' => '{{APPDIRS.BUNDLES.BASE_FOLDER}}".strtoupper($this->name)."',
+    'Observers' => array(), // Observers-Events for bundle
+    'users' => array(
+        'Dependencies' => array()
+    ) // Controller Dependencies
 ));";
 
         $this->createFile($this->bundleFolder . $this->bundleConfigsFolder . "{$this->name}.Config.php", $initTemplate);

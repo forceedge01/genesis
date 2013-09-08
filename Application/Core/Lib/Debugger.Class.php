@@ -34,6 +34,31 @@ abstract class Debugger implements DebuggerInterface{
         echo '</pre>';
     }
 
+    public static function prexPOST()
+    {
+        self::prex($_POST);
+    }
+
+    public static function prexGET()
+    {
+        self::prex($_GET);
+    }
+
+    public static function prexSERVER()
+    {
+        self::prex($_SERVER);
+    }
+
+    public static function prexSESSION()
+    {
+        self::prex($_SESSION);
+    }
+
+    public static function prexCOOKIE()
+    {
+        self::prex($_COOKIE);
+    }
+
     /**
      *
      * @param void $var - variable you want to dump to screen
@@ -52,9 +77,9 @@ abstract class Debugger implements DebuggerInterface{
      */
     public function debug() {
 
-        $this->pre($this);
+        self::pre($this);
         echo '<br />Libs loaded', print_r(AppKernal::get(), true), '<br />Debug data: <br /><br />';
-        $this->pre(debug_backtrace());
+        self::pre(debug_backtrace());
     }
 
     /**
@@ -141,7 +166,8 @@ abstract class Debugger implements DebuggerInterface{
 
             if (\Get::Config('Errors.mailTriggeredErrors'))
             {
-                $mail = new \Application\Components\Mail();
+                Loader::LoadComponent('Mailer');
+                $mail = new \Application\Components\Mailer();
 
                 $mail->send(array(
                     'to' => \Get::Config('Application.Admin_Email'),
@@ -227,7 +253,8 @@ abstract class Debugger implements DebuggerInterface{
 
         if (\Get::Config('Errors.mailTriggeredErrors'))
         {
-            $mail = new \Application\Components\Mail();
+            Loader::LoadComponent('Mailer');
+            $mail = new \Application\Components\Mailer();
 
             $mail->send(array(
                 'to' => \Get::Config('Application.Admin_Email'),
@@ -260,6 +287,63 @@ abstract class Debugger implements DebuggerInterface{
 
     public static function ThrowStaticError($message, $file = __FILE__, $line = __LINE__)
     {
-        die($message);
+        echo '
+        <style>
+
+        #errorWrapper
+        {
+            margin: 0px auto;
+            position: relative;
+            width: 80%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid gray;
+            background: whitesmoke;
+            line-height: 25px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: verdana;
+        }
+
+        #errorHeader
+        {
+            height: 50px;
+            font-size: 18px;
+        }
+
+        #errorWrapper #errorMessage
+        {
+            float: left;
+            width: 85%;
+        }
+
+        #errorWrapper #errorNo
+        {
+            float: right;
+            height: 50px;
+            font-size: 10px;
+        }
+
+        #errorLocation
+        {
+            padding-bottom: 20px;
+            font-size: 15px;
+        }
+
+        #errorBacktrace
+        {
+        }
+
+        </style>
+        ';
+
+        echo '<div id="errorWrapper">
+            <div id="errorHeader">
+                <div id="errorMessage">Error Explanation: ', $message, '</div>
+            </div>
+            <hr>
+            <div id="errorLocation">in ', $file, ' on Line: ', $line . '</div>
+
+            ';
     }
 }

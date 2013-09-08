@@ -1,4 +1,4 @@
-<?=$this->IncludeView(':Header.html.php');?>
+<?=$this->IncludeView('::Header.html.php');?>
 
 <div class="errorPage">
 

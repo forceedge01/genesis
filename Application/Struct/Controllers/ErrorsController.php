@@ -24,7 +24,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetNotFound();
 
-        $this->Render(':Errors/RouteNotFound.html.php', 'Route Not Found!', $params);
+        $this->Render(':Errors:RouteNotFound.html.php', 'Route Not Found!', $params);
     }
 
     public function ActionNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -42,7 +42,7 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/ActionNotFound.html.php', 'Action Not Found!', $params);
+        $this->Render(':Errors:ActionNotFound.html.php', 'Action Not Found!', $params);
     }
 
     public function ClassNotFoundAction($action, $class, $controller, $route, $backtrace){
@@ -60,25 +60,25 @@ class ErrorsController extends Application implements Error{
 
         $this ->GetResponseManager() ->SetStatus(400);
 
-        $this->Render(':Errors/ClassNotFound.html.php', 'Class Not Found!', $params);
+        $this->Render(':Errors:ClassNotFound.html.php', 'Class Not Found!', $params);
     }
 
     public function TemplateNotFoundAction($template){
 
         $this ->GetResponseManager() ->SetBadRequest();
 
-        $this->Render(':Errors/TemplateNotFound.html.php', 'Template Not Found!', $template);
+        $this->Render(':Errors:TemplateNotFound.html.php', 'Template Not Found!', $template);
     }
 
     public function NotFoundError404Action(){
 
         $this->GetResponseManager()->SetNotFound();
-        $this->Render(':Errors/error404.html.php', 'Error 404: Page not found');
+        $this->Render(':Errors:error404.html.php', 'Error 404: Page not found');
     }
 
     public function ServerError500Action(){
 
         $this->GetResponseManager()->SetInternalServerError();
-        $this->Render(':Errors/error500.html.php', 'Error 500: Internal server error');
+        $this->Render(':Errors:error500.html.php', 'Error 500: Internal server error');
     }
 }

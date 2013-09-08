@@ -23,8 +23,7 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
 
             if(method_exists($observer, $eventHandler))
             {
-                $event = new $observer();
-                $event->$eventHandler($args);
+                $this->InstantiateObject($observer)->$eventHandler($args);
             }
         }
     }

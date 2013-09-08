@@ -304,17 +304,18 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
 
     private function createViews(){
 
+        $viewsFolder = $this->bundleFolder . $this->bundleViewsFolder . $this->name;
         mkdir($this->bundleFolder . $this->bundleViewsFolder);
-        mkdir($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews');
+        mkdir($viewsFolder);
 
-        $initTemplate = "<?=\$this->IncludeTemplate(':Header.html.php', \$params)?>
+        $initTemplate = "<?=\$this->IncludeTemplate('::Header.html.php', \$params)?>
 <?=\$this->setAsset('{$this->name}:{$this->name}.css')?>
 ";
 
         $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'Header.html.php', $initTemplate);
 
         $initTemplate = "<?=\$this->setAsset('{$this->name}:{$this->name}.js')?>
-<?=\$this->IncludeTemplate(':Footer.html.php', \$params)?>
+<?=\$this->IncludeTemplate('::Footer.html.php', \$params)?>
 ";
 
         $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'Footer.html.php', $initTemplate);
@@ -329,7 +330,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/list.html.php', $initTemplate);
+        $this->createFile($viewsFolder . '/list.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -341,7 +342,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/view.html.php', $initTemplate);
+        $this->createFile($viewsFolder . '/view.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -353,7 +354,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/create.html.php', $initTemplate);
+        $this->createFile($viewsFolder . '/create.html.php', $initTemplate);
 
         $initTemplate = "<div class='wrapper'>
     <div class=''>
@@ -365,7 +366,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
     </div>
 </div>";
 
-        $this->createFile($this->bundleFolder . $this->bundleViewsFolder . 'ControllerViews/edit.html.php', $initTemplate);
+        $this->createFile($viewsFolder . '/edit.html.php', $initTemplate);
 
         return $this;
     }
@@ -641,7 +642,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         //This will be used in the template to generate the above declared table.
         \$this->htmlgen = \$this ->GetComponent('HTMLGenerator');
 
-        \$this->Render('{$this->name}:list.html.php', 'List {$this->name}', \$params);
+        \$this->Render('{$this->name}:{$this->name}:list.html.php', 'List {$this->name}', \$params);
 
     }
 
@@ -670,7 +671,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
         \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-        \$this->Render('{$this->name}:view.html.php', 'View {$this->singular}', \$params);
+        \$this->Render('{$this->name}:{$this->name}:view.html.php', 'View {$this->singular}', \$params);
     }
 
     protected function createAction()
@@ -729,7 +730,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
         //This will be used in the template to generate the above declared form.
         \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-        \$this->Render('{$this->name}:create.html.php', 'Create new {$this->singular}', \$params);
+        \$this->Render('{$this->name}:{$this->name}:create.html.php', 'Create new {$this->singular}', \$params);
     }
 
     protected function editAction(\$id)
@@ -773,7 +774,7 @@ final class {$this->name}Controller extends {$this->name}BundleController implem
 
         \$this->htmlgen = \$this ->GetComponent('HTMLGenerator') ;
 
-        \$this->Render('{$this->name}:edit.html.php', 'Edit {$this->singular}', \$params);
+        \$this->Render('{$this->name}:{$this->name}:edit.html.php', 'Edit {$this->singular}', \$params);
     }
 
     /**

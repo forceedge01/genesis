@@ -20,13 +20,12 @@ class ApplicationController extends Application{
     }
 
     public function indexAction(){
-
         $this->ForwardTo(\Get::Config('Application.LandingPageRoute'));
     }
 
     public function UnderDevelopmentAction()
     {
-        $this->Render(':UnderDevelopment/SiteUnderDevelopment.html.php', 'Site Under Development');
+        $this->Render(':UnderDevelopment:SiteUnderDevelopment.html.php', 'Site Under Development');
         exit;
     }
 }

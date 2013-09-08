@@ -23,7 +23,12 @@ interface Router{
     /**
      * Redirects to the home route defined in the config
      */
-    public function RedirectToHome();
+    public function GoToHome();
+
+    /**
+     * Redirects to the landing page route defined in the config
+     */
+    public function GoToLandingPage();
 
     /**
      *

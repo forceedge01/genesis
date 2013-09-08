@@ -17,7 +17,7 @@ abstract class EventHandler extends AppMethods implements EventHandlerInterface{
     public function Detach($observer)
     {
         $unset = (is_object($observer)) ? get_class($observer) : $observer;
-        $this->observers = $this->Variable($this->observers)->RemoveValue($unset)->GetVariableResult();
+        EventDispatcher::$observers = $this->Variable(EventDispatcher::$observers)->RemoveValue($unset)->GetVariableResult();
 
         return $this;
     }

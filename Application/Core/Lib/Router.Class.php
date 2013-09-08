@@ -170,9 +170,14 @@ class Router extends EventHandler implements RouterInterface{
 
     }
 
-    public function RedirectToHome()
+    public function GoToHome()
     {
-        $this->ForwardTo('Application');
+        $this->ForwardTo(\Get::Config('Application.HomeRoute'));
+    }
+
+    public function GoToLandingPage()
+    {
+        $this->ForwardTo(\Get::Config('Application.LandingPageRoute'));
     }
 
     /**

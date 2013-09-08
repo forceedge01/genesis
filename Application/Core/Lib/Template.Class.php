@@ -25,20 +25,34 @@ class Template extends Router {
      */
     private function GetView($template){
 
-        list($bundle, $template) = explode(':', $template);
+        list($bundle, $controller, $template) = explode(':', $template);
 
         if ($bundle) {
 
             return array(
-                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $this->GetBundleFromName($bundle) . \Get::Config('APPDIRS.BUNDLES.VIEWS') .'ControllerViews/' . $template)),
-                'path' => $this->refactorUrl(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle . \Get::Config('APPDIRS.BUNDLES.VIEWS'))
+                'template' =>
+                        $this->stripDoubleSlashes(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') .
+                        $this->GetBundleFromName($bundle) .
+                        \Get::Config('APPDIRS.BUNDLES.VIEWS') .
+                        "$controller/$template")
+                 ,
+                'path' =>
+                        \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') .
+                        $bundle .
+                        \Get::Config('APPDIRS.BUNDLES.VIEWS').
+                        "$controller/"
             );
         }
-        else{
-
+        else
+        {
             return array(
-                'template' => $this->refactorUrl($this->stripDoubleSlashes(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . $template )),
-                'path' => $this->refactorUrl(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER'))
+                'template' =>
+                        $this->stripDoubleSlashes(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') .
+                        "$controller/$template")
+                 ,
+                'path' =>
+                        \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER').
+                        "$controller/"
             );
         }
     }
@@ -47,7 +61,7 @@ class Template extends Router {
      *
      * @param string $template bundle:template
      * @param string $pageTitle The page title to set
-     * @param array $params - pass in data to template, set PageTitle in array to set the title of the page
+     * @param array $params - pass in data to template
      */
     public function Render($template, $pageTitle, array $params = array()) {
 
@@ -88,17 +102,18 @@ class Template extends Router {
     private function ProcessOutput($templateUrl, $params)
     {
         extract($params, EXTR_OVERWRITE);
+
         ob_start();
 
         if(is_file($templateUrl['template']))
         {
             if($this->header)
-                $this->GetBundleHeader ($this->GetClassFromNameSpacedController(get_called_class()));
+                $this->GetBundleHeader ();
 
             require $templateUrl['template'];
 
             if($this->footer)
-                $this->GetBundleFooter ($this->GetClassFromNameSpacedController(get_called_class()));
+                $this->GetBundleFooter ();
         }
         else
             $this->ViewNotFound($templateUrl['template']);
@@ -198,7 +213,7 @@ class Template extends Router {
 
         $params['Error'] = array(
 
-          'Template' => $template,
+          'Template' => $this->RefactorUrl($template),
           'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
@@ -215,18 +230,22 @@ class Template extends Router {
     protected function GetBundleHeader($bundle = null)
     {
         if(! $bundle)
-            $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
+            $bundle = $this->GetBundleFromName ($this->GetClassFromNameSpacedController (get_called_class ()));
 
-        $path = $this->RefactorUrl(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
-                $this->GetBundleFromName($bundle).
+        $path = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
+                $bundle.
                 '/'.
                 \Get::Config('APPDIRS.BUNDLES.VIEWS').
-                \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_HEADER_FILE'));
+                \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_HEADER_FILE');
 
         if(is_file($path))
+        {
             require_once $path;
+        }
         else
+        {
             $this->ViewNotFound ($path);
+        }
 
         return $this;
     }
@@ -241,13 +260,13 @@ class Template extends Router {
     protected function GetBundleFooter($bundle)
     {
         if(! $bundle)
-            $bundle = $this->GetClassFromNameSpacedController (get_called_class ());
+            $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController (get_called_class ()));
 
-        $path = $this->RefactorUrl(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
-                $this->GetBundleFromName($bundle).
+        $path = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
+                $bundle.
                 '/'.
                 \Get::Config('APPDIRS.BUNDLES.VIEWS').
-                \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_FOOTER_FILE'));
+                \Get::Config('APPDIRS.BUNDLES.BUNDLE_VIEW_FOOTER_FILE');
 
         if(is_file($path))
             require_once $path;
@@ -277,7 +296,7 @@ class Template extends Router {
         if(!is_file($template['template'])){
 
             $this->ViewNotFound ($template['template']);
-            die();
+            exit;
         }
 
         ob_start();

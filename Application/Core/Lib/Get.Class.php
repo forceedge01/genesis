@@ -40,7 +40,7 @@ class Get{
 
             if(preg_match_all('/({{.+?}})/', $config, $matches))
             {
-                if(count($matches[0]) > 0)
+                if(count($matches[0]))
                 {
                     foreach($matches[0] as $match)
                     {

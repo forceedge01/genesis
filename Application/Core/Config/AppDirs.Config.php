@@ -2,11 +2,9 @@
 
 // Core folder paths
 
-define('HOST', (isset($_SERVER['HTTP_HOST'])
-        ? "http".(isset($_SERVER['HTTPS']) ? 's' : '')."://{$_SERVER['HTTP_HOST']}"
-        : '').($_SERVER['SERVER_PORT'] != 80 ? ':80' : '') . '/');
+define('HOST', \Application\Core\AppKernal::GetHost());
 
-define('ROOT', (!empty($_SERVER['DOCUMENT_ROOT'])) ? "{$_SERVER['DOCUMENT_ROOT']}/../" : __DIR__ . '/../../../');
+define('ROOT', __DIR__ . '/../../../');
 
 Set::Config('APPDIRS', array(
 
@@ -15,7 +13,6 @@ Set::Config('APPDIRS', array(
     'CACHE_FOLDER' => ROOT . 'Public/Cache/',
 
     'APPLICATION_TESTS_FOLDER' => '{{APPDIRS.APPLICATION_FOLDER}}Tests/',
-    'TRAITS_FOLDER' => '{{APPDIRS.APPLICATION_FOLDER}}Traits',
 
     'CORE' => array(
         'BASE_FOLDER' => '{{APPDIRS.APPLICATION_FOLDER}}Core/',

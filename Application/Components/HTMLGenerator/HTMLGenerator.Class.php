@@ -15,8 +15,6 @@ class HTMLGenerator extends Router{
     private $host, $database, $username, $password, $link;
 
     function __construct($params = null) {
-
-        $this->init($params);
     }
 
     public function Form($name, array $params = array())
@@ -152,36 +150,36 @@ class HTMLGenerator extends Router{
     function add($params) {//this function should store data in an array so that they can be re-arranged or modified individually.
         $i = 0;
 
-        $element = 
-        $value = 
-        $class = 
-        $id = 
+        $element =
+        $value =
+        $class =
+        $id =
         $name =
-        $type = 
-        $disabled = 
+        $type =
+        $disabled =
         $buttonValue =
-        $buttonStyle = 
-        $buttonId = 
-        $buttonClass = 
-        $style = 
-        $rows = 
-        $cols = 
-        $multiple = 
-        $requiredText = 
-        $append = 
-        $prepend = 
-        $align = 
-        $src = 
-        $title = 
-        $alt = 
-        $href = 
-        $target = 
-        $size = 
-        $valid = 
-        $icon = 
+        $buttonStyle =
+        $buttonId =
+        $buttonClass =
+        $style =
+        $rows =
+        $cols =
+        $multiple =
+        $requiredText =
+        $append =
+        $prepend =
+        $align =
+        $src =
+        $title =
+        $alt =
+        $href =
+        $target =
+        $size =
+        $valid =
+        $icon =
         $iconText =
         null;
-        
+
         if(isset($params['value']))
             $value = "value='{$params['value']}'";
 

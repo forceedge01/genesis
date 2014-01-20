@@ -16,6 +16,11 @@ class AppKernal extends Loader{
             $msyqlVersion,
             $scriptStartTime;
 
+    public static function GetHost()
+    {
+        return "http://{$_SERVER['HTTP_HOST']}/";
+    }
+
     /**
      * Initializes an instance of the application
      */

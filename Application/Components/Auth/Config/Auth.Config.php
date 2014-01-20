@@ -57,7 +57,7 @@ Set::Config('Auth', array(
 
     'Login' => array(
         'EntityRepository' => 'users:users',
-        'UserPopulateMethod' => false,//'populateUser',
+        'UserPopulateMethod' => false,
 
         'LoginRoute' => 'users_login',
         'LoginAuthRoute' => 'users_login_auth',

@@ -61,11 +61,4 @@ interface Router{
      * Forward control from one controller to another without redirecting.
      */
     public function ForwardToController($route, array $variables = array());
-
-    /**
-     *
-     * @return Router
-     * Returns the router object for further processing
-     */
-    public function GetRouter();
 }

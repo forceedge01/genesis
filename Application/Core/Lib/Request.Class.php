@@ -30,7 +30,7 @@ class Request extends AppMethods implements RequestInterface{
         $this->remoteIp = $this->RemoteAddress();
         $this->self = $_SERVER['PHP_SELF'];
         $this->server = $_SERVER;
-        $this->scheme = 'http' . ($_SERVER['HTTPS'] ? 's' : '');
+        $this->scheme = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '');
         $this->domain = HOST;
     }
 

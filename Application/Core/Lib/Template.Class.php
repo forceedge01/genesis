@@ -31,10 +31,9 @@ class Template extends Router {
 
             return array(
                 'template' =>
-                        $this->stripDoubleSlashes(\Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') .
+                        \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') .
                         $this->GetBundleFromName($bundle) .
-                        \Get::Config('APPDIRS.BUNDLES.VIEWS') .
-                        "$controller/$template")
+                        \Get::Config('APPDIRS.BUNDLES.VIEWS') . "$controller/$template"
                  ,
                 'path' =>
                         \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') .
@@ -46,13 +45,8 @@ class Template extends Router {
         else
         {
             return array(
-                'template' =>
-                        $this->stripDoubleSlashes(\Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') .
-                        "$controller/$template")
-                 ,
-                'path' =>
-                        \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER').
-                        "$controller/"
+                'template' => \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . "$controller/$template",
+                'path' => \Get::Config('APPDIRS.TEMPLATING.TEMPLATES_FOLDER') . "$controller/"
             );
         }
     }
@@ -422,21 +416,22 @@ class Template extends Router {
      */
     public function IncludeBundleAssets($bundle, array $exclusions = array(), $css = true, $js = true)
     {
+        $path = \Get::Config('APPDIRS.BUNDLES.ASSETS_FOLDER');
+
         if($css)
         {
-            $this->IncludeAssetDir($bundle, 'css', ROOT.'Public/Assets/Bundles/'.$bundle.'/CSS', $exclusions);
+            $this->IncludeAssetDir($bundle, 'css', $path.$bundle.'/CSS', $exclusions);
         }
 
         if($js)
         {
-            $this->IncludeAssetDir($bundle, 'js', ROOT.'Public/Assets/Bundles/'.$bundle.'/JS', $exclusions);
+            $this->IncludeAssetDir($bundle, 'js', $path.$bundle.'/JS', $exclusions);
         }
     }
 
     private function IncludeAssetDir($bundle, $assetType, $dir, $exclusions = array(), $append = null)
     {
         $assets = scandir($dir);
-        $url = $this->AbsolutePathToUrl($dir);
         foreach($assets as $asset)
         {
             if($asset != '.' and $asset != '..' and !$this->Variable($exclusions)->Search($asset))

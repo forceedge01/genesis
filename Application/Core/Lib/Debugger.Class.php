@@ -22,16 +22,43 @@ abstract class Debugger implements DebuggerInterface{
 
     /**
      *
-     * @param void $var - variable you want to dump to screen
-     * Will dump the variable on screen in readable format.
+     * @param void $params any variable to output to the screen
      */
-    public static function pre() {
+    public static function pre()
+    {
+        $params = func_get_args();
+        $callers = debug_backtrace();
 
-        $args = func_get_args();
+        foreach($params as $param)
+        {
+            self::preOut($param);
+            echo '<b>Output from</b>: '.get_called_class().' :: '.$callers[1]['function'].'(), <b>Line:</b> '.$callers[0]['line'];
+        }
+    }
+
+    private function preOut($param)
+    {
         echo '<pre>';
-        foreach ($args as $var)
-            print_r($var);
+        print_r($param);
         echo '</pre>';
+    }
+
+    /**
+     *
+     * @param void $params any variable to output to the screen and then stop execution of the program
+     */
+    public static function prex()
+    {
+        $params = func_get_args();
+        $callers = debug_backtrace();
+
+        foreach($params as $param)
+        {
+            self::preOut($param);
+            echo '<b>Output from</b>: '.get_called_class().' :: '.$callers[1]['function'].'(), <b>Line:</b> '.$callers[0]['line'];
+        }
+
+        exit;
     }
 
     public static function prexPOST()
@@ -57,19 +84,6 @@ abstract class Debugger implements DebuggerInterface{
     public static function prexCOOKIE()
     {
         self::prex($_COOKIE);
-    }
-
-    /**
-     *
-     * @param void $var - variable you want to dump to screen
-     * Will dump the variable on screen in readable format and then stop execution.
-     */
-    public static function prex() {
-
-        $args = func_get_args();
-        foreach ($args as $var)
-            self::pre($var);
-        exit;
     }
 
     /**

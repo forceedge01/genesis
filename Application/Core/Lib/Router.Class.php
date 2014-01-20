@@ -36,6 +36,8 @@ class Router extends EventHandler implements RouterInterface{
      */
     public function ForwardRequest(){
 
+        self::prexSERVER();
+
         $this->CheckIfUnderDevelopment();
 
         if(\Get::Config('Cache.html.enabled'))
@@ -43,11 +45,6 @@ class Router extends EventHandler implements RouterInterface{
 
         $value = $this->funcVariables = array();
 
-        // Should the value contain a regular expression?
-        // Render the right controller;
-//        $route = $this->GetRouteFromPattern();
-//        \Get::Route($route);
-//        $routeInfo = self::$Route[$route];
         foreach(self::$Route as $key => $value)
         {
             if($this->ExtractVariable($value['Pattern']) == $this->pattern)
@@ -330,7 +327,7 @@ class Router extends EventHandler implements RouterInterface{
         if(strpos($_SERVER['REQUEST_URI'], $_SERVER['SCRIPT_NAME']) === 0)
             $this->routePattern = $_SERVER['SCRIPT_NAME'] . $this->routePattern;
 
-        return $this->lastURL = $this->Variable($this->routePattern)->RemoveDoubleOccuranceOf(array('/'))->GetVariableResult();
+        return $this->lastURL = $this->routePattern;
     }
 
     /**
@@ -412,9 +409,7 @@ class Router extends EventHandler implements RouterInterface{
     public function ForwardTo($route, $urlQueryString = null){
 
         self::$LastRoute = $this->pattern;
-
         $this->GetCoreObject('Session')->Set('LastRoute', $route);
-
         $route = $this->GetRoute($route);
 
         session_write_close();
@@ -424,6 +419,7 @@ class Router extends EventHandler implements RouterInterface{
 
         header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
+        // To get testing working with this method
         if(getenv('HTTP_HOST'))
             exit;
     }
@@ -461,7 +457,7 @@ class Router extends EventHandler implements RouterInterface{
             }
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -479,7 +475,7 @@ class Router extends EventHandler implements RouterInterface{
 
             if(preg_match($pattern, $this->pattern))
             {
-                return true;
+                return $this;
             }
         }
 
@@ -530,15 +526,5 @@ class Router extends EventHandler implements RouterInterface{
         );
 
         $this->ForwardTo('404', $this->pattern);
-    }
-
-    /**
-     *
-     * @return Router
-     * Returns the router object for further processing
-     */
-    public function GetRouter(){
-
-        return $this->Router;
     }
 }

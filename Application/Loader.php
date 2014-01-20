@@ -35,7 +35,7 @@ class Loader extends Debugger{
         return array(
 
             'Welcome',
-            'Authentication/users',
+            'users',
         );
     }
 
@@ -86,7 +86,6 @@ class Loader extends Debugger{
     {
         self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
-        self::Load('traits', \Get::Config('APPDIRS.TRAITS_FOLDER'));
         self::RequireAllClasses(\Get::Config('APPDIRS.CORE.LIB_FOLDER'));
         self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
         self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
@@ -199,7 +198,7 @@ class Loader extends Debugger{
                 require_once $classDir . $class;
             }
             else
-                die('<h1>Class '.$classDir.$class.' not found in kernel::FetchAllClasses</h1>');
+                die('<h1>Class '.$classDir.$class.' not found in Loader::FetchAllClasses</h1>');
         }
     }
 
@@ -270,6 +269,7 @@ class Loader extends Debugger{
             if(is_dir($bundle))
             {
                 self::LoadFilesFromDir($bundle, array('php'), false);
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'), array('php'));
                 self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
             }
             else

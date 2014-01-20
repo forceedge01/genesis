@@ -90,5 +90,3 @@ class AppKernal extends Loader{
         return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
     }
 }
-
-//spl_autoload_register(__NAMESPACE__ . '\Loader::LoadClass');

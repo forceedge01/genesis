@@ -36,7 +36,7 @@ abstract class Debugger implements DebuggerInterface{
         }
     }
 
-    private function preOut($param)
+    private static function preOut($param)
     {
         echo '<pre>';
         print_r($param);

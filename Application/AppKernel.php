@@ -2,12 +2,10 @@
 
 namespace Application\Core;
 
+
 require_once __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
 require_once __DIR__ . '/Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/Loader.php';
-require_once __DIR__ . '/Core/Lib/Set.Class.php';
-require_once __DIR__ . '/Core/Config/AppDirs.Config.php';
-require_once __DIR__ . '/Core/Lib/Get.Class.php';
 
 class AppKernal extends Loader{
 
@@ -15,6 +13,13 @@ class AppKernal extends Loader{
             $phpVersion,
             $msyqlVersion,
             $scriptStartTime;
+
+    public static function initLibs()
+    {
+        require_once __DIR__ . '/Core/Lib/Set.Class.php';
+        require_once __DIR__ . '/Core/Config/AppDirs.Config.php';
+        require_once __DIR__ . '/Core/Lib/Get.Class.php';
+    }
 
     public static function GetHost()
     {
@@ -26,6 +31,7 @@ class AppKernal extends Loader{
      */
     public static function Initialize() {
 
+        self::initLibs();
         self::$scriptStartTime = microtime(true);
         self::CheckDependencies();
         self::LoadFramework();

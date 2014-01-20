@@ -2,7 +2,7 @@
 
 // Core folder paths
 
-define('HOST', \Application\Core\AppKernal::GetHost());
+define('HOST', Application\Core\AppKernal::GetHost());
 
 define('ROOT', __DIR__ . '/../../../');
 

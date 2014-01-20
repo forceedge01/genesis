@@ -36,8 +36,6 @@ class Router extends EventHandler implements RouterInterface{
      */
     public function ForwardRequest(){
 
-        self::prexSERVER();
-
         $this->CheckIfUnderDevelopment();
 
         if(\Get::Config('Cache.html.enabled'))

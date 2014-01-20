@@ -4,7 +4,7 @@ namespace Application\Core\Tests;
 
 
 
-use Application\Console\WebTestCase;
+use Application\Console\Lib\WebTestCase;
 
 class AuthTest extends WebTestCase {
 

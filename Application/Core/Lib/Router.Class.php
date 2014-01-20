@@ -194,6 +194,12 @@ class Router extends EventHandler implements RouterInterface{
     {
         if(\Get::Config('Application.Environment.UnderDevelopmentPage.State'))
         {
+            /*
+             * This does not prevent from accessing the page through
+             * 1. Load balancers
+             * 2. Proxy servers
+             * 3. Port forwarded stuff (just consider)
+             */
             if(!$this->Variable(getenv('REMOTE_ADDR'))->IsIn(\Get::Config('Application.Environment.UnderDevelopmentPage.ExemptIPs')))
             {
                 list($bundle, $controller, $action) = explode(':', \Get::Config('Application.Environment.UnderDevelopmentPage.Controller'));

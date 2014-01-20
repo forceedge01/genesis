@@ -18,6 +18,8 @@ class Template extends Router {
             $cssFiles = array(),
             $jsFiles = array();
 
+    public $Session, $Server;
+
     /**
      *
      * @param string $template - template to render
@@ -61,11 +63,12 @@ class Template extends Router {
 
         $this->title = $pageTitle;
 
-        $this->ProcessOutput($this->GetView($template), $params);
-
-        $this->CheckJsCacheOptions();
-        $this->CheckCssCacheOptions();
-        $this->CheckHtmlCacheOptions();
+        $this
+            ->ExportGlobalVars()
+            ->ProcessOutput($this->GetView($template), $params)
+            ->CheckJsCacheOptions()
+            ->CheckCssCacheOptions()
+            ->CheckHtmlCacheOptions();
 
         if(\Get::Config('Cache.html.compress.enabled'))
             $this->html = Cache::Compress ($this->html, \Get::Config('Cache.html.compress.level'));
@@ -79,8 +82,14 @@ class Template extends Router {
 
         if(\Get::Config('Cache.html.enabled'))
             Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
+    }
 
-//        unset($this->html);
+    private function ExportGlobalVars()
+    {
+        $this->server = $this->ArrayToObject($_SERVER);
+        $this->Session = $this->ArrayToObject($_SESSION);
+
+        return $this;
     }
 
     public function Render404Response()
@@ -113,6 +122,8 @@ class Template extends Router {
             $this->ViewNotFound($templateUrl['template']);
 
         $this->EndOutput();
+
+        return $this;
     }
 
     public function EndOutput()
@@ -149,6 +160,8 @@ class Template extends Router {
 
             return Cache::WriteCacheFile($this->SetPattern()->GetPattern(), $this->html);
         }
+
+        return $this;
     }
 
     private function CheckJsCacheOptions()
@@ -167,9 +180,9 @@ class Template extends Router {
             }
 
             $this->html = $html;
-
-            return true;
         }
+
+        return $this;
     }
 
     private function ReplaceJsFiles($jsFiles)
@@ -177,7 +190,7 @@ class Template extends Router {
         for($index = 0; $index < count($jsFiles); $index++ )
             $this->html = str_replace (self::$jsFiles[$index], $jsFiles[$index], $this->html);
 
-        return true;
+        return $this;
     }
 
     private function CheckCssCacheOptions()
@@ -194,9 +207,9 @@ class Template extends Router {
                     Cache::Minify ($file, 'css');
 
             $this->html = $html;
-
-            return true;
         }
+
+        return $this;
     }
 
     /**

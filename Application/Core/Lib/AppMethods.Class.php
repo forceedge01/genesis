@@ -224,6 +224,13 @@ abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
         }
     }
 
+    /**
+     *
+     * @param array $array
+     * @return \stdClass
+     *
+     * Converts an array to an object type
+     */
     public function ArrayToObject(array $array)
     {
         try

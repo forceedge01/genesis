@@ -4,15 +4,13 @@ namespace Application\Core\Tests;
 
 
 
-use Application\Console\WebTestCase;
+use Application\Console\Lib\WebTestCase;
 
 class DebuggerTest extends WebTestCase {
 
     public function __construct() {
-        
+
         parent::__construct();
-        
-        self::$testClass = new \Application\Core\Debugger();
     }
 
     public function testPre()
@@ -38,11 +36,11 @@ class DebuggerTest extends WebTestCase {
         ));
 
         $this ->AssertURL('http://localhost/GENESIS/index.php/people');
-        
+
         $this ->AssertRedirect('http://localhost/GENESIS/index.php/people/', 'http://localhost/GENESIS/index.php/login/');
-        
+
         $array = array('portal' => 123);
-        
+
         $this->AssertIsArray($array);
         $this->AssertArrayHasKey($array, 'portal');
         $this->AssertEquals($array['portal'], 123);

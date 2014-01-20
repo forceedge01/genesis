@@ -225,9 +225,10 @@ class Loader extends Debugger{
         self::FetchAllBundles();
         $bundleConfigDir = \Get::Config('APPDIRS.BUNDLES.CONFIG');
         $bundleRoutesDir = \Get::Config('APPDIRS.BUNDLES.ROUTES');
+        $bundleInterfacesDir = \Get::Config('APPDIRS.BUNDLES.INTERFACES');
 
-        foreach(self::$bundles as $bundle){
-
+        foreach(self::$bundles as $bundle)
+        {
             if(is_dir($bundle))
             {
                 self::$configs = array_merge(
@@ -238,6 +239,7 @@ class Loader extends Debugger{
                         self::$routes,
                         self::LoadFilesFromDir($bundle . $bundleRoutesDir, array('php'))
                         );
+                self::$interfaces = self::LoadFilesFromDir($bundle . $bundleInterfacesDir, array('php'));
             }
             else
             {
@@ -270,7 +272,8 @@ class Loader extends Debugger{
             if(is_dir($bundle))
             {
                 self::LoadFilesFromDir($bundle, array('php'), false);
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'), array('php'));
+//                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'));
+                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'));
             }
             else
             {

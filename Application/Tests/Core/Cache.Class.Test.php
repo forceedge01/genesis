@@ -3,16 +3,16 @@
 namespace Application\Core\Tests;
 
 
-use Application\Console\BaseTestingRoutine as base;
+use Application\Console\Lib\BaseTestingRoutine as base;
 
 class CacheTest extends base{
-    
+
     public function testMethodCheckCacheFile()
     {
         self::$testClass = new \Application\Core\Cache();
-        
+
         $method = 'CheckForCachedFile';
-        
+
         $this ->AssertNumberOfMethodArguments($method, 1);
         $this ->AssertArgumentParameterForMethod($method, 'pattern');
         $this ->AssertMultipleFalse($method, array(
@@ -23,17 +23,17 @@ class CacheTest extends base{
             ),
         ));
     }
-    
+
     public function testMethodWriteCacheFile()
     {
         $method = 'WriteCacheFile';
     }
-    
+
     public function testMethodReadCacheFile()
     {
         $method = 'ReadCacheFile';
     }
-    
+
     public function testMethodOutputCacheFile()
     {
         $method = 'OutputCacheFile';

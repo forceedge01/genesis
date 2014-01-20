@@ -19,70 +19,11 @@ class Application extends Template implements Interfaces\Application{
 
         if(\Get::Config('Application.Session.Enabled'))
         {
-            $session = $this->GetCoreObject('Session');
-
-            if(\Get::Config('Application.Session.Secure.HttpsSecure') or \Get::Config('Application.Session.Secure.HttpOnly'))
-            {
-                call_user_func_array(array($session, 'StartSecure'), \Get::Config('Application.Session.Secure.HttpsSecure', 'Application.Session.Secure.HttpOnly'));
-            }
-            else
-            {
-                $session->Start('PHPGENESISSESSID_7736298');
-            }
+            $session = $this->startSession();
 
             if(\Get::Config('Application.Session.UseAuthComponent'))
             {
-                $auth = $this->GetComponent('Auth');
-
-                // Check for login interval expiration and authorized page view
-                if($session->IsSessionKeySet('login_expires'))
-                {
-                    if(time() > $session->Get('login_expires'))
-                    {
-                        $session->Destroy()->StartSecure();
-                        $session->Set('AccessedRoute', $this->getRouteFromPattern());
-                        $this
-                            ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
-                                ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
-                    }
-                }
-                else
-                {
-                    if(!$session->IsSessionKeySet('login_expires') AND !$this->IsPageAllowed() AND !$session->IsSessionKeySet('route_error'))
-                    {
-                        $session->Set('AccessedRoute', $this->getRouteFromPattern());
-                        $this
-                            ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
-                                ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
-                    }
-                }
-
-                // Populate User object with user defined method
-                if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
-                {
-                    $this->User = $auth->GetUser();
-
-                    $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
-
-                    // Prevent Session Hijacking
-                    if(isset($this->User->$tableColumn))
-                    {
-                        $browser = $this->GetSessionManager()->GetBrowserAgent();
-
-                        $db = $this->GetDatabaseManager();
-
-                        $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))->GetOneRecordBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn));
-
-                        $login_check = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password->password.$browser);
-
-                        if($login_check != $session->Get('login_string'))
-                        {
-                            $session->Destroy()->StartSecure();
-                            $session->Set('AccessedRoute', $this->getRouteFromPattern());
-                            $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
-                        }
-                    }
-                }
+                $this->GetComponent('Auth')->Init($session);
             }
         }
     }
@@ -90,6 +31,22 @@ class Application extends Template implements Interfaces\Application{
     public function __destruct()
     {
         $this->AfterApplicationHook();
+    }
+
+    public function startSession()
+    {
+        $session = $this->GetCoreObject('Session');
+
+        if(\Get::Config('Application.Session.Secure.HttpsSecure') or \Get::Config('Application.Session.Secure.HttpOnly'))
+        {
+            call_user_func_array(array($session, 'StartSecure'), \Get::Config('Application.Session.Secure.HttpsSecure', 'Application.Session.Secure.HttpOnly'));
+        }
+        else
+        {
+            $session->Start('PHPGENESISSESSID_7736298');
+        }
+
+        return $session;
     }
 
     /**

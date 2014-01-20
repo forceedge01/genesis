@@ -6,6 +6,8 @@ namespace Application\Console;
 
 class Initializer{
 
+    private static $object;
+
     public static function init($switch)
     {
         $args = explode(':', $switch);
@@ -172,49 +174,49 @@ class Initializer{
 
     private static function TestOptions($args)
     {
-        $this->object = New Lib\Test();
-        Lib\Test::$output = $_SERVER['argv'][2];
+        self::$object = New Lib\Test();
+        Lib\Test::$output = @$_SERVER['argv'][2];
 
         switch($args[1])
         {
             case 'routes':
             {
-                $this->object->RunTests('route');
+                self::$object->RunTests('route');
                 break;
             }
 
             case 'classes':
             {
-                $this->object->RunTests('class');
+                self::$object->RunTests('class');
                 break;
             }
 
             case 'methods':
             {
-                $this->object->RunTests('method');
+                self::$object->RunTests('method');
                 break;
             }
 
             case 'templates':
             {
-                $this->object->RunTests('template');
+                self::$object->RunTests('template');
                 break;
             }
 
             case 'models':
             {
-                $this->object->RunTests('model');
+                self::$object->RunTests('model');
                 break;
             }
 
             case 'all':
             {
-                if(!is_object($this->object))
-                    $this->object = new Test();
+                if(!is_object(self::$object))
+                    self::$object = new Test();
 
-                $this->object->RunTests();
+                self::$object->RunTests();
 
-                $this->object->clearResults();
+                self::$object->clearResults();
                 break;
             }
         }

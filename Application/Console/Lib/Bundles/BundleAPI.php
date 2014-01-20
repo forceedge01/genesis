@@ -75,7 +75,7 @@ abstract Class BundleAPI extends Console{
             $this
                 ->createConfig()
                 ->createRoutes()
-                ->createInterface()
+                ->createInterfaces()
                 ->createController()
                 ->createViews()
                 ->createTests();
@@ -371,7 +371,7 @@ final class {$this->name}Events extends ApplicationEvents implements {$this->nam
         return $this;
     }
 
-    private function createInterface(){
+    private function createInterfaces(){
 
         // Create all directories
         mkdir($this->bundleFolder . $this->bundleInterfacesFolder);
@@ -909,7 +909,7 @@ require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
-use Application\\Console\\WebTestCase;
+use Application\\Console\\Lib\\WebTestCase;
 
 
 class Test{$this -> name}Controller extends WebTestCase
@@ -935,7 +935,7 @@ require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\Lib\\BaseTestingRoutine;
 
 
 class Test{$this -> name}Entity extends BaseTestingRoutine
@@ -960,7 +960,7 @@ namespace {$this->bundleNamespace}\\Tests;
 require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\Lib\\BaseTestingRoutine;
 
 
 class Test{$this -> name}Repository extends BaseTestingRoutine
@@ -986,7 +986,7 @@ require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
-use Application\\Console\\TemplateTestCase;
+use Application\\Console\\Lib\\TemplateTestCase;
 
 
 class Test{$this -> name}Templates extends TemplateTestCase
@@ -1022,7 +1022,7 @@ require_once __DIR__ . '/../Config/{$this->name}.Test.Config.php';
 
 
 
-use Application\\Console\\BaseTestingRoutine;
+use Application\\Console\\Lib\\BaseTestingRoutine;
 
 
 class Test{$this -> name}Model extends BaseTestingRoutine

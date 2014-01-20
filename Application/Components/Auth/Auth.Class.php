@@ -16,10 +16,80 @@ class Auth extends Template{
 
     public function __construct(){
 
-        $this->username = @$_POST[\Get::Config('Auth.Form.EmailFieldName')];
-        $this->password = @$_POST[\Get::Config('Auth.Form.PasswordFieldName')];
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
         $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
+    }
+
+    public function SetPostParams()
+    {
+        $username = \Get::Config('Auth.Form.EmailFieldName');
+        $password = \Get::Config('Auth.Form.PasswordFieldName');
+
+        if(! isset($_POST[$username]))
+            $this->ThrowError ('Post parameter field name: '.$username.' was not found');
+
+        if(! isset($_POST[$password]))
+            $this->ThrowError ('Post parameter field name: '.$password.' was not found');
+
+        $this->username = $_POST[$username];
+        $this->password = $_POST[$password];
+    }
+
+    // Refactor this whole method, consider moving to classes structure or something
+    public function Init(\Application\Core\Session $session)
+    {
+        // Check for login interval expiration and authorized page view
+        if($session->IsSessionKeySet('login_expires'))
+        {
+            if(time() > $session->Get('login_expires'))
+            {
+                $session->Destroy()->StartSecure();
+                $session->Set('AccessedRoute', $this->getRouteFromPattern());
+                $this
+                    ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
+                        ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+            }
+        }
+        else
+        {
+            if(!$session->IsSessionKeySet('login_expires')
+                    AND !$this->IsPageAllowed()
+                        AND !$session->IsSessionKeySet('route_error'))
+            {
+                $session->Set('AccessedRoute', $this->getRouteFromPattern());
+                $this
+                    ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
+                        ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+            }
+        }
+
+        // Populate User object with user defined method
+        if(\Get::Config('Auth.Login.EntityRepository') AND $session->IsSessionKeySet('login_time'))
+        {
+            $this->User = $this->GetUser();
+
+            $tableColumn = \Get::Config('Auth.DBTable.AuthColumnName');
+
+            // Prevent Session Hijacking
+            if(isset($this->User->$tableColumn))
+            {
+                $browser = $session->GetBrowserAgent();
+                $db = $this->GetDatabaseManager();
+                $password = $db->Table(\Get::Config('Auth.DBTable.AuthTableName'), array('password'))
+                                ->GetOneRecordBy(array(
+                                    \Get::Config('Auth.DBTable.AuthColumnName') => $this->User->$tableColumn)
+                                );
+                $login_check = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password->password.$browser);
+
+                if($login_check != $session->Get('login_string'))
+                {
+                    $session->Destroy()->StartSecure();
+                    $session->Set('AccessedRoute', $this->getRouteFromPattern());
+                    $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))
+                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                }
+            }
+        }
     }
 
     public function ForwardToLoginPage($message = null)

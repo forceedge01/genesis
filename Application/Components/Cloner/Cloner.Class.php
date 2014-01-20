@@ -4,6 +4,7 @@ namespace Application\Components;
 
 /**
  * Author: Wahab Qureshi.
+ * Depreciated? Works only with wp-contents where as that was a separate module, re-think this logic?
  */
 
 use Application\Core\DatabaseManager;

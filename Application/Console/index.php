@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__ . '/../Core/Interfaces/Debugger.Interface.php';
+require_once __DIR__ . '/../Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/../Loader.php';
-require_once __DIR__ . '/../Classes/Core/Set.Class.php';
-require_once __DIR__ . '/../Classes/Core/Get.Class.php';
-require_once __DIR__ . '/../Resources/Configs/Console/Console.Config.php';
+require_once __DIR__ . '/../Core/Lib/Set.Class.php';
+require_once __DIR__ . '/../Core/Lib/Get.Class.php';
+require_once __DIR__ . '/Config/Console.Config.php';
 
 if(!\Get::Config('Console.ALLOW_CONSOLE_FROM_BROWSER') and isset($_SERVER['SERVER_NAME']))
 {
@@ -18,6 +20,20 @@ function getOptions() {
         'Bundles' => array(
             'bundle:create',
             'bundle:delete',
+            'bundle:assets:create',
+            'bundle:assets:delete',
+            'bundle:verify'
+        ),
+        'Components' => array(
+            'component:list',
+            'component:create',
+            'component:delete'
+        ),
+        'Schema' => array(
+            'schema:export[:{database}::'.Get::Config('Database.name').']',
+            'schema:import:{file}',
+            'schema:drop[:{database}::'.Get::Config('Database.name').']',
+            'schema:execute:{query}'
         ),
         'Tests' => array(
             'test:routes',
@@ -31,7 +47,7 @@ function getOptions() {
             'cache:clear'
         ),
         'Other' => array(
-            'automate:testing-(beta)',
+            'help',
             'exit'
         )
     );
@@ -62,6 +78,8 @@ function requireAll($directory) {
         echo 'Failed retrieving files from '.$files;
 }
 
+requireAll(\Get::Config('Console.CONFIG_FOLDER'));
+requireAll(\Get::Config('Console.APP_CONFIG_FOLDER'));
 requireAll(\Get::Config('Console.LIB_FOLDER'));
 
 $console = new Application\Console\Console();

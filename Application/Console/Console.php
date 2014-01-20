@@ -4,43 +4,46 @@ namespace Application\Console;
 
 
 
-class Console {
+use Application\Core\Debugger;
+
+class Console extends Debugger {
 
     private
             $object;
 
-    public function init(){
+    public function __construct() {}
 
-        if (!isset($_SERVER['SERVER_NAME'])) {
-
-            passthru('clear');
-
-            echo $this ->blue(' =========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<=========') ;
-            $this->linebreak(1);
-
-            while (true) {
-
-                if(isset($_SERVER['argv'][1]))
-                {
-                    $this->switchOption(str_replace('--', '', $_SERVER['argv'][1]));
-                    exit;
-                }
-
-                $this->showAllOptions(getOptions());
-
-                echo 'Enter choice: ';
-
-                $line = $this->readUser();
-
-                $args = explode('--', $line);
-
-                $this->switchOption($args[0]);
+    protected function persistOptions()
+    {
+        while (true)
+        {
+            if(isset($_SERVER['argv'][1]))
+            {
+                $this->switchOption(str_replace('--', '', $_SERVER['argv'][1]));
+                exit;
             }
-        } else {
 
-            echo '
-            <title>Simplify</title>
-            <style>
+            $this->showAllOptions(getOptions());
+            $line = $this->readUser('Enter choice: ');
+            $args = explode('--', $line);
+            $this->switchOption($args[0]);
+        }
+    }
+
+    public function init()
+    {
+        if (!isset($_SERVER['SERVER_NAME']))
+        {
+            echo $this->AddBreaks($this->blue('=========>>> Welcome to Genesis Simplify Engine, please choose an option and proceed with the onscreen instructions. <<<========='));
+
+            $this->persistOptions();
+        }
+        else
+        {
+
+            $title = '<title>Simplify</title>';
+            $heading = '<div class="mainHeading">Welcome to Genesis Simplify Engine.</div>';
+            $style = '<style>
 
             .mainHeading
             {
@@ -91,26 +94,21 @@ class Console {
                 color: orange;
             }
 
-            </style>
-            ';
+            </style>';
 
-            echo '<div class="mainHeading">Welcome to Genesis Simplify Engine.</div>';
-
+            echo $title, $style, $heading;
             $options = getOptions();
-
             $bundle = new Libraries\Bundle('html');
 
-            if (isset($_POST['submitOption'])) {
-
+            if (isset($_POST['submitOption']))
+            {
                 $option = $_POST['option'];
-
                 $this->switchOption($option[0]);
             }
 
             echo '<form method="post" class="form">';
-
-            foreach ($options as $key => $option) {
-
+            foreach ($options as $key => $option)
+            {
                 echo "<div class='subHeading'>$key</div>";
 
                 foreach($option as $opt)
@@ -120,17 +118,14 @@ class Console {
             }
 
             echo '<div class="heading">List of bundles installed</div>';
-
             $bundles = $bundle->readBundles(true);
 
-            foreach ($bundles as $bundle) {
-
+            foreach ($bundles as $bundle)
+            {
                 echo "<div class='option'><input type='radio' id='$bundle' ".($_POST['bundleName'][0] == $bundle ? 'checked=checked' : '')." name='bundleName[]' value='$bundle'> <label for='$bundle'>$bundle</label></div><br />";
             }
 
-            echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br />';
-
-            echo '<input type="submit" name="submitOption"></form>';
+            echo '<br />New Bundle Name: <input type="text" name="bundle"><br /><br /><input type="submit" name="submitOption"></form>';
         }
     }
 
@@ -138,13 +133,9 @@ class Console {
 
         echo 'Unknown option!';
 
-        $this->showAllOptions();
-
-        $message = 'Enter option: ';
-
-        $option = $this->readUser($message);
-
-        return $option;
+        return $this
+                ->showAllOptions()
+                    ->readUser('Enter option: ');
     }
 
     public function readUser($message = null) {
@@ -155,7 +146,6 @@ class Console {
         if (!isset($_SERVER['SERVER_NAME'])) {
 
             $handle = fopen('php://stdin', 'r');
-
             $line = trim(fgets($handle));
 
             return $line;
@@ -171,37 +161,44 @@ class Console {
 
     public function showAllOptions($options) {
 
-        foreach ($options as $key => $option) {
-
-            echo $this->green($key).$this->linebreak(1);
+        foreach ($options as $key => $option)
+        {
+            echo $this->linebreak(1), $this->green($key);
 
             foreach($option as $opt)
+            {
                 echo $this->linebreak(1).' '.$opt;
+            }
         }
 
-        $this->linebreak(2);
+        echo $this->linebreak(2);
+
+        return $this;
     }
 
     protected function removeDirectory($directory) {
 
         try {
 
-            if (is_dir($directory)) {
-
+            if (is_dir($directory))
+            {
                 $files = scandir($directory);
 
-                foreach ($files as $file) {
+                foreach ($files as $file)
+                {
                     if (($file != '.' && $file != '..')) {
 
                         $absolutePath = $directory . '/' . $file;
 
-                        if (is_dir($absolutePath)) {
-                            echo 'Entring direcotry';
-                            $this->linebreak(1);
-                            $this->removeDirectory($absolutePath);
-                        } else {
-                            echo 'deleting file: ' . $absolutePath;
-                            $this->linebreak(1);
+                        if (is_dir($absolutePath))
+                        {
+                            echo $this->linebreak(), '.. ';
+                            if(!$this->removeDirectory($absolutePath))
+                                return false;
+                        }
+                        else
+                        {
+                            echo '. ';
                             unlink($absolutePath);
                         }
                     }
@@ -214,176 +211,72 @@ class Console {
             }
             else
                 return false;
-        } catch (Exception $e) {
 
+        }
+        catch (Exception $e)
+        {
             echo $e->getMessage();
-
-            return false;
         }
     }
 
-    public function linebreak($val)
+    public function linebreak($val = 1)
     {
-        for ($i = 0; $i < $val; $i++) {
+        $linebreak = $break = null;
 
-            if (!isset($_SERVER['SERVER_NAME']))
-                echo chr(10) . chr(13);
-            else
-                echo '<br />';
+        if (!isset($_SERVER['SERVER_NAME']))
+            $break = chr(10) . chr(13);
+        else
+            $break = '<br />';
+
+        for ($i = 0; $i < $val; $i++)
+        {
+            $linebreak .= $break;
         }
+
+        return $linebreak;
     }
 
     public function space($num)
     {
-        $space = null;
+        $spaces = $space = null;
 
-        for ($i = 0; $i < $num; $i++) {
+        if (!isset($_SERVER['SERVER_NAME']))
+            $space = ' ';
+        else
+            $space = '&nbsp;';
 
-            if (!isset($_SERVER['SERVER_NAME']))
-                $space .= ' ';
-            else
-                $space .= '&nbsp;';
+        for ($i = 0; $i < $num; $i++)
+        {
+            $spaces .= $space;
         }
 
-        return $space;
+        return $spaces;
     }
 
     function switchOption($switch) {
 
-        $args = explode(':', $switch);
+        require_once __DIR__ . '/initializer.php';
 
-        switch (strtolower($args[0]))
-        {
-            case 'bundle':
-            {
-                if (isset($_SERVER['SERVER_NAME']))
-                {
-                    $bundle = new Libraries\Bundle('html');
-                    $bundle->name = ucfirst(str_replace('bundle', '', strtolower(($_POST['bundle'] ? $_POST['bundle'] : $_POST['bundleName'][0] ))));
-                }
-                else
-                {
-                    $bundle = new Libraries\Bundle('console');
-                }
+        Initializer::init($switch);
 
-                switch ($args[1])
-                {
-                    case 'create':
-                    {
-                        $bundle->createBundle();
-                        break;
-                    }
-                    case 'delete':
-                    {
-                        $bundle->deleteBundle();
-                        break;
-                    }
-                    case '0':
-                    case 'exit':
-                    {
-                        exit(0);
-                        break;
-                    }
-                }
-                break;
-            }
+        $this->flushOptions();
+        $this->persistOptions();
+    }
 
-            case 'test':
-            {
-                $this->object = New Test();
-
-                switch($args[1])
-                {
-                    case 'routes':
-                    {
-                        $this->object->RunTests('route');
-                        break;
-                    }
-
-                    case 'classes':
-                    {
-                        $this->object->RunTests('class');
-                        break;
-                    }
-
-                    case 'methods':
-                    {
-                        $this->object->RunTests('method');
-                        break;
-                    }
-
-                    case 'templates':
-                    {
-                        $this->object->RunTests('template');
-                        break;
-                    }
-
-                    case 'models':
-                    {
-                        $this->object->RunTests('model');
-                        break;
-                    }
-
-                    case 'all':
-                    {
-                        if(!is_object($this->object))
-                            $this->object = new Test();
-
-                        $this->object->RunTests();
-
-                        $this->object->clearResults();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'cache':
-            {
-                require_once \Get::Config('CORE.APPLICATION_CLASSES_FOLDER') . 'Core/Debugger.Class.php';
-                require_once \Get::Config('CORE.APPLICATION_COMPONENTS_FOLDER') . 'Directory/Directory.Class.php';
-
-                $cache = new Cache();
-                switch($args[1])
-                {
-                    case 'clear':
-                    {
-                        $cache->Clear();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case 'automate':
-            {
-                switch($args[1])
-                {
-                    case 'testing':
-                    {
-                        $watcher = new Watcher($args[2], 'test:all');
-                        $watcher ->automate();
-                        break;
-                    }
-                }
-                break;
-            }
-
-            default:
-            {
-                echo 'Exiting';
-                exit;
-                break;
-            }
-        }
+    protected function flushOptions()
+    {
+        unset($_SERVER['argv'][1]);
     }
 
     public function green($string)
     {
-        if (!isset($_SERVER['SERVER_NAME']))
-            return "\033[32m".$string."\033[37m";
-        else
-            return "<font color='#339933'>$string</font>";
+        if(Lib\Test::$output != 'Failures')
+        {
+            if (!isset($_SERVER['SERVER_NAME']))
+                return "\033[32m".$string."\033[37m";
+            else
+                return "<font color='#339933'>$string</font>";
+        }
     }
 
     public function red($string)
@@ -420,13 +313,23 @@ class Console {
 
     public function createFile($filePath, $content)
     {
-        $handle = fopen($filePath, 'w+');
-        fwrite($handle, $content);
-        fclose($handle);
+        try
+        {
+            $handle = fopen($filePath, 'w+');
+            fwrite($handle, $content);
+            fclose($handle);
+
+            return true;
+        }
+        catch(Exception $e)
+        {
+            trigger_error($e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * 
+     *
      * @param type $readMessage
      * @param type $htmlDefault
      * @return type
@@ -434,5 +337,91 @@ class Console {
     public function decide($readMessage, $htmlDefault)
     {
         return ( !isset($_SERVER['SERVER_NAME']) ? $this->readUser($readMessage) : $htmlDefault);
+    }
+
+    /**
+     *
+     * @param type $string
+     * @param type $breaks
+     * @return type
+     */
+    public function AddBreaks($string, $breaks = 1)
+    {
+        return $this->linebreak($breaks). $string. $this->linebreak($breaks);
+    }
+
+    private function is_dir_empty($dir) {
+
+        if (!is_readable($dir)) return NULL;
+        return (count(scandir($dir)) == 2);
+    }
+
+    public function Choice($message, $defaultHtml = 'yes')
+    {
+        $ans = $this->decide($this->blue($message.' [yes/no]: '), $defaultHtml);
+        if($ans == 'yes')
+            return true;
+        else if($ans == 'no')
+            return false;
+        else
+            return $this->Choice ($message, $defaultHtml);
+    }
+
+    public function ShowFormattedArray(array $array, $increment = 0)
+    {
+        foreach($array as $key => $value)
+        {
+            if($increment !== false)
+            {
+                if(is_numeric($key))
+                    $key += $increment;
+
+                echo '[ ',$this->green($key), ' ]:';
+            }
+
+            echo ' ', $value, $this->linebreak();
+        }
+    }
+
+    public static function Legend()
+    {
+        echo ("\r\n".
+        ' - [NUMBER] specifies an index option for you to choose from'.
+        "\r\n".
+        ' - [...] specifies an optional part of a command.'.
+        "\r\n".
+        ' - {...} specifies a variable to be replaced by a value by the user.'.
+        "\r\n".
+        ' - {...}::{value} shows the default value that is going to be used if the variable value is not provided.'.
+        "\r\n".
+        ' - Instructions will be given as you proceed with your choice'.
+        "\r\n".
+        ' - Example command: component:create OR schema:export:YourSchemaName'.
+        "\r\n");
+    }
+
+    public static function HowToUse()
+    {
+        echo self::blue("\r\n".
+        "You can execute commands by typing in an option from the menu or directory passing the option from the command line as an argument e.g\r\n".
+        "$ Application/simplify --create:bundle would take you to the create bundle menu directly.\r\n"
+        );
+    }
+
+    public function IsDirectoryEmpty($dir)
+    {
+        if(count(scandir($dir)) < 3)
+            return $this;
+
+        return false;
+    }
+
+    public function OutputMessages(array $messages)
+    {
+        foreach($messages as $key => $message)
+        {
+            foreach($message as $msg)
+                echo $this->$key($msg), $this->linebreak();
+        }
     }
 }

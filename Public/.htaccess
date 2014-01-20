@@ -9,5 +9,6 @@
         RewriteRule ^(.*)$ /index.php/$1 [L]
 </IfModule>
 
-ErrorDocument 404 /GENESIS/index.php/404
-ErrorDocument 500 /GENESIS/index.php/500
+# Redirect 404 and 500 errors to controllers
+ErrorDocument 404 /GENESIS/index.php/404/
+ErrorDocument 500 /GENESIS/index.php/500/

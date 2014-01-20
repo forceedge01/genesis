@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Console;
+namespace Application\Console\Lib;
 
 
 
@@ -11,9 +11,15 @@ class Test extends BaseTestingRoutine{
             $testClassesAndComponents,
             $type;
 
+    public static
+            $output;
+
     public function __construct($type = null) {
 
         parent::__construct();
+
+        error_reporting(E_ALL);
+        ini_set('display_errors', 0);
 
         $this->type = $type;
         $this ->LoadTestFiles();

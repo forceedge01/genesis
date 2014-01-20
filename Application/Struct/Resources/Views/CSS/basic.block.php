@@ -1,0 +1,1 @@
+<?=$this->SetAsset(':/CSS/genesis.css');?>

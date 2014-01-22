@@ -7,3 +7,6 @@ nbproject
 /Public/Assets/JS/unified/*
 
 .vagrant/
+
+# ignore dist files
+/Application/VersionControl/Config/Variables

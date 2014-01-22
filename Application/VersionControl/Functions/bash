@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+function editGenesisConfig() {
+	$genesis_editor $genesis_vc/Config/Variables;
+}

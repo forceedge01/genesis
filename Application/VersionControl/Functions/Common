@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+function print() {
+	printf "** $1\r\n";
+}
+
+function genesisHelp() {
+	print "";
+}
+
+function genesisMenu() {
+	print "";
+}
+
+function sourceFile() {
+	source $genesis_vc$1;
+}
+
+function genesisConfigCreate() {
+	cp $genesis_vc/Config/Variables $genesis_vc/Config/Variables.dist;
+}

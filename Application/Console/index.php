@@ -5,6 +5,7 @@ require_once __DIR__ . '/../Core/Lib/Debugger.Class.php';
 require_once __DIR__ . '/../Loader.php';
 require_once __DIR__ . '/../Core/Lib/Set.Class.php';
 require_once __DIR__ . '/../Core/Lib/Get.Class.php';
+require_once __DIR__ . '/../AppKernal.php';
 require_once __DIR__ . '/Config/Console.Config.php';
 
 if(!\Get::Config('Console.ALLOW_CONSOLE_FROM_BROWSER') and isset($_SERVER['SERVER_NAME']))
@@ -77,11 +78,3 @@ function requireAll($directory) {
     else
         echo 'Failed retrieving files from '.$files;
 }
-
-requireAll(\Get::Config('Console.CONFIG_FOLDER'));
-requireAll(\Get::Config('Console.APP_CONFIG_FOLDER'));
-requireAll(\Get::Config('Console.LIB_FOLDER'));
-
-$console = new Application\Console\Console();
-
-$console->init();

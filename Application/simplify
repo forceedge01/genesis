@@ -2,3 +2,11 @@
 <?php
 
 require_once __DIR__ . '/Console/index.php';
+
+requireAll(\Get::Config('Console.CONFIG_FOLDER'));
+requireAll(\Get::Config('Console.APP_CONFIG_FOLDER'));
+requireAll(\Get::Config('Console.LIB_FOLDER'));
+
+$console = new Application\Console\Console();
+
+$console->init();

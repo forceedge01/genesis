@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+########################################################################
+# Include this file in your bashrc file to get genesis console activated in your terminal
+########################################################################
+
+# Source common functions file
+source $(dirname "${BASH_SOURCE[0]}")/Functions/Common;
+
+if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
+	source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
+else
+    printf "\nConfig/Variables file not found, creating file now";
+    genesisConfigCreate;
+    genesisEditConfig;
+fi
+
+# Source config variables
+sourceFile 'Config/Variables';
+
+# Source bsah functions
+sourceFile 'Functions/bash';
+
+# Source local functions
+sourceFile 'Functions/Local';
+
+# Source remote functions
+sourceFile 'Functions/Remote';
+

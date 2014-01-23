@@ -6,10 +6,16 @@ function genesisEdit() {
 
 function genesisSave() {
 
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	print "Files edited:";
+	git diff --name-only
+
+	cd $currentDir;
+
 	print "Please enter a commit message:";
 	read message;
 
-	currentDir=$(pwd);
 	cd $genesis_dir;
 
 	print "Existing tags:";

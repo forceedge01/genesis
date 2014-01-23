@@ -20,3 +20,6 @@ export genesis_sshUser='';
 
 # remote ssh ip
 export genesis_sshIp='';
+
+# remote server genesis directory
+export genesis_remoteDir='';

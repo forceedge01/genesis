@@ -10,6 +10,7 @@ source $(dirname "${BASH_SOURCE[0]}")/Source/Common;
 if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
 	source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
 else
+	git config --global color.ui true
     printf "\nConfig/Variables file not found, creating file now";
     genesisConfigCreate;
     editGenesisConfig;

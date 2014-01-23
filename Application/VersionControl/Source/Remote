@@ -1,1 +1,17 @@
 #!/usr/bin/env bash
+
+if [[ -z $genesis_sshUser ]] || [[ -z $genesis_sshIp ]]; then
+	return;
+fi
+
+function genesisPush() {
+	genesisSSH "cd $genesis_remoteDir; git pull;";
+}
+
+function genesisPoint() {
+	genesisSSH "cd $genesis_remoteDir; git pull;";
+}
+
+function genesisSSH() {
+	ssh "$genesis_sshUser"@"$genesis_sshIp" "$1";
+}

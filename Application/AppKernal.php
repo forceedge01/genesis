@@ -23,7 +23,7 @@ class AppKernal extends Loader{
 
     public static function GetHost()
     {
-        return "http://{$_SERVER['HTTP_HOST']}/";
+        return "http://{$_SERVER['HTTP_HOST']}";
     }
 
     /**

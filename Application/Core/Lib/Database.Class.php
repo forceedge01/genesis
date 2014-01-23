@@ -132,8 +132,9 @@ abstract class Database extends Template implements DatabaseInterface{
                 $statement = $this->activeConnection->query($sql);
 
                 $result = $statement->execute();
+                $error = $statement->errorInfo();
 
-                if (!empty($statement->errorInfo()))
+                if (! empty($error))
                 {
                     if (\Get::Config('Errors.showDBErrors'))
                     {

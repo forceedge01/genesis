@@ -2,7 +2,8 @@
 
 // Core folder paths
 
-define('HOST', Application\Core\AppKernal::GetHost());
+// Set to custom url if it involves use of index.php
+define('HOST', Application\Core\AppKernal::GetHost().'genesis/Public/index.php');
 
 define('ROOT', __DIR__ . '/../../../');
 

@@ -6,12 +6,25 @@ function print() {
 
 function genesisHelp() {
 	print "Welcome to Genesis Remote Bash
+==================================
+-- Commands Available --
 
-genesis
-* help
-* edit
-* dir
-* save";
+help - shows this menu
+edit - edit genesis in editor
+dir - switch to genesis directory
+status - show git status
+save - commit and push to repo
+config - edit configuration
+update - pull changes from repo
+point ?[branch] - point to a branch
+branch
+  * list - lists branches
+  * create ?[branch] - create new branch
+  * delete ?[branch] - delete branch
+bash
+  * edit
+  * reload
+";
 }
 
 function genesis() {
@@ -22,10 +35,23 @@ function genesis() {
 			genesisEdit;;
 		"dir" )
 			cd $genesis_dir;;
+		"status" )
+			genesisStatus;;
 		"save" )
 			genesisSave;;
-		"reload" )
-			genesisBashReload;;
+		"update" )
+			genesisUpdate;;
+		"bash" )
+			case $2 in
+				"reload" )
+					genesisBashReload;;
+				"edit" )
+					genesisBashEdit;;
+			esac;;
+		"config" )
+			editGenesisConfig;;
+		"*" )
+			print "Unknown option entered, aborting";
 	esac
 }
 

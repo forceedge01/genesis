@@ -8,3 +8,7 @@ function genesisBashReload() {
 	print "Reloading bash env";
 	source "$genesis_vc"index
 }
+
+function genesisBashEdit() {
+	$genesis_editor $genesis_vc;
+}

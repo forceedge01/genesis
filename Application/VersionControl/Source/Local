@@ -9,17 +9,21 @@ function genesisSave() {
 	print "Please enter a commit message:";
 	read message;
 
+	currentDir=$(pwd);
+	cd $genesis_dir;
+
 	print "Existing tags:";
 	git tag;
 	print "Current version:";
 	git describe --tag
+
+	cd $currentDir;
+
 	print "Please enter a version number for this push:";
 	read version;
 
-	currentDir=$(pwd);
-
 	cd $genesis_dir;
-
+	
 	git pull;
 	git add --all;
 	git commit -m "$message";
@@ -29,4 +33,20 @@ function genesisSave() {
 	git push --tag;
 
 	cd $currentDir;
+}
+
+function genesisUpdate() {
+	print "Updating genesis on local machine";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git pull;
+	cd $currentDir;	
+}
+
+function genesisStatus() {
+	print "Showing git status on Genesis";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git status;
+	cd $currentDir;	
 }

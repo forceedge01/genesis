@@ -12,7 +12,7 @@ if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
 else
     printf "\nConfig/Variables file not found, creating file now";
     genesisConfigCreate;
-    genesisEditConfig;
+    editGenesisConfig;
 fi
 
 # Source config variables

@@ -5,11 +5,26 @@ function print() {
 }
 
 function genesisHelp() {
-	print "";
+	print "Welcome to Genesis Remote Bash
+
+genesis
+* help
+* edit
+* dir
+* save";
 }
 
-function genesisMenu() {
-	print "";
+function genesis() {
+	case $1 in
+		"help" )
+			genesisHelp;;
+		"edit" )
+			genesisEdit;;
+		"dir" )
+			cd $genesis_dir;;
+		"save" )
+			genesisSave;;
+	esac
 }
 
 function sourceFile() {

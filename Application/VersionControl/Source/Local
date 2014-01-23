@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+function genesisEdit() {
+	$genesis_editor $genesis_dir;
+}
+
+function genesisSave() {
+
+	print "Please enter a commit message:";
+	read message;
+
+	print "Existing tags:";
+	git tag;
+	print "Current version:";
+	git describe --tag
+	print "Please enter a version number for this push:";
+	read version;
+
+	currentDir=$(pwd);
+
+	cd $genesis_dir;
+
+	git pull;
+	git add --all;
+	git commit -m $message;
+	git push;
+
+	git tag $version;
+	git push --tag;
+
+	cd $currentDir;
+}

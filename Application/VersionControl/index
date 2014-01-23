@@ -5,7 +5,7 @@
 ########################################################################
 
 # Source common functions file
-source $(dirname "${BASH_SOURCE[0]}")/Functions/Common;
+source $(dirname "${BASH_SOURCE[0]}")/Source/Common;
 
 if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
 	source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
@@ -19,11 +19,10 @@ fi
 sourceFile 'Config/Variables';
 
 # Source bsah functions
-sourceFile 'Functions/bash';
+sourceFile 'Source/bash';
 
 # Source local functions
-sourceFile 'Functions/Local';
+sourceFile 'Source/Local';
 
 # Source remote functions
-sourceFile 'Functions/Remote';
-
+sourceFile 'Source/Remote';

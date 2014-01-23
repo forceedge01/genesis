@@ -22,7 +22,7 @@ function genesisSave() {
 
 	git pull;
 	git add --all;
-	git commit -m $message;
+	git commit -m "$message";
 	git push;
 
 	git tag $version;

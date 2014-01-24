@@ -28,6 +28,8 @@ function genesisSave() {
 	print "Please enter a version number for this push: (leave empty to skip tagging)";
 	read version;
 
+	print "Saving changes with message: '$message'";
+
 	cd $genesis_dir;
 
 	git pull;

@@ -27,6 +27,7 @@ point ?[branch] - point to a branch/tag
 version - shows local app version
 tags - shows tags on local app
 execute - execute command on genesis directory
+log ?[number] - show git log of app
 branch
   * list - lists branches
   * create [branch] - create new branch
@@ -79,9 +80,11 @@ function genesis() {
 		"execute" )
 			genesisExecute;;
 		"version" )
-			genesisVersion;;
+			genesisVersion $2;;
 		"tags" )
 			genesisTags;;
+		"log" )
+			genesisLog $2;;
 		"branch" )
 			case $2 in
 				"list" )

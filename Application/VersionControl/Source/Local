@@ -76,7 +76,14 @@ function genesisVersion() {
 	print "Current version:";
 	currentDir=$(pwd);
 	cd $genesis_dir;
-	git describe --tag
+	version=$(git describe --tag);
+	echo $version;
+
+	if [[ $1 == '--more' ]]; then
+		print "Info";
+		git show $version;
+	fi
+
 	cd $currentDir;
 }
 
@@ -132,5 +139,19 @@ function genesisBranchDelete() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	git branch -D $1;
+	cd $currentDir;
+}
+
+function genesisLog() {
+	print "Showing log entries:";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+
+	if [[ -z $1 ]]; then
+		git log -n 3;
+	else
+		git log -n $1;
+	fi
+
 	cd $currentDir;
 }

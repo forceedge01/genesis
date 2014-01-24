@@ -25,18 +25,20 @@ function genesisSave() {
 
 	cd $currentDir;
 
-	print "Please enter a version number for this push:";
+	print "Please enter a version number for this push: (leave empty to skip tagging)";
 	read version;
 
 	cd $genesis_dir;
-	
+
 	git pull;
 	git add --all;
 	git commit -m "$message";
 	git push;
 
-	git tag $version;
-	git push --tag;
+	if [[ ! -z $version ]]; then
+		git tag $version;
+		git push --tag;
+	fi;
 
 	cd $currentDir;
 }
@@ -46,7 +48,7 @@ function genesisUpdate() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	git pull;
-	cd $currentDir;	
+	cd $currentDir;
 }
 
 function genesisStatus() {
@@ -54,5 +56,5 @@ function genesisStatus() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	git status;
-	cd $currentDir;	
+	cd $currentDir;
 }

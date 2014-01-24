@@ -26,7 +26,7 @@ function genesisSave() {
 	print "Please enter a version number for this push: (leave empty to skip tagging)";
 	read version;
 
-	print "Are you sure you want to continue?";
+	print "Attempting to commit with message '$message' and tag '$version', continue? [Y/N]";
 	if [[ $(userChoice) != 'Y' ]]; then
 		return;
 	fi
@@ -106,5 +106,31 @@ function genesisExecute() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	$genesisCommand;
+	cd $currentDir;
+}
+
+function genesisBranch() {
+	print "Showing branches:";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git branch;
+	cd $currentDir;
+}
+
+function genesisBranchCreate() {
+	print "Creating/Switching branch '$1':";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git branch $1;
+	git checkout $1;
+	git branch -u origin/$1;
+	cd $currentDir;
+}
+
+function genesisBranchDelete() {
+	print "Deleting branch '$1':";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git branch -D $1;
 	cd $currentDir;
 }

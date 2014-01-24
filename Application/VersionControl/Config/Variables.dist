@@ -7,7 +7,7 @@
 export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
 
 # genesis directory
-export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../../
+export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../../;
 
 # version control dir
 export genesis_vc=$(dirname "${BASH_SOURCE[0]}")/../;

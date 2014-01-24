@@ -18,25 +18,19 @@ function genesisHelp() {
 ==================================
 -- Commands Available --
 
-help - shows this menu
-edit - edit genesis in editor
 dir - switch to genesis directory
+edit - edit genesis in editor
 status - show git status
 save - commit and push to repo
-config - edit configuration
 update - pull changes from repo
-point ?[branch] - point to a branch
+point ?[branch] - point to a branch/tag
+version - shows local app version
+tags - shows tags on local app
+execute - execute command on genesis directory
 branch
   * list - lists branches
   * create [branch] - create new branch
   * delete [branch] - delete branch
-version - shows local app version
-tags - shows tags on local app
-execute - execute command on genesis directory
-
-bash
-  * edit - edit genesis bash
-  * reload - reload genesis bash env
 
 remote";
 
@@ -54,6 +48,15 @@ else
 	print "You need to configure your servers SSH details to access remote commands, run 'genesis config' to configure.
 	";
 fi;
+
+printf "bash
+  * edit - edit genesis bash
+  * reload - reload genesis bash env
+  * config - edit configuration
+
+help - shows this menu
+
+";
 
 }
 
@@ -73,6 +76,12 @@ function genesis() {
 			genesisPoint $2;;
 		"update" )
 			genesisUpdate;;
+		"execute" )
+			genesisExecute;;
+		"version" )
+			genesisVersion;;
+		"tags" )
+			genesisTags;;
 		"branch" )
 			case $2 in
 				"list" )
@@ -82,21 +91,15 @@ function genesis() {
 				"delete" )
 					genesisBranchDelete $3;;
 			esac;;
-		"execute" )
-			genesisExecute;;
 		"bash" )
 			case $2 in
 				"reload" )
 					genesisBashReload;;
 				"edit" )
 					genesisBashEdit;;
+				"config" )
+					editGenesisConfig;;
 			esac;;
-		"config" )
-			editGenesisConfig;;
-		"version" )
-			genesisVersion;;
-		"tags" )
-			genesisTags;;
 		"remote" )
 			case $2 in
 				"login" )

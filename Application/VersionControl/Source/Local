@@ -18,15 +18,18 @@ function genesisSave() {
 
 	cd $genesis_dir;
 
-	print "Existing tags:";
-	git tag;
-	print "Current version:";
-	git describe --tag
+	genesisTags;
+	genesisVersion;
 
 	cd $currentDir;
 
 	print "Please enter a version number for this push: (leave empty to skip tagging)";
 	read version;
+
+	print "Are you sure you want to continue?";
+	if [[ $(userChoice) != 'Y' ]]; then
+		return;
+	fi
 
 	print "Saving changes with message: '$message'";
 
@@ -58,5 +61,50 @@ function genesisStatus() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	git status;
+	cd $currentDir;
+}
+
+function genesisTags() {
+	print "Existing Tags:";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git tag;
+	cd $currentDir;
+}
+
+function genesisVersion() {
+	print "Current version:";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git describe --tag
+	cd $currentDir;
+}
+
+function genesisPoint() {
+
+	if [[ -z $1 ]]; then
+		branch='development';
+	else
+		branch=$1;
+	fi
+
+	print "Pointing local env to branch/tag '$branch':";
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git checkout $branch;
+	cd $currentDir;
+}
+
+function genesisExecute() {
+	print "Enter command to run:";
+	read genesisCommand;
+
+	if [[ -z $genesisCommand ]]; then
+		return;
+	fi
+
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	$genesisCommand;
 	cd $currentDir;
 }

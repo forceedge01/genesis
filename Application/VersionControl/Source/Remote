@@ -4,14 +4,37 @@ if [[ -z $genesis_sshUser ]] || [[ -z $genesis_sshIp ]]; then
 	return;
 fi
 
-function genesisPush() {
-	genesisSSH "cd $genesis_remoteDir; git pull;";
+function genesisRemoteFetch() {
+	genesisSSH "cd $genesis_remoteDir; git fetch;";
 }
 
-function genesisPoint() {
-	genesisSSH "cd $genesis_remoteDir; git pull;";
+function genesisRemotePoint() {
+	if [[ -z $1 ]]; then
+		print "You must enter a branch/version/tag to point the server to";
+		return;
+	fi;
+
+	print "";
+	genesisSSH "cd $genesis_remoteDir; git checkout $1";
 }
 
 function genesisSSH() {
 	ssh "$genesis_sshUser"@"$genesis_sshIp" "$1";
+}
+
+function genesisRemoteTags() {
+	print "Showing tags on server:";
+	genesisSSH "cd $genesis_remoteDir; git tag";
+}
+
+function genesisRemoteVersion() {
+	print "Showing current version on server:";
+	genesisSSH "cd $genesis_remoteDir; git describe --tags";
+}
+
+function genesisRemoteExecute() {
+	print "Enter command to execute on remote server:";
+	read genesisRemoteCommand;
+	print "Executing '$genesisRemoteCommand' on remote server:";
+	genesisSSH "$genesisRemoteCommand";
 }

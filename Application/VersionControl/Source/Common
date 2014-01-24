@@ -4,11 +4,19 @@ function print() {
 	printf "** $1\r\n";
 }
 
+function userChoice () {
+    read choice;
+    case $choice in
+      "n"|"N" ) echo 'N';;
+      "y"|"Y" ) echo 'Y';;
+      *) echo 'Response not valid';;
+    esac
+}
+
 function genesisHelp() {
 	print "Welcome to Genesis Remote Bash
 ==================================
 -- Commands Available --
-
 
 help - shows this menu
 edit - edit genesis in editor
@@ -22,16 +30,31 @@ branch
   * list - lists branches
   * create ?[branch] - create new branch
   * delete ?[branch] - delete branch
+version - shows local app version
+tags - shows tags on local app
+execute - execute command on genesis directory
 
 bash
   * edit - edit genesis bash
   * reload - reload genesis bash env
 
-remote
-  * login - login to remote ssh server
+remote";
+
+if [[ ! -z $genesis_sshUser ]] || [[ ! -z $genesis_sshIp ]]; then
+
+printf "  * login - login to remote ssh server
   * update - update remote repo
   * point ?{branch} - point to branch/version/tag
+  * version - shows the current version of your application
+  * tags - shows the tags available on the remote server
+  * execute - execute command on remote server
+
 ";
+else
+	print "You need to configure your servers SSH details to access remote commands, run 'genesis config' to configure.
+	";
+fi;
+
 }
 
 function genesis() {
@@ -46,8 +69,21 @@ function genesis() {
 			genesisStatus;;
 		"save" )
 			genesisSave;;
+		"point" )
+			genesisPoint $2;;
 		"update" )
 			genesisUpdate;;
+		"branch" )
+			case $2 in
+				"list" )
+					genesisBranch;;
+				"create" )
+					genesisBranchCreate $3;;
+				"delete" )
+					genesisBranchDelete $3;;
+			esac;;
+		"execute" )
+			genesisExecute;;
 		"bash" )
 			case $2 in
 				"reload" )
@@ -57,6 +93,25 @@ function genesis() {
 			esac;;
 		"config" )
 			editGenesisConfig;;
+		"version" )
+			genesisVersion;;
+		"tags" )
+			genesisTags;;
+		"remote" )
+			case $2 in
+				"login" )
+					genesisSSH;;
+				"update" )
+					genesisRemoteFetch;;
+				"point" )
+					genesisRemotePoint $3;;
+				"version" )
+					genesisRemoteVersion;;
+				"tags" )
+					genesisRemoteTags;;
+				"execute" )
+					genesisRemoteExecute;;
+			esac;;
 		"*" )
 			print "Unknown option entered, aborting";
 	esac

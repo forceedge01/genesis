@@ -23,3 +23,9 @@ export genesis_sshIp='';
 
 # remote server genesis directory
 export genesis_remoteDir='';
+
+# if phpunit is setup please set its path below
+export genesis_phpunit='';
+
+# if you have set the variable above, please set
+export genesis_phpunitPath='';

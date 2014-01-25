@@ -23,6 +23,12 @@ function genesisSave() {
 		fi
 	fi
 
+	if [[ -z $(git diff --name-only) ]]; then
+		print "No file changes found, Attempting to push commits/tags";
+		genesisPush;
+		genesisPushTag;
+	fi
+
 	print "Files edited:";
 	git diff --name-only
 
@@ -50,17 +56,28 @@ function genesisSave() {
 
 	cd $genesis_dir;
 
-	git pull;
-	git add --all;
-	git commit -m "$message";
-	git push;
+	genesisPush $message;
 
 	if [[ ! -z $version ]]; then
 		git tag $version;
-		git push --tag;
-	fi;
+		genesisPushTag $version;
+	fi
 
 	cd $currentDir;
+}
+
+function genesisPush() {
+	cd $genesis_dir;
+
+	git pull;
+	git add --all;
+	git commit -m "$1";
+	git push;
+}
+
+function genesisPushTag() {
+	cd $genesis_dir;
+	git push --tag;
 }
 
 function genesisUpdate() {

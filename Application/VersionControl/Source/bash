@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-function editGenesisConfig() {
-	$genesis_editor $genesis_vc/Config/Variables;
-}
-
 function genesisBashReload() {
 	print "Reloading bash env";
 	source "$genesis_vc"index

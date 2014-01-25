@@ -13,7 +13,7 @@ export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../../;
 export genesis_vc=$(dirname "${BASH_SOURCE[0]}")/../;
 
 # bash compatible editor
-export genesis_editor='sublime';
+export genesis_editor='vim';
 
 # remote ssh user
 export genesis_sshUser='';
@@ -25,7 +25,7 @@ export genesis_sshIp='';
 export genesis_remoteDir='';
 
 # if phpunit is setup please set its path below
-export genesis_phpunit='';
+export genesis_phpunitBin='phpunit';
 
 # if you have set the variable above, please set
-export genesis_phpunitPath='';
+export genesis_phpunitConfigPath='';

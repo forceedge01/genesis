@@ -8,6 +8,21 @@ function genesisSave() {
 
 	currentDir=$(pwd);
 	cd $genesis_dir;
+
+	if [[ ! -z $genesis_phpunitBin ]]; then
+
+		print "Running PHPUnit, config search in: '$genesis_phpunitConfigPath'";
+		# Run unit tests on app
+		$genesis_phpunitBin -c $genesis_phpunitConfigPath;
+
+		print "Are you sure you want to save data after considering the output above? [Y/N]";
+		if [[ $(userChoice) != 'Y' ]]; then
+			print "Aborting";
+			cd $currentDir;
+			return;
+		fi
+	fi
+
 	print "Files edited:";
 	git diff --name-only
 
@@ -53,6 +68,7 @@ function genesisUpdate() {
 	currentDir=$(pwd);
 	cd $genesis_dir;
 	git pull;
+	genesisBashReload;
 	cd $currentDir;
 }
 

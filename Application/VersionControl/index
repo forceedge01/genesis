@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Author: Wahab Qureshi
+
 ########################################################################
 # Include this file in your bashrc file to get genesis console activated in your terminal
 ########################################################################
@@ -11,8 +13,9 @@ if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
 	source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
 else
 	git config --global color.ui true
-    printf "\nConfig/Variables file not found, creating file now";
+    print "Config/Variables file not found, creating file now";
     genesisConfigCreate;
+    source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
     editGenesisConfig;
 fi
 

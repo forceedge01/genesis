@@ -46,7 +46,7 @@ printf "  * login - login to remote ssh server
 
 ";
 else
-	print "You need to configure your servers SSH details to access remote commands, run 'genesis config' to configure.
+	print "You need to configure your servers SSH details to access remote commands, run 'genesis bash config' to configure.
 	";
 fi;
 
@@ -128,5 +128,10 @@ function sourceFile() {
 }
 
 function genesisConfigCreate() {
-	cp $genesis_vc/Config/Variables $genesis_vc/Config/Variables.dist;
+	cp $(dirname "${BASH_SOURCE[0]}")/../Config/Variables.dist $(dirname "${BASH_SOURCE[0]}")/../Config/Variables;
+}
+
+function editGenesisConfig() {
+	$genesis_editor $genesis_vc/Config/Variables;
+	sourceFile Config/Variables;
 }

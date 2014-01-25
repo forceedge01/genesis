@@ -27,6 +27,8 @@ function genesisSave() {
 		print "No file changes found, Attempting to push commits/tags";
 		genesisPush;
 		genesisPushTag;
+		
+		return;
 	fi
 
 	print "Files edited:";

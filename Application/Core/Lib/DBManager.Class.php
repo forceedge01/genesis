@@ -6,7 +6,7 @@ namespace Application\Core;
 
 use Application\Core\Interfaces\DatabaseManager as DatabaseManagerInterface;
 
-class DatabaseManager extends Database{
+class BDManager extends Database{
 
 	private static $Query;
     
@@ -16,9 +16,9 @@ class DatabaseManager extends Database{
      * @param type $params
      * @return type
      */
-    public function fetchSingle($table, array $params = array())
+    public function fetchSingle(array $params = array())
     {
-        $this->buildQuery($table, array_merge(array('limit' => 1), $params));
+        $this->buildQuery($this->tableName, array_merge(array('limit' => 1), $params));
         $this->Query(self::$Query);
         $results = $this->getResultSet();
         
@@ -35,6 +35,7 @@ class DatabaseManager extends Database{
     {        
         $this->buildQuery($table, $params);
         $this->Query(self::$Query);
+
         return $this->getResultSet();
     }
     
@@ -72,6 +73,11 @@ class DatabaseManager extends Database{
         if(isset($params['left join']))
         {
             $select .= " LEFT JOIN {$params['left join']}";
+        }
+
+        if(isset($params['using']))
+        {
+            $select .= " USING ({$params['using']})";
         }
         
         if(isset($params['where']))
@@ -121,9 +127,24 @@ class DatabaseManager extends Database{
      * @param type $where
      * @return type
      */
-    public static function updateTable($table, array $params, array $where = array())
+    public function update(array $params, array $where = array())
     {
-        return self::StaticDB('getConnection')->update($table, $params, $where);
+        $toUpdate = columnToValue($params);
+        $where = columnToValue($where);
+        
+        return $this->Query("UPDATE {$this->tableName} SET $toUpdate WHERE $where");
+    }
+
+    private function columnToValue(array $array)
+    {
+        $string = '';
+
+        foreach($array as $column => $value)
+        {
+            $string .= "$column = " . (is_int($value) ? $value : "'$value'" ) . ' and ';
+        }
+
+        return trim($string, ' and ');
     }
     
     public static function queryDB($query)
@@ -158,16 +179,16 @@ class DatabaseManager extends Database{
         return self::StaticDB('buildQuery', $table, $params);
     }
     
-    public static function deleteFromTable($table, $where = null)
+    public function delete($where = null)
     {
-        return self::queryDB("delete from $table where $where");
+        return $this->Query("delete from {$this->table} where $where");
     }
     
-    public static function insertIntoTable($table, $params)
+    public function insert($params)
     {
         list($columns, $values) = self::StringifyParams($params);
         
-        return self::queryDB("INSERT INTO $table ($columns) VALUES ($values)");
+        return $this->Query("INSERT INTO {$this->table} ($columns) VALUES ($values)");
     }
     
     public static function getLastQuery()

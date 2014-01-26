@@ -38,8 +38,8 @@ remote";
 if [[ ! -z $genesis_sshUser ]] || [[ ! -z $genesis_sshIp ]]; then
 
 printf "  * login - login to remote ssh server
-  * update - update remote repo
-  * point ?{branch} - point to branch/version/tag
+  * update - update server app
+  * point [branch] - point to branch/version/tag
   * version - shows the current version of your application
   * tags - shows the tags available on the remote server
   * execute - execute command on remote server

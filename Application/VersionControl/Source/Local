@@ -70,15 +70,18 @@ function genesisSave() {
 
 function genesisPush() {
 	cd $genesis_dir;
-
+	print "Looking for updates: ";
 	git pull;
+	print "Committing all changes: ";
 	git add --all;
 	git commit -m "$1";
+	print "Pushing commits: ";
 	git push;
 }
 
 function genesisPushTag() {
 	cd $genesis_dir;
+	print "Pushing tags: ";
 	git push --tag;
 }
 

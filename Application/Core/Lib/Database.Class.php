@@ -60,7 +60,7 @@ abstract class Database extends Template implements DatabaseInterface{
             switch($driver)
             {
                 case 'mysqli':
-                    $this->activeConnection = new \PDO("mysql:host={$this->host};dbname={$this->name}", $this->username, $this->password);
+                    $this->activeConnection = new \PDO("mysql:host={$this->host};dbname={$this->name};charset=utf8", $this->username, $this->password);
                     break;
                 case 'sql':
                     break;
@@ -71,7 +71,7 @@ abstract class Database extends Template implements DatabaseInterface{
                 case 'postgreSQL':
                     break;
                 default:
-//                    $this->activeConnection = new \mysqli($this->host, $this->username, $this->password, $this->name);
+                   $this->activeConnection = new \mysqli($this->host, $this->username, $this->password, $this->name);
                     break;
             }
 
@@ -86,8 +86,6 @@ abstract class Database extends Template implements DatabaseInterface{
                         )
                     ->ThrowError();
             }
-
-            $this->activeConnection->set_charset('utf8');
 
         } catch (Exception $e) {
 
@@ -129,17 +127,17 @@ abstract class Database extends Template implements DatabaseInterface{
             if (!empty($sql))
             {
                 $this->lastQuery = $sql;
-                $statement = $this->activeConnection->query($sql);
+                $statement = $this->activeConnection->prepare($sql);
 
                 $result = $statement->execute();
                 $error = $statement->errorInfo();
 
-                if (! empty($error))
+                if (! empty($error[1]))
                 {
                     if (\Get::Config('Errors.showDBErrors'))
                     {
                         if(isset($_SERVER['SERVER_NAME']))
-                            $this->SetErrorArgs('There was a database failure: ' . $statement->errorInfo() . ', SQL query: ' . $sql ,'Ref backtrace','0','2')->ThrowError();
+                            $this->SetErrorArgs('There was a database failure: ' . print_r($statement->errorInfo(), true) . ', SQL query: ' . $sql ,'Ref backtrace','0','2')->ThrowError();
                     }
 
                     if (\Get::Config('Errors.mailDBErrors'))
@@ -171,7 +169,7 @@ abstract class Database extends Template implements DatabaseInterface{
 
                         if ($this->numRows > 0)
                         {
-                            while ($row = $statement->fetch(PDO::FETCH_ASSOC))
+                            while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
                             {
                                 $this->queryResult[] = $row;
                             }

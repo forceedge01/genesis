@@ -6,8 +6,6 @@ namespace Application\Core\Interfaces;
 
 interface Router{
 
-    public function __construct();
-
     /**
      *
      * @return boolean - true on success, false on failure<br />

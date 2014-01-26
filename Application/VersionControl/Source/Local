@@ -75,13 +75,13 @@ function genesisPush() {
 	print "Committing all changes: ";
 	git add --all;
 	git commit -m "$1";
-	print "Pushing commits: ";
+	print "Pushing commit(s): ";
 	git push;
 }
 
 function genesisPushTag() {
 	cd $genesis_dir;
-	print "Pushing tags: ";
+	print "Pushing tag(s): ";
 	git push --tag;
 }
 

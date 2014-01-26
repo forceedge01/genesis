@@ -53,7 +53,109 @@ class BDManager extends Database{
 
         return $result[0]['just-Column1'];
     }
+
+    /**
+     * 
+     * @param type $table
+     * @param type $params
+     * @param type $where
+     * @return type
+     */
+    public function update(array $params, array $where = array())
+    {
+        $toUpdate = $this->columnToValueString($params);
+        $where = $this->columnToValueString($where);
+        
+        return $this->Query("UPDATE {$this->tableName} SET $toUpdate WHERE $where");
+    }
+
+    public function delete(array $where = array())
+    {
+        $where = null;
+
+        if($this->isLoopable($where))
+            $where = 'where '.$this->columnToValueString($where);
+
+        return $this->Query("delete from {$this->table} $where");
+    }
     
+    public function insert($params)
+    {
+        list($columns, $values) = $this->StringifyParams($params);
+        
+        return $this->Query("INSERT INTO {$this->table} ($columns) VALUES ($values)");
+    }
+    
+    public function setDBQuery($table, $params)
+    {
+        $this->buildQuery($table, $params);
+        
+        return $this;
+    }
+    
+    /**
+     * 
+     * @param type $table
+     * @param type $params
+     * @return type
+     */
+    public function getQuery($table, array $params)
+    {        
+        $this->buildQuery($table, $params);
+
+        return self::$Query;
+    }
+    
+    public function getLastQuery()
+    {
+        return self::$Query;
+    }
+    
+    /**
+     * 
+     * @param array $queries
+     * @return array
+     */
+    public function multiQueryDB(array $queries)
+    {
+        $results = array();
+        
+        foreach($queries as $query)
+        {
+            $results[] = $this->Query($query);
+        }
+        
+        return $results;
+    }
+
+    private function columnToValueString(array $array)
+    {
+        $string = '';
+
+        foreach($array as $column => $value)
+        {
+            $string .= "$column = " . (is_int($value) ? $value : "'$value'" ) . ' and ';
+        }
+
+        return trim($string, ' and ');
+    }
+
+    private function StringifyParams($params)
+    {
+        $indexed = array();
+        
+        foreach($params as $column => $value)
+        {
+            $indexed[0] .= "$column,";
+            $indexed[1] .= ((is_int($value) || strpos($value,'(') != false) ? $value : "'$value'" ) . ',';
+        }
+        
+        $indexed[0] = trim($indexed[0], ',');
+        $indexed[1] = trim($indexed[1], ',');
+        
+        return $indexed;
+    }
+
     private function buildQuery($table, array $params = array())
     {
         $columns = '*';
@@ -98,134 +200,5 @@ class BDManager extends Database{
         self::$Query = $select;
         
         return $this;
-    }
-    
-    protected function setDBQuery($table, $params)
-    {
-        $this->buildQuery($table, $params);
-        
-        return $this;
-    }
-
-    /**
-     * 
-     * @param type $method
-     * @param type $table
-     * @param type $params
-     * @return type
-     * Run a query on the database without instantiating an object
-     */
-    public static function StaticDB ($method, $table = null, array $params = array()) 
-    {        
-        return Base::getObject('Base')->$method($table, $params);
-    }
-    
-    /**
-     * 
-     * @param type $table
-     * @param type $params
-     * @param type $where
-     * @return type
-     */
-    public function update(array $params, array $where = array())
-    {
-        $toUpdate = columnToValue($params);
-        $where = columnToValue($where);
-        
-        return $this->Query("UPDATE {$this->tableName} SET $toUpdate WHERE $where");
-    }
-
-    private function columnToValue(array $array)
-    {
-        $string = '';
-
-        foreach($array as $column => $value)
-        {
-            $string .= "$column = " . (is_int($value) ? $value : "'$value'" ) . ' and ';
-        }
-
-        return trim($string, ' and ');
-    }
-    
-    public static function queryDB($query)
-    {
-        self::$Query = $query;
-        return self::StaticDB('getConnection')->query($query);
-    }
-    
-    public static function getLastInsertId()
-    {
-        return self::StaticDB('getConnection')->insert_id;
-    }
-    
-    public static function getNumberOfRowsAffected() 
-    {
-        return self::StaticDB('getConnection')->rows_affected;
-    }
-    
-    public static function getNumberOfRows()
-    {
-        return self::StaticDB('getConnection')->num_rows;
-    }
-    
-    /**
-     * 
-     * @param type $table
-     * @param type $params
-     * @return type
-     */
-    public static function getQuery($table, array $params)
-    {        
-        return self::StaticDB('buildQuery', $table, $params);
-    }
-    
-    public function delete($where = null)
-    {
-        return $this->Query("delete from {$this->table} where $where");
-    }
-    
-    public function insert($params)
-    {
-        list($columns, $values) = self::StringifyParams($params);
-        
-        return $this->Query("INSERT INTO {$this->table} ($columns) VALUES ($values)");
-    }
-    
-    public static function getLastQuery()
-    {
-        return self::$Query;
-    }
-    
-    private static function StringifyParams($params)
-    {
-        $indexed = array();
-        
-        foreach($params as $column => $value)
-        {
-            $indexed[0] .= "$column,";
-            $indexed[1] .= ((is_int($value) || strpos($value,'(') != false) ? $value : "'$value'" ) . ',';
-        }
-        
-        $indexed[0] = trim($indexed[0], ',');
-        $indexed[1] = trim($indexed[1], ',');
-        
-        return $indexed;
-    }
-    
-    /**
-     * 
-     * @param array $queries
-     * @return array
-     */
-    public static function multiQueryDB(array $queries)
-    {
-        $results = array();
-        
-        foreach($queries as $query)
-        {
-            $results[] = self::queryDB($query);
-        }
-        
-        return $results;
     }
 }

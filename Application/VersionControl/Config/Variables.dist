@@ -2,6 +2,7 @@
 
 # Configure your genesis application bash script
 # This file should be set before using the script
+# Genesis version control uses git only
 
 # genesis repository
 export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
@@ -18,6 +19,9 @@ export genesis_editor='vim';
 # genesis default branch
 export genesis_defaultBranch='development';
 
+# genesis php error log
+export genesis_phpErrorLog='';
+
 # remote ssh user
 export genesis_sshUser='';
 
@@ -30,5 +34,5 @@ export genesis_remoteDir='';
 # if phpunit is setup please set its path below
 export genesis_phpunitBin='phpunit';
 
-# if you have set the variable above, please set
+# if you have set the variable above, please set where the config xml file is for phpunit
 export genesis_phpunitConfigPath='';

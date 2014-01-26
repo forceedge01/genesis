@@ -198,3 +198,16 @@ function genesisLog() {
 
 	cd $currentDir;
 }
+
+function genesisErrorLog() {
+	if [[ ! -f $genesis_phpErrorLog ]]; then
+		print "Unable to find error log '$genesis_phpErrorLog', please run 'genesis bash config' to reconfigure";
+		return;
+	fi
+
+	tail -f $genesis_phpErrorLog;
+}
+
+function genesisConfig() {
+	$genesis_editor "$genesis_dir"Application/Core/Config;
+}

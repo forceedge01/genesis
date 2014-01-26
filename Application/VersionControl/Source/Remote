@@ -10,12 +10,17 @@ function genesisRemoteFetch() {
 
 function genesisRemotePoint() {
 	if [[ -z $1 ]]; then
-		print "You must enter a branch/version/tag to point the server to";
-		return;
+		if [[ -z $genesis_defaultBranch ]]; then
+			print "You must enter a branch/version/tag to point the server to";
+			return;
+		fi
+		branch=$genesis_defaultBranch;
+	else
+		branch=$1;
 	fi;
 
-	print "";
-	genesisSSH "cd $genesis_remoteDir; git checkout $1";
+	print "Pointing remote server to branch/tag: $branch";
+	genesisSSH "cd $genesis_remoteDir; git fetch; git checkout $branch";
 }
 
 function genesisSSH() {

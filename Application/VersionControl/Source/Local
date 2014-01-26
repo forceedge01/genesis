@@ -125,7 +125,7 @@ function genesisVersion() {
 function genesisPoint() {
 
 	if [[ -z $1 ]]; then
-		branch='development';
+		branch=$genesis_defaultBranch;
 	else
 		branch=$1;
 	fi
@@ -173,6 +173,11 @@ function genesisBranchDelete() {
 	print "Deleting branch '$1':";
 	currentDir=$(pwd);
 	cd $genesis_dir;
+
+	if [[ ! -z $genesis_defaultBranch ]]; then
+		git checkout $genesis_defaultBranch;
+	fi
+	
 	git branch -D $1;
 	cd $currentDir;
 }

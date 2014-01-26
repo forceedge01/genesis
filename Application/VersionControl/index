@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Author: Wahab Qureshi
+# Dependency: Git
 
 ########################################################################
 # Include this file in your bashrc file to get genesis console activated in your terminal

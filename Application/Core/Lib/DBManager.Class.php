@@ -63,8 +63,8 @@ class BDManager extends Database{
      */
     public function update(array $params, array $where = array())
     {
-        $toUpdate = $this->columnToValueString($params);
-        $where = $this->columnToValueString($where);
+        $toUpdate = $this->commaValueString($params);
+        $where = $this->whereString($where);
         
         return $this->Query("UPDATE {$this->tableName} SET $toUpdate WHERE $where");
     }
@@ -74,7 +74,7 @@ class BDManager extends Database{
         $where = null;
 
         if($this->isLoopable($where))
-            $where = 'where '.$this->columnToValueString($where);
+            $where = 'where '.$this->commaValueString($where);
 
         return $this->Query("delete from {$this->table} $where");
     }
@@ -128,9 +128,9 @@ class BDManager extends Database{
         return $results;
     }
 
-    private function columnToValueString(array $array)
+    private function whereString(array $array)
     {
-        $string = '';
+        $string = null;
 
         foreach($array as $column => $value)
         {
@@ -138,6 +138,18 @@ class BDManager extends Database{
         }
 
         return trim($string, ' and ');
+    }
+
+    private function commaValueString(array $array)
+    {
+        $string = null;
+
+        foreach($array as $column => $value)
+        {
+            $string .= "$column = " . (is_int($value) ? $value : "'$value'" ) . ', ';
+        }
+
+        return trim($string, ', ');
     }
 
     private function StringifyParams($params)

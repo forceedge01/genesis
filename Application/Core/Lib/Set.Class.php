@@ -3,7 +3,7 @@
 
 class Set extends Application\Core\Loader{
 
-    private function __construct() {}
+    public function __construct() {}
     private function __clone() {}
 
     /**

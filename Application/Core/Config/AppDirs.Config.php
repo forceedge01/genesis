@@ -3,7 +3,7 @@
 // Core folder paths
 
 // Set to custom url if it involves use of index.php
-define('HOST', Application\Core\AppKernal::GetHost().'genesis/Public/index.php');
+define('HOST', Application\Core\AppKernal::GetHost());
 
 define('ROOT', __DIR__ . '/../../../');
 
@@ -52,7 +52,7 @@ Set::Config('APPDIRS', array(
     ),
 
     'BUNDLES' => array(
-        'BASE_FOLDER' => '{{APPDIRS.SOURCE_FOLDER}}/Bundles/',
+        'BASE_FOLDER' => '{{APPDIRS.SOURCE_FOLDER}}Bundles/',
         'CONFIG' => '/Resources/Config/',
         'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.ASSETS_FOLDER}}Bundles/',
         'DATABASE_FILES' => '/Model/',

@@ -31,7 +31,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
                 if(is_array($dependencies))
                     $this->$object = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, $dependencies);
                 else
-                    $this->$object = $this->InstantiateObject ($classNamespace, $args);
+                    $this->$object = self::InstantiateObject ($classNamespace, $args);
             }
             else
             {
@@ -48,7 +48,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      * @param type $args
      * @return \Application\Core\obj
      */
-    public function InstantiateObject($obj, $args = null)
+    public static function InstantiateObject($obj, $args = null)
     {
         return new $obj($args);
     }
@@ -68,7 +68,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
             if (class_exists($fullClassPath, false))
             {
-                $this->$object = $this->InstantiateObject($fullClassPath, $args);
+                $this->$object = self::InstantiateObject($fullClassPath, $args);
             }
             else
             {
@@ -114,7 +114,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
                     {
                         if(class_exists($object, false))
                         {
-                            $this->$object = $this->InstantiateObject($object, $args);
+                            $this->$object = self::InstantiateObject($object, $args);
                         }
 
                         if(!isset($this->$object))
@@ -141,7 +141,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         if(!class_exists($namespace, false))
             Loader::LoadBundleRepositories($this->GetBundleFromName ($bundle));
 
-        return $this->InstantiateObject($namespace);
+        return self::InstantiateObject($namespace);
     }
 
     /**
@@ -158,7 +158,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         if(!class_exists($namespace, false))
             Loader::LoadBundleModel($this->GetBundleFromName ($bundle));
 
-        return $this->InstantiateObject($namespace);
+        return self::InstantiateObject($namespace);
     }
 
     /**
@@ -175,7 +175,7 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
         if(!class_exists($namespace, false))
             Loader::LoadBundleEntities($this->GetBundleFromName ($bundle));
 
-        return $this->InstantiateObject($namespace);
+        return self::InstantiateObject($namespace);
     }
 
     /**
@@ -299,8 +299,12 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
             $bundleName = end($ch);
 
             if($bundleName == $bundle)
-                return $bundlePath;
+            {
+                return $bundleName;
+            }
         }
+
+        return false;
     }
 
     public function GetBundleNameSpace($bundle)

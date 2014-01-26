@@ -6,7 +6,7 @@ namespace Application\Core;
 
 class Cache extends AppMethods{
 
-    private function __construct() {}
+    public function __construct() {}
     private function __clone() {}
 
     public static function CheckForCachedFile($pattern)

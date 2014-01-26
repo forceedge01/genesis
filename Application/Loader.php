@@ -135,6 +135,7 @@ class Loader extends Debugger{
     public static function LoadEvents($bundle)
     {
         $bundle = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle;
+        
         return self::LoadFilesFromDir($bundle.'/Events');
     }
 
@@ -224,7 +225,6 @@ class Loader extends Debugger{
         self::FetchAllBundles();
         $bundleConfigDir = \Get::Config('APPDIRS.BUNDLES.CONFIG');
         $bundleRoutesDir = \Get::Config('APPDIRS.BUNDLES.ROUTES');
-        $bundleInterfacesDir = \Get::Config('APPDIRS.BUNDLES.INTERFACES');
 
         foreach(self::$bundles as $bundle)
         {
@@ -238,7 +238,6 @@ class Loader extends Debugger{
                         self::$routes,
                         self::LoadFilesFromDir($bundle . $bundleRoutesDir, array('php'))
                         );
-                self::$interfaces = self::LoadFilesFromDir($bundle . $bundleInterfacesDir, array('php'));
             }
             else
             {

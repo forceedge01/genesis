@@ -11,7 +11,7 @@ abstract class Debugger implements DebuggerInterface{
 
     private $message, $file, $line, $errorNumber;
 
-    private function __construct()
+    public function __construct()
     {
         // Set error reporting on
         ini_set('error_reporting', E_ALL);

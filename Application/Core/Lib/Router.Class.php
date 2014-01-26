@@ -58,7 +58,14 @@ class Router extends EventHandler implements RouterInterface{
                 list($bundle, $controller, $action) = explode(':', $value['Controller']);
 
                 if($bundle)
-                    Loader::LoadBundle($this->GetBundleFromName($bundle));
+                {
+                    $fullBundle = $this->GetBundleFromName($bundle);
+
+                    if($fullBundle)
+                        Loader::LoadBundle($fullBundle);
+                    else
+                        $this->ForwardToController('Bundle_Not_Found', $error);
+                }
 
                 $this->CheckDependencies ($bundle, $controller, $action);
                 $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
@@ -129,7 +136,7 @@ class Router extends EventHandler implements RouterInterface{
         }
         else
         {
-            return $this->InstantiateObject($objectName);
+            return self::InstantiateObject($objectName);
         }
     }
 
@@ -138,10 +145,10 @@ class Router extends EventHandler implements RouterInterface{
         $this->ControllerDependencies = \Get::Config("{$bundle}.{$controller}.Dependencies");
         $this->ActionDependencies = \Get::Config("{$bundle}.{$controller}.{$action}.Dependencies");
 
-        if(!$this->ControllerDependencies)
+        if(! $this->ControllerDependencies)
             $this->ControllerDependencies = array();
 
-        if(!$this->ActionDependencies)
+        if(! $this->ActionDependencies)
             $this->ActionDependencies = array();
 
         return $this;
@@ -158,11 +165,9 @@ class Router extends EventHandler implements RouterInterface{
      * <br />Get pattern appended to index.php in url
      */
     protected function SetPattern(){
-
-        $this->pattern = (isset($_SERVER['PATH_INFO']) ? str_replace('//', '/', $_SERVER['PATH_INFO'] . '/') : '/');
+        $this->pattern = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/');
 
         return $this;
-
     }
 
     public function GoToHome()
@@ -421,7 +426,7 @@ class Router extends EventHandler implements RouterInterface{
         if(ob_get_contents())
             ob_end_flush();
 
-        header('Location: ' . HOST . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
+        header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
         // To get testing working with this method
         if(getenv('HTTP_HOST'))

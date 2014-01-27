@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-if [[ -z $genesis_sshUser ]] || [[ -z $genesis_sshIp ]]; then
-	return;
-fi
-
 function genesisRemoteFetch() {
 	genesisSSH "cd $genesis_remoteDir; git fetch;";
 }
@@ -24,6 +20,11 @@ function genesisRemotePoint() {
 }
 
 function genesisSSH() {
+	if [[ -z $genesis_sshUser ]] || [[ -z $genesis_sshIp ]]; then
+		print "Unable to run remote command, please set config using command: 'genesis bash config'";
+		return;
+	fi
+
 	ssh "$genesis_sshUser"@"$genesis_sshIp" "$1";
 }
 

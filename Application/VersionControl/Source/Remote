@@ -5,6 +5,7 @@ function genesisRemoteFetch() {
 }
 
 function genesisRemotePoint() {
+
 	if [[ -z $1 ]]; then
 		if [[ -z $genesis_defaultBranch ]]; then
 			print "You must enter a branch/version/tag to point the server to";

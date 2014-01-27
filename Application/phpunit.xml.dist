@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+    backupGlobals               = "false"
+    backupStaticAttributes      = "false"
+    colors                      = "true"
+    convertErrorsToExceptions   = "true"
+    convertNoticesToExceptions  = "true"
+    convertWarningsToExceptions = "true"
+    processIsolation            = "false"
+    stopOnFailure               = "false"
+    syntaxCheck                 = "true"
+    bootstrap                   = "bootstrap.php" >
+
+    <testsuites>
+        <testsuite name="Bundles Test Suite">
+            <directory>../Source/Bundles/*/Tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>../Source</directory>
+            <exclude>
+                <directory>../Source/Bundles/*/*/Controller</directory>
+                <directory>../Source/Bundles/*/*/Entity</directory>
+                <directory>../Source/Bundles/*/*/Model</directory>
+                <directory>../Source/Bundles/*/*/Repository</directory>
+                <directory>../Source/Bundles/*/*/DependencyInjection</directory>
+                <directory>../Source/Bundles/*/*/Resources</directory>
+                <directory>../Source/Bundles/*/*/Tests</directory>
+
+                <directory>../Source/Bundles/*/*/*/Controller</directory>
+                <directory>../Source/Bundles/*/*/*/Entity</directory>
+                <directory>../Source/Bundles/*/*/*/Model</directory>
+                <directory>../Source/Bundles/*/*/*/Repository</directory>
+                <directory>../Source/Bundles/*/*/*/DependencyInjection</directory>
+                <directory>../Source/Bundles/*/*/*/Resources</directory>
+                <directory>../Source/Bundles/*/*/*/Tests</directory>
+
+                <directory>../Source/Bundles/*/*/*/*/Controller</directory>
+                <directory>../Source/Bundles/*/*/*/*/Entity</directory>
+                <directory>../Source/Bundles/*/*/*/*/Model</directory>
+                <directory>../Source/Bundles/*/*/*/*/Repository</directory>
+                <directory>../Source/Bundles/*/*/*/*/DependencyInjection</directory>
+                <directory>../Source/Bundles/*/*/*/*/Resources</directory>
+                <directory>../Source/Bundles/*/*/*/*/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+</phpunit>

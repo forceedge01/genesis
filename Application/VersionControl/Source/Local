@@ -27,7 +27,7 @@ function genesisSave() {
 		print "No file changes found, Attempting to push commits/tags";
 		genesisPush;
 		genesisPushTag;
-		
+
 		return;
 	fi
 
@@ -163,25 +163,56 @@ function genesisBranch() {
 }
 
 function genesisBranchCreate() {
-	print "Creating/Switching branch '$1':";
+
+	if [[ $1 == 'origin' ]]; then
+		branch=$2;
+	else
+		branch=$1;
+	fi
+
+	print "Creating/Switching branch '$branch':";
 	currentDir=$(pwd);
 	cd $genesis_dir;
-	git branch $1;
-	git checkout $1;
-	git branch -u origin/$1;
+	git branch $branch;
+	git checkout $branch;
+
+	if [[ ! -z $2 ]]; then
+		print "Creating branch on repo:";
+		git push origin $branch;
+	else
+		print "To create the branch on remote repository, run: 'genesis branch create origin feature-list'";
+	fi
+
+	git branch -u origin/$branch;
 	cd $currentDir;
 }
 
 function genesisBranchDelete() {
-	print "Deleting branch '$1':";
+
+	if [[ $1 == 'origin' ]]; then
+		branch=$2;
+	else
+		branch=$1;
+	fi
+
+	print "Deleting branch '$branch':";
 	currentDir=$(pwd);
 	cd $genesis_dir;
 
 	if [[ ! -z $genesis_defaultBranch ]]; then
+		print "Switching to default branch '$genesis_defaultBranch'";
 		git checkout $genesis_defaultBranch;
 	fi
-	
-	git branch -D $1;
+
+	git branch -D $branch;
+
+	if [[ ! -z $2 ]]; then
+		print "Deleting branch from repo:";
+		git push origin :$branch;
+	else
+		print "To delete the branch from the remote repository, run: 'genesis branch create origin feature-list'";
+	fi
+
 	cd $currentDir;
 }
 
@@ -210,4 +241,8 @@ function genesisErrorLog() {
 
 function genesisConfig() {
 	$genesis_editor "$genesis_dir"Application/Core/Config;
+}
+
+function genesisOpen() {
+	open $genesis_dir;
 }

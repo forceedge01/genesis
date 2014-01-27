@@ -20,6 +20,7 @@ function genesisHelp() {
 
 dir - switch to genesis directory
 edit - edit genesis in editor
+open - open the project folder in finder (OS X)
 errorlog - display real time php error log
 status - show git status
 save - commit and push to repo
@@ -71,6 +72,8 @@ function genesis() {
 			genesisEdit;;
 		"dir" )
 			cd $genesis_dir;;
+		"open" )
+			genesisOpen;;
 		"errorlog" )
 			genesisErrorLog;;
 		"status" )
@@ -96,9 +99,9 @@ function genesis() {
 				"list" )
 					genesisBranch;;
 				"create" )
-					genesisBranchCreate $3;;
+					genesisBranchCreate $3 $4;;
 				"delete" )
-					genesisBranchDelete $3;;
+					genesisBranchDelete $3 $4;;
 			esac;;
 		"bash" )
 			case $2 in

@@ -246,3 +246,7 @@ function genesisConfig() {
 function genesisOpen() {
 	open $genesis_dir;
 }
+
+function genesisConsole() {
+	$genesis_dir/Application/simplify;
+}

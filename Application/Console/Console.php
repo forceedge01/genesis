@@ -219,7 +219,7 @@ class Console extends Debugger {
         }
     }
 
-    public function linebreak($val = 1)
+    public static function linebreak($val = 1)
     {
         $linebreak = $break = null;
 
@@ -236,7 +236,7 @@ class Console extends Debugger {
         return $linebreak;
     }
 
-    public function space($num)
+    public static function space($num)
     {
         $spaces = $space = null;
 
@@ -268,7 +268,7 @@ class Console extends Debugger {
         unset($_SERVER['argv'][1]);
     }
 
-    public function green($string)
+    public static function green($string)
     {
         if(Lib\Test::$output != 'Failures')
         {
@@ -279,7 +279,7 @@ class Console extends Debugger {
         }
     }
 
-    public function red($string)
+    public static function red($string)
     {
         if (!isset($_SERVER['SERVER_NAME']))
             return "\033[31m".$string."\033[37m";
@@ -287,7 +287,7 @@ class Console extends Debugger {
             return "<font color='#B80000'>$string</font>";
     }
 
-    public function blackOnRed($string)
+    public static function blackOnRed($string)
     {
         if (!isset($_SERVER['SERVER_NAME']))
             return "\033[41m".$string."\033[0m";
@@ -295,7 +295,7 @@ class Console extends Debugger {
             return "<div style='background-color: #CC9999; padding: 10px'>$string</div>";
     }
 
-    public function greenOnRed($string)
+    public static function greenOnRed($string)
     {
         if (!isset($_SERVER['SERVER_NAME']))
             return "\033[42m".$string."\033[0m";
@@ -303,7 +303,7 @@ class Console extends Debugger {
             return "<div style='background-color: #CCFF99; padding: 10px'>$string</div>";
     }
 
-    public function blue($string)
+    public static function blue($string)
     {
         if (!isset($_SERVER['SERVER_NAME']))
             return "\033[34m".$string."\033[37m";

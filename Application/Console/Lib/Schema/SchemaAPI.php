@@ -205,7 +205,7 @@ abstract class SchemaAPI extends Console {
         $queries = explode(';', $sqlQueries);
         $number = count($queries);
         unset($queries[$number-1]);
-        array_walk(&$queries, 'trim');
+        array_walk($queries, 'trim');
 
         return $queries;
     }

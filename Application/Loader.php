@@ -135,7 +135,7 @@ class Loader extends Debugger{
     public static function LoadEvents($bundle)
     {
         $bundle = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle;
-        
+
         return self::LoadFilesFromDir($bundle.'/Events');
     }
 
@@ -473,10 +473,15 @@ class Loader extends Debugger{
         return self::$files;
     }
 
-    public static function LoadClassesAndComponentsTestFiles()
+    public static function LoadClassesAndComponentsTestFiles(array $components = array())
     {
         self::$LoadedFiles = array();
-        self::LoadFilesFromDir(\Get::Config('APPDIRS.APPLICATION_TESTS_FOLDER'), array('php')) ;
+        self::LoadFilesFromDir(\Get::Config('APPDIRS.APPLICATION_TESTS_FOLDER'), array('php'));
+
+        foreach($components as $component)
+        {
+            self::LoadFilesFromDir(\Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER').$component.'/Tests/', array('php'));
+        }
 
         return self::$LoadedFiles;
     }

@@ -23,18 +23,21 @@ class AppKernal extends Loader{
 
     public static function GetHost()
     {
-        return "http://{$_SERVER['HTTP_HOST']}";
+        if(isset($_SERVER['HTTP_HOST']))
+            return "http://{$_SERVER['HTTP_HOST']}";
+    }
+
+    public static function LoadGenesis() {
+        self::initLibs();
+        self::$scriptStartTime = microtime(true);
+        self::CheckDependencies();
+        self::LoadFramework();
     }
 
     /**
      * Initializes an instance of the application
      */
     public static function Initialize() {
-
-        self::initLibs();
-        self::$scriptStartTime = microtime(true);
-        self::CheckDependencies();
-        self::LoadFramework();
 
         $app = new Application();
 

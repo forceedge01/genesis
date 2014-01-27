@@ -21,6 +21,7 @@ function genesisHelp() {
 dir - switch to genesis directory
 edit - edit genesis in editor
 open - open the project folder in finder (OS X)
+simplify - runs the genesis simplify console
 errorlog - display real time php error log
 status - show git status
 save - commit and push to repo
@@ -74,6 +75,8 @@ function genesis() {
 			cd $genesis_dir;;
 		"open" )
 			genesisOpen;;
+		"simplify" )
+			genesisConsole;;
 		"errorlog" )
 			genesisErrorLog;;
 		"status" )

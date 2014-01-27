@@ -9,7 +9,7 @@
  */
 
 // Loads the file responsible for loading the framework.
-require_once __DIR__ . '/../Application/AppKernal.php';
+require_once __DIR__ . '/../Application/Bootstrap.php';
 
 // Initialize the kernel
 Application\Core\AppKernal::Initialize();

@@ -2,9 +2,16 @@
 
 function genesisBashReload() {
 	print "Reloading bash env";
+	# Reset variables
+	resetVars;
 	source "$genesis_vc"index
 }
 
 function genesisBashEdit() {
 	$genesis_editor $genesis_vc;
+}
+
+function resetVars() {
+	export genesis_dir='';
+	export genesis_phpunitConfigPath='';
 }

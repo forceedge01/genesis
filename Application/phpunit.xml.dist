@@ -11,7 +11,7 @@
     processIsolation            = "false"
     stopOnFailure               = "false"
     syntaxCheck                 = "true"
-    bootstrap                   = "bootstrap.php" >
+    bootstrap                   = "Bootstrap.php" >
 
     <testsuites>
         <testsuite name="Bundles Test Suite">

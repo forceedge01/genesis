@@ -11,11 +11,6 @@ function genesisSave() {
 
 	if [[ ! -z $genesis_phpunitBin && ! -z $genesis_phpunitConfigPath ]]; then
 
-		if [[ ! -f $genesis_phpunitConfigPath ]]; then
-			print "PHPUnit configuration file '$genesis_phpunitConfigPath' could not be found, to reconfigure run: 'genesis bash config'";
-			return;
-		fi
-
 		print "Running PHPUnit, config search in: '$genesis_phpunitConfigPath'";
 		# Run unit tests on app
 		$genesis_phpunitBin -c $genesis_phpunitConfigPath;

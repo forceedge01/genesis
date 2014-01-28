@@ -18,6 +18,9 @@ function genesisHelp() {
 ==================================
 -- Commands Available --
 
+git repo: $genesis_repo
+remote points to: $genesis_remote
+
 dir - switch to genesis directory
 edit - edit genesis in editor
 open - open the project folder in finder (OS X)
@@ -27,11 +30,14 @@ status - show git status
 save - commit and push to repo
 update - pull changes from repo
 point ?[branch] - point to a branch/tag
-version - shows local app version
 tags - shows tags on local app
 execute - execute command on genesis directory
 log ?[number] - show git log of app
 config - open the config folder of genesis in the editor
+version - shows git tag version
+ * major - Update major version
+ * minor - Update minor version
+ * patch - Update patch version
 branch
   * list - lists branches
   * create [branch] - create new branch

@@ -161,11 +161,19 @@ class Router extends EventHandler implements RouterInterface{
 
     /**
      *
-     * @return boolean - true on success, false on failure<br />
-     * <br />Get pattern appended to index.php in url
+     * @return Method should set pattern to the value that comes after index.php
      */
     protected function SetPattern(){
-        $this->pattern = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/');
+
+        if(isset($_SERVER['PATH_INFO']))
+            $pattern = $_SERVER['PATH_INFO'];
+        else
+            $pattern = '/';
+
+        // $currentIndex = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
+        // $pattern = str_replace(array('index.php', $currentIndex), '', $_SERVER['REQUEST_URI']);
+
+        $this->pattern = $pattern;
 
         return $this;
     }
@@ -426,7 +434,7 @@ class Router extends EventHandler implements RouterInterface{
         if(ob_get_contents())
             ob_end_flush();
 
-        header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
+        header('Location: ' . HOST . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
         // To get testing working with this method
         if(getenv('HTTP_HOST'))
@@ -534,6 +542,6 @@ class Router extends EventHandler implements RouterInterface{
             'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
         );
 
-        $this->ForwardTo('404', $this->pattern);
+        $this->ForwardToController('404', $error);
     }
 }

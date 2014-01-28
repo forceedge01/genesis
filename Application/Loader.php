@@ -338,17 +338,14 @@ class Loader extends Debugger{
 
                 $filepath = $directory . '/' . $file;
 
-                if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
+                if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
                 {
-                    $loadedFiles[] = self::$LoadedFiles[] = $filepath;
-                    require $filepath;
+                    self::LoadFilesFromDir ($filepath, $extensions, $subdirectories);
                 }
-                else if($subdirectories)
+                else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
-                    if($file != '.' && $file != '..' && is_dir($filepath))
-                    {
-                        self::LoadFilesFromDir ($filepath, $extensions);
-                    }
+                    self::$LoadedFiles[] = self::$LoadedFiles[] = $filepath;
+                    require $filepath;
                 }
             }
         }
@@ -364,13 +361,15 @@ class Loader extends Debugger{
      */
     public static function LoadOnceFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
+        $loadedFiles = array();
+
         if(is_dir($directory)){
 
             $files = scandir($directory);
 
             foreach($files as $file){
 
-                $filepath = str_replace('//', '/', $directory . '/' . $file);
+                $filepath = $directory . '/' . $file;
 
                 if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
                 {
@@ -378,13 +377,13 @@ class Loader extends Debugger{
                 }
                 else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
-                    self::$LoadedFiles[] = $filepath;
+                    self::$LoadedFiles[] = self::$LoadedFiles[] = $filepath;
                     require_once $filepath;
                 }
             }
         }
 
-        return true;
+        return $loadedFiles;
     }
 
     /**

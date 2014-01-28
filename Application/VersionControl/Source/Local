@@ -58,6 +58,9 @@ function genesisSave() {
 
 	cd $genesis_dir;
 
+	print "Updating App Version";
+	$genesis_dir/UpdateVersion $($version#"v");
+
 	genesisPush $message;
 
 	if [[ ! -z $version ]]; then
@@ -65,6 +68,7 @@ function genesisSave() {
 		genesisPushTag $version;
 	fi
 
+	print "Version updated to: $genesis_dir/UpdateVersion --version";
 	cd $currentDir;
 }
 

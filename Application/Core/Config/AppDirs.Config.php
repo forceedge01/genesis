@@ -43,8 +43,7 @@ Set::Config('APPDIRS', array(
     'TEMPLATING' => array(
         'TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/',
         'ERRORS_TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/Error_Pages/',
-
-        'PUBLIC_FOLDER' => HOST . trim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/',
+        'PUBLIC_FOLDER' => str_replace('/index.php', '', HOST) . '/',
         'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/',
         'IMAGES_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/Images/',
         'CSS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/CSS/',

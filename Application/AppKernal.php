@@ -23,8 +23,13 @@ class AppKernal extends Loader{
 
     public static function GetHost()
     {
+        if(isset($_SERVER['HTTPS']))
+            $http = 'https';
+        else
+            $http = 'http';
+
         if(isset($_SERVER['HTTP_HOST']))
-            return "http://{$_SERVER['HTTP_HOST']}";
+            return "{$http}://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
     }
 
     public static function LoadGenesis() {

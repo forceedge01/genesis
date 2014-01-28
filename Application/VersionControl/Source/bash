@@ -4,7 +4,7 @@ function genesisBashReload() {
 	print "Reloading bash env";
 	# Reset variables
 	resetVars;
-	source "$genesis_vc"index
+	source $genesis_vc/index;
 }
 
 function genesisBashEdit() {

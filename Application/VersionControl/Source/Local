@@ -55,7 +55,6 @@ function genesisSave() {
 	fi
 
 	print "Saving changes with message: '$message'";
-
 	cd $genesis_dir;
 
 	print "Updating App Version";

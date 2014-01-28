@@ -19,7 +19,7 @@ function genesisHelp() {
 -- Commands Available --
 
 git repo: $genesis_repo
-remote points to: $genesis_remote
+remote pointing to: $genesis_sshIp
 
 dir - switch to genesis directory
 edit - edit genesis in editor

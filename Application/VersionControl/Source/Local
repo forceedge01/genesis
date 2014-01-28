@@ -57,8 +57,14 @@ function genesisSave() {
 	print "Saving changes with message: '$message'";
 	cd $genesis_dir;
 
+	if [[ ! -z $version ]]; then
+		inAppVersion=${version#"v"}'-0';
+	else
+		inAppVersion='';
+	fi
+
 	print "Updating App Version";
-	$genesis_dir/UpdateVersion ${version#"v"};
+	$genesis_dir/UpdateVersion $inAppVersion;
 
 	genesisPush $message;
 

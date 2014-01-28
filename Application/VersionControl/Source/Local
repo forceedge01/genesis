@@ -64,7 +64,7 @@ function genesisSave() {
 	fi
 
 	print "Updating App Version";
-	$genesis_dir/UpdateVersion $inAppVersion;
+	$genesis_vu $inAppVersion;
 
 	genesisPush $message;
 
@@ -73,7 +73,7 @@ function genesisSave() {
 		genesisPushTag $version;
 	fi
 
-	version=$($genesis_dir/UpdateVersion --version);
+	version=$($genesis_vu --version);
 	print "Version updated to: $version";
 
 	cd $currentDir;
@@ -122,9 +122,11 @@ function genesisTags() {
 }
 
 function genesisVersion() {
-	print "Current version:";
+	print "Current App version:";
+	$genesis_vu --version;
 	currentDir=$(pwd);
 	cd $genesis_dir;
+	print "Latest Tag Version:";
 	version=$(git describe --tag);
 	echo $version;
 

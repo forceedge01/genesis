@@ -7,3 +7,6 @@ export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../..;
 
 # version control dir
 export genesis_vc=$(dirname "${BASH_SOURCE[0]}")/..;
+
+# VersionUpdate file
+export genesis_vu=$(dirname "${BASH_SOURCE[0]}")/../UpdateVersion;

@@ -22,7 +22,7 @@ class updateVersion
         // ------------------------------- Config, do not edit below this section -------------------------------- //
 
         // The file that holds the version
-        self::$path = __DIR__ . '/Public/index.php';
+        self::$path = __DIR__ . '/../../Public/index.php';
 
         // The line pattern that holds the version details
         self::$pattern = '/^\s*\*\s*Version:\s*.+$/i';

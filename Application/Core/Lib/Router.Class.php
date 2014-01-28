@@ -434,7 +434,7 @@ class Router extends EventHandler implements RouterInterface{
         if(ob_get_contents())
             ob_end_flush();
 
-        header('Location: ' . HOST . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
+        header('Location: ' . $route . (!empty($urlQueryString) ? '?'.$urlQueryString : '' ));
 
         // To get testing working with this method
         if(getenv('HTTP_HOST'))

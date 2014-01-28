@@ -58,7 +58,7 @@ function genesisSave() {
 	cd $genesis_dir;
 
 	if [[ ! -z $version ]]; then
-		inAppVersion=${version#"v"}'-0';
+		inAppVersion=${version#"v"};
 	else
 		inAppVersion='';
 	fi

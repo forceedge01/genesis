@@ -58,7 +58,7 @@ function genesisSave() {
 	cd $genesis_dir;
 
 	print "Updating App Version";
-	$genesis_dir/UpdateVersion $($version#"v");
+	$genesis_dir/UpdateVersion ${version#"v"};
 
 	genesisPush $message;
 

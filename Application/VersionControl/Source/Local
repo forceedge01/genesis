@@ -75,6 +75,7 @@ function genesisSave() {
 
 	version=$($genesis_dir/UpdateVersion --version);
 	print "Version updated to: $version";
+
 	cd $currentDir;
 }
 

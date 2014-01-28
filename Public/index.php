@@ -4,7 +4,7 @@
  *
  * Developer: Wahab Qureshi
  * Date: 12-02-2013
- * Version: 0.3.6-2
+ * Version: 0.3.7-3
  *
  */
 

@@ -136,7 +136,7 @@ function genesis() {
 }
 
 function sourceFile() {
-	source $genesis_vc$1;
+	source $genesis_vc/$1;
 }
 
 function genesisConfigCreate() {

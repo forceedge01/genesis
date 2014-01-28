@@ -7,12 +7,6 @@
 # genesis repository
 export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
 
-# genesis directory
-export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../../;
-
-# version control dir
-export genesis_vc="$genesis_dir"Application/VersionControl/;
-
 # bash compatible editor
 export genesis_editor='sublime';
 
@@ -35,4 +29,4 @@ export genesis_remoteDir='';
 export genesis_phpunitBin='phpunit';
 
 # if you have set the variable above, please set where the config xml file is for phpunit
-export genesis_phpunitConfigPath="$genesis_dir"Application/;
+export genesis_phpunitConfigPath=$(dirname "${BASH_SOURCE[0]}")/../../;

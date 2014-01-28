@@ -3,20 +3,21 @@
 # Author: Wahab Qureshi
 # Dependency: Git
 
-########################################################################
-# Include this file in your bashrc file to get genesis console activated in your terminal
-########################################################################
+###########################################################################################
+# Include this file in your bashrc file to get genesis console activated in your terminal #
+###########################################################################################
 
 # Source common functions file
-source $(dirname "${BASH_SOURCE[0]}")/Source/Common;
+source $(dirname "${BASH_SOURCE[0]}")/Config/Core;
+source $genesis_vc/Source/Common;
 
-if [[ -f $(dirname "${BASH_SOURCE[0]}")/Config/Variables ]]; then
-	source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
+if [[ -f $genesis_vc/Config/Variables ]]; then
+	sourceFile Config/Variables;
 else
 	git config --global color.ui true
     print "Config/Variables file not found, creating file now";
     genesisConfigCreate;
-    source $(dirname "${BASH_SOURCE[0]}")/Config/Variables;
+    sourceFile Config/Variables;
     editGenesisConfig;
 fi
 

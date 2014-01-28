@@ -67,7 +67,7 @@ function genesisSave() {
 		genesisPushTag $version;
 	fi
 
-	print "Version updated to: $genesis_dir/UpdateVersion --version";
+	print "Version updated to: "$($genesis_dir/UpdateVersion --version);
 	cd $currentDir;
 }
 

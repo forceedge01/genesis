@@ -8,7 +8,7 @@ interface ObjectManager{
 
     public function GetComponent( $object, $args );
 
-    public function GetObject($object, $args );
+    // public function GetObject($object, $args );
 
     public function GetCoreObject( $object, $args );
 

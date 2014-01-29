@@ -3,9 +3,9 @@
 namespace Application\Core;
 
 
-require_once __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
-require_once __DIR__ . '/Core/Lib/Debugger.Class.php';
-require_once __DIR__ . '/Loader.php';
+require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
+require __DIR__ . '/Core/Lib/Debugger.Class.php';
+require __DIR__ . '/Loader.php';
 
 class AppKernal extends Loader{
 
@@ -16,9 +16,9 @@ class AppKernal extends Loader{
 
     public static function initLibs()
     {
-        require_once __DIR__ . '/Core/Lib/Set.Class.php';
-        require_once __DIR__ . '/Core/Config/AppDirs.Config.php';
-        require_once __DIR__ . '/Core/Lib/Get.Class.php';
+        require __DIR__ . '/Core/Lib/Set.Class.php';
+        require __DIR__ . '/Core/Config/AppDirs.Config.php';
+        require __DIR__ . '/Core/Lib/Get.Class.php';
     }
 
     public static function GetHost()

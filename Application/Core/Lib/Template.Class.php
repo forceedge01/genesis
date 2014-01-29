@@ -445,41 +445,42 @@ class Template extends Router {
     private function IncludeAssetDir($bundle, $assetType, $dir, $exclusions = array(), $append = null)
     {
         $assets = scandir($dir);
+
         foreach($assets as $asset)
         {
-            if($asset != '.' and $asset != '..' and !$this->Variable($exclusions)->Search($asset))
+            if($asset != '.' and $asset != '..' and ! $this->Variable($exclusions)->Search($asset))
             {
                 switch($assetType)
                 {
                     case 'css':
                     {
-                        if(is_dir($dir.'/'.$asset))
-                        {
-                            $this->IncludeAssetDir ($bundle,'css', $dir.'/'.$asset, array(), str_replace(ROOT.'Public/Assets/Bundles/'.$bundle.'/CSS/', '', $dir.'/'.$asset));
-                        }
-                        else
-                        {
-                            if($append)
-                                $append .= '/';
+                        $method = 'includeCSS';
+                        $folder = 'CSS/';
 
-                            $this->includeCSS ($url.'/'.$asset);
-                        }
                         break;
                     }
 
                     case 'js':
                     {
-                        if(is_dir($dir.'/'.$asset))
-                            $this->IncludeAssetDir ($bundle, 'js', $dir.'/'.$asset, array(), str_replace(ROOT.'Public/Assets/Bundles/'.$bundle.'/JS/', '', $dir.'/'.$asset));
-                        else
-                        {
-                            if($append)
-                                $append .= '/';
+                        $method = 'includeCSS';
+                        $folder = 'JS/';
 
-                            $this->includeJS ($url.'/'.$asset);
-                        }
                         break;
                     }
+                }
+
+                $url = $this->associateAssetBundle($bundle);
+
+                if(is_dir($dir.'/'.$asset))
+                {
+                    $this->IncludeAssetDir ($bundle, $assetType, $dir.'/'.$asset, array(), str_replace(ROOT.'Public/Assets/Bundles/'.$bundle.'/'.$folder, '', $dir.'/'.$asset));
+                }
+                else
+                {
+                    if($append)
+                        $append .= '/';
+
+                    $this->$method ($url.$folder.$append.$asset);
                 }
             }
         }
@@ -697,7 +698,7 @@ class Template extends Router {
         list($bundle, $asset) = explode(':', $param);
 
         if($bundle)
-            return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $bundle . '/'.$asset;
+            return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $bundle .'/'. $asset;
 
         return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Common/' .$asset;
     }

@@ -7,6 +7,8 @@ use \Application\Core\Interfaces\ObjectManager as ObjectManagerInterface;
 
 abstract class ObjectManager extends Variable implements ObjectManagerInterface{
 
+    private static $objects = array();
+
     /**
      *
      * @param string $object
@@ -17,29 +19,27 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetComponent($object, $args = null) {
 
-        if (!isset($this->$object))
+        if (! isset(self::$objects[$object]))
         {
-            Loader::LoadComponent($object);
             $classNamespace = $this->DirectoryToNamespace(\Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER')).$object;
+
+            Loader::LoadComponent($object);
             $dependencies = \Get::Config("$object.Dependencies");
 
             if($args)
                 $dependencies[] = $args;
 
-            if (class_exists($classNamespace, false))
+            if(is_array($dependencies))
             {
-                if(is_array($dependencies))
-                    $this->$object = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, $dependencies);
-                else
-                    $this->$object = self::InstantiateObject ($classNamespace, $args);
+                self::$objects[$object] = $this->GetCoreObject ('DependencyInjector')->Inject($classNamespace, array_merge($dependencies, $args));
             }
             else
             {
-                return false;
+                self::$objects[$object] = self::InstantiateObject ($classNamespace, $args);
             }
         }
 
-        return $this->$object;
+        return self::$objects[$object];
     }
 
     /**
@@ -62,21 +62,26 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      */
     public function GetCoreObject($object, $args = null){
 
-        if (!isset($this->$object))
+        if (! isset(self::$objects[$object]))
         {
             $fullClassPath = $this->DirectoryToNamespace(\Get::Config('APPDIRS.CORE.BASE_FOLDER')).$object;
 
             if (class_exists($fullClassPath, false))
             {
-                $this->$object = self::InstantiateObject($fullClassPath, $args);
+                self::$objects[$object] = self::InstantiateObject($fullClassPath, $args);
             }
             else
             {
-                return false;
+                $this->throwClassError($object);
             }
         }
 
-        return $this->$object;
+        return self::$objects[$object];
+    }
+
+    private function throwClassError($class)
+    {
+        self::ThrowStaticError("Class '<b>$class</b>' was not found, " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found, called from ".  get_called_class());
     }
 
     /**
@@ -85,47 +90,49 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      * @param type $args
      * @return boolean
      */
-    public function GetObject($object, $args = null) {
+    // public function GetObject($object, $args = null) {
 
-        list($object, $type) = $this->ExplodeAndGetLastChunk($object, '\\');
+    //     list($object, $type) = $this->ExplodeAndGetLastChunk($object, '\\');
 
-        if((!isset($this->$object)))
-        {
-            if($type)
-            {
-                if($type == 'Core')
-                {
-                    $this->$object = $this->GetCoreObject($object, $args);
-                }
-                else
-                {
-                    $this->$object = $this->GetComponent($object, $args);
-                }
-            }
-            else
-            {
-                $this->GetCoreObject($object);
+    //     if((! isset(self::$objects[$object])))
+    //     {
+    //         if($type)
+    //         {
+    //             if($type == 'Core')
+    //             {
+    //                 self::$objects[$object] = $this->GetCoreObject($object, $args);
+    //             }
+    //             else
+    //             {
+    //                 self::$objects[$object] = $this->GetComponent($object, $args);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             $this->GetCoreObject($object);
 
-                if(!isset($this->$object))
-                {
-                    $this->GetComponent($object);
+    //             if(! isset(self::$objects[$object]))
+    //             {
+    //                 $this->GetComponent($object);
 
-                    if(!isset($this->$object))
-                    {
-                        if(class_exists($object, false))
-                        {
-                            $this->$object = self::InstantiateObject($object, $args);
-                        }
+    //                 if(!isset(self::$objects[$object]))
+    //                 {
+    //                     if(class_exists($object, false))
+    //                     {
+    //                         self::$objects[$object] = self::InstantiateObject($object, $args);
+    //                     }
 
-                        if(!isset($this->$object))
-                            return false;
-                    }
-                }
-            }
-        }
+    //                     if(! isset(self::$objects[$object]))
+    //                     {
+    //                         $this->throwClassError($object);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        return $this->$object;
-    }
+    //     return self::$objects[$object];
+    // }
 
     /**
      *
@@ -136,12 +143,18 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
     public function GetRepository($bundleColonEntityName){
 
         list($bundle, $repository) = explode(':', $bundleColonEntityName);
-        $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Repositories\\'.$repository.'Repository';
 
-        if(!class_exists($namespace, false))
-            Loader::LoadBundleRepositories($this->GetBundleFromName ($bundle));
+        if(! isset($this->objects[$repository.'Repository']))
+        {
+            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Repositories\\'.$repository.'Repository';
 
-        return self::InstantiateObject($namespace);
+            if(! class_exists($namespace, false))
+                Loader::LoadBundleRepositories($this->GetBundleFromName ($bundle));
+
+            self::$objects[$repository.'Repository'] = self::InstantiateObject($namespace);
+        }
+
+        return self::$objects[$repository.'Repository'];
     }
 
     /**
@@ -153,12 +166,18 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
     public function GetModel($bundleColonEntityName){
 
         list($bundle, $model) = explode(':', $bundleColonEntityName);
-        $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Models\\'.$model.'Model';
 
-        if(!class_exists($namespace, false))
-            Loader::LoadBundleModel($this->GetBundleFromName ($bundle));
+        if(! isset($this->objects[$model.'Model']))
+        {
+            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Models\\'.$model.'Model';
 
-        return self::InstantiateObject($namespace);
+            if(! class_exists($namespace, false))
+                Loader::LoadBundleModel($this->GetBundleFromName ($bundle));
+
+            self::$objects[$model.'Model'] = self::InstantiateObject($namespace);
+        }
+
+        return self::$objects[$model.'Model'];
     }
 
     /**
@@ -170,12 +189,18 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
     public function GetEntity($bundleColonEntityName){
 
         list($bundle, $entity) = explode(':', $bundleColonEntityName);
-        $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Entities\\'.$entity.'Entity';
 
-        if(!class_exists($namespace, false))
-            Loader::LoadBundleEntities($this->GetBundleFromName ($bundle));
+        if(! isset($this->objects[$entity.'Entity']))
+        {
+            $namespace = '\\Bundles\\'.$this->GetBundleNameSpace($bundle).'\\Entities\\'.$entity.'Entity';
 
-        return self::InstantiateObject($namespace);
+            if(! class_exists($namespace, false))
+                Loader::LoadBundleEntities($this->GetBundleFromName ($bundle));
+
+            self::$objects[$entity.'Entity'] = self::InstantiateObject($namespace);
+        }
+
+        return self::$objects[$entity.'Entity'];
     }
 
     /**

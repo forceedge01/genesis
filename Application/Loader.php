@@ -110,7 +110,7 @@ class Loader extends Debugger{
 
             if(is_file($loaderFile))
             {
-                require_once $baseFolder . $component . '/Loader.php';
+                require $baseFolder . $component . '/Loader.php';
             }
             else
             {
@@ -147,6 +147,7 @@ class Loader extends Debugger{
     public static function LoadEvent($class)
     {
         $event = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . trim(str_replace('\\', '/', $class));
+
         require_once $event;
     }
 
@@ -173,8 +174,6 @@ class Loader extends Debugger{
     private static function RequireAllClasses($classDir){
 
         $classes = array(
-
-            'Debugger.Class.php',
             'Hooks.Class.php',
             'Variable.Class.php',
             'ObjectManager.Class.php',
@@ -196,7 +195,7 @@ class Loader extends Debugger{
         foreach($classes as $class)
         {
             if(is_file($classDir . $class)){
-                require_once $classDir . $class;
+                require $classDir . $class;
             }
             else
                 die('<h1>Class '.$classDir.$class.' not found in Loader::FetchAllClasses</h1>');

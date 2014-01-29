@@ -43,17 +43,18 @@ Set::Config('APPDIRS', array(
     'TEMPLATING' => array(
         'TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/',
         'ERRORS_TEMPLATES_FOLDER' => '{{APPDIRS.STRUCT.RESOURCES_FOLDER}}Views/Error_Pages/',
-        'PUBLIC_FOLDER' => str_replace('/index.php', '', HOST) . '/',
-        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/',
-        'IMAGES_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/Images/',
-        'CSS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/CSS/',
-        'JS_FOLDER' => '{{APPDIRS.TEMPLATING.PUBLIC_FOLDER}}Assets/Common/JS/'
+        'HOST_PUBLIC_FOLDER' => str_replace('/index.php', '', HOST) . '/',
+        'ROOT_PUBLIC_FOLDER' => ROOT . 'Public/',
+        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.HOST_PUBLIC_FOLDER}}Assets/',
+        'IMAGES_FOLDER' => '{{APPDIRS.TEMPLATING.HOST_PUBLIC_FOLDER}}Assets/Common/Images/',
+        'CSS_FOLDER' => '{{APPDIRS.TEMPLATING.HOST_PUBLIC_FOLDER}}Assets/Common/CSS/',
+        'JS_FOLDER' => '{{APPDIRS.TEMPLATING.HOST_PUBLIC_FOLDER}}Assets/Common/JS/'
     ),
 
     'BUNDLES' => array(
         'BASE_FOLDER' => '{{APPDIRS.SOURCE_FOLDER}}Bundles/',
         'CONFIG' => '/Resources/Config/',
-        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.ASSETS_FOLDER}}Bundles/',
+        'ASSETS_FOLDER' => '{{APPDIRS.TEMPLATING.ROOT_PUBLIC_FOLDER}}Assets/Bundles/',
         'DATABASE_FILES' => '/Model/',
         'INTERFACES' => '/Interfaces/',
         'CONTROLLERS' => '/Controllers/',

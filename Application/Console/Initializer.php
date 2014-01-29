@@ -224,7 +224,6 @@ class Initializer{
 
     private static function CacheOptions($args)
     {
-        require_once \Get::Config('APPDIRS.CORE.LIB_FOLDER') . 'Debugger.Class.php';
         require_once \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER') . 'Directory/Directory.Class.php';
 
         $cache = new Lib\CacheUI();

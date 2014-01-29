@@ -1,12 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../Core/Interfaces/Debugger.Interface.php';
-require_once __DIR__ . '/../Core/Lib/Debugger.Class.php';
-require_once __DIR__ . '/../Loader.php';
-require_once __DIR__ . '/../Core/Lib/Set.Class.php';
-require_once __DIR__ . '/../Core/Lib/Get.Class.php';
-require_once __DIR__ . '/../AppKernal.php';
-require_once __DIR__ . '/Config/Console.Config.php';
+require __DIR__ . '/../AppKernal.php';
+require __DIR__ . '/../Core/Lib/Set.Class.php';
+require __DIR__ . '/../Core/Lib/Get.Class.php';
+require __DIR__ . '/Config/Console.Config.php';
 
 if(!\Get::Config('Console.ALLOW_CONSOLE_FROM_BROWSER') and isset($_SERVER['SERVER_NAME']))
 {

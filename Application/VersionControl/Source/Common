@@ -33,7 +33,7 @@ point ?[branch] - point to a branch/tag
 tags - shows tags on local app
 execute - execute command on genesis directory
 log ?[number] - show git log of app
-config - open the config folder of genesis in the editor
+config - open the genesis config folder
 version - shows git tag version
  * major - Update major version
  * minor - Update minor version

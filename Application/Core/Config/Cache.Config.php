@@ -3,7 +3,6 @@
 Set::Config('Cache', array(
 
     'html' => array(
-
         'enabled' => false,
         'minify' => false,
         'compress' => array(
@@ -13,13 +12,11 @@ Set::Config('Cache', array(
         'expire' => 60*60,
     ),
     'javascript' => array(
-
         'enabled' => false,
         'unify' => true,
         'placement' => 'startof-body'
     ),
     'css' => array(
-
         'enabled' => false,
         'minify' => true,
         'unify' => true,

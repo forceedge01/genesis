@@ -253,7 +253,7 @@ function genesisErrorLog() {
 }
 
 function genesisConfig() {
-	$genesis_editor "$genesis_dir"Application/Core/Config;
+	$genesis_editor "$genesis_dir"/Application/Core/Config;
 }
 
 function genesisOpen() {

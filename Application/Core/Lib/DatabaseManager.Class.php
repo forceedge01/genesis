@@ -295,6 +295,8 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
         {
             $params = $this->prepare($id);
 
+            self::prex($params);
+
             if(!$params)
                 $this->setError ('Failed to prepare params, check if field exists in table');
 
@@ -322,13 +324,21 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
      */
     private function prepare(array $params = array(), $type = null) {
 
-        $query = function ($query = null) use  ($params, $type)
+        self::pre($params);
+
+        $query = function ($query = null) use ($params, $type)
         {
             foreach ($params as $key => $value)
             {
-                foreach ($this->queryTableColumns as $column)
+                $columns = ($this->queryTableColumns ? $this->queryTableColumns : $this->queryColumns);
+
+                foreach ($columns as $column)
                 {
-                    if ($this->queryTable . '.' . $key == $column->Field)
+                    // TODO: $columns should contain something like {table}.{field}
+                    // In generate column list create array with table.field indexes
+                    // to make this work
+                    self::pre($this->queryTable . '.' . $key, $column['Field']);
+                    if ($this->queryTable . '.' . $key == $column['Field'])
                     {
                         $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
@@ -346,6 +356,8 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                 }
             }
 
+            self::prex($query);
+
             return trim(trim($query, ' AND '),',');
 
         };
@@ -358,8 +370,12 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
         if(empty($this->queryCount))
         {
             $columns = $this->queryColumns;
+            // self::prex($columns);
             $this->queryColumns = null;
 
+            // TODO:
+            // Remove one of the if statements, use one methodology, this is very 
+            // Convoluted
             if($this->isLoopable($columns) && $columns[0] != '*')
             {
                 foreach ($columns as $column)
@@ -377,7 +393,9 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                 $this->queryColumns = null;
 
                 foreach ($columns as $column)
-                    $this->queryColumns .= "{$column->Field}  as '" . str_replace('.', '__', $column->Field) . "',";
+                {
+                    $this->queryColumns .= "{$column['Field']}  as '" . str_replace('.', '__', $column['Field']) . "',";
+                }
             }
 
             $this->queryColumns = trim($this->queryColumns, ',');

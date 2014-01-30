@@ -24,13 +24,6 @@ abstract class ApplicationModel extends EventHandler implements Model{
         $this->AfterModelHook();
     }
 
-    protected function dump()
-    {
-        $this->pre($this->entityObject);
-
-        return $this;
-    }
-
     /**
      * @param string $bundleColonEntity
      * @param array $params

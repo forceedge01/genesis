@@ -88,31 +88,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
 
     /**
      *
-     * @param type $table
-     * @return boolean<br>
-     * Sets All the columns for a given table from the database into queryTableColumns
-     */
-    protected function GetColumns($table = null) {
-
-        if (empty($table))
-            $table = $this->queryTable;
-
-        $this->Query("SHOW COLUMNS FROM {$table} FROM " . \Get::Config('Database.name'));
-
-        foreach ($this->queryResult as $columns)
-        {
-            $columns->Field = $table . '.' . $columns->Field;
-            $this->queryTableColumns[] = $columns;
-        }
-
-        if ($this->queryTableColumns)
-            return $this;
-        else
-            return false;
-    }
-
-    /**
-     *
      * @return Object Returns the first result set from a select query
      */
     public function GetFirstResult() {
@@ -295,8 +270,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
         {
             $params = $this->prepare($id);
 
-            self::prex($params);
-
             if(!$params)
                 $this->setError ('Failed to prepare params, check if field exists in table');
 
@@ -324,8 +297,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
      */
     private function prepare(array $params = array(), $type = null) {
 
-        self::pre($params);
-
         $query = function ($query = null) use ($params, $type)
         {
             foreach ($params as $key => $value)
@@ -337,7 +308,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                     // TODO: $columns should contain something like {table}.{field}
                     // In generate column list create array with table.field indexes
                     // to make this work
-                    self::pre($this->queryTable . '.' . $key, $column['Field']);
                     if ($this->queryTable . '.' . $key == $column['Field'])
                     {
                         $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
@@ -356,8 +326,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                 }
             }
 
-            self::prex($query);
-
             return trim(trim($query, ' AND '),',');
 
         };
@@ -365,12 +333,36 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
         return $query ( );
     }
 
+    /**
+     *
+     * @param type $table
+     * @return boolean<br>
+     * Sets All the columns for a given table from the database into queryTableColumns
+     */
+    protected function GetColumns($table = null) {
+
+        if (empty($table))
+            $table = $this->queryTable;
+
+        $this->Query("SHOW COLUMNS FROM {$table} FROM " . \Get::Config('Database.name'));
+
+        foreach ($this->queryResult as $columns)
+        {
+            $columns['Field'] = $table . '.' . $columns['Field'];
+            $this->queryTableColumns[] = $columns;
+        }
+
+        if ($this->queryTableColumns)
+            return $this;
+        else
+            return false;
+    }
+
     private function createColumnList(){
 
         if(empty($this->queryCount))
         {
             $columns = $this->queryColumns;
-            // self::prex($columns);
             $this->queryColumns = null;
 
             // TODO:
@@ -383,7 +375,7 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                     if(strstr($column, 'as'))
                         $this->queryColumns .= $column . ',';
                     else
-                        $this->queryColumns .= "{$column} as '".str_replace('.', '__', $column)."',";
+                        $this->queryColumns .= "{$column} as '". str_replace('.', '__', $column)."',";
                 }
             }
 

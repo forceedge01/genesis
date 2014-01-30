@@ -10,40 +10,62 @@ use Application\Interfaces\Entities\Entity;
 
 abstract class ApplicationEntity extends DatabaseManager implements Entity{
 
+    // Set table name
     protected $tableName;
-    private $table;
-    public $id;
+
+    // Sets fields for entity
+    protected $fields = array();
 
     public function __construct($params = null) {
 
         parent::__construct($params);
         $this->BeforeEntityHook();
 
-        $this->getTable();
+        $this->setTableForEntity();
 
         if(is_numeric($params))
-            $this->Get($params);
-
-        
-    }
-    
-    public function setTable($table)
-    {
-        $this->tableName = $table;
-        
-        return $this;
-    }
-    
-    private function getTable()
-    {
-        $class = get_called_class();
-        $this->tableName = $class::$table;
-        
-        return $this;
+            $this->Find($params);
     }
 
     public function __destruct() {
         $this->AfterEntityHook();
+    }
+
+    // Goes with above
+    private function setTableForEntity()
+    {
+        $class = get_called_class();
+        $this->tableName = $class::$table;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param type $property
+     * @param type $value
+     * @return \Application\Entities\ApplicationEntity
+     */
+    public function setProperty($property, $value)
+    {
+        $this->fields[$property] = $value;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param array $properties
+     * @return \Application\Entities\ApplicationEntity
+     */
+    public function setProperties(array $properties)
+    {
+        foreach($properties as $property => $value)
+        {
+            $this->setProperty($property, $value);
+        }
+
+        return $this;
     }
 
     /**
@@ -52,9 +74,6 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
      * @return mixed Returns the matching data set from the database.
      */
     public function Find($id = null) {
-
-        if (!$id)
-            $id = $this->id;
 
         return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
     }
@@ -79,12 +98,6 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
         return $this->Table(str_replace('Entity', '', $entity));
     }
 
-    public function SetTableName($table)
-    {
-        $this->tableName = $table;
-        return $this;
-    }
-
     /**
      *
      * @param array $params Pass in the data for saving it to the database, if not provided<br>
@@ -106,9 +119,18 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
     public function Delete($id = null) {
 
         if (!$id)
-            $id = $this->id;
+            $id = $this->fields[$this->tableName.'.id'];
 
         return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
+    }
+
+    /**
+     *
+     * @return type
+     */
+    public function GetClean()
+    {
+        return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
 
     private function CreateEntity($object)
@@ -125,15 +147,5 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
         }
 
         return $newObj;
-    }
-
-    public function GetId()
-    {
-        return $this->id;
-    }
-
-    public function GetClean()
-    {
-        return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
 }

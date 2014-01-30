@@ -90,49 +90,43 @@ abstract class ObjectManager extends Variable implements ObjectManagerInterface{
      * @param type $args
      * @return boolean
      */
-    // public function GetObject($object, $args = null) {
+    public function GetObject($object, $args = null) 
+    {
+        list($object, $type) = $this->ExplodeAndGetLastChunk($object, '\\');
 
-    //     list($object, $type) = $this->ExplodeAndGetLastChunk($object, '\\');
+        if((! isset(self::$objects[$object])))
+        {
+            if(! $type)
+            {
+                if(class_exists($object, false))
+                {
+                    self::$objects[$object] = self::InstantiateObject($object, $args);
+                }
+                else
+                {
+                    $this->GetCoreObject($object);
+                }
+            }
+            else
+            {
+                if($type == 'Core')
+                {
+                    $this->GetCoreObject($object, $args);
+                }
+                else
+                {
+                    $this->GetComponent($object, $args);
+                }
+            }
+        }
 
-    //     if((! isset(self::$objects[$object])))
-    //     {
-    //         if($type)
-    //         {
-    //             if($type == 'Core')
-    //             {
-    //                 self::$objects[$object] = $this->GetCoreObject($object, $args);
-    //             }
-    //             else
-    //             {
-    //                 self::$objects[$object] = $this->GetComponent($object, $args);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             $this->GetCoreObject($object);
+        if(! isset(self::$objects[$object]))
+        {
+            $this->throwClassError($object);
+        }
 
-    //             if(! isset(self::$objects[$object]))
-    //             {
-    //                 $this->GetComponent($object);
-
-    //                 if(!isset(self::$objects[$object]))
-    //                 {
-    //                     if(class_exists($object, false))
-    //                     {
-    //                         self::$objects[$object] = self::InstantiateObject($object, $args);
-    //                     }
-
-    //                     if(! isset(self::$objects[$object]))
-    //                     {
-    //                         $this->throwClassError($object);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     return self::$objects[$object];
-    // }
+        return self::$objects[$object];
+    }
 
     /**
      *

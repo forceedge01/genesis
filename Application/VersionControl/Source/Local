@@ -257,7 +257,7 @@ function genesisConfig() {
 }
 
 function genesisOpen() {
-	open $genesis_dir;
+	open $1;
 }
 
 function genesisConsole() {

@@ -69,7 +69,7 @@ function genesisSave() {
 	print "Updating App Version";
 	$genesis_vu $inAppVersion;
 
-	genesisPush $message;
+	genesisPush "$message";
 
 	if [[ ! -z $version ]]; then
 		git tag $version;

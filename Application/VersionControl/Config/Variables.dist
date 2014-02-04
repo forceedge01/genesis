@@ -5,7 +5,7 @@
 # Genesis version control uses git only
 
 # genesis repository
-export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
+export genesis_repo='git@bitbucket.org:wqureshi/genesis.git';
 
 # bash compatible editor
 export genesis_editor='sublime';

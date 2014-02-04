@@ -299,11 +299,12 @@ function genesisClone() {
 
 	if [[ ! -z $genesis_defaultBranch ]]; then
 		currentDir=$(pwd);
+		print "Switching to '$path'";
 		cd $path;
 		print "Checking out default branch";
 		git checkout genesis_defaultBranch;
 		print "Showing all branches";
-		genesisStatus;
+		git status;
 		cd $currentDir;
 	fi
 }

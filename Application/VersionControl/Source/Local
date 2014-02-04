@@ -6,6 +6,9 @@ function genesisEdit() {
 
 function genesisSave() {
 
+	# Check if bash editing has caused an error or not?
+	genesisBashReload;
+
 	currentDir=$(pwd);
 	cd $genesis_dir;
 
@@ -268,4 +271,39 @@ function genesisOpen() {
 
 function genesisConsole() {
 	$genesis_dir/Application/simplify;
+}
+
+function genesisClone() {
+	print "Directory Listing";
+	ls -la;
+	print "Current Directory";
+	pwd;
+	print "Where do you want to clone? (use '.' to clone in current folder)";
+	read path;
+	print "Attempting to clone '$genesis_repo' to '$path' [y/n]:";
+
+	if [[ $(userChoice) != 'Y' ]]; then
+		print "Aborting";
+		return;
+	fi
+
+	print "Cloning now...";
+	sudo git clone $genesis_repo $path;
+
+	if [[ ! -d $path ]]; then
+		print "Unable to clone to $path, please check permissions to repo.";
+		return;
+	fi
+
+	print "Cloning complete";
+
+	if [[ ! -z $genesis_defaultBranch ]]; then
+		currentDir=$(pwd);
+		cd $path;
+		print "Checking out default branch";
+		git checkout genesis_defaultBranch;
+		print "Showing all branches";
+		genesisStatus;
+		cd $currentDir;
+	fi
 }

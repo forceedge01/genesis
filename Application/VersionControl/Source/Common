@@ -22,6 +22,7 @@ git repo: $genesis_repo
 remote pointing to: $genesis_sshIp
 
 dir - switch to genesis directory
+clone - clones the repo to a specified path
 edit - edit genesis in editor
 open - open the project folder in finder (OS X)
 web - open the project in browser (OS X)
@@ -106,6 +107,8 @@ function genesis() {
 			genesisLog $2;;
 		"config" )
 			genesisConfig;;
+		"clone" )
+			genesisClone;;
 		"branch" )
 			case $2 in
 				"list" )

@@ -139,8 +139,8 @@ function genesis() {
 				"execute" )
 					genesisRemoteExecute;;
 			esac;;
-		"*" )
-			print "Unknown option entered, aborting";
+		* )
+			print "Unknown argument '$1', aborting";
 	esac
 }
 

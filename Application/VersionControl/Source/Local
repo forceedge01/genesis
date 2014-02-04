@@ -208,6 +208,12 @@ function genesisBranchDelete() {
 		branch=$1;
 	fi
 
+	if [[ -z $branch ]]; then
+		print "You need to provide a branch name to delete";
+		genesisBranch;
+		return;
+	fi
+
 	print "Deleting branch '$branch':";
 	currentDir=$(pwd);
 	cd $genesis_dir;

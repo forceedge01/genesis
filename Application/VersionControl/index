@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Author: Wahab Qureshi
-# Dependency: Git
+# Dependency:
+#   Git
+# 	updateVersion php class
 
 ###########################################################################################
 # Include this file in your bashrc file to get genesis console activated in your terminal #

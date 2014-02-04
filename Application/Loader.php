@@ -268,7 +268,6 @@ class Loader extends Debugger{
 
             if(is_dir($bundle))
             {
-                self::LoadFilesFromDir($bundle, array('php'), false);
                 self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'));
                 self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'));
             }
@@ -329,12 +328,12 @@ class Loader extends Debugger{
 
         $loadedFiles = array();
 
-        if(is_dir($directory)){
-
+        if(is_dir($directory))
+        {
             $files = scandir($directory);
 
-            foreach($files as $file){
-
+            foreach($files as $file)
+            {
                 $filepath = $directory . '/' . $file;
 
                 if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
@@ -343,7 +342,7 @@ class Loader extends Debugger{
                 }
                 else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
-                    self::$LoadedFiles[] = self::$LoadedFiles[] = $filepath;
+                    $loadedFiles = self::$LoadedFiles[] = $filepath;
                     require $filepath;
                 }
             }
@@ -376,7 +375,7 @@ class Loader extends Debugger{
                 }
                 else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
-                    self::$LoadedFiles[] = self::$LoadedFiles[] = $filepath;
+                    $loadedFiles = self::$LoadedFiles[] = $filepath;
                     require_once $filepath;
                 }
             }

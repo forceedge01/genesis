@@ -88,31 +88,6 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
 
     /**
      *
-     * @param type $table
-     * @return boolean<br>
-     * Sets All the columns for a given table from the database into queryTableColumns
-     */
-    protected function GetColumns($table = null) {
-
-        if (empty($table))
-            $table = $this->queryTable;
-
-        $this->Query("SHOW COLUMNS FROM {$table} FROM " . \Get::Config('Database.name'));
-
-        foreach ($this->queryResult as $columns)
-        {
-            $columns->Field = $table . '.' . $columns->Field;
-            $this->queryTableColumns[] = $columns;
-        }
-
-        if ($this->queryTableColumns)
-            return $this;
-        else
-            return false;
-    }
-
-    /**
-     *
      * @return Object Returns the first result set from a select query
      */
     public function GetFirstResult() {
@@ -322,13 +297,18 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
      */
     private function prepare(array $params = array(), $type = null) {
 
-        $query = function ($query = null) use  ($params, $type)
+        $query = function ($query = null) use ($params, $type)
         {
             foreach ($params as $key => $value)
             {
-                foreach ($this->queryTableColumns as $column)
+                $columns = ($this->queryTableColumns ? $this->queryTableColumns : $this->queryColumns);
+
+                foreach ($columns as $column)
                 {
-                    if ($this->queryTable . '.' . $key == $column->Field)
+                    // TODO: $columns should contain something like {table}.{field}
+                    // In generate column list create array with table.field indexes
+                    // to make this work
+                    if ($this->queryTable . '.' . $key == $column['Field'])
                     {
                         $query .= ($this->queryTable ? $this->queryTable . '.' : '' ) . str_replace('__', '.', $key) . ' = ';
 
@@ -353,6 +333,31 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
         return $query ( );
     }
 
+    /**
+     *
+     * @param type $table
+     * @return boolean<br>
+     * Sets All the columns for a given table from the database into queryTableColumns
+     */
+    protected function GetColumns($table = null) {
+
+        if (empty($table))
+            $table = $this->queryTable;
+
+        $this->Query("SHOW COLUMNS FROM {$table} FROM " . \Get::Config('Database.name'));
+
+        foreach ($this->queryResult as $columns)
+        {
+            $columns['Field'] = $table . '.' . $columns['Field'];
+            $this->queryTableColumns[] = $columns;
+        }
+
+        if ($this->queryTableColumns)
+            return $this;
+        else
+            return false;
+    }
+
     private function createColumnList(){
 
         if(empty($this->queryCount))
@@ -360,6 +365,9 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
             $columns = $this->queryColumns;
             $this->queryColumns = null;
 
+            // TODO:
+            // Remove one of the if statements, use one methodology, this is very 
+            // Convoluted
             if($this->isLoopable($columns) && $columns[0] != '*')
             {
                 foreach ($columns as $column)
@@ -367,7 +375,7 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                     if(strstr($column, 'as'))
                         $this->queryColumns .= $column . ',';
                     else
-                        $this->queryColumns .= "{$column} as '".str_replace('.', '__', $column)."',";
+                        $this->queryColumns .= "{$column} as '". str_replace('.', '__', $column)."',";
                 }
             }
 
@@ -377,7 +385,9 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
                 $this->queryColumns = null;
 
                 foreach ($columns as $column)
-                    $this->queryColumns .= "{$column->Field}  as '" . str_replace('.', '__', $column->Field) . "',";
+                {
+                    $this->queryColumns .= "{$column['Field']}  as '" . str_replace('.', '__', $column['Field']) . "',";
+                }
             }
 
             $this->queryColumns = trim($this->queryColumns, ',');

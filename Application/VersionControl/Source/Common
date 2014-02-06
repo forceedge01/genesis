@@ -143,7 +143,7 @@ function genesis() {
 					genesisRemoteExecute;;
 			esac;;
 		* )
-			print "Unknown argument '$1', aborting";
+			genesisHelp;;
 	esac
 }
 

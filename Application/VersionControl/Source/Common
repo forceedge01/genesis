@@ -77,8 +77,6 @@ help - shows this menu
 
 function genesis() {
 	case $1 in
-		"help" )
-			genesisHelp;;
 		"edit" )
 			genesisEdit;;
 		"dir" )
@@ -86,7 +84,7 @@ function genesis() {
 		"open" )
 			genesisOpen $genesis_dir;;
 		"web" )
-			genesisOpen $genesis_url;;
+			genesisOpen "$genesis_url";;
 		"simplify" )
 			genesisConsole;;
 		"errorlog" )

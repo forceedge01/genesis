@@ -5,7 +5,13 @@
 # Genesis version control uses git only
 
 # genesis repository
-export genesis_repo='git@bitbucket.org:wqureshi/genesis.git';
+export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
+
+# genesis directory
+export genesis_dir=$(dirname "${BASH_SOURCE[0]}")/../../../;
+
+# version control dir
+export genesis_vc=$(dirname "${BASH_SOURCE[0]}")/../;
 
 # bash compatible editor
 export genesis_editor='sublime';
@@ -14,22 +20,22 @@ export genesis_editor='sublime';
 export genesis_defaultBranch='master';
 
 # genesis php error log
-export genesis_phpErrorLog='';
+export genesis_phpErrorLog='/Applications/MAMP/logs/php_error.log';
 
 # remote ssh user
-export genesis_sshUser='';
+export genesis_sshUser='fandist';
 
 # remote ssh ip
-export genesis_sshIp='';
+export genesis_sshIp='web1';
 
 # remote server genesis directory
 export genesis_remoteDir='';
 
 # if phpunit is setup please set its path below
-export genesis_phpunitBin='phpunit';
+export genesis_phpunitBin='';
 
 # if you have set the variable above, please set where the config xml file is for phpunit
-export genesis_phpunitConfigPath=$(dirname "${BASH_SOURCE[0]}")/../../;
+export genesis_phpunitConfigPath='';
 
 # Url to open for project
 export genesis_url='http://';

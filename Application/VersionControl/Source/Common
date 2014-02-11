@@ -137,7 +137,7 @@ function genesis() {
 					genesisRemoteExecute;;
 			esac;;
 		"*" )
-			print "Unknown option entered, aborting";
+			genesisHelp;;
 	esac
 }
 
@@ -152,20 +152,4 @@ function genesisConfigCreate() {
 function editGenesisConfig() {
 	$genesis_editor $genesis_vc/Config/Variables;
 	sourceFile Config/Variables;
-}
-
-function red() {
-    return "\033[31m".$1."\033[37m";
-}
-
-function blackOnRed() {
-    return "\033[41m".$1."\033[0m";
-}
-
-function greenOnRed() {
-    return "\033[42m".$1."\033[0m";
-}
-
-function blue() {
-    return "\033[34m".$1."\033[37m";
 }

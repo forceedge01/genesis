@@ -106,13 +106,14 @@ function genesisSave() {
 	$genesis_vu $inAppVersion;
 
 	genesisPush "$message";
+	version=$($genesis_vu --version);
+	version=${version#"v"};
 
 	if [[ ! -z $version ]]; then
 		git tag $version;
 		genesisPushTag $version;
 	fi
 
-	version=$($genesis_vu --version);
 	print "Version updated to: $version";
 
 	cd $currentDir;

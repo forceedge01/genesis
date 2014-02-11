@@ -31,6 +31,7 @@ errorlog - display real time php error log
 status - show git status
 save - commit and push to repo
 merge - merge two branches
+conflicts - show conflicts on current branch
 update - pull changes from repo
 point ?[branch] - point to a branch/tag
 tags - shows tags on local app
@@ -112,6 +113,8 @@ function genesis() {
 			genesisClone;;
 		"merge" ) 
 			genesisMerge;;
+		"conflicts" )
+			genesisConflicts;;
 		"branch" )
 			case $2 in
 				"list" )

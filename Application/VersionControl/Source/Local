@@ -47,6 +47,16 @@ function genesisSave() {
 	if [[ -z $(git diff --name-only) ]]; then
 		print "No file changes found, Attempting to push commits/tags";
 		git pull;
+
+		print "Showing conflicts on this branch:";
+		conflicts=$(genesisConflicts);
+
+		if [[ -z $conflicts ]]; then
+			print "No conflicts found";
+		else
+			printf "$conflicts";
+		fi
+
 		genesisPush;
 		genesisPushTag;
 
@@ -102,10 +112,17 @@ function genesisSave() {
 	cd $currentDir;
 }
 
+function genesisConflicts() {
+	currentDir=$(pwd);
+	cd $genesis_dir;
+	git diff --name-only --diff-filter=U;
+	cd $currentDir;
+}
+
 function genesisMerge() {
 	currentDir=$(pwd);
 	genesisBranch;
-	cd genesis_dir;
+	cd $genesis_dir;
 	print "Enter branch name to merge changes from:";
 	read mergeBranch;
 
@@ -204,7 +221,9 @@ function genesisVersion() {
 function genesisPoint() {
 
 	if [[ -z $1 ]]; then
-		branch=$genesis_defaultBranch;
+		genesisBranch;
+		print "Enter branch to point to:";
+		read branch;
 	else
 		branch=$1;
 	fi

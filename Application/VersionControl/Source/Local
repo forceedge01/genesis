@@ -73,13 +73,11 @@ function genesisSave() {
 	read message;
 
 	cd $genesis_dir;
-
 	genesisTags;
 	genesisVersion;
-
 	cd $currentDir;
 
-	print "Please enter a version number for this push: (leave empty to skip tagging)";
+	print "Please enter a version number for this push or [major|minor|patch]: (leave empty to skip tagging)";
 	read version;
 
 	print "Attempting to commit with message '$message' and tag '$version', continue? [Y/N]";
@@ -91,7 +89,15 @@ function genesisSave() {
 	cd $genesis_dir;
 
 	if [[ ! -z $version ]]; then
-		inAppVersion=${version#"v"};
+		if [[ $version == 'major' ]]; then
+			inAppVersion='--major';
+		elif [[ $version == 'minor' ]]; then
+			inAppVersion='--minor';
+		elif [[ $version == 'patch' ]]; then
+			inAppVersion='--patch';
+		else
+			inAppVersion=${version#"v"};
+		fi
 	else
 		inAppVersion='';
 	fi

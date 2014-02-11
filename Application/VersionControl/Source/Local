@@ -4,10 +4,31 @@ function genesisEdit() {
 	$genesis_editor $genesis_dir;
 }
 
+function getCurrentBranch() {
+	echo $(git rev-parse --abbrev-ref HEAD);
+}
+
 function genesisSave() {
+
+	# Check if bash editing has caused an error or not?
+	genesisBashReload;
+	genesisBranch;
 
 	currentDir=$(pwd);
 	cd $genesis_dir;
+
+	if [[ -z $1 ]]; then
+		print "Enter branch to save (leave empty to select current branch):";
+		read branch;
+	else
+		branch=$1;
+	fi
+
+	if [[ -z $branch ]]; then
+		branch=$(getCurrentBranch);
+	fi
+
+	git checkout $branch;
 
 	if [[ ! -z $genesis_phpunitBin && ! -z $genesis_phpunitConfigPath ]]; then
 
@@ -25,14 +46,16 @@ function genesisSave() {
 
 	if [[ -z $(git diff --name-only) ]]; then
 		print "No file changes found, Attempting to push commits/tags";
+		git pull;
 		genesisPush;
 		genesisPushTag;
 
 		return;
 	fi
 
+	git add --all;
 	print "Files edited:";
-	git diff --name-only
+	git diff --name-only --cached
 
 	cd $currentDir;
 
@@ -66,7 +89,7 @@ function genesisSave() {
 	print "Updating App Version";
 	$genesis_vu $inAppVersion;
 
-	genesisPush $message;
+	genesisPush "$message";
 
 	if [[ ! -z $version ]]; then
 		git tag $version;
@@ -75,6 +98,46 @@ function genesisSave() {
 
 	version=$($genesis_vu --version);
 	print "Version updated to: $version";
+
+	cd $currentDir;
+}
+
+function genesisMerge() {
+	currentDir=$(pwd);
+	genesisBranch;
+	cd genesis_dir;
+	print "Enter branch name to merge changes from:";
+	read mergeBranch;
+
+	print "Enter branch name to merge into (leave blank to select current branch):"
+	read branch;
+
+	if [[ -z $branch ]]; then
+		branch=$(getCurrentBranch);
+	fi
+
+	print "About to merge '$mergeBranch' into '$branch', continue? [y/n]";
+	if [[ $(userChoice) != 'Y' ]]; then
+		return;
+	fi
+
+	print "Pulling in latest changes";
+	git pull;
+	print "Updating '$mergeBranch' branch with changes in 'master' branch";
+	git checkout $mergeBranch;
+	git merge master;
+	print "Merging '$mergeBranch' branch into '$branch' branch";
+	git checkout $branch;
+	git merge $mergeBranch;
+
+	print "Merge successfull";
+
+	if [[ $branch == 'master' ]]; then
+		print "Do you want to push / tag this version [y/n]";
+		if [[ $(userChoice) == 'Y' ]]; then
+			genesisSave $branch;
+		fi
+	fi
 
 	cd $currentDir;
 }
@@ -176,55 +239,64 @@ function genesisBranch() {
 }
 
 function genesisBranchCreate() {
+	currentDir=$(pwd);
 
-	if [[ $1 == 'origin' ]]; then
-		branch=$2;
+	if [[ -z $1 ]]; then
+		genesisBranch;
+		print "Enter branch name to create";
+		read branch;
 	else
 		branch=$1;
 	fi
 
-	print "Creating/Switching branch '$branch':";
-	currentDir=$(pwd);
-	cd $genesis_dir;
 	git branch $branch;
-	git checkout $branch;
+	print "Branch created successfully.";
+	
+	print "Set upstream? [y/n]";
 
-	if [[ ! -z $2 ]]; then
-		print "Creating branch on repo:";
-		git push origin $branch;
-	else
-		print "To create the branch on remote repository, run: 'genesis branch create origin feature-list'";
+	if [[ $(userChoice) == 'Y' ]]; then
+		print "Updating app from repo";
+		git fetch origin;
+		git branch -u origin/$branch;
 	fi
 
-	git branch -u origin/$branch;
+	print "Do you want to switch to '$branch'? [y/n]";
+	if [[ $(userChoice) == 'Y' ]]; then
+		git checkout $branch;
+	fi
+
 	cd $currentDir;
 }
 
 function genesisBranchDelete() {
 
-	if [[ $1 == 'origin' ]]; then
-		branch=$2;
+	if [[ -z $genesis_defaultBranch ]]; then
+		print "To use this feature, set genesis_defaultBranch variable in config";
+		return;
+	fi
+
+	currentDir=$(pwd);
+
+	if [[ -z $1 ]]; then
+		genesisBranch;
+
+		print "Enter branch name to delete (empty to delete current branch)";
+		read branch;
 	else
 		branch=$1;
 	fi
 
-	print "Deleting branch '$branch':";
-	currentDir=$(pwd);
-	cd $genesis_dir;
-
-	if [[ ! -z $genesis_defaultBranch ]]; then
-		print "Switching to default branch '$genesis_defaultBranch'";
-		git checkout $genesis_defaultBranch;
+	if [[ -z $branch ]]; then
+		branch=$(getCurrentBranch);
 	fi
 
-	git branch -D $branch;
-
-	if [[ ! -z $2 ]]; then
-		print "Deleting branch from repo:";
+	print "Delete remote branch '$branch'? [y/n]";
+	if [[ $(userChoice) == 'Y' ]]; then
 		git push origin :$branch;
-	else
-		print "To delete the branch from the remote repository, run: 'genesis branch create origin feature-list'";
 	fi
+
+	git checkout $genesis_defaultBranch;
+	git branch -D $branch;
 
 	cd $currentDir;
 }
@@ -257,9 +329,45 @@ function genesisConfig() {
 }
 
 function genesisOpen() {
-	open $genesis_dir;
+	open $1;
 }
 
 function genesisConsole() {
 	$genesis_dir/Application/simplify;
+}
+
+function genesisClone() {
+	print "Directory Listing";
+	ls -la;
+	print "Current Directory";
+	pwd;
+	print "Where do you want to clone? (use '.' to clone in current folder)";
+	read path;
+	print "Attempting to clone '$genesis_repo' to '$path' [y/n]:";
+
+	if [[ $(userChoice) != 'Y' ]]; then
+		print "Aborting";
+		return;
+	fi
+
+	print "Cloning now...";
+	sudo git clone $genesis_repo $path;
+
+	if [[ ! -d $path ]]; then
+		print "Unable to clone to $path, please check permissions to repo.";
+		return;
+	fi
+
+	print "Cloning complete";
+
+	if [[ ! -z $genesis_defaultBranch ]]; then
+		currentDir=$(pwd);
+		print "Switching to '$path'";
+		cd $path;
+		print "Checking out default branch";
+		git checkout genesis_defaultBranch;
+		print "Showing all branches";
+		git status;
+		cd $currentDir;
+	fi
 }

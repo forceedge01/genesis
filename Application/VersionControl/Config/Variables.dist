@@ -5,7 +5,7 @@
 # Genesis version control uses git only
 
 # genesis repository
-export genesis_repo='git@bitbucket.org/wqureshi/genesis.git';
+export genesis_repo='git@bitbucket.org:wqureshi/genesis.git';
 
 # bash compatible editor
 export genesis_editor='sublime';
@@ -30,3 +30,6 @@ export genesis_phpunitBin='phpunit';
 
 # if you have set the variable above, please set where the config xml file is for phpunit
 export genesis_phpunitConfigPath=$(dirname "${BASH_SOURCE[0]}")/../../;
+
+# Url to open for project
+export genesis_url='http://';

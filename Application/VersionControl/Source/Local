@@ -44,7 +44,7 @@ function genesisSave() {
 		fi
 	fi
 
-	if [[ -z $(git diff --name-only) ]]; then
+	if [[ -z $(git diff --name-only --cached) ]]; then
 		print "No file changes found, Attempting to push commits/tags";
 		git pull;
 
@@ -89,15 +89,7 @@ function genesisSave() {
 	cd $genesis_dir;
 
 	if [[ ! -z $version ]]; then
-		if [[ $version == 'major' ]]; then
-			inAppVersion='--major';
-		elif [[ $version == 'minor' ]]; then
-			inAppVersion='--minor';
-		elif [[ $version == 'patch' ]]; then
-			inAppVersion='--patch';
-		else
-			inAppVersion=${version#"v"};
-		fi
+		inAppVersion=${version#"v"};
 	else
 		inAppVersion='';
 	fi
@@ -106,14 +98,13 @@ function genesisSave() {
 	$genesis_vu $inAppVersion;
 
 	genesisPush "$message";
-	version=$($genesis_vu --version);
-	version=${version#"v"};
 
 	if [[ ! -z $version ]]; then
 		git tag $version;
 		genesisPushTag $version;
 	fi
 
+	version=$($genesis_vu --version);
 	print "Version updated to: $version";
 
 	cd $currentDir;

@@ -3,7 +3,7 @@
 /**
  * Developer: Wahab Qureshi
  * Date: 12-02-2013
- * Version: 0.5.10-21
+ * Version: 0.5.11-22
  */
 
 // Loads the file responsible for loading the framework.

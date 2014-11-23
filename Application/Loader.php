@@ -1,8 +1,11 @@
 <?php
 
-namespace Application\Core;
+namespace Application;
 
+require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
+require __DIR__ . '/Core/Lib/Debugger.Class.php';
 
+use Application\Core\Debugger;
 
 class Loader extends Debugger{
 
@@ -23,75 +26,88 @@ class Loader extends Debugger{
 
     public static
             $environment,
-            $appConfiguration;
+            $appConfiguration,
+            $scriptStartTime;
+
+    const BOOSTRAP_FILE = 'bootstrap.cache.php';
+
+    public function initLibs()
+    {
+        require __DIR__ . '/Core/Lib/Set.Class.php';
+        require __DIR__ . '/Core/Config/AppDirs.Config.php';
+        require __DIR__ . '/Core/Lib/Get.Class.php';
+    }
 
     /**
      *
      * @return type
      * Returns list of bundles included in app
      */
-    public static function AppBundles()
+    public function AppBundles()
     {
         return array(
-
             'Welcome',
             'users',
         );
     }
 
     /**
-     *
-     * @param type $class
-     * Registered autoloader
-     */
-    public static function LoadClass($class)
-    {
-        $dir = str_replace('\\','/', $class);
-        $className = explode('/', $dir);
-
-        $path = ROOT . $dir . '/'.end($className);
-
-        if(is_file($path.'.Class.php'))
-        {
-            require_once $path.'.Class.php';
-        }
-        else if(is_file($path.'.Component.php'))
-        {
-            require_once $path.'.Component.php';
-        }
-        else if(is_file($path.'.php'))
-        {
-            require_once $path.'.php';
-        }
-        else
-        {
-            Debugger::ThrowStaticError("Class '<b>$class</b>' was not found, tried including file with " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found, called from ".  get_called_class());
-        }
-    }
-
-    /**
      * Loads the framework - consider making protected
      */
-    public static function LoadFramework()
+    public function LoadFramework()
     {
-        self::LoadCore();
-        self::GetComponents();
-        self::LoadBundles();
+        $this
+            ->loadCoreLib()
+            ->LoadCoreStruct()
+            ->GetComponents()
+            ->LoadBundles();
+    }
+
+    private function LoadCoreLib()
+    {
+        $this
+            ->Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'))
+            ->FetchAllClasses();
+
+        return $this;
+    }
+
+    private function FetchAllClasses()
+    {
+        $classDir = \Get::Config('APPDIRS.CORE.LIB_FOLDER');
+        $classes = $this->getFiles();
+
+        foreach($classes as $class)
+        {
+            $path = $classDir . $class . '.Class.php';
+
+            if(is_file($path))
+            {
+                require $path;
+            }
+            else
+            {
+                die('<h1>Class '.$path.' not found in Loader->FetchAllClasses</h1>');
+            }
+        }
+
+        return $this;
     }
 
     /**
      * Loads framework core library
      */
-    public static function LoadCore()
+    private function LoadCoreStruct()
     {
-        self::Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
-        self::Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'));
-        self::RequireAllClasses(\Get::Config('APPDIRS.CORE.LIB_FOLDER'));
-        self::Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'));
-        self::Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'));
-        self::Load('events', \Get::Config('APPDIRS.STRUCT.EVENTS_FOLDER'));
-        self::Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'));
-        self::Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
+        $this
+            ->Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'))
+            ->Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'))
+            ->Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'))
+            ->Load('events', \Get::Config('APPDIRS.STRUCT.EVENTS_FOLDER'))
+            ->Load('models', \Get::Config('APPDIRS.STRUCT.MODELS_FOLDER'))
+            ->Load('controllers', \Get::Config('APPDIRS.STRUCT.CONTROLLERS_FOLDER'));
+
+        return $this;
     }
 
     /**
@@ -100,12 +116,12 @@ class Loader extends Debugger{
      * @return boolean
      * Loads a component
      */
-    public static function LoadComponent($component)
+    public function LoadComponent($component)
     {
         if(in_array($component, self::$components))
         {
             $baseFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-            self::LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
+            $this->LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
             $loaderFile = $baseFolder . $component . '/Loader.php';
 
             if(is_file($loaderFile))
@@ -132,11 +148,11 @@ class Loader extends Debugger{
      * Loads events for a bundle
      * Consider making protected
      */
-    public static function LoadEvents($bundle)
+    public function LoadEvents($bundle)
     {
         $bundle = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle;
 
-        return self::LoadFilesFromDir($bundle.'/Events');
+        return $this->LoadOnceFromDir($bundle.'/Events');
     }
 
     /**
@@ -144,7 +160,7 @@ class Loader extends Debugger{
      * @param type $class
      * Legacy
      */
-    public static function LoadEvent($class)
+    public function LoadEvent($class)
     {
         $event = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . trim(str_replace('\\', '/', $class));
 
@@ -155,9 +171,9 @@ class Loader extends Debugger{
      * Fetches bundles for inclusion in app.
      * Consider making protected
      */
-    public static function FetchAllBundles(){
+    public function FetchAllBundles(){
 
-        $bundles = self::AppBundles();
+        $bundles = $this->AppBundles();
         $bundlesDIR = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER');
 
         foreach($bundles as $bundle)
@@ -166,40 +182,26 @@ class Loader extends Debugger{
         }
     }
 
-    /**
-     *
-     * @param type $classDir
-     * @return type
-     */
-    private static function RequireAllClasses($classDir){
-
-        $classes = array(
-            'Hooks.Class.php',
-            'Variable.Class.php',
-            'ObjectManager.Class.php',
-            'AppMethods.Class.php',
-            'DependencyInjector.Class.php',
-            'EventHandler.Class.php',
-            'Request.Class.php',
-            'Response.Class.php',
-            'Router.Class.php',
-            'Cache.Class.php',
-            'Template.Class.php',
-            'Application.Class.php',
-            'Database.Class.php',
-            'DatabaseManager.Class.php',
-            'Session.Class.php',
-            'EventDispatcher.Class.php',
+    public function getFiles()
+    {
+        return array(
+            'Hooks',
+            'Variable',
+            'ObjectManager',
+            'AppMethods',
+            'DependencyInjector',
+            'EventHandler',
+            'Request',
+            'Response',
+            'Router',
+            'Cache',
+            'Template',
+            'Application',
+            'Database',
+            'DatabaseManager',
+            'Session',
+            'EventDispatcher',
         );
-
-        foreach($classes as $class)
-        {
-            if(is_file($classDir . $class)){
-                require $classDir . $class;
-            }
-            else
-                die('<h1>Class '.$classDir.$class.' not found in Loader::FetchAllClasses</h1>');
-        }
     }
 
     /**
@@ -208,20 +210,22 @@ class Loader extends Debugger{
      * @param type $dir
      * Loads files for use for the app
      */
-    protected static function Load($staticVar, $dir){
+    private function Load($staticVar, $dir){
 
         self::$files = array();
         self::$$staticVar = array_merge(self::$$staticVar, self::FetchAll ($dir));
         foreach(self::$$staticVar as $file)
             require_once $file;
+
+        return $this;
     }
 
     /**
      * Loads config and routes of all registered bundles for usage throughout the app.
      */
-    protected static function LoadBundles(){
+    private function LoadBundles(){
 
-        self::FetchAllBundles();
+        $this->FetchAllBundles();
         $bundleConfigDir = \Get::Config('APPDIRS.BUNDLES.CONFIG');
         $bundleRoutesDir = \Get::Config('APPDIRS.BUNDLES.ROUTES');
 
@@ -229,14 +233,25 @@ class Loader extends Debugger{
         {
             if(is_dir($bundle))
             {
-                self::$configs = array_merge(
+                $configs = $this->LoadOnceFromDir($bundle . $bundleConfigDir, array('php'));
+
+                if(is_array($configs))
+                {
+                    self::$configs = array_merge(
                         self::$configs,
-                        self::LoadFilesFromDir($bundle . $bundleConfigDir, array('php'))
+                        $configs
                         );
-                self::$routes = array_merge(
+                }
+
+                $routes = $this->LoadOnceFromDir($bundle . $bundleRoutesDir, array('php'));
+
+                if(is_array($routes))
+                {
+                    self::$routes = array_merge(
                         self::$routes,
-                        self::LoadFilesFromDir($bundle . $bundleRoutesDir, array('php'))
+                        $routes
                         );
+                }
             }
             else
             {
@@ -250,26 +265,22 @@ class Loader extends Debugger{
 
     }
 
-    protected static function RemoveDoubleSlash($string)
-    {
-        return str_replace('//', '/', $string);
-    }
-
     /**
      *
      * @param type $bundle
      */
-    public static function LoadBundle($bundle)
+    public function LoadBundle($bundle)
     {
         if(!in_array($bundle, self::$LoadedBundles))
         {
             self::$LoadedBundles[] = $bundle;
-            $bundle = self::GetBundleAbsolutePath($bundle);
+            $bundle = $this->GetBundleAbsolutePath($bundle);
 
             if(is_dir($bundle))
             {
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'));
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'));
+                $this
+                    ->LoadOnceFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.INTERFACES'))
+                    ->LoadOnceFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.CONTROLLERS'));
             }
             else
             {
@@ -282,7 +293,7 @@ class Loader extends Debugger{
         }
     }
 
-    private static function GetBundleAbsolutePath($bundle)
+    private function GetBundleAbsolutePath($bundle)
     {
         return str_replace('//', '/', \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . $bundle);
     }
@@ -292,9 +303,9 @@ class Loader extends Debugger{
      * @param type $bundle
      * @return type
      */
-    public static function LoadBundleEntities($bundle)
+    public function LoadBundleEntities($bundle)
     {
-        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Entities', array('php'));
+        return $this->LoadOnceFromDir($this->GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Entities', array('php'));
     }
 
     /**
@@ -302,9 +313,9 @@ class Loader extends Debugger{
      * @param type $bundle
      * @return type
      */
-    public static function LoadBundleRepositories($bundle)
+    public function LoadBundleRepositories($bundle)
     {
-        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Repositories', array('php'));
+        return $this->LoadOnceFromDir($this->GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES').'Repositories', array('php'));
     }
 
     /**
@@ -312,43 +323,9 @@ class Loader extends Debugger{
      * @param type $bundle
      * @return type
      */
-    public static function LoadBundleModel($bundle)
+    public function LoadBundleModel($bundle)
     {
-        return self::LoadFilesFromDir(self::GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
-    }
-
-    /**
-     *
-     * @param type $directory
-     * @param array $extensions - default php
-     * @param type $subdirectories - default true
-     * @return array Returns files included, uses require
-     */
-    protected static function LoadFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
-
-        $loadedFiles = array();
-
-        if(is_dir($directory))
-        {
-            $files = scandir($directory);
-
-            foreach($files as $file)
-            {
-                $filepath = $directory . '/' . $file;
-
-                if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
-                {
-                    self::LoadFilesFromDir ($filepath, $extensions, $subdirectories);
-                }
-                else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
-                {
-                    $loadedFiles = self::$LoadedFiles[] = $filepath;
-                    require $filepath;
-                }
-            }
-        }
-
-        return $loadedFiles;
+        return $this->LoadOnceFromDir($this->GetBundleAbsolutePath($bundle) . \Get::Config('APPDIRS.BUNDLES.DATABASE_FILES'), array('php'));
     }
 
     /**
@@ -357,7 +334,7 @@ class Loader extends Debugger{
      * @param type $subdirectories - default true
      * @return boolean Requires all files in the current directory along with files in subdirectories<br /> presedence of files in subdirectory
      */
-    public static function LoadOnceFromDir($directory, array $extensions = array('php'), $subdirectories = true){
+    public function LoadOnceFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
         $loadedFiles = array();
 
@@ -371,7 +348,7 @@ class Loader extends Debugger{
 
                 if($subdirectories and $file != '.' && $file != '..' && is_dir($filepath))
                 {
-                    self::LoadOnceFromDir ($filepath, $extensions, $subdirectories);
+                    $this->LoadOnceFromDir ($filepath, $extensions, $subdirectories);
                 }
                 else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
                 {
@@ -381,13 +358,13 @@ class Loader extends Debugger{
             }
         }
 
-        return $loadedFiles;
+        return $this;
     }
 
     /**
      * Dev env method
      */
-    protected static function LoadConfigFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
+    private function LoadConfigFilesFromDir($directory, array $extensions = array('php'), $subdirectories = true){
 
         if(is_dir($directory)){
 
@@ -397,7 +374,7 @@ class Loader extends Debugger{
 
                 $filepath = str_replace('//', '/', $directory . '/' . $file);
 
-                if(is_file(str_replace('.php','_dev.php', $filepath)) && self::FileExtensionIs($filepath, $extensions))
+                if(is_file(str_replace('.php','_dev.php', $filepath)) && $this->FileExtensionIs($filepath, $extensions))
                 {
                     self::$LoadedFiles[] = $filepath;
                     require_once $filepath;
@@ -406,7 +383,7 @@ class Loader extends Debugger{
                 {
                     if($file != '.' && $file != '..' && is_dir($filepath))
                     {
-                        self::LoadFilesFromDir ($filepath, $extensions);
+                        $this->LoadOnceFromDir ($filepath, $extensions);
                     }
                 }
                 else if(is_file($filepath) && self::FileExtensionIs($filepath, $extensions))
@@ -420,7 +397,7 @@ class Loader extends Debugger{
         return true;
     }
 
-    protected static function FileExtensionIs($file, array $extensions){
+    private function FileExtensionIs($file, array $extensions){
 
         foreach($extensions as $extension)
         {
@@ -436,7 +413,7 @@ class Loader extends Debugger{
     /**
      * Gets a list of components available in the application.
      */
-    private static function GetComponents()
+    private function GetComponents()
     {
         $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
         $components = scandir($base);
@@ -452,38 +429,40 @@ class Loader extends Debugger{
                 self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
             }
         }
+
+        return $this;
     }
 
-    private static function FetchAll($dir){
+    private function FetchAll($dir){
 
         $directory = $dir;
         $files = scandir($directory);
 
         foreach($files as $file){
 
-            if(is_file($directory . $file) && self::FileExtensionIs($directory . $file, array('php')))
+            if(is_file($directory . $file) && $this->FileExtensionIs($directory . $file, array('php')))
                 self::$files[] = $directory .$file;
             else if($file != '.' && $file != '..' && is_dir($directory . $file))
-                self::FetchAll ($directory . $file . '/');
+                $this->FetchAll ($directory . $file . '/');
         }
 
         return self::$files;
     }
 
-    public static function LoadClassesAndComponentsTestFiles(array $components = array())
+    public function LoadClassesAndComponentsTestFiles(array $components = array())
     {
         self::$LoadedFiles = array();
-        self::LoadFilesFromDir(\Get::Config('APPDIRS.APPLICATION_TESTS_FOLDER'), array('php'));
+        $this->LoadOnceFromDir(\Get::Config('APPDIRS.APPLICATION_TESTS_FOLDER'), array('php'));
 
         foreach($components as $component)
         {
-            self::LoadFilesFromDir(\Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER').$component.'/Tests/', array('php'));
+            $this->LoadOnceFromDir(\Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER').$component.'/Tests/', array('php'));
         }
 
         return self::$LoadedFiles;
     }
 
-    public static function LoadBundleTestFiles()
+    public function LoadBundleTestFiles()
     {
         $testBundles = array();
 
@@ -492,7 +471,7 @@ class Loader extends Debugger{
             if(is_dir($bundle)){
 
                 $testBundles[] = $bundle;
-                self::LoadFilesFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.TESTS'), array('php'));
+                $this->LoadOnceFromDir($bundle . \Get::Config('APPDIRS.BUNDLES.TESTS'), array('php'));
             }
         }
 
@@ -503,7 +482,7 @@ class Loader extends Debugger{
      *
      * @param array $files
      */
-    public static function RequireOnce(array $files)
+    public function RequireOnce(array $files)
     {
         try
         {
@@ -514,5 +493,101 @@ class Loader extends Debugger{
         {
             echo $e->getMessage();
         }
+    }
+
+    private function getBoostrapPath()
+    {
+        return __DIR__ . '/' . self::BOOSTRAP_FILE;
+    }
+
+    public function LoadBoostrap()
+    {
+        if(! file_exists(self::getBoostrapPath()))
+        {
+            $this->createBoostrap(__DIR__ . '/Core');
+        }
+
+        require_once self::getBoostrapPath();
+    }
+
+    private function createBoostrap($folder)
+    {
+        $files = $this->getFiles();
+
+        ob_start();
+        foreach($files as $file)
+        {
+            echo php_strip_whitespace($folder . '/Interfaces/' . $file . '.Interface.php');
+            echo php_strip_whitespace($folder . '/Lib/' . $file . '.Class.php');
+        }
+
+        $contents = $this->sanitizeContentsForOnePHPFile(ob_get_clean());
+
+        file_put_contents($this->getBoostrapPath(), $contents);
+    }
+
+    private function sanitizeContentsForOnePHPFile($contents)
+    {
+        $removedMultiplePHPSymbols = str_replace(['<?php', '<?', '?>'], '', $contents);
+
+        return '<?php // GENESIS Bootstrap file' . $removedMultiplePHPSymbols;
+    }
+
+    public function LoadGenesis() {
+
+        $this->initLibs();
+
+        self::$scriptStartTime = microtime(true);
+
+        $this->CheckDependencies()
+             ->LoadFramework();
+    }
+
+    private function CheckDependencies(){
+
+        $version = '5.3.0';
+
+        if(!version_compare(phpversion(), $version, '>='))
+            die('You need to update your php version, GENESIS requires atleast php '.$version);
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param type $fileType
+     * @return type
+     * Gets info on file types loaded
+     */
+    public function Get($fileType = null){
+
+        if(emtpy($fileType))
+            return array(
+                'Interfaces' => self::$interfaces,
+                'Traits' => self::$traits,
+                'Bundles' => self::$bundles,
+                'Classes' => self::$classes,
+                'Components' => self::$components,
+                'Configs' => self::$configs,
+                'Controllers' => self::$controllers,
+                'Files' => self::$files,
+                'Models' => self::$models,
+                'Routes' => self::$routes
+            );
+
+        return self::$$fileType;
+    }
+
+    /**
+     *
+     * @param string Append text
+     * @return mixed Returns execution time in Milliseconds
+     */
+    public function GetExecutionTime($text = 'Milliseconds')
+    {
+        if($text)
+            $text = ' '.$text;
+
+        return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
     }
 }

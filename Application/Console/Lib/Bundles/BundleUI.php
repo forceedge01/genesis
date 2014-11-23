@@ -185,7 +185,7 @@ class BundleUI extends BundleAPI {
 
         require_once __DIR__ . '/../../../Loader.php';
 
-        $bundles = \Application\Core\Loader::AppBundles();
+        $bundles = \Application\Loader::AppBundles();
         $bundlesArray = array();
 
         foreach ($bundles as $bundle) {

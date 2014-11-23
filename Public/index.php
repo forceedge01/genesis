@@ -6,8 +6,14 @@
  * Version: 0.5.11-22
  */
 
-// Loads the file responsible for loading the framework.
-require __DIR__ . '/../Application/Bootstrap.php';
+require_once '../Application/AppKernal.php';
+
+use Application\AppKernal;
+
 
 // Initialize the kernel
-Application\Core\AppKernal::Initialize();
+$loader = AppKernal::getLoader();
+// LoadBootstrap for production only
+//$loader->LoadBoostrap();
+$loader->LoadGenesis();
+AppKernal::Initialize();

@@ -13,7 +13,7 @@ class Get{
     public static function Config()
     {
         $keys = func_get_args();
-        $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
+        $config = self::ProcessGet(Application\Loader::$appConfiguration, $keys);
 
         if(is_array($config))
         {

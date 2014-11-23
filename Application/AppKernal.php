@@ -1,42 +1,25 @@
 <?php
 
-namespace Application\Core;
+namespace Application;
 
 
-require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
-require __DIR__ . '/Core/Lib/Debugger.Class.php';
-require __DIR__ . '/Loader.php';
+class AppKernal {
 
-class AppKernal extends Loader{
-
-    public static
-            $phpVersion,
-            $msyqlVersion,
-            $scriptStartTime;
-
-    public static function initLibs()
-    {
-        require __DIR__ . '/Core/Lib/Set.Class.php';
-        require __DIR__ . '/Core/Config/AppDirs.Config.php';
-        require __DIR__ . '/Core/Lib/Get.Class.php';
-    }
+    private static $loader;
 
     public static function GetHost()
     {
-        if(isset($_SERVER['HTTPS']))
-            $http = 'https';
-        else
+        if(isset($_SERVER['HTTP_HOST']))
+        {
             $http = 'http';
 
-        if(isset($_SERVER['HTTP_HOST']))
-            return "{$http}://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
-    }
+            if(isset($_SERVER['HTTPS']))
+            {
+                $http = 'https';
+            }
 
-    public static function LoadGenesis() {
-        self::initLibs();
-        self::$scriptStartTime = microtime(true);
-        self::CheckDependencies();
-        self::LoadFramework();
+            return "{$http}://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
+        }
     }
 
     /**
@@ -44,7 +27,7 @@ class AppKernal extends Loader{
      */
     public static function Initialize() {
 
-        $app = new Application();
+        $app = new Core\Application();
 
         if(!$app->ForwardRequest())
         {
@@ -52,49 +35,17 @@ class AppKernal extends Loader{
         }
     }
 
-    private static function CheckDependencies(){
+    public static function getLoader() {
 
-        $version = '5.3.0';
+        if(self::$loader)
+        {
+            return self::$loader;
+        }
 
-        if(!version_compare(phpversion(), $version, '>='))
-            die('You need to update your php version, GENESIS requires atleast php '.$version);
-    }
+        require_once __DIR__ . '/Loader.php';
 
-    /**
-     *
-     * @param type $fileType
-     * @return type
-     * Gets info on file types loaded
-     */
-    public static function Get($fileType = null){
+        self::$loader = new Loader();
 
-        if(emtpy($fileType))
-            return array(
-                'Interfaces' => self::$interfaces,
-                'Traits' => self::$traits,
-                'Bundles' => self::$bundles,
-                'Classes' => self::$classes,
-                'Components' => self::$components,
-                'Configs' => self::$configs,
-                'Controllers' => self::$controllers,
-                'Files' => self::$files,
-                'Models' => self::$models,
-                'Routes' => self::$routes
-            );
-
-        return self::$$fileType;
-    }
-
-    /**
-     *
-     * @param string Append text
-     * @return mixed Returns execution time in Milliseconds
-     */
-    public static function GetExecutionTime($text = 'Milliseconds')
-    {
-        if($text)
-            $text = ' '.$text;
-
-        return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
+        return self::$loader;
     }
 }

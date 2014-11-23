@@ -11,7 +11,7 @@ abstract class SchemaAPI extends Console {
     private $connection, $tables, $database;
 
     public function __construct() {
-        \Application\Core\Loader::LoadCore();
+        \Application\Loader::LoadCore();
         $this->connection = new \Application\Core\DatabaseManager();
     }
 

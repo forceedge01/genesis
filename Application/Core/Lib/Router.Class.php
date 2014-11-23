@@ -49,12 +49,19 @@ class Router extends EventHandler implements RouterInterface{
             {
                 $this->lastRoute = $key;
 
+                // Check http method allowed
                 if(isset($value['Method']))
+                {
                     $this->CheckRouteMethod($value['Method']);
+                }
 
+                // Check if route variables are set
                 if(isset($value['Requirements']))
+                {
                     $this->CheckRouteRequirements ($value['Requirements']);
+                }
 
+                // Do some error handling here to see if the right stuff has been provided
                 list($bundle, $controller, $action) = explode(':', $value['Controller']);
 
                 if($bundle)
@@ -62,9 +69,13 @@ class Router extends EventHandler implements RouterInterface{
                     $fullBundle = $this->GetBundleFromName($bundle);
 
                     if($fullBundle)
-                        Loader::LoadBundle($fullBundle);
+                    {
+                        \Application\AppKernal::getLoader()->LoadBundle($fullBundle);
+                    }
                     else
-                        $this->ForwardToController('Bundle_Not_Found', $error);
+                    {
+                        $this->ForwardToController('Bundle_Not_Found');
+                    }
                 }
 
                 $this->CheckDependencies ($bundle, $controller, $action);
@@ -105,7 +116,7 @@ class Router extends EventHandler implements RouterInterface{
         $this->CallControllerAction($controller, $action);
 
         // Ouput execution time of the whole script
-        echo \Application\Core\AppKernal::GetExecutionTime();
+        echo \Application\AppKernal::GetExecutionTime();
 
         die();
     }
@@ -454,7 +465,7 @@ class Router extends EventHandler implements RouterInterface{
         list($bundle, $controller, $action) = explode(':', $this->GetController($route));
 
         if($bundle)
-            Loader::LoadBundle($this->GetBundleFromName($bundle));
+            \Application\AppKernal::getLoader()->LoadBundle($this->GetBundleFromName($bundle));
 
         $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $variables);
     }

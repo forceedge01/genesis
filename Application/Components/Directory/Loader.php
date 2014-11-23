@@ -1,3 +1,3 @@
 <?php
 
-\Application\Core\Loader::LoadOnceFromDir(__DIR__);
+\Application\Loader::LoadOnceFromDir(__DIR__);

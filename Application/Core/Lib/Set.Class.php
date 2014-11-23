@@ -1,7 +1,7 @@
 <?php
 
 
-class Set extends Application\Core\Loader{
+class Set extends Application\Loader{
 
     public function __construct() {}
     private function __clone() {}
@@ -39,7 +39,7 @@ class Set extends Application\Core\Loader{
             {
                 $ptr[$key] = array();
             }
-            
+
             $ptr = &$ptr[$key];
         }
 

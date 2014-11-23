@@ -31,7 +31,7 @@ abstract class EventDispatcher extends AppMethods implements EventDispatcherInte
     public static function GetObservers($bundle)
     {
         // Get Events from event files in events folder of the bundle
-        $events = self::GetNamespaceFromMultipleFiles(Loader::LoadEvents($bundle));
+        $events = self::GetNamespaceFromMultipleFiles(\Application\AppKernal::getLoader()->LoadEvents($bundle));
 
         // Include observers from config bundle file
         $configObservers = \Get::Config($bundle.'.Observers');

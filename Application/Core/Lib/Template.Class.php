@@ -8,7 +8,6 @@ class Template extends Router {
 
     private
             $title,
-            $bundle,
             $html,
             $header,
             $footer,

@@ -180,7 +180,7 @@ abstract class Debugger implements DebuggerInterface{
 
             if (\Get::Config('Errors.mailTriggeredErrors'))
             {
-                Loader::LoadComponent('Mailer');
+                \Application\AppKernal::getLoader()->LoadComponent('Mailer');
                 $mail = new \Application\Components\Mailer();
 
                 $mail->send(array(
@@ -267,7 +267,7 @@ abstract class Debugger implements DebuggerInterface{
 
         if (\Get::Config('Errors.mailTriggeredErrors'))
         {
-            Loader::LoadComponent('Mailer');
+            \Application\AppKernal::getLoader()->LoadComponent('Mailer');
             $mail = new \Application\Components\Mailer();
 
             $mail->send(array(

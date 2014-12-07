@@ -59,7 +59,7 @@ class Loader extends Debugger{
         $this
             ->loadCoreLib()
             ->LoadCoreStruct()
-            ->GetComponents()
+//            ->GetComponents()
             ->LoadBundles();
     }
 
@@ -112,37 +112,6 @@ class Loader extends Debugger{
 
     /**
      *
-     * @param type $component
-     * @return boolean
-     * Loads a component
-     */
-    public function LoadComponent($component)
-    {
-        if(in_array($component, self::$components))
-        {
-            $baseFolder = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-            $this->LoadOnceFromDir($baseFolder . $component . '/Config', array('php'));
-            $loaderFile = $baseFolder . $component . '/Loader.php';
-
-            if(is_file($loaderFile))
-            {
-                require $baseFolder . $component . '/Loader.php';
-            }
-            else
-            {
-                Debugger::ThrowStaticError("Could not load $component, '<b>$loaderFile</b>' file for this component was not found.", __FILE__, __LINE__);
-            }
-
-            return true;
-        }
-        else
-            self::ThrowStaticError('Component: '.$component. ' not found! Components found: <pre>'.print_r(Loader::$components, true).'</pre>', __FILE__, __LINE__);
-
-        return false;
-    }
-
-    /**
-     *
      * @param string $bundle
      * @return type
      * Loads events for a bundle
@@ -186,7 +155,6 @@ class Loader extends Debugger{
     {
         return array(
             'Hooks',
-            'Variable',
             'ObjectManager',
             'AppMethods',
             'DependencyInjector',
@@ -194,7 +162,6 @@ class Loader extends Debugger{
             'Request',
             'Response',
             'Router',
-            'Cache',
             'Template',
             'Application',
             'Database',
@@ -421,14 +388,48 @@ class Loader extends Debugger{
         {
             if($component != '.' and $component != '..')
             {
+                $lowered = strtolower($component);
+
                 if(is_file($base.'/'.$component.'/Loader.php'))
                 {
-                    self::$components[] = $component; continue;
+                    self::$components[$lowered] = $component; continue;
                 }
 
-                self::$components[] = $component . ' (Broken: Loader.php for component not found.)';
+                self::$components[$lowered] = $component . ' (Broken: Loader.php for component not found.)';
             }
         }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param type $class
+     * @return boolean
+     * Loads a component
+     */
+    public function LoadComponent($class)
+    {
+        $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
+        $folder = function() use ($class) {
+            $folder = null;
+            $chunks = explode('\\', $class);
+            for($i = 0; $i < count($chunks) -1; $i++)
+            {
+                $folder .= $chunks[$i] . '/';
+            }
+
+            return $folder;
+        };
+
+        $loader = $base . $folder() . 'Loader.php';
+
+        if(! is_file($loader))
+        {
+            Debugger::ThrowStaticError("Could not load $class, '<b>$loader</b>' file for this component was not found.", __FILE__, __LINE__);
+        }
+
+        require $loader;
 
         return $this;
     }

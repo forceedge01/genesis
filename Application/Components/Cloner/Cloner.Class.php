@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components;
+namespace Application\Components\Cloner;
 
 /**
  * Author: Wahab Qureshi.

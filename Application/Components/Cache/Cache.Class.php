@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Core;
+namespace Application\Components\Cache;
 
 
 
@@ -9,7 +9,7 @@ class Cache extends AppMethods{
     public function __construct() {}
     private function __clone() {}
 
-    public static function CheckForCachedFile($pattern)
+    public function CheckForCachedFile($pattern)
     {
         $file = str_replace('//', '/', \Get::Config('APPDIRS.CACHE_FOLDER') . $pattern . '/index.html');
 
@@ -28,7 +28,7 @@ class Cache extends AppMethods{
             return false;
     }
 
-    public static function WriteCacheFile($pattern, $content)
+    public function WriteCacheFile($pattern, $content)
     {
         $folderChunks = explode('/', trim($pattern,'/'));
         $patt = \Get::Config('APPDIRS.CACHE_FOLDER');
@@ -50,7 +50,7 @@ class Cache extends AppMethods{
         fclose($handle);
     }
 
-    private static function OutputFile($file)
+    private function OutputFile($file)
     {
         ob_start();
         require $file;
@@ -58,7 +58,7 @@ class Cache extends AppMethods{
         die();
     }
 
-    public static function Minify($content, $case)
+    public function Minify($content, $case)
     {
         switch($case)
         {
@@ -95,7 +95,7 @@ class Cache extends AppMethods{
         }
     }
 
-    public static function Unify($html, array $files)
+    public function Unify($html, array $files)
     {
         $aggregatedContents = null;
         $extension = pathinfo($files[0], PATHINFO_EXTENSION);
@@ -181,7 +181,7 @@ class Cache extends AppMethods{
         return $html;
     }
 
-    public static function Compress($content, $level = 3)
+    private function Compress($content, $level = 3)
     {
         header('Content-Encoding: gzip');
 

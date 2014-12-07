@@ -7,6 +7,16 @@ class AppKernal {
 
     private static $loader;
 
+    public static function ComponentsRegister()
+    {
+        \Set::Component('Auth', 'Auth\Auth');
+    }
+
+    public static function BundlesRegister()
+    {
+        
+    }
+
     public static function GetHost()
     {
         if(isset($_SERVER['HTTP_HOST']))
@@ -26,6 +36,9 @@ class AppKernal {
      * Initializes an instance of the application
      */
     public static function Initialize() {
+
+        self::ComponentsRegister();
+        self::BundlesRegister();
 
         $app = new Core\Application();
 

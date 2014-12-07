@@ -54,4 +54,9 @@ class Set extends Application\Loader{
 
         self::$appConfiguration = array_replace_recursive(self::$appConfiguration, $result);
     }
+
+    public static function Component($alias, $class)
+    {
+        self::$components[$alias] = $class;
+    }
 }

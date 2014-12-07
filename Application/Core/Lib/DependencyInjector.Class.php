@@ -38,10 +38,16 @@ class DependencyInjector extends AppMethods implements DependencyInjectorInterfa
 
         foreach($dependencies as $inject)
         {
-            $dependenciesObjects[] = $this->GetObject($inject);
+            $inject = strtolower($inject);
+            if(strpos($inject, 'component:') === 0)
+            {
+                $class = str_replace('component:', '', $inject);
+                $dependenciesObjects[] = $this->GetComponent($class);
 
-            if(!end($dependenciesObjects))
-                $this->SetErrorArgs('Unable to inject dependency: '.$inject.' for object '. get_class($dependenciesObjects) . ', make sure the class exists', __FILE__, __LINE__)->ThrowError();
+                continue;
+            }
+
+            $dependenciesObjects[] = $this->GetCoreObject($inject);
         }
 
         return $dependenciesObjects;

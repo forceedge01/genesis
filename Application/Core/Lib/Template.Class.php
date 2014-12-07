@@ -24,9 +24,9 @@ class Template extends Router {
      * @param string $template - template to render
      * @param array $params - The parameters to pass to a controller
      */
-    private function GetView($template){
+    private function GetView($templatePath){
 
-        list($bundle, $controller, $template) = explode(':', $template);
+        list($bundle, $controller, $template) = explode(':', $templatePath);
 
         if ($bundle) {
 

@@ -6,7 +6,7 @@ namespace Application\Core;
 
 use Application\Core\Interfaces\Router as RouterInterface;
 
-class Router extends EventHandler implements RouterInterface{
+class Router extends AppMethods implements RouterInterface {
 
     private
             $url,
@@ -79,6 +79,7 @@ class Router extends EventHandler implements RouterInterface{
                 }
 
                 $this->CheckDependencies ($bundle, $controller, $action);
+
                 $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
             }
         }
@@ -434,8 +435,8 @@ class Router extends EventHandler implements RouterInterface{
      * @param type $urlQueryString - append this query string to the url to redirect to<br />
      * Redirects to a route.
      */
-    public function ForwardTo($route, $urlQueryString = null){
-
+    public function ForwardTo($route, $urlQueryString = null)
+    {
         self::$LastRoute = $this->pattern;
         $this->GetCoreObject('Session')->Set('LastRoute', $route);
         $route = $this->GetRoute($route);

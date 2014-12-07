@@ -5,12 +5,14 @@ namespace Application;
 
 class AppKernal {
 
-    private static $loader;
+    private static $loader, $app;
+    public static $scriptStartTime;
 
     public static function ComponentsRegister()
     {
+        \Set::Component('HTMLGenerator', 'HTMLGenerator\HTMLGenerator');
+        \Set::Component('Router', 'Router\Router');
         \Set::Component('Auth', 'Auth\Auth');
-        \Set::Component('HTMLGenerator', 'HTMLGenerator\HtmlGenerator');
     }
 
     public static function BundlesRegister()
@@ -40,13 +42,6 @@ class AppKernal {
 
         self::ComponentsRegister();
         self::BundlesRegister();
-
-        $app = new Core\Application();
-
-        if(!$app->ForwardRequest())
-        {
-            $app->ForwardToController('404', array('pattern'=> $app->GetPattern()));
-        }
     }
 
     public static function getLoader() {
@@ -58,8 +53,21 @@ class AppKernal {
 
         require_once __DIR__ . '/Loader.php';
 
-        self::$loader = new Loader();
+        self::$loader = new \Application\Loader();
 
         return self::$loader;
+    }
+
+    /**
+     *
+     * @param string Append text
+     * @return mixed Returns execution time in Milliseconds
+     */
+    public static function GetExecutionTime($text = 'Milliseconds')
+    {
+        if($text)
+            $text = ' '.$text;
+
+        return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
     }
 }

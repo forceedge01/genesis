@@ -1,15 +1,15 @@
 <?php
 
-namespace Application\Core;
+namespace Router;
 
 
 
 use Application\Core\Interfaces\Router as RouterInterface;
+use Application\Core\AppMethods;
 
 class Router extends AppMethods implements RouterInterface {
 
     private
-            $url,
             $lastRoute,
             $lastURL,
             $funcVariables,
@@ -20,11 +20,11 @@ class Router extends AppMethods implements RouterInterface {
             $ControllerDependencies = array(),
             $ActionDependencies = array();
 
-    public static $Route = array(), $LastRoute, $patterns = array();
+    public static $LastRoute, $routes = array();
 
     public function __construct() {
 
-        $this->url = $_SERVER['PHP_SELF'];
+        $this->funcVariables = array();
         $this->SetPattern()->SetParams();
     }
 
@@ -40,58 +40,117 @@ class Router extends AppMethods implements RouterInterface {
         if(\Get::Config('Cache.html.enabled'))
             Cache::CheckForCachedFile($this->GetPattern());
 
-        $value = $this->funcVariables = array();
+        $patternConfig = $this->getPatternConfiguration($this->pattern);
 
-        foreach(self::$Route as $key => $value)
+        if(! $patternConfig)
         {
-            if($this->ExtractVariable($value['Pattern']) == $this->pattern)
+            // Forward to route not found controller
+            return false;
+        }
+
+        // Save the last route in this param
+        $this->lastRoute = $patternConfig['name'];
+
+        // Check http method allowed
+        if(isset($patternConfig['Method']))
+        {
+            $this->CheckRouteMethod($patternConfig['Method']);
+        }
+
+        // Check if route variables are set
+        if(isset($patternConfig['Requirements']))
+        {
+            $this->CheckRouteRequirements ($patternConfig['Requirements']);
+        }
+
+        // Do some error handling here to see if the right stuff has been provided
+        list($bundle, $controller, $action) = explode(':', $patternConfig['Controller']);
+
+        if($bundle)
+        {
+            $fullBundle = $this->GetBundleFromName($bundle);
+
+            if($fullBundle)
             {
-                $this->lastRoute = $key;
-
-                // Check http method allowed
-                if(isset($value['Method']))
-                {
-                    $this->CheckRouteMethod($value['Method']);
-                }
-
-                // Check if route variables are set
-                if(isset($value['Requirements']))
-                {
-                    $this->CheckRouteRequirements ($value['Requirements']);
-                }
-
-                // Do some error handling here to see if the right stuff has been provided
-                list($bundle, $controller, $action) = explode(':', $value['Controller']);
-
-                if($bundle)
-                {
-                    $fullBundle = $this->GetBundleFromName($bundle);
-
-                    if($fullBundle)
-                    {
-                        \Application\AppKernal::getLoader()->LoadBundle($fullBundle);
-                    }
-                    else
-                    {
-                        $this->ForwardToController('Bundle_Not_Found');
-                    }
-                }
-
-                $this->CheckDependencies ($bundle, $controller, $action);
-
-                $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
+                \Application\AppKernal::getLoader()->LoadBundle($fullBundle);
+            }
+            else
+            {
+                $this->ForwardToController('Bundle_Not_Found');
             }
         }
 
-        return false;
+        $this->CheckDependencies ($bundle, $controller, $action);
+
+        $this->CallAction($this->GetControllerNamespace($bundle, $controller), $action . 'Action', $this->funcVariables);
+    }
+
+    private function getPatternConfiguration($toMatchPattern)
+    {
+        $patternInfo = $this->getPatternInfo($toMatchPattern);
+
+        if(! $patternInfo)
+        {
+            return false;
+        }
+
+        return $this->setControllerVariablesFromPattern($patternInfo);
+    }
+
+    private function setControllerVariablesFromPattern($patternInfo)
+    {
+        // Extract variables pattern call
+        if($patternInfo)
+        {
+            // Pattren matched, extract variables from this pattern
+            $routeParams = explode('/', $patternInfo['Pattern']);
+            $index = 0;
+
+            foreach($routeParams as $param)
+            {
+                if(preg_match('(\\{.+\\})', $param))
+                {
+                    $param = $this->funcVariables[$param] = $this->params[$index];
+                }
+
+                $index++;
+            }
+        }
+
+        return $patternInfo;
+    }
+
+    private function getPatternInfo($pattern)
+    {
+        // Get pattern method call
+        foreach(self::$routes as $name => $configuration)
+        {
+            // If pattern has place holders in it then do the preg match else dont
+            if(strpos($configuration['Pattern'], '{') !== false)
+            {
+                $patternRegex = preg_replace('/{.+}/', '.*', $configuration['Pattern']);
+
+                if(preg_match("#^$patternRegex$#", $pattern))
+                {
+                    return array_merge($configuration, array('name' => $name));
+                }
+            }
+            else
+            {
+                if($configuration['Pattern'] == $pattern)
+                {
+                    return array_merge($configuration, array('name' => $name));
+                }
+            }
+
+        }
     }
 
     /**
      *
      * @param type $objectName
-     * @param type $objectAction
-     * @param type $variable<br />
-     * Calls an action of a controller.
+     * @param type $action
+     * @param array $variable
      */
     private function CallAction($objectName, $action, array $variable = array())
     {
@@ -180,9 +239,6 @@ class Router extends AppMethods implements RouterInterface {
             $pattern = $_SERVER['PATH_INFO'];
         else
             $pattern = '/';
-
-        // $currentIndex = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
-        // $pattern = str_replace(array('index.php', $currentIndex), '', $_SERVER['REQUEST_URI']);
 
         $this->pattern = $pattern;
 
@@ -303,32 +359,32 @@ class Router extends AppMethods implements RouterInterface {
      * @param type $route
      * @return string extract variables in the url
      */
-    private function ExtractVariable($route){
-
-        if(strpos($route,'{'))
-        {
-            $routeParams = explode('/', $route);
-            $index = 0;
-
-            foreach($routeParams as $param)
-            {
-                if(preg_match('(\\{.*?\\})', $param))
-                {
-                    if(isset($this->params[$index]))
-                    {
-                        $param = $this->funcVariables[$param] = $this->params[$index];
-                    }
-                }
-
-                $routeParams[$index] = $param;
-                $index++;
-            }
-
-            return implode('/', $routeParams);
-        }
-
-        return $route;
-    }
+//    private function ExtractVariable($route){
+//
+//        if(strpos($route,'{'))
+//        {
+//            $routeParams = explode('/', $route);
+//            $index = 0;
+//
+//            foreach($routeParams as $param)
+//            {
+//                if(preg_match('(\\{.*?\\})', $param))
+//                {
+//                    if(isset($this->params[$index]))
+//                    {
+//                        $param = $this->funcVariables[$param] = $this->params[$index];
+//                    }
+//                }
+//
+//                $routeParams[$index] = $param;
+//                $index++;
+//            }
+//
+//            return implode('/', $routeParams);
+//        }
+//
+//        return $route;
+//    }
 
     private function GetControllerNamespace($bundle, $controller){
 
@@ -363,9 +419,9 @@ class Router extends AppMethods implements RouterInterface {
      * @param type $route
      * @return string Gets a route and its details
      */
-    protected function GetRoute($route)
+    public function GetRoute($route, array $variables = array())
     {
-        return  $this->SetRoute($route);
+        return  $this->SetRoute($route, $variables);
     }
 
     /**
@@ -375,12 +431,12 @@ class Router extends AppMethods implements RouterInterface {
      */
     private function GetRawRoute($route = null){
 
-        if(!empty($route))
+        if(! empty($route))
             $this->route = $route;
 
-        if(\Get::Route($this->route))
+        if(self::Get($this->route))
         {
-            $this->lastRoute = $this->routePattern = \Get::Route($this->route.'.Pattern');
+            $this->lastRoute = $this->routePattern = self::Get($this->route.'.Pattern');
 
             return $this->lastRoute;
         }
@@ -407,10 +463,10 @@ class Router extends AppMethods implements RouterInterface {
         if(!empty($route))
             $this->route = $route;
 
-        if(isset(self::$Route[$this->route]))
+        if(isset(self::$routes[$this->route]))
         {
-            $this->routePattern = $this->lastRoute = self::$Route[$this->route]['Pattern'];
-            $controller = self::$Route[$this->route]['Controller'];
+            $this->routePattern = $this->lastRoute = self::$routes[$this->route]['Pattern'];
+            $controller = self::$routes[$this->route]['Controller'];
 
             unset($_SESSION['routeError']);
 
@@ -493,11 +549,11 @@ class Router extends AppMethods implements RouterInterface {
      * @return boolean - true on success, false on failure<br />
      * <br />Checks wether the page landed on is an exception to session security or not.
      */
-    protected function IsPageAllowed(){
+    public function IsPageAllowed($patterns){
 
         $this->SetPattern();
 
-        foreach(\Get::Config('Auth.Security.Bypass') as $pattern)
+        foreach($patterns as $pattern)
         {
             $pattern = '/'.str_replace('/', '\\/', $pattern).'/i';
 
@@ -536,7 +592,7 @@ class Router extends AppMethods implements RouterInterface {
         else
             $this->SetPattern ();
 
-        foreach(self::$Route as $routeKey => $routes)
+        foreach(self::$routes as $routeKey => $routes)
         {
             if($this->ExtractVariable($routes['Pattern']) == $this->pattern)
             {
@@ -554,5 +610,35 @@ class Router extends AppMethods implements RouterInterface {
         );
 
         $this->ForwardToController('404', $error);
+    }
+
+    /**
+     *
+     * @param string $key
+     * @param array $routeParams
+     */
+    public static function Set($key, array $routeParams)
+    {
+        // Get router here somehow
+        self::$routes[$key] = $routeParams;
+    }
+
+    /**
+     *
+     * @param mixed any number of params
+     * @return Route variable
+     * @example Route('Application','Welcome');
+     */
+    public static function Get()
+    {
+        $keys = func_get_args();
+        $route = \Get::ProcessGet(self::$routes, $keys);
+
+        if(! $route)
+        {
+            \Application\Core\Debugger::ThrowStaticError("Could not get route '$keys'");
+        }
+
+        return $route;
     }
 }

@@ -26,8 +26,7 @@ class Loader extends Debugger{
 
     public static
             $environment,
-            $appConfiguration,
-            $scriptStartTime;
+            $appConfiguration;
 
     const BOOSTRAP_FILE = 'bootstrap.cache.php';
 
@@ -36,6 +35,8 @@ class Loader extends Debugger{
         require __DIR__ . '/Core/Lib/Set.Class.php';
         require __DIR__ . '/Core/Config/AppDirs.Config.php';
         require __DIR__ . '/Core/Lib/Get.Class.php';
+
+        return $this;
     }
 
     /**
@@ -62,7 +63,6 @@ class Loader extends Debugger{
             'Server',
             'Request',
             'Response',
-            'Router',
             'Template',
             'Application',
             'Database',
@@ -79,8 +79,13 @@ class Loader extends Debugger{
     {
         $this
             ->loadCoreLib()
+            ->GetComponents();
+    }
+
+    public function loadBundleConfigs()
+    {
+        $this
             ->LoadCoreStruct()
-//            ->GetComponents()
             ->LoadBundles();
     }
 
@@ -537,12 +542,13 @@ class Loader extends Debugger{
 
     public function LoadGenesis() {
 
-        $this->initLibs();
+        AppKernal::$scriptStartTime = microtime(true);
+        $this->initLibs()
+            ->CheckDependencies()
+            ->LoadFramework()
+            ;
 
-        self::$scriptStartTime = microtime(true);
-
-        $this->CheckDependencies()
-             ->LoadFramework();
+        return new Core\Application();
     }
 
     private function CheckDependencies(){
@@ -577,19 +583,6 @@ class Loader extends Debugger{
                 'Routes' => self::$routes
             );
 
-        return self::$$fileType;
-    }
-
-    /**
-     *
-     * @param string Append text
-     * @return mixed Returns execution time in Milliseconds
-     */
-    public function GetExecutionTime($text = 'Milliseconds')
-    {
-        if($text)
-            $text = ' '.$text;
-
-        return round(((microtime(true) - self::$scriptStartTime)), 5).$text;
+        return self::$fileType;
     }
 }

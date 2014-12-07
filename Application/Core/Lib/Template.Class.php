@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Template extends Router {
+class Template extends AppMethods {
 
     private
             $title,
@@ -263,7 +263,7 @@ class Template extends Router {
         return $this;
     }
 
-    protected function GetBundleFooter($bundle)
+    protected function GetBundleFooter($bundle = null)
     {
         if(! $bundle)
             $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController (get_called_class ()));
@@ -389,7 +389,7 @@ class Template extends Router {
 
     public function Path($route, array $routeVars = array())
     {
-        return $this->setRoute($route, $routeVars);
+        return $this->getComponent('Router')->GetRoute($route, $routeVars);
     }
 
     /**

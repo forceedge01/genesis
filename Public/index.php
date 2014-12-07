@@ -15,5 +15,12 @@ use Application\AppKernal;
 $loader = AppKernal::getLoader();
 // LoadBootstrap for production only
 //$loader->LoadBoostrap();
-$loader->LoadGenesis();
+$app = $loader->LoadGenesis();
 AppKernal::Initialize();
+$router = $app->getComponent('Router');
+$loader->loadBundleConfigs();
+
+if(! $router->ForwardRequest())
+{
+    $router->ForwardToController('404', array('pattern'=> $router->GetPattern()));
+}

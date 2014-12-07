@@ -51,6 +51,27 @@ class Loader extends Debugger{
         );
     }
 
+    public function getFiles()
+    {
+        return array(
+            'Hooks',
+            'ObjectManager',
+            'AppMethods',
+            'DependencyInjector',
+            'EventHandler',
+            'Server',
+            'Request',
+            'Response',
+            'Router',
+            'Template',
+            'Application',
+            'Database',
+            'DatabaseManager',
+            'Session',
+            'EventDispatcher',
+        );
+    }
+
     /**
      * Loads the framework - consider making protected
      */
@@ -149,26 +170,6 @@ class Loader extends Debugger{
         {
             self::$bundles[] = $bundlesDIR . str_replace('\\', '/', $bundle);
         }
-    }
-
-    public function getFiles()
-    {
-        return array(
-            'Hooks',
-            'ObjectManager',
-            'AppMethods',
-            'DependencyInjector',
-            'EventHandler',
-            'Request',
-            'Response',
-            'Router',
-            'Template',
-            'Application',
-            'Database',
-            'DatabaseManager',
-            'Session',
-            'EventDispatcher',
-        );
     }
 
     /**

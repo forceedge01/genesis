@@ -10,11 +10,12 @@ class AppKernal {
     public static function ComponentsRegister()
     {
         \Set::Component('Auth', 'Auth\Auth');
+        \Set::Component('HTMLGenerator', 'HTMLGenerator\HtmlGenerator');
     }
 
     public static function BundlesRegister()
     {
-        
+
     }
 
     public static function GetHost()

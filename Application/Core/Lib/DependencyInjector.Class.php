@@ -38,10 +38,9 @@ class DependencyInjector extends AppMethods implements DependencyInjectorInterfa
 
         foreach($dependencies as $inject)
         {
-            $inject = strtolower($inject);
-            if(strpos($inject, 'component:') === 0)
+            if(preg_match('/^component:/i', $inject))
             {
-                $class = str_replace('component:', '', $inject);
+                $class = preg_replace('/^component:/i', '', $inject);
                 $dependenciesObjects[] = $this->GetComponent($class);
 
                 continue;

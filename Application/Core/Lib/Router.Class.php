@@ -16,12 +16,11 @@ class Router extends AppMethods implements RouterInterface {
             $routePattern,
             $route,
             $params,
-            $Router,
             $pattern,
             $ControllerDependencies = array(),
             $ActionDependencies = array();
 
-    public static $Route = array(), $LastRoute;
+    public static $Route = array(), $LastRoute, $patterns = array();
 
     public function __construct() {
 

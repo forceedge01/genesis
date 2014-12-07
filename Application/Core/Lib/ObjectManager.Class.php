@@ -23,7 +23,7 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
         {
             if(! isset(\Application\Loader::$components[$component]))
             {
-                Debugger::ThrowStaticError("Component $component is not registered");
+                Debugger::ThrowStaticError("Component $component is not registered, requested by " . get_called_class());
             }
 
             // Get class from configured components array

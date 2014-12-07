@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components;
+namespace HTMLGenerator;
 
 /**
  * Author: Wahab Qureshi.

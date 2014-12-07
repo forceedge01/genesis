@@ -41,10 +41,13 @@ class EventDispatcher extends AppMethods implements EventDispatcherInterface{
         // Include observers from config bundle file
         $configObservers = \Get::Config($bundle.'.Observers');
 
-        // Merge event observers
-        $allEvents = array_merge($events, $configObservers);
+        if(is_array($configObservers))
+        {
+            // Merge event observers
+            $events = array_merge($events, $configObservers);
+        }
 
         // merge and return results
-        return (is_array(self::$observers)) ? array_merge(self::$observers, $allEvents) : $allEvents;
+        return (is_array(self::$observers)) ? array_merge(self::$observers, $events) : $events;
     }
 }

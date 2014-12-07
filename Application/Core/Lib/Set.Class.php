@@ -24,6 +24,7 @@ class Set extends Application\Loader{
     public static function Route($key, array $routeParams)
     {
         Application\Core\Router::$Route[$key] = $routeParams;
+        Application\Core\Router::$patterns[] = $routeParams['Pattern'];
     }
 
     public static function OverwriteConfig($stringKey, $value)

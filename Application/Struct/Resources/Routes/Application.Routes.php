@@ -3,5 +3,5 @@
 Set::Route('Application', array(
 
     'Controller' => ':Application:index',
-    'Pattern' => '/',
+    'Pattern' => '/{id}/something',
 ));

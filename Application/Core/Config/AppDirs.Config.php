@@ -3,7 +3,7 @@
 // Core folder paths
 
 // Set to custom url if it involves use of index.php
-define('HOST', Application\Core\AppKernal::GetHost());
+define('HOST', Application\AppKernal::GetHost());
 
 define('ROOT', __DIR__ . '/../../../');
 

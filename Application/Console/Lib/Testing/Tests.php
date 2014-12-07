@@ -147,9 +147,9 @@ class Test extends BaseTestingRoutine{
     {
         require_once ROOT . '/Application/Loader.php';
 
-        \Application\Core\Loader::loadFramework();
+        \Application\Loader::loadFramework();
 
-        $testClassesAndComponents = \Application\Core\Loader::loadClassesAndComponentsTestFiles();
+        $testClassesAndComponents = \Application\Loader::loadClassesAndComponentsTestFiles();
 
         foreach($testClassesAndComponents as $classOrComponent)
         {
@@ -157,7 +157,7 @@ class Test extends BaseTestingRoutine{
             $this -> testClassesAndComponents[] = end($chunks);
         }
 
-        $this -> testBundles = \Application\Core\Loader::loadBundleTestFiles();
+        $this -> testBundles = \Application\Loader::loadBundleTestFiles();
 
         $b = array();
 

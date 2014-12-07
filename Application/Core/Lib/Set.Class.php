@@ -1,7 +1,7 @@
 <?php
 
 
-class Set extends Application\Core\Loader{
+class Set {
 
     public function __construct() {}
     private function __clone() {}
@@ -13,17 +13,7 @@ class Set extends Application\Core\Loader{
      */
     public static function Config($key, $config)
     {
-        self::$appConfiguration[$key] = $config;
-    }
-
-    /**
-     *
-     * @param string $key
-     * @param array $routeParams
-     */
-    public static function Route($key, array $routeParams)
-    {
-        Application\Core\Router::$Route[$key] = $routeParams;
+        \Application\Loader::$appConfiguration[$key] = $config;
     }
 
     public static function OverwriteConfig($stringKey, $value)
@@ -39,7 +29,7 @@ class Set extends Application\Core\Loader{
             {
                 $ptr[$key] = array();
             }
-            
+
             $ptr = &$ptr[$key];
         }
 
@@ -52,6 +42,11 @@ class Set extends Application\Core\Loader{
             $ptr[] = $value;
         }
 
-        self::$appConfiguration = array_replace_recursive(self::$appConfiguration, $result);
+        \Application\Loader::$appConfiguration = array_replace_recursive(self::$appConfiguration, $result);
+    }
+
+    public static function Component($alias, $class)
+    {
+        \Application\Loader::$components[$alias] = $class;
     }
 }

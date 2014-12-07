@@ -13,7 +13,7 @@ class Get{
     public static function Config()
     {
         $keys = func_get_args();
-        $config = self::ProcessGet(Application\Core\Loader::$appConfiguration, $keys);
+        $config = self::ProcessGet(Application\Loader::$appConfiguration, $keys);
 
         if(is_array($config))
         {
@@ -61,20 +61,7 @@ class Get{
         return $config;
     }
 
-    /**
-     *
-     * @param mixed any number of params
-     * @return Route variable
-     * @example Route('Application','Welcome');
-     */
-    public static function Route()
-    {
-        $keys = func_get_args();
-
-        return self::ProcessGet(Application\Core\Router::$Route, $keys);
-    }
-
-    private static function ProcessGet($globalVariable, $keys)
+    public static function ProcessGet($globalVariable, $keys)
     {
         $configs = array();
 
@@ -88,8 +75,8 @@ class Get{
             reset($configs);
             return $configs[key($configs)];
         }
-        else
-            return $configs;
+
+        return $configs;
     }
 
     private static function GetGlobal($config, $key)

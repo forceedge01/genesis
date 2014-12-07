@@ -1,13 +1,13 @@
 <?php
 
-namespace Application\Components;
+namespace HTMLGenerator;
 
 /**
  * Author: Wahab Qureshi.
  */
-use Application\Core\Router;
+use Application\Core\Template;
 
-class HTMLGenerator extends Router{
+class HTMLGenerator extends \Application\Core\Template{
 
     private $formname; //used for saving and retrieving form from database
     private $form, $errors = array(), $errorColor, $elements = array(), $element = array();
@@ -15,6 +15,8 @@ class HTMLGenerator extends Router{
     private $host, $database, $username, $password, $link;
 
     function __construct($params = null) {
+
+        $this->router = $this->getComponent('Router');
     }
 
     public function Form($name, array $params = array())
@@ -572,14 +574,6 @@ class HTMLGenerator extends Router{
 
     function showError() {
         pre($this->errors);
-    }
-
-    function render() {
-        if (!empty($this->errors))
-            foreach ($this->errors as $errorName => $error)
-                echo '<font color="' . $this->errorColor . '">', $errorName, ': ', $error, '</font><br />';
-
-        echo $this->filterForRender() . '</form>';
     }
 
     private function filterForRender($var = null) {

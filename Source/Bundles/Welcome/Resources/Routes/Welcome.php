@@ -1,42 +1,43 @@
 <?php
 
+use Router\Router;
 
-Set::Route('Welcome', array(
+Router::Set('Welcome', array(
 
       "Controller" => "Welcome:Welcome:index",
       "Pattern" => "/Welcome/"
 
 ));
 
-Set::Route('Welcome_List', array(
+Router::Set('Welcome_List', array(
 
       "Controller" => "Welcome:Welcome:list",
       "Pattern" => "/Welcome/List/"
 
 ));
 
-Set::Route('Welcome_View', array(
+Router::Set('Welcome_View', array(
 
       "Controller" => "Welcome:Welcome:view",
       "Pattern" => "/Welcome/View/{id}/"
 
 ));
 
-Set::Route('Welcome_Create', array(
+Router::Set('Welcome_Create', array(
 
       "Controller" => "Welcome:Welcome:create",
       "Pattern" => "/Welcome/Create/"
 
 ));
 
-Set::Route('Welcome_Edit', array(
+Router::Set('Welcome_Edit', array(
 
       "Controller" => "Welcome:Welcome:edit",
       "Pattern" => "/Welcome/Edit/{id}/"
 
 ));
 
-Set::Route('Welcome_Delete', array(
+Router::Set('Welcome_Delete', array(
 
       "Controller" => "Welcome:Welcome:delete",
       "Pattern" => "/Welcome/Delete/{id}/"

@@ -1,42 +1,38 @@
 <?php
 
-namespace Application\Core;
+namespace Application;
 
 
-require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
-require __DIR__ . '/Core/Lib/Debugger.Class.php';
-require __DIR__ . '/Loader.php';
+class AppKernal {
 
-class AppKernal extends Loader{
+    private static $loader, $app;
+    public static $scriptStartTime;
 
-    public static
-            $phpVersion,
-            $msyqlVersion,
-            $scriptStartTime;
-
-    public static function initLibs()
+    public static function ComponentsRegister()
     {
-        require __DIR__ . '/Core/Lib/Set.Class.php';
-        require __DIR__ . '/Core/Config/AppDirs.Config.php';
-        require __DIR__ . '/Core/Lib/Get.Class.php';
+        \Set::Component('HTMLGenerator', 'HTMLGenerator\HTMLGenerator');
+        \Set::Component('Router', 'Router\Router');
+        \Set::Component('Auth', 'Auth\Auth');
+    }
+
+    public static function BundlesRegister()
+    {
+
     }
 
     public static function GetHost()
     {
-        if(isset($_SERVER['HTTPS']))
-            $http = 'https';
-        else
+        if(isset($_SERVER['HTTP_HOST']))
+        {
             $http = 'http';
 
-        if(isset($_SERVER['HTTP_HOST']))
-            return "{$http}://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
-    }
+            if(isset($_SERVER['HTTPS']))
+            {
+                $http = 'https';
+            }
 
-    public static function LoadGenesis() {
-        self::initLibs();
-        self::$scriptStartTime = microtime(true);
-        self::CheckDependencies();
-        self::LoadFramework();
+            return "{$http}://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
+        }
     }
 
     /**
@@ -44,45 +40,22 @@ class AppKernal extends Loader{
      */
     public static function Initialize() {
 
-        $app = new Application();
+        self::ComponentsRegister();
+        self::BundlesRegister();
+    }
 
-        if(!$app->ForwardRequest())
+    public static function getLoader() {
+
+        if(self::$loader)
         {
-            $app->ForwardToController('404', array('pattern'=> $app->GetPattern()));
+            return self::$loader;
         }
-    }
 
-    private static function CheckDependencies(){
+        require_once __DIR__ . '/Loader.php';
 
-        $version = '5.3.0';
+        self::$loader = new \Application\Loader();
 
-        if(!version_compare(phpversion(), $version, '>='))
-            die('You need to update your php version, GENESIS requires atleast php '.$version);
-    }
-
-    /**
-     *
-     * @param type $fileType
-     * @return type
-     * Gets info on file types loaded
-     */
-    public static function Get($fileType = null){
-
-        if(emtpy($fileType))
-            return array(
-                'Interfaces' => self::$interfaces,
-                'Traits' => self::$traits,
-                'Bundles' => self::$bundles,
-                'Classes' => self::$classes,
-                'Components' => self::$components,
-                'Configs' => self::$configs,
-                'Controllers' => self::$controllers,
-                'Files' => self::$files,
-                'Models' => self::$models,
-                'Routes' => self::$routes
-            );
-
-        return self::$$fileType;
+        return self::$loader;
     }
 
     /**

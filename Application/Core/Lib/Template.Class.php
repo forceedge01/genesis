@@ -4,11 +4,10 @@ namespace Application\Core;
 
 
 
-class Template extends Router {
+class Template extends AppMethods {
 
     private
             $title,
-            $bundle,
             $html,
             $header,
             $footer,
@@ -25,9 +24,9 @@ class Template extends Router {
      * @param string $template - template to render
      * @param array $params - The parameters to pass to a controller
      */
-    private function GetView($template){
+    private function GetView($templatePath){
 
-        list($bundle, $controller, $template) = explode(':', $template);
+        list($bundle, $controller, $template) = explode(':', $templatePath);
 
         if ($bundle) {
 
@@ -264,7 +263,7 @@ class Template extends Router {
         return $this;
     }
 
-    protected function GetBundleFooter($bundle)
+    protected function GetBundleFooter($bundle = null)
     {
         if(! $bundle)
             $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController (get_called_class ()));
@@ -321,7 +320,7 @@ class Template extends Router {
      * @param mixed $params
      * @return html Will include a template and pass variables without extracting them, prefereable use within templates to include other templates
      */
-    public function IncludeView($template, $params)
+    public function IncludeView($template, array $params = array())
     {
         return $this->RenderView($template, $params, false);
     }
@@ -390,7 +389,7 @@ class Template extends Router {
 
     public function Path($route, array $routeVars = array())
     {
-        return $this->setRoute($route, $routeVars);
+        return $this->getComponent('Router')->GetRoute($route, $routeVars);
     }
 
     /**
@@ -444,11 +443,16 @@ class Template extends Router {
 
     private function IncludeAssetDir($bundle, $assetType, $dir, $exclusions = array(), $append = null)
     {
+        if(! is_dir($dir))
+        {
+            Debugger::ThrowStaticError('Unable to include dir ' . $dir . ' in ' . __METHOD__ . ' requested by ' . get_called_class(), __FILE__, __LINE__);
+        }
+
         $assets = scandir($dir);
 
         foreach($assets as $asset)
         {
-            if($asset != '.' and $asset != '..' and ! $this->Variable($exclusions)->Search($asset))
+            if($asset != '.' and $asset != '..' and ! array_search($asset, $exclusions))
             {
                 switch($assetType)
                 {
@@ -693,14 +697,21 @@ class Template extends Router {
         return $style;
     }
 
-    private function associateAssetBundle($param){
+    private function associateAssetBundle($param)
+    {
+        $asset = null;
 
-        list($bundle, $asset) = explode(':', $param);
+        if(strpos($param, ':') !== false)
+        {
+            list($bundle, $asset) = explode(':', $param);
 
-        if($bundle)
-            return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $bundle .'/'. $asset;
+            if($bundle)
+                $path = \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Bundles/' . $bundle .'/'. $asset;
+        }
 
-        return \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Common/' .$asset;
+        $path = \Get::Config('APPDIRS.TEMPLATING.ASSETS_FOLDER') . 'Common/' .$asset;
+
+        return $path;
     }
 
     /**

@@ -11,25 +11,25 @@ class Request extends AppMethods implements RequestInterface{
     public
             $post,
             $get,
-            $method,
+//            $method,
             $server,
-            $time,
-            $uri,
+//            $time,
+//            $uri,
             $remoteIp,
-            $self,
+//            $self,
             $scheme,
             $domain;
 
     public function __construct() {
 
+        $this->server = new Lib\Server();
         $this->post = $_POST;
         $this->get = $_GET;
-        $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->time = $_SERVER['REQUEST_TIME'];
-        $this->uri = $_SERVER['REQUEST_URI'];
+//        $this->method = $_SERVER['REQUEST_METHOD'];
+//        $this->time = $_SERVER['REQUEST_TIME'];
+//        $this->uri = $_SERVER['REQUEST_URI'];
         $this->remoteIp = $this->RemoteAddress();
-        $this->self = $_SERVER['PHP_SELF'];
-        $this->server = $_SERVER;
+//        $this->self = $_SERVER['PHP_SELF'];
         $this->scheme = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '');
         $this->domain = HOST;
     }
@@ -51,15 +51,12 @@ class Request extends AppMethods implements RequestInterface{
      */
     public function IsAjax(){
 
-        if($this->Variable($_SERVER['HTTP_X_REQUESTED_WITH'])->IsNotEmpty()->ToLower()->Equals('xmlhttprequest')) {
-
+        if($this->server->get('HTTP_X_REQUESTED_WITH') == 'xmlhttprequest')
+        {
             return $this;
         }
-        else{
 
-            return false;
-        }
-
+        return false;
     }
 
     /**
@@ -69,7 +66,7 @@ class Request extends AppMethods implements RequestInterface{
      */
     public function IsPost($key = null){
 
-        if($this->Variable($_SERVER['REQUEST_METHOD'])->Equals('POST')) {
+        if($this->server->get('REQUEST_METHOD') === 'POST') {
 
             if(!empty($key)){
 
@@ -95,7 +92,7 @@ class Request extends AppMethods implements RequestInterface{
      */
     public function IsGet($key = null){
 
-        if($this->Variable($_SERVER['REQUEST_METHOD'])->Equals('GET')) {
+        if($this->server->get('REQUEST_METHOD') === 'GET') {
 
             if(!empty($key)){
 
@@ -269,7 +266,7 @@ class Request extends AppMethods implements RequestInterface{
 
     public function IsProxiedRequest()
     {
-        if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) || isset($_SERVER['HTTP_CLIENT_IP']))
+        if($this->server->get('HTTP_X_FORWARDED_FOR') || $this->server->get('HTTP_CLIENT_IP'))
             return true;
 
         return false;
@@ -283,7 +280,7 @@ class Request extends AppMethods implements RequestInterface{
 
     public function IsLocal()
     {
-        if($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'])
+        if($this->server->get('REMOTE_ADDR') == $this->server->get('SERVER_ADDR'))
             return true;
 
         return false;
@@ -291,6 +288,6 @@ class Request extends AppMethods implements RequestInterface{
 
     public function GetStatus()
     {
-        return $_SERVER["REDIRECT_STATUS"];
+        return $this->server->get('REDIRECT_STATUS');
     }
 }

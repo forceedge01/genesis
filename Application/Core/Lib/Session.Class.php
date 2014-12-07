@@ -8,10 +8,15 @@ class Session extends Request{
 
     protected $User;
 
-    public function Start($name = null){
-
+    public function Start($name = null)
+    {
         session_name($name);
-        session_start();
+
+        if (session_status() == PHP_SESSION_NONE)
+        {
+            session_start();
+        }
+
         return $this;
     }
 

@@ -6,8 +6,21 @@
  * Version: 0.5.11-22
  */
 
-// Loads the file responsible for loading the framework.
-require __DIR__ . '/../Application/Bootstrap.php';
+require_once '../Application/AppKernal.php';
+
+use Application\AppKernal;
+
 
 // Initialize the kernel
-Application\Core\AppKernal::Initialize();
+$loader = AppKernal::getLoader();
+// LoadBootstrap for production only
+//$loader->LoadBoostrap();
+$app = $loader->LoadGenesis();
+AppKernal::Initialize();
+$router = $app->getComponent('Router');
+$loader->loadBundleConfigs();
+
+if(! $router->ForwardRequest())
+{
+    $router->ForwardToController('404', array('pattern'=> $router->GetPattern()));
+}

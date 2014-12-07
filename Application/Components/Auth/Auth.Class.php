@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Components;
+namespace Auth;
 
 
 
@@ -12,12 +12,14 @@ class Auth extends Template{
             $username,
             $password,
             $authTable,
-            $authField;
+            $authField,
+            $router;
 
     public function __construct(){
 
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
         $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
+        $this->router = $this->getComponent('Router');
     }
 
     public function SetPostParams()
@@ -47,19 +49,19 @@ class Auth extends Template{
                 $session->Set('AccessedRoute', $this->getRouteFromPattern());
                 $this
                     ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
-                        ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                        ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
             }
         }
         else
         {
             if(!$session->IsSessionKeySet('login_expires')
-                    AND !$this->IsPageAllowed()
+                    AND !$this->GetComponent('Router')->IsPageAllowed(\Get::Config('Auth.Security.Bypass'))
                         AND !$session->IsSessionKeySet('route_error'))
             {
                 $session->Set('AccessedRoute', $this->getRouteFromPattern());
                 $this
                     ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
-                        ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                        ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
             }
         }
 
@@ -86,7 +88,7 @@ class Auth extends Template{
                     $session->Destroy()->StartSecure();
                     $session->Set('AccessedRoute', $this->getRouteFromPattern());
                     $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))
-                            ->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+                            ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
             }
         }
@@ -94,13 +96,13 @@ class Auth extends Template{
 
     public function ForwardToLoginPage($message = null)
     {
-        $this->SetFlash($message)->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->SetFlash($message)->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     public function Logout($message = null)
     {
         $this->GetCoreObject('Session')->Destroy()->StartSecure(\Get::Config('Application.Session.Secure.HttpsSecure'), \Get::Config('Application.Session.Secure.HttpOnly'))->RegenerateId(true);
-        $this->SetFlash($message)->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->SetFlash($message)->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     /**
@@ -181,10 +183,10 @@ class Auth extends Template{
     {
         if($this->GetCoreObject('Session')->IsSessionKeySet('AccessedRoute'))
         {
-            $this->ForwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
+            $this->router->ForwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
         }
 
-        $this->ForwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
+        $this->router->ForwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
     }
 
     /**

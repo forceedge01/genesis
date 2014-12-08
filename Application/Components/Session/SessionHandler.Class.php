@@ -1,16 +1,16 @@
 <?php
 
-namespace Application\Core;
+namespace Session;
 
 
 
-class Session extends Request{
+class SessionHandler {
 
     protected $User;
 
-    public function Start($name = null)
+    public function Start()
     {
-        session_name($name);
+        session_name();
 
         if (session_status() == PHP_SESSION_NONE)
         {
@@ -180,16 +180,7 @@ class Session extends Request{
 
     public function GetUser()
     {
-        return $this->GetEntity('users:users')->FindBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->Get('username')));
-    }
-
-    public function GetServerInfo($key)
-    {
-        return $_SERVER[$key];
-    }
-
-    public function GetBrowserAgent()
-    {
-        return $_SERVER['HTTP_USER_AGENT'];
+//        return $this->GetEntity('users:users')->FindBy(array(\Get::Config('Auth.DBTable.AuthColumnName') => $this->Get('username')));
+        return false;
     }
 }

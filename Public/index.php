@@ -15,9 +15,20 @@ use Application\AppKernal;
 $loader = AppKernal::getLoader();
 // LoadBootstrap for production only
 //$loader->LoadBoostrap();
-$app = $loader->LoadGenesis();
+
+// Load genesis framework
+$loader->LoadGenesis();
+
+// Initialize appkernal settings
 AppKernal::Initialize();
+
+// New app
+$app = $loader->getAppInstance();
+
+// Instantiate router instance and forward the request
 $router = $app->getComponent('Router');
+
+// Register bundle configurations
 $loader->loadBundleConfigs();
 
 if(! $router->ForwardRequest())

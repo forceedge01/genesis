@@ -17,7 +17,7 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
      * Returns an existing object or creates a new one if it does not exist in the current scope
      * Loads components config files in Application/Resources/Config folder
      */
-    public function GetComponent($component, $args = null) {
+    public function GetComponent($component) {
 
         if (! isset(self::$objects[$component]))
         {
@@ -35,19 +35,14 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
             // Check for component dependencies
             $dependencies = \Get::Config("$component.Dependencies");
 
-            if($args)
-            {
-                $dependencies[] = $args;
-            }
-
             // Instantiate component
             if(is_array($dependencies))
             {
-                self::$objects[$component] = $this->GetCoreObject ('DependencyInjector')->Inject($class, array_merge($dependencies, $args));
+                self::$objects[$component] = $this->GetCoreObject ('DependencyInjector')->Inject($class, $dependencies);
             }
             else
             {
-                self::$objects[$component] = self::InstantiateObject ($class, $args);
+                self::$objects[$component] = self::InstantiateObject ($class);
             }
         }
 
@@ -60,9 +55,9 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
      * @param type $args
      * @return \Application\Core\obj
      */
-    public static function InstantiateObject($obj, $args = null)
+    public static function InstantiateObject($obj)
     {
-        return new $obj($args);
+        return new $obj();
     }
 
     /**
@@ -95,52 +90,6 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
     {
         self::ThrowStaticError("Class '<b>$class</b>' was not found, " . __FUNCTION__ ."() from <b>{$path}.|Class|Component|.php</b> but file was not found, called from ".  get_called_class());
     }
-
-    /**
-     *
-     * @param type $object
-     * @param type $args
-     * @return boolean
-     */
-//    public function GetObject($object, $args = null)
-//    {
-//        $objectType = $this->ExplodeAndGetLastChunk($object, '\\');
-//        $objectClass = $objectType[0];
-//        $type = $objectType[1];
-//
-//        if((! isset(self::$objects[$object])))
-//        {
-//            if(! $type)
-//            {
-//                if(class_exists($object, false))
-//                {
-//                    self::$objects[$object] = self::InstantiateObject($object, $args);
-//                }
-//                else
-//                {
-//                    $this->GetCoreObject($object);
-//                }
-//            }
-//            else
-//            {
-//                if($type == 'Core')
-//                {
-//                    $this->GetCoreObject($object, $args);
-//                }
-//                else
-//                {
-//                    $this->GetComponent($object, $args);
-//                }
-//            }
-//        }
-//
-//        if(! isset(self::$objects[$object]))
-//        {
-//            $this->throwClassError($object);
-//        }
-//
-//        return self::$objects[$object];
-//    }
 
     /**
      *
@@ -231,38 +180,11 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
 
     /**
      *
-     * @return \Application\Components\Variable
-     */
-    public function GetVariableManager ( )
-    {
-        return $this ->GetCoreObject('Variable');
-    }
-
-    /**
-     *
      * @return DatabaseManager
      */
     public function GetDatabaseManager ( )
     {
         return $this ->GetCoreObject('DatabaseManager');
-    }
-
-    /**
-     *
-     * @return Router
-     */
-    public function GetRouterManager ( )
-    {
-        return $this ->GetCoreObject('Router');
-    }
-
-    /**
-     *
-     * @return Session
-     */
-    public function GetSessionManager ( )
-    {
-        return $this ->GetCoreObject('Session');
     }
 
     /**

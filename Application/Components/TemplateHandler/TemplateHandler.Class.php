@@ -1,17 +1,20 @@
 <?php
 
-namespace Application\Core;
+namespace TemplateHandler;
 
 
+use Application\Core\Interfaces\Template as TemplateInterface;
+use Application\Core\AppMethods;
 
-class Template extends AppMethods {
+class TemplateHandler extends AppMethods implements TemplateInterface {
 
     private
             $title,
             $html,
             $header,
             $footer,
-            $divs;
+            $divs,
+            $classCalledFrom;
 
     public static
             $cssFiles = array(),
@@ -85,8 +88,8 @@ class Template extends AppMethods {
 
     private function ExportGlobalVars()
     {
-        $this->server = $this->ArrayToObject($_SERVER);
-        $this->Session = $this->ArrayToObject($_SESSION);
+//        $this->server = $this->ArrayToObject($_SERVER);
+//        $this->Session = $this->ArrayToObject($_SESSION);
 
         return $this;
     }
@@ -104,7 +107,6 @@ class Template extends AppMethods {
     private function ProcessOutput($templateUrl, $params)
     {
         extract($params, EXTR_OVERWRITE);
-
         ob_start();
 
         if(is_file($templateUrl['template']))
@@ -135,10 +137,10 @@ class Template extends AppMethods {
         return $this->html;
     }
 
-    public function IncludeHeaderAndFooter()
+    public function IncludeHeaderAndFooter($class)
     {
-        $this->header = true;
-        $this->footer = true;
+        $this->IncludeHeader($class);
+        $this->IncludeFooter($class);
 
         return $this;
     }
@@ -226,8 +228,9 @@ class Template extends AppMethods {
         $this->ForwardToController('Template_Not_Found', $params);
     }
 
-    public function IncludeHeader()
+    public function IncludeHeader($class)
     {
+        $this->classCalledFrom = $class;
         $this->header = true;
 
         return $this;
@@ -236,7 +239,7 @@ class Template extends AppMethods {
     protected function GetBundleHeader($bundle = null)
     {
         if(! $bundle)
-            $bundle = $this->GetBundleFromName ($this->GetClassFromNameSpacedController (get_called_class ()));
+            $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController ($this->classCalledFrom));
 
         $path = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
                 $bundle.
@@ -256,8 +259,9 @@ class Template extends AppMethods {
         return $this;
     }
 
-    public function IncludeFooter()
+    public function IncludeFooter($class)
     {
+        $this->classCalledFrom = $class;
         $this->footer = true;
 
         return $this;
@@ -266,7 +270,7 @@ class Template extends AppMethods {
     protected function GetBundleFooter($bundle = null)
     {
         if(! $bundle)
-            $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController (get_called_class ()));
+            $bundle = $this->GetBundleFromName($this->GetClassFromNameSpacedController ($this->classCalledFrom));
 
         $path = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER').
                 $bundle.
@@ -299,16 +303,14 @@ class Template extends AppMethods {
 
         $template = $this->GetView($template);
 
-        if(!is_file($template['template'])){
+        if(! is_file($template['template'])){
 
             $this->ViewNotFound ($template['template']);
             exit;
         }
 
         ob_start();
-
         require $template['template'];
-
         $html = ob_get_clean();
 
         return $html;
@@ -513,7 +515,7 @@ class Template extends AppMethods {
      * @param type $array - the flash message to set
      * Set a flash message for the immidiate next template to be rendered, after displaying the message is deleted.
      */
-    protected function SetFlash($message) {
+    public function SetFlash($message) {
 
         if(!empty($message))
         {
@@ -538,7 +540,7 @@ class Template extends AppMethods {
      * @param type $array - The error message to display
      * Sets an Error message for the immidiate next template to be rendered, after displaying message is deleted.
      */
-    protected function SetError($message) {
+    public function SetError($message) {
 
         if($message)
         {
@@ -761,7 +763,7 @@ class Template extends AppMethods {
     public function GenerateOption($value, $label, $selected = null){
 
         $option .= "<option value='$value' ";
-        if($this->Variable($selected)->Equals($value)) $option .= 'selected="selected" ';
+        if($selected === $value) $option .= 'selected="selected" ';
         $option .= " >$label</option>";
 
         return $option;

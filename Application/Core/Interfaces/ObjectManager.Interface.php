@@ -6,9 +6,7 @@ namespace Application\Core\Interfaces;
 
 interface ObjectManager{
 
-    public function GetComponent( $object, $args );
-
-    // public function GetObject($object, $args );
+    public function GetComponent( $object );
 
     public function GetCoreObject( $object, $args );
 

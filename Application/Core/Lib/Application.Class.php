@@ -4,7 +4,7 @@ namespace Application\Core;
 
 
 
-class Application extends Template implements Interfaces\Application{
+class Application extends AppMethods implements Interfaces\Application{
 
     public
         $Request,
@@ -12,10 +12,9 @@ class Application extends Template implements Interfaces\Application{
 
     public function __construct() {
 
+        $this->checkForDependencies();
         parent::__construct();
-
         $this->BeforeApplicationHook();
-        $this->Request = $this->GetCoreObject('Request');
 
         if(\Get::Config('Application.Session.Enabled'))
         {
@@ -25,6 +24,23 @@ class Application extends Template implements Interfaces\Application{
             {
                 $this->GetComponent('Auth')->Init($session);
             }
+        }
+    }
+
+    private function checkForDependencies()
+    {
+        $deps = \Application\AppKernal::GenesisDependencies();
+
+        foreach($deps as $component => $interface)
+        {
+            $this->$component =  $this->getComponent($component);
+
+            if($this->$component and $this->$component instanceof $interface)
+            {
+                continue;
+            }
+
+            Debugger::ThrowStaticError("Component '$component' is required by Genesis and must implement the interface $interface", __FILE__, __LINE__);
         }
     }
 

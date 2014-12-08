@@ -5,9 +5,9 @@ namespace HTMLGenerator;
 /**
  * Author: Wahab Qureshi.
  */
-use Application\Core\Template;
+use TemplateHandler\TemplateHandler;
 
-class HTMLGenerator extends \Application\Core\Template{
+class HTMLGenerator extends TemplateHandler{
 
     private $formname; //used for saving and retrieving form from database
     private $form, $errors = array(), $errorColor, $elements = array(), $element = array();

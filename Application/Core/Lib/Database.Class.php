@@ -5,10 +5,9 @@ namespace Application\Core;
 
 use Application\Core\Interfaces\Database as DatabaseInterface;
 
-abstract class Database extends Template implements DatabaseInterface{
+abstract class Database extends AppMethods implements DatabaseInterface{
 
     private
-        $threadId,
         $host,
         $username,
         $password,

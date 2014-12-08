@@ -11,12 +11,8 @@ class Request extends AppMethods implements RequestInterface{
     public
             $post,
             $get,
-//            $method,
             $server,
-//            $time,
-//            $uri,
             $remoteIp,
-//            $self,
             $scheme,
             $domain;
 
@@ -25,11 +21,7 @@ class Request extends AppMethods implements RequestInterface{
         $this->server = new Lib\Server();
         $this->post = $_POST;
         $this->get = $_GET;
-//        $this->method = $_SERVER['REQUEST_METHOD'];
-//        $this->time = $_SERVER['REQUEST_TIME'];
-//        $this->uri = $_SERVER['REQUEST_URI'];
         $this->remoteIp = $this->RemoteAddress();
-//        $this->self = $_SERVER['PHP_SELF'];
         $this->scheme = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '');
         $this->domain = HOST;
     }

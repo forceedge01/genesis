@@ -2,8 +2,6 @@
 
 namespace Application;
 
-require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
-require __DIR__ . '/Core/Lib/Debugger.Class.php';
 
 use Application\Core\Debugger;
 
@@ -63,11 +61,9 @@ class Loader extends Debugger{
             'Server',
             'Request',
             'Response',
-            'Template',
             'Application',
             'Database',
             'DatabaseManager',
-            'Session',
             'EventDispatcher',
         );
     }
@@ -78,24 +74,19 @@ class Loader extends Debugger{
     public function LoadFramework()
     {
         $this
-            ->loadCoreLib()
-            ->GetComponents();
-    }
-
-    public function loadBundleConfigs()
-    {
-        $this
-            ->LoadCoreStruct()
-            ->LoadBundles();
-    }
-
-    private function LoadCoreLib()
-    {
-        $this
             ->Load('interfaces', \Get::Config('APPDIRS.CORE.INTERFACES_FOLDER'))
             ->FetchAllClasses();
 
         return $this;
+    }
+
+    public function loadBundleConfigs()
+    {
+        Core\Debugger::debugMessage('Loading bundle configuration files');
+
+        $this
+            ->LoadCoreStruct()
+            ->LoadBundles();
     }
 
     private function FetchAllClasses()
@@ -384,31 +375,6 @@ class Loader extends Debugger{
     }
 
     /**
-     * Gets a list of components available in the application.
-     */
-    private function GetComponents()
-    {
-        $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-        $components = scandir($base);
-        foreach($components as $component)
-        {
-            if($component != '.' and $component != '..')
-            {
-                $lowered = strtolower($component);
-
-                if(is_file($base.'/'.$component.'/Loader.php'))
-                {
-                    self::$components[$lowered] = $component; continue;
-                }
-
-                self::$components[$lowered] = $component . ' (Broken: Loader.php for component not found.)';
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      *
      * @param type $class
      * @return boolean
@@ -542,23 +508,24 @@ class Loader extends Debugger{
 
     public function LoadGenesis() {
 
+        Core\Debugger::debugMessage('Loading Genesis');
+
         AppKernal::$scriptStartTime = microtime(true);
         $this->initLibs()
-            ->CheckDependencies()
+//            ->CheckDependencies()
             ->LoadFramework()
             ;
 
-        return new Core\Application();
-    }
-
-    private function CheckDependencies(){
-
-        $version = '5.3.0';
-
-        if(!version_compare(phpversion(), $version, '>='))
-            die('You need to update your php version, GENESIS requires atleast php '.$version);
+        Core\Debugger::debugMessage('Loaded Genesis');
 
         return $this;
+    }
+
+    public function getAppInstance()
+    {
+        Core\Debugger::debugMessage('Instantiating new Application');
+
+        return new Core\Application();
     }
 
     /**

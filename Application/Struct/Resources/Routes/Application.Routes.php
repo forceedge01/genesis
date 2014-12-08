@@ -2,8 +2,7 @@
 
 use Router\Router;
 
-Router::Set('Application', array(
-
+Router::Add('Application', array(
     'Controller' => ':Application:index',
-    'Pattern' => '/{id}/something',
+    'Pattern' => '/',
 ));

@@ -3,23 +3,25 @@
 namespace Auth;
 
 
+use Session\SessionHandler;
+use Application\Core\AppMethods;
 
-use Application\Core\Template;
-
-class Auth extends Template{
+class Auth extends AppMethods{
 
     protected
             $username,
             $password,
             $authTable,
             $authField,
-            $router;
+            $router,
+            $templateHandler;
 
     public function __construct(){
 
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
         $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
         $this->router = $this->getComponent('Router');
+        $this->templateHandler = $this->getComponent('TemplateHandler');
     }
 
     public function SetPostParams()
@@ -38,7 +40,7 @@ class Auth extends Template{
     }
 
     // Refactor this whole method, consider moving to classes structure or something
-    public function Init(\Application\Core\Session $session)
+    public function Init(SessionHandler $session)
     {
         // Check for login interval expiration and authorized page view
         if($session->IsSessionKeySet('login_expires'))
@@ -48,7 +50,7 @@ class Auth extends Template{
                 $session->Destroy()->StartSecure();
                 $session->Set('AccessedRoute', $this->getRouteFromPattern());
                 $this
-                    ->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
+                    ->templateHandler->SetError(array('Logged Out' => \Get::Config('Auth.Security.Session.ExpireMessage')))
                         ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
             }
         }
@@ -60,7 +62,7 @@ class Auth extends Template{
             {
                 $session->Set('AccessedRoute', $this->getRouteFromPattern());
                 $this
-                    ->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
+                    ->templateHandler->setError(array('Access Denied' => \Get::Config('Auth.Security.AccessDeniedMessage')))
                         ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
             }
         }
@@ -87,7 +89,7 @@ class Auth extends Template{
                 {
                     $session->Destroy()->StartSecure();
                     $session->Set('AccessedRoute', $this->getRouteFromPattern());
-                    $this->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))
+                    $this->templateHandler->SetError(\Get::Config('Auth.Security.Session.Anti-Hijacking.Message'))
                             ->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
                 }
             }
@@ -96,13 +98,14 @@ class Auth extends Template{
 
     public function ForwardToLoginPage($message = null)
     {
-        $this->SetFlash($message)->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->templateHandler->SetFlash($message);
+        $this->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     public function Logout($message = null)
     {
         $this->GetCoreObject('Session')->Destroy()->StartSecure(\Get::Config('Application.Session.Secure.HttpsSecure'), \Get::Config('Application.Session.Secure.HttpOnly'))->RegenerateId(true);
-        $this->SetFlash($message)->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
+        $this->templateHandler->SetFlash($message)->router->ForwardTo(\Get::Config('Auth.Login.LoginRoute'));
     }
 
     /**
@@ -117,7 +120,7 @@ class Auth extends Template{
         {
             if(!$this->IsValidEmail($this->username))
             {
-                $this->SetError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
+                $this->templateHandler->SetError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
                 return false;
             }
         }
@@ -142,13 +145,13 @@ class Auth extends Template{
             }
             else
             {
-                $this->setError(array('Invalid User' => $message));
+                $this->templateHandler->setError(array('Invalid User' => $message));
                 return false;
             }
         }
         else
         {
-            $this->SetError(\Get::Config('Auth.Security.Session.BruteForce.Message'));
+            $this->templateHandler->SetError(\Get::Config('Auth.Security.Session.BruteForce.Message'));
             return false;
         }
     }

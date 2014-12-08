@@ -6,6 +6,7 @@ namespace Router;
 
 use Application\Core\Interfaces\Router as RouterInterface;
 use Application\Core\AppMethods;
+use Application\Core\Debugger;
 
 class Router extends AppMethods implements RouterInterface {
 
@@ -23,7 +24,7 @@ class Router extends AppMethods implements RouterInterface {
     public static $LastRoute, $routes = array();
 
     public function __construct() {
-
+        $this->getComponent('Session')->start();
         $this->funcVariables = array();
         $this->SetPattern()->SetParams();
     }
@@ -34,6 +35,8 @@ class Router extends AppMethods implements RouterInterface {
      * <br />Forwards the request to the appropriate controller once the params are read.
      */
     public function ForwardRequest(){
+
+        Debugger::debugMessage('Forwarding request');
 
         $this->CheckIfUnderDevelopment();
 
@@ -66,6 +69,8 @@ class Router extends AppMethods implements RouterInterface {
         // Do some error handling here to see if the right stuff has been provided
         list($bundle, $controller, $action) = explode(':', $patternConfig['Controller']);
 
+        Debugger::debugMessage("Forward request to $bundle:$controller:$action");
+
         if($bundle)
         {
             $fullBundle = $this->GetBundleFromName($bundle);
@@ -79,6 +84,8 @@ class Router extends AppMethods implements RouterInterface {
                 $this->ForwardToController('Bundle_Not_Found');
             }
         }
+
+        Debugger::debugMessage("Checking for dependencies");
 
         $this->CheckDependencies ($bundle, $controller, $action);
 
@@ -154,6 +161,8 @@ class Router extends AppMethods implements RouterInterface {
      */
     private function CallAction($objectName, $action, array $variable = array())
     {
+        Debugger::debugMessage("Attempting to call action '$action' of object '$objectName'");
+
         if(!method_exists($objectName, $action))
         {
             $error = array(
@@ -167,10 +176,16 @@ class Router extends AppMethods implements RouterInterface {
             $this->ForwardToController('Action_Not_Found', $error);
         }
 
+
+
         if(!empty($variable))
             $this->funcVariables = $variable;
 
+        Debugger::debugMessage("Instantiating object '$objectName'");
+
         $controller = $this->InstantiateController($objectName);
+
+        Debugger::debugMessage("Calling action '$action' of object '$objectName'");
 
         $this->CallControllerAction($controller, $action);
 
@@ -182,18 +197,26 @@ class Router extends AppMethods implements RouterInterface {
 
     private function CallControllerAction($controller, $action)
     {
-        if(count($this->ActionDependencies))
+        Debugger::debugMessage("Fetching action dependencies");
+
+        if($this->ActionDependencies)
+        {
             $this->funcVariables = array_merge(
-                    $this->funcVariables,
-                    $this->GetCoreObject('DependencyInjector')->ResolveDependencies($this->ActionDependencies)
-                );
+                $this->funcVariables,
+                $this->GetCoreObject('DependencyInjector')->ResolveDependencies($this->ActionDependencies)
+            );
+        }
 
         if(count($this->funcVariables))
         {
+            Debugger::debugMessage("Calling action '$action' with dependencies");
+
             return call_user_func_array (array($controller, $action) , $this->funcVariables);
         }
         else
         {
+            Debugger::debugMessage("Calling action '$action");
+
             return call_user_func (array($controller, $action));
         }
     }
@@ -293,40 +316,39 @@ class Router extends AppMethods implements RouterInterface {
 
     private function CheckRouteMethod($method)
     {
-        if($method)
+        $error = false;
+
+        if($this->IsLoopable($method))
         {
-            $error = false;
-
-            if($this->IsLoopable($method))
+            if(strtoupper($method['Type']) != getenv('REQUEST_METHOD'))
             {
-                if(strtoupper($method['Type']) != getenv('REQUEST_METHOD'))
+                if(isset($method['Message']))
                 {
-                    if(isset($method['Message']))
+                    if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
                     {
-                        if($this->GetRouteFromPattern() != $this->GetRouteFromPattern($this->GetPatternFromUrl($_SERVER['HTTP_REFERER'])))
-                        {
-                            $this->GetCoreObject('Template')->SetError($method['Message'])->ForwardTo($this->lastRoute);
-                        }
-
-                        if(isset($method['Fallback']))
-                        {
-                            $this->GetCoreObject('Template')->SetError($method['Message'])->ForwardTo($method['FallbackRoute']);
-                        }
+                        $this->GetComponent('TemplateHandler')->SetError($method['Message']);
+                        $this->getComponent('Router')->ForwardTo($this->lastRoute);
                     }
 
-                    $error = true;
+                    if(isset($method['Fallback']))
+                    {
+                        $this->GetComponent('TemplateHandler')->SetError($method['Message']);
+                        $this->getComponent('Router')->ForwardTo($method['Fallback']);
+                    }
                 }
-            }
-            else if(strtoupper($method) != getenv('REQUEST_METHOD'))
-            {
+
                 $error = true;
             }
-
-            if($error)
-                $this
-                    ->SetErrorArgs('Access request denied', 'Router', '0')
-                        ->ThrowException();
         }
+        else if(strtoupper($method) != getenv('REQUEST_METHOD'))
+        {
+            $error = true;
+        }
+
+        if($error)
+            $this
+                ->SetErrorArgs('Access request denied', 'Router', '0')
+                    ->ThrowException();
 
         return $this;
     }
@@ -353,38 +375,6 @@ class Router extends AppMethods implements RouterInterface {
             }
         }
     }
-
-    /**
-     *
-     * @param type $route
-     * @return string extract variables in the url
-     */
-//    private function ExtractVariable($route){
-//
-//        if(strpos($route,'{'))
-//        {
-//            $routeParams = explode('/', $route);
-//            $index = 0;
-//
-//            foreach($routeParams as $param)
-//            {
-//                if(preg_match('(\\{.*?\\})', $param))
-//                {
-//                    if(isset($this->params[$index]))
-//                    {
-//                        $param = $this->funcVariables[$param] = $this->params[$index];
-//                    }
-//                }
-//
-//                $routeParams[$index] = $param;
-//                $index++;
-//            }
-//
-//            return implode('/', $routeParams);
-//        }
-//
-//        return $route;
-//    }
 
     private function GetControllerNamespace($bundle, $controller){
 
@@ -511,7 +501,7 @@ class Router extends AppMethods implements RouterInterface {
     /**
      *
      * @param type $route
-     * @param type $variable
+     * @param type $variables
      * <br />
      * Forward control from one controller to another without redirecting.
      * Will not check for security bypass
@@ -592,16 +582,13 @@ class Router extends AppMethods implements RouterInterface {
         else
             $this->SetPattern ();
 
-        foreach(self::$routes as $routeKey => $routes)
+        if($configuration = $this->getPatternConfiguration($this->pattern))
         {
-            if($this->ExtractVariable($routes['Pattern']) == $this->pattern)
-            {
-                $this->route = $routeKey;
-                $this->routePattern = $pattern;
-                unset($_SESSION['routeError']);
+            $this->route = $configuration['name'];
+            $this->routePattern = $pattern;
+            unset($_SESSION['routeError']);
 
-                return $this->route;
-            }
+            return $this->route;
         }
 
         $error = array(
@@ -617,7 +604,7 @@ class Router extends AppMethods implements RouterInterface {
      * @param string $key
      * @param array $routeParams
      */
-    public static function Set($key, array $routeParams)
+    public static function Add($key, array $routeParams)
     {
         // Get router here somehow
         self::$routes[$key] = $routeParams;

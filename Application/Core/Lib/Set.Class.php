@@ -47,6 +47,19 @@ class Set {
 
     public static function Component($alias, $class)
     {
+        if(isset(\Application\Loader::$components[$alias]))
+        {
+            Application\Core\Debugger::ThrowStaticError("Component '$alias' already registered");
+        }
+
         \Application\Loader::$components[$alias] = $class;
+    }
+
+    public static function Components(array $components)
+    {
+        foreach($components as $component => $ref)
+        {
+            self::Component($component, $ref);
+        }
     }
 }

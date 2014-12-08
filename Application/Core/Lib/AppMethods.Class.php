@@ -6,7 +6,7 @@ namespace Application\Core;
 
 use Application\Core\Interfaces\AppMethods as AppMethodsInterface;
 
-abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
+abstract class AppMethods extends ObjectManager implements AppMethodsInterface {
 
     /**
      *
@@ -111,10 +111,8 @@ abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
 
     public function RefactorUrl($url){
 
-        $chunks = $this->Variable($url)->RemoveDoubleOccuranceOf(array('/'))->Explode('/')->GetVariableResult();
-
+        $chunks = explode('/', str_replace('//', '/', $url));
         $array = $chunks;
-
         $deleteIndex = array();
 
         foreach($array as $key => $urlChunk){
@@ -246,5 +244,25 @@ abstract class AppMethods extends ObjectManager implements AppMethodsInterface{
         {
             trigger_error($e->getMessage());
         }
+    }
+
+    public function ForwardTo($route, $queryString = null)
+    {
+        return $this->getComponent('Router')->ForwardTo($route, $queryString);
+    }
+
+    public function ForwardToController($controller, array $args = array())
+    {
+        return $this->getComponent('Router')->ForwardToController($controller, $args);
+    }
+
+    public function IncludeHeaderFooter()
+    {
+        return $this->getComponent('TemplateHandler')->IncludeHeaderAndFooter(get_called_class());
+    }
+
+    public function Render($view, $title, array $params = array())
+    {
+        return $this->getComponent('TemplateHandler')->Render($view, $title, $params);
     }
 }

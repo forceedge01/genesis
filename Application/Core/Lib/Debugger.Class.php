@@ -10,6 +10,7 @@ use \Application\Core\Interfaces\Debugger as DebuggerInterface;
 abstract class Debugger implements DebuggerInterface{
 
     private $message, $file, $line, $errorNumber;
+    const DEBUG = false;
 
     public function __construct()
     {
@@ -18,6 +19,14 @@ abstract class Debugger implements DebuggerInterface{
 
         // Enable garbage collector
         gc_enable();
+    }
+
+    public static function debugMessage($doing)
+    {
+        if(self::DEBUG)
+        {
+            self::pre($doing);
+        }
     }
 
     /**

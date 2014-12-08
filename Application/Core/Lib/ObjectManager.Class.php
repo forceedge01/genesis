@@ -184,7 +184,7 @@ abstract class ObjectManager extends Hooks implements ObjectManagerInterface{
      */
     public function GetDatabaseManager ( )
     {
-        return $this ->getComponent('DatabaseManager');
+        return $this ->GetComponent('DatabaseManager');
     }
 
     /**

@@ -17,8 +17,4 @@ interface ObjectManager{
     public function GetRepository( $bundleColonEntityName);
 
     public function GetDatabaseManager ( );
-
-    public function GetSessionManager ( );
-
-    public function GetRouterManager ( );
 }

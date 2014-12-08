@@ -2,14 +2,11 @@
 
 namespace Application\Repositories;
 
-
-
-use Application\Core\DatabaseManager;
-
 use Application\Interfaces\Repositories\Repository;
+use Application\Core\AppMethods;
 
 
-abstract class ApplicationRepository extends DatabaseManager implements Repository {
+abstract class ApplicationRepository extends AppMethods implements Repository {
 
     protected
             $id,
@@ -20,6 +17,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
 
         parent::__construct($params);
         $this->BeforeRepositoryHook();
+        $this->DBManager = $this->getComponent('DatabaseManager');
         $this->tableName = str_replace('Repository', '', $this->GetClassFromNameSpacedClass(get_called_class()));
     }
 
@@ -36,7 +34,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
     public function Find($id, array $tables = array()){
 
         $entity = $this
-                ->Table($this->tableName);
+                ->DBManager->Table($this->tableName);
 
         if(count($tables))
             return $entity
@@ -58,6 +56,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
     public function FindOneBy(array $params){
 
         return $this
+                ->DBManager
                 ->Table($this->tableName)
                 ->GetOneRecordBy($params);
     }
@@ -71,6 +70,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
     public function FindAll(array $params = array(), $tables = array()){
 
         $entity = $this
+                ->DBManager
                 ->Table($this->tableName, $this->tableColumns);
 
         if(count($tables))
@@ -92,6 +92,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
     public function GetAll(array $params = array(), array $tables = array()) {
 
         $entity = $this
+                ->DBManager
                 ->Table($this->tableName, $this->tableColumns);
 
         if(count($tables))
@@ -115,6 +116,7 @@ abstract class ApplicationRepository extends DatabaseManager implements Reposito
     public function GetCount($column, $predicament){
 
         return $this
+                ->DBManager
                 ->Table($this->tableName, $this->tableColumns)
                 ->Count($column, $predicament)
                 ->Execute()

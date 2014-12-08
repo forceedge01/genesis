@@ -62,8 +62,6 @@ class Loader extends Debugger{
             'Request',
             'Response',
             'Application',
-            'Database',
-            'DatabaseManager',
             'EventDispatcher',
         );
     }
@@ -383,18 +381,9 @@ class Loader extends Debugger{
     public function LoadComponent($class)
     {
         $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-        $folder = function() use ($class) {
-            $folder = null;
-            $chunks = explode('\\', $class);
-            for($i = 0; $i < count($chunks) -1; $i++)
-            {
-                $folder .= $chunks[$i] . '/';
-            }
+        $chunks = explode('\\', $class);
 
-            return $folder;
-        };
-
-        $loader = $base . $folder() . 'Loader.php';
+        $loader = $base . $chunks[0] . '/Loader.php';
 
         if(! is_file($loader))
         {

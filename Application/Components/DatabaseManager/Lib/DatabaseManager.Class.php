@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Core;
+namespace DatabaseManager\Lib;
 
 
 
@@ -366,7 +366,7 @@ class DatabaseManager extends Database implements DatabaseManagerInterface{
             $this->queryColumns = null;
 
             // TODO:
-            // Remove one of the if statements, use one methodology, this is very 
+            // Remove one of the if statements, use one methodology, this is very
             // Convoluted
             if($this->isLoopable($columns) && $columns[0] != '*')
             {

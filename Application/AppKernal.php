@@ -2,10 +2,9 @@
 
 namespace Application;
 
+
 require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
 require __DIR__ . '/Core/Lib/Debugger.Class.php';
-
-use Application\Core\Debugger;
 
 class AppKernal {
 
@@ -19,6 +18,8 @@ class AppKernal {
         \Set::Component('Router', 'Router\Router');
         \Set::Component('Auth', 'Auth\Auth');
         \Set::Component('TemplateHandler', 'TemplateHandler\TemplateHandler');
+        \Set::Component('DatabaseManager', 'DatabaseManager\Lib\DatabaseManager');
+        \Set::Component('DBConnection', 'DatabaseManager\Lib\Database');
     }
 
     public static function BundlesRegister()

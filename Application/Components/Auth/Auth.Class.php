@@ -118,7 +118,7 @@ class Auth extends AppMethods{
 
         if(\Get::Config('Auth.Validation.Email.Enable'))
         {
-            if(!$this->IsValidEmail($this->username))
+            if(! $this->IsValidEmail($this->username))
             {
                 $this->templateHandler->SetError(array('Invalid User' => \Get::Config('Auth.Validation.Email.Message')));
                 return false;
@@ -131,13 +131,13 @@ class Auth extends AppMethods{
 
             if($password)
             {
-                $session = $this->GetCoreObject('Session');
+                $session = $this->GetComponent('Session');
                 $session->RegenerateId();
                 $session->Clear();
                 $session->Set('username', $this->username);
                 $session->Set('login_time', time());
                 $session->Set('login_expires', time() + \Get::Config('Auth.Security.Session.Interval'));
-                $userBrowser = $this->GetSessionManager()->GetBrowserAgent();
+                $userBrowser = $session->GetBrowserAgent();
                 $login_string = hash(\Get::Config('Auth.Security.PasswordEncryption'), $password.$userBrowser);
                 $session->Set('login_string', $login_string);
 
@@ -160,7 +160,10 @@ class Auth extends AppMethods{
 
         $db = $this->GetDatabaseManager();
 
-        $password = hash(\Get::Config('Auth.Security.PasswordEncryption'), $this->password . \Get::Config('Auth.Security.Salt'));
+        $password = hash(
+            \Get::Config('Auth.Security.PasswordEncryption'),
+            $this->password . \Get::Config('Auth.Security.Salt')
+        );
 
         $db->Table($this->authTable)->FindExistanceBy(array($this->authField => $this->username , 'password' => $password));
 
@@ -168,8 +171,8 @@ class Auth extends AppMethods{
         {
             return $password;
         }
-        else
-            return false;
+
+        return false;
     }
 
     public function GeneratePassword($length = 10)
@@ -184,9 +187,9 @@ class Auth extends AppMethods{
 
     public function ForwardToLoggedInPage()
     {
-        if($this->GetCoreObject('Session')->IsSessionKeySet('AccessedRoute'))
+        if($this->GetComponent('Session')->IsSessionKeySet('AccessedRoute'))
         {
-            $this->router->ForwardTo($this->GetCoreObject('Session')->Get('AccessedRoute'));
+            $this->router->ForwardTo($this->GetComponent('Session')->Get('AccessedRoute'));
         }
 
         $this->router->ForwardTo(\Get::Config('Auth.Login.LoggedInDefaultRoute'));
@@ -214,13 +217,13 @@ class Auth extends AppMethods{
 
         if(!empty($_SESSION['login_expires']))
             return true;
-        else
-            return false;
+
+        return false;
     }
 
     private function CheckBruteForceLogins()
     {
-        $session = $this->GetCoreObject('Session');
+        $session = $this->GetComponent('Session');
 
         if($session->IsSessionKeySet('Blocked.'.$this->username))
         {

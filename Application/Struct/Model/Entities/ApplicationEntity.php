@@ -2,13 +2,13 @@
 
 namespace Application\Entities;
 
-
-use Application\Core\DatabaseManager;
-
 use Application\Interfaces\Entities\Entity;
+use Application\Core\AppMethods;
 
 
-abstract class ApplicationEntity extends DatabaseManager implements Entity{
+abstract class ApplicationEntity extends AppMethods implements Entity{
+
+    private $DBManager;
 
     // Set table name
     protected $tableName;
@@ -22,6 +22,7 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
         $this->BeforeEntityHook();
 
         $this->setTableForEntity();
+        $this->DBManager = $this->getComponent('DatabaseManager');
 
         if(is_numeric($params))
             $this->Find($params);
@@ -75,7 +76,7 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
      */
     public function Find($id = null) {
 
-        return $this->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
+        return $this->DBManager->Table($this->tableName, $this->tableColumns)->GetRecordBy($id)->GetResultSet();
     }
 
     /**
@@ -85,7 +86,7 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
      */
     public function FindBy(array $params = array()) {
 
-        return $this->CreateEntity($this->Table($this->tableName)->GetOneRecordBy($params));
+        return $this->CreateEntity($this->DBManager->Table($this->tableName)->GetOneRecordBy($params));
     }
 
     /**
@@ -95,7 +96,7 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
      */
     public function GetTableForEntity($entity){
 
-        return $this->Table(str_replace('Entity', '', $entity));
+        return $this->DBManager->Table(str_replace('Entity', '', $entity));
     }
 
     /**
@@ -106,9 +107,9 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
     public function Save($params = array(), array $tables = array()) {
 
         if(is_object($params))
-            $params = $this->ObjectToArray ($params);
+            $params = $this->DBManager->ObjectToArray ($params);
 
-        return $this->Table($this->tableName)->QueryOnly($tables)->SaveRecord($params)->GetAffectedRows();
+        return $this->DBManager->Table($this->tableName)->QueryOnly($tables)->SaveRecord($params)->GetAffectedRows();
     }
 
     /**
@@ -121,7 +122,7 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
         if (!$id)
             $id = $this->fields[$this->tableName.'.id'];
 
-        return $this->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
+        return $this->DBManager->Table($this->tableName)->DeleteRecord($id)->GetAffectedRows();
     }
 
     /**
@@ -130,12 +131,12 @@ abstract class ApplicationEntity extends DatabaseManager implements Entity{
      */
     public function GetClean()
     {
-        return $this->RemoveTableName($this->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
+        return $this->RemoveTableName($this->DBManager->Table($this->tableName)->GetOneRecordBy(array('id' => $this->id)));
     }
 
     private function CreateEntity($object)
     {
-        return $this->RemoveTableName($object, $this->GetEntity("{$this->tableName}:{$this->tableName}"));
+        return $this->RemoveTableName($object, $this->DBManager->GetEntity("{$this->tableName}:{$this->tableName}"));
     }
 
     private function RemoveTableName($object, $newObj = null)

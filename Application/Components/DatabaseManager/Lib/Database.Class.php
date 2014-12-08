@@ -1,9 +1,10 @@
 <?php
 
-namespace Application\Core;
+namespace DatabaseManager\Lib;
 
 
 use Application\Core\Interfaces\Database as DatabaseInterface;
+use Application\Core\AppMethods;
 
 abstract class Database extends AppMethods implements DatabaseInterface{
 

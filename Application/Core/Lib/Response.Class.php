@@ -172,37 +172,32 @@ class Response implements ResponseInterface{
         return $this->success === 1;
     }
 
-    public function SetStatus($code)
+    public function setStatus($code)
     {
         header( 'HTTP/1.1 '.$code, true, $code );
     }
 
-    public function SetNotFound()
+    public function setNotFound()
     {
-        $this ->SetStatus(404);
+        $this ->setStatus(404);
     }
 
-    public function SetBadRequest()
+    public function setBadRequest()
     {
-        $this ->SetStatus(400);
+        $this ->setStatus(400);
     }
 
-    public function SetInternalServerError()
+    public function setInternalServerError()
     {
-        $this ->SetStatus(500);
+        $this ->setStatus(500);
     }
 
-    public function SetForbidden()
+    public function setForbidden()
     {
-        $this ->SetStatus(403);
+        $this ->setStatus(403);
     }
 
-    public function GetStatus()
-    {
-        return $_SERVER["REDIRECT_STATUS"];
-    }
-
-    public function setJson($json)
+    public function setJSONResponse($json)
     {
         return $this->content = json_encode($value);
     }

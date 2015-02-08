@@ -22,7 +22,7 @@ class Request extends AppMethods implements RequestInterface{
         $this->server = new Lib\Server();
         $this->post = $_POST;
         $this->get = $_GET;
-        $this->remoteIp = $this->RemoteAddress();
+        $this->remoteIp = $this->remoteAddress();
         $this->scheme = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '');
         $this->domain = HOST;
         $this->form = new Form();
@@ -46,65 +46,53 @@ class Request extends AppMethods implements RequestInterface{
         return false;
     }
 
-    public function getCookie($Name){
+    public function isPost() {
+	    if(isset($_POST) && $_POST) {
+            return true;
+        }
 
+	    return false;
+    }
+
+    public function isGet() {
+        if(isset($_GET) and $_GET) {
+            return true;
+        }
+
+	    return false;
+    }
+
+    public function isAjax() {
+    	if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+	    	return true;    
+    	}
+
+	    return false;
+    }
+
+    public function getQueryStringParam($key) {
+	    return filter_input(INPUT_GET, $key); 
+    }
+
+    public function getPostParam($key) {
+        return filter_input(INPUT_POST, $key); 
+    }
+
+    public function getCookie($Name){
         if(isset($_COOKIE[$Name]))
             return $_COOKIE[$Name];
-        else
-            return false;
+        
+        return false;
     }
 
     public function hasCookie($Name){
-
         if(isset($_COOKIE[$Name]))
             return $this;
-        else
-            return false;
+       
+        return false;
     }
 
-    /**
-     *
-     * @param $string or $array $key
-     * @return boolean
-     */
-    public function HasKeys($keys){
-
-        if(is_array($keys)){
-
-            foreach($keys as $key){
-
-                if(!isset($_REQUEST[$key]))
-                    return false;
-            }
-
-            return $this;
-        }
-        else{
-
-            if(isset($_REQUEST[$key]))
-               return $this;
-            else
-               return false;
-        }
-    }    
-
-    public function getQueryStringValue($name) {
-        return filter_input(INPUT_GET, $name);
-    }
-
-    public function getPostValue($name) {
-        return filter_input(INPUT_POST, $name);
-    }
-
-    public function hasQueryStringValue($name) {
-        return filter_has_var(INPUT_GET, $name);
-    }
-
-    public function hasPostValue($name) {
-        return filter_has_var(INPUT_POST, $name);
-    }
-
-    public function RemoteAddress()
+    public function remoteAddress()
     {
         $ipaddress = '';
 
@@ -126,7 +114,7 @@ class Request extends AppMethods implements RequestInterface{
         return $ipaddress;
     }
 
-    public function IsProxiedRequest()
+    public function isProxiedRequest()
     {
         if($this->server->get('HTTP_X_FORWARDED_FOR') || $this->server->get('HTTP_CLIENT_IP'))
             return true;
@@ -140,7 +128,7 @@ class Request extends AppMethods implements RequestInterface{
             die('Access denied for proxy users.');
     }
 
-    public function IsLocal()
+    public function isLocal()
     {
         if($this->server->get('REMOTE_ADDR') == $this->server->get('SERVER_ADDR'))
             return true;
@@ -148,7 +136,7 @@ class Request extends AppMethods implements RequestInterface{
         return false;
     }
 
-    public function GetStatus()
+    public function getStatus()
     {
         return $this->server->get('REDIRECT_STATUS');
     }

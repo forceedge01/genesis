@@ -1,8 +1,11 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Quickly build RAD/Agile web applications with Genesis.
 
-### What is this repository for? ###
+Installation
+
+clone this repo to use instantly
+`git clone git@bitbucket.org:wqureshi/genesis.git`
 
 * Quick summary
 * Version

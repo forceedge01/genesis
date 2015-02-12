@@ -5,28 +5,19 @@ Quickly build RAD/Agile web applications with Genesis.
 Installation
 
 clone this repo to use instantly
-`git clone git@bitbucket.org:wqureshi/genesis.git`
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+`
+git clone git@bitbucket.org:wqureshi/genesis.git`
 
-### How do I get set up? ###
+Start off by configuring your web server locally, i recommend using the php internal web server from the Public folder
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+`
+$ cd Genesis/Public
+$ php -S localhost:8010
+`
 
-### Contribution guidelines ###
+This should start the web server. Go to localhost:8010 in your web browser to look at your cloned project.
 
-* Writing tests
-* Code review
-* Other guidelines
+The intended database server to be used with Genesis is SQLite, as its a zero configuration database, you dont need to worry about anything else other than starting the PHP server which we have done above.
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Thats it, your ready to roll! ;)

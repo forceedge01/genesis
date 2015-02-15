@@ -3,7 +3,8 @@
 namespace Application;
 
 
-use Application\Core\Debugger;
+use Application\Core\Lib\Debugger;
+use Application\Core\Lib\Application;
 
 class Loader extends Debugger{
 
@@ -30,9 +31,9 @@ class Loader extends Debugger{
 
     public function initLibs()
     {
-        require __DIR__ . '/Core/Lib/Set.Class.php';
-        require __DIR__ . '/Core/Config/AppDirs.Config.php';
-        require __DIR__ . '/Core/Lib/Get.Class.php';
+        require __DIR__ . '/Core/Lib/Set.php';
+        require __DIR__ . '/Core/Config/AppDirs.php';
+        require __DIR__ . '/Core/Lib/Get.php';
 
         return $this;
     }
@@ -45,7 +46,7 @@ class Loader extends Debugger{
     public function AppBundles()
     {
         return array(
-            'Welcome',
+            //'Welcome',
             'users',
         );
     }
@@ -59,10 +60,9 @@ class Loader extends Debugger{
             'DependencyInjector',
             'EventHandler',
             'Server',
-            'Request',
-            'Response',
             'Application',
             'EventDispatcher',
+            'Controller'
         );
     }
 
@@ -80,11 +80,15 @@ class Loader extends Debugger{
 
     public function loadBundleConfigs()
     {
-        Core\Debugger::debugMessage('Loading bundle configuration files');
+        Debugger::debugMessage('Loading bundle configuration files');
 
         $this
             ->LoadCoreStruct()
             ->LoadBundles();
+    }
+
+    public function LoadCoreConfiguration() {
+        $this->Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'));
     }
 
     private function FetchAllClasses()
@@ -94,7 +98,7 @@ class Loader extends Debugger{
 
         foreach($classes as $class)
         {
-            $path = $classDir . $class . '.Class.php';
+            $path = $classDir . $class . '.php';
 
             if(is_file($path))
             {
@@ -115,7 +119,6 @@ class Loader extends Debugger{
     private function LoadCoreStruct()
     {
         $this
-            ->Load('configs', \Get::Config('APPDIRS.CORE.CONFIG_FOLDER'))
             ->Load('routes', \Get::Config('APPDIRS.STRUCT.ROUTES_FOLDER'))
             ->Load('interfaces', \Get::Config('APPDIRS.STRUCT.INTERFACES_FOLDER'))
             ->Load('events', \Get::Config('APPDIRS.STRUCT.EVENTS_FOLDER'))
@@ -149,6 +152,16 @@ class Loader extends Debugger{
         $event = \Get::Config('APPDIRS.BUNDLES.BASE_FOLDER') . trim(str_replace('\\', '/', $class));
 
         require_once $event;
+    }
+
+    public static function LoadFileFromClass($class) {
+        $file = ROOT . trim(str_replace('\\', '/', $class), '/') . '.php';
+
+        if(! file_exists($file)) {
+            Debugger::ThrowStaticError("File not found $file", __FILE__, __LINE__);
+        }
+
+        require $file;
     }
 
     /**
@@ -380,17 +393,22 @@ class Loader extends Debugger{
      */
     public function LoadComponent($class)
     {
-        $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-        $chunks = explode('\\', $class);
+        // $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
+        // $chunks = explode('\\', $class);
 
-        $loader = $base . $chunks[0] . '/Loader.php';
+        // $loader = $base . $chunks[0] . '/Loader.php';
 
-        if(! is_file($loader))
-        {
-            Debugger::ThrowStaticError("Could not load $class, '<b>$loader</b>' file for this component was not found.", __FILE__, __LINE__);
-        }
+        // echo $class;
+        // exit;
 
-        require $loader;
+        // if(! is_file($loader))
+        // {
+        //     Debugger::ThrowStaticError("Could not load $class, '<b>$loader</b>' file for this component was not found.", __FILE__, __LINE__);
+        // }
+
+        // require $loader;
+
+        self::LoadFileFromClass($class);
 
         return $this;
     }
@@ -479,8 +497,8 @@ class Loader extends Debugger{
         ob_start();
         foreach($files as $file)
         {
-            echo php_strip_whitespace($folder . '/Interfaces/' . $file . '.Interface.php');
-            echo php_strip_whitespace($folder . '/Lib/' . $file . '.Class.php');
+            echo php_strip_whitespace($folder . '/Interfaces/' . $file . '.php');
+            echo php_strip_whitespace($folder . '/Lib/' . $file . '.php');
         }
 
         $contents = $this->sanitizeContentsForOnePHPFile(ob_get_clean());
@@ -497,7 +515,7 @@ class Loader extends Debugger{
 
     public function LoadGenesis() {
 
-        Core\Debugger::debugMessage('Loading Genesis');
+        Debugger::debugMessage('Loading Genesis');
 
         AppKernal::$scriptStartTime = microtime(true);
         $this->initLibs()
@@ -505,16 +523,16 @@ class Loader extends Debugger{
             ->LoadFramework()
             ;
 
-        Core\Debugger::debugMessage('Loaded Genesis');
+        Debugger::debugMessage('Loaded Genesis');
 
         return $this;
     }
 
     public function getAppInstance()
     {
-        Core\Debugger::debugMessage('Instantiating new Application');
+        Debugger::debugMessage('Instantiating new Application');
 
-        return new Core\Application();
+        return new Application();
     }
 
     /**

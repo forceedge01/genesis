@@ -3,7 +3,7 @@
 namespace Application\Entities;
 
 use Application\Interfaces\Entities\Entity;
-use Application\Core\AppMethods;
+use Application\Core\Lib\AppMethods;
 
 
 abstract class ApplicationEntity extends AppMethods implements Entity{

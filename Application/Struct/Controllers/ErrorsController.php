@@ -1,15 +1,13 @@
 <?php
 
-namespace Application\Controllers;
+namespace Application\Core\Struct\Controllers;
 
 
-
-use \Application\Core\Application;
-
+use Application\Core\Lib\Controller;
 use Application\Interfaces\Controllers\Error;
 
 
-class ErrorsController extends Application implements Error{
+class ErrorsController extends Controller implements Error{
 
     public function RouteNotFoundAction($route, $pattern, $backtrace){
 
@@ -22,7 +20,7 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this ->GetResponseManager() ->SetNotFound();
+//        $this ->GetResponseManager() ->SetNotFound();
 
         $this->Render(':Errors:RouteNotFound.html.php', 'Route Not Found!', $params);
     }
@@ -40,7 +38,7 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this ->GetResponseManager() ->SetStatus(400);
+//        $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors:ActionNotFound.html.php', 'Action Not Found!', $params);
     }
@@ -58,27 +56,27 @@ class ErrorsController extends Application implements Error{
             'Backtrace' => $backtrace
         );
 
-        $this ->GetResponseManager() ->SetStatus(400);
+//        $this ->GetResponseManager() ->SetStatus(400);
 
         $this->Render(':Errors:ClassNotFound.html.php', 'Class Not Found!', $params);
     }
 
     public function TemplateNotFoundAction($template){
 
-        $this ->GetResponseManager() ->SetBadRequest();
+//        $this ->GetResponseManager() ->SetBadRequest();
 
         $this->Render(':Errors:TemplateNotFound.html.php', 'Template Not Found!', $template);
     }
 
     public function NotFoundError404Action(){
 
-        $this->GetResponseManager()->SetNotFound();
+//        $this->GetResponseManager()->SetNotFound();
         $this->Render(':Errors:error404.html.php', 'Error 404: Page not found');
     }
 
     public function ServerError500Action(){
 
-        $this->GetResponseManager()->SetInternalServerError();
+//        $this->GetResponseManager()->SetInternalServerError();
         $this->Render(':Errors:error500.html.php', 'Error 500: Internal server error');
     }
 }

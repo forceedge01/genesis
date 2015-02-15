@@ -1,6 +1,6 @@
 <?php
 
-use Router\Router;
+use Application\Components\Router\Router;
 
 Router::Add('Application', array(
     'Controller' => ':Application:index',

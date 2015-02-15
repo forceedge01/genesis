@@ -5,7 +5,7 @@ namespace Application\Models;
 
 
 use Application\Interfaces\Models\Model;
-use Application\Core\EventHandler;
+use Application\Core\Lib\EventHandler;
 
 
 abstract class ApplicationModel extends EventHandler implements Model{

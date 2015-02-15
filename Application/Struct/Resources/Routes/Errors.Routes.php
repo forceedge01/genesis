@@ -1,6 +1,6 @@
 <?php
 
-use Router\Router;
+use Application\Components\Router\Router;
 
 
 Router::Add('Route_Not_Found', array(

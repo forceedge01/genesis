@@ -1,13 +1,13 @@
 <?php
 
-namespace Application\Core\Struct\Controllers;
+namespace Application\Struct\Controllers;
 
 
 use Application\Core\Lib\Controller;
-use Application\Interfaces\Controllers\Error;
+use Application\Struct\Interfaces\Controllers\ErrorController as ErrorInterface;
 
 
-class ErrorsController extends Controller implements Error{
+class ErrorsController extends Controller implements ErrorInterface{
 
     public function RouteNotFoundAction($route, $pattern, $backtrace){
 

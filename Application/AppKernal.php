@@ -16,12 +16,15 @@ class AppKernal {
     {
         \Set::Component('Session', 'Application\Components\Session\SessionHandler');
         \Set::Component('HTMLGenerator', 'Application\Components\HTMLGenerator\HTMLGenerator');
-        \Set::Component('Auth', 'Auth\Auth');
+        \Set::Component('Auth', 'Application\Components\Vault\Auth');
         \Set::Component('DatabaseManager', 'DatabaseManager\Lib\DatabaseManager');
         \Set::Component('DBConnection', 'DatabaseManager\Lib\Database');
         \Set::Component('Router', '\Application\Components\Router\Router');
         \Set::Component('Template', '\Application\Components\TemplateHandler\TemplateHandler');
         \Set::Component('Request', '\Application\Core\Lib\Request');
+        \Set::Component('DependencyInjector', '\Application\Components\DependencyInjection\DependencyInjector');
+        \Set::Component('EventDispatcher', '\Application\Components\EventDispatcher\EventDispatcher');
+        \Set::Component('EventHandler', '\Application\Components\EventDispatcher\EventHandler');
         \Set::Component('Response', '\Application\Components\Response\Response');
     }
 

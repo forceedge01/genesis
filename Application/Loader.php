@@ -57,11 +57,8 @@ class Loader extends Debugger{
             'Hooks',
             'ObjectManager',
             'AppMethods',
-            'DependencyInjector',
-            'EventHandler',
             'Server',
             'Application',
-            'EventDispatcher',
             'Controller'
         );
     }
@@ -393,21 +390,6 @@ class Loader extends Debugger{
      */
     public function LoadComponent($class)
     {
-        // $base = \Get::Config('APPDIRS.COMPONENTS.BASE_FOLDER');
-        // $chunks = explode('\\', $class);
-
-        // $loader = $base . $chunks[0] . '/Loader.php';
-
-        // echo $class;
-        // exit;
-
-        // if(! is_file($loader))
-        // {
-        //     Debugger::ThrowStaticError("Could not load $class, '<b>$loader</b>' file for this component was not found.", __FILE__, __LINE__);
-        // }
-
-        // require $loader;
-
         self::LoadFileFromClass($class);
 
         return $this;
@@ -519,7 +501,6 @@ class Loader extends Debugger{
 
         AppKernal::$scriptStartTime = microtime(true);
         $this->initLibs()
-//            ->CheckDependencies()
             ->LoadFramework()
             ;
 

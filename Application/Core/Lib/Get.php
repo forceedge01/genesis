@@ -34,7 +34,7 @@ class Get{
 
     private static function placeConfig($config)
     {
-        if(!is_array($config) or !empty($config))
+        if(!is_array($config) and !empty($config))
         {
             $matches = array();
 

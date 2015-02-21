@@ -1,10 +1,11 @@
 <?php
 
-namespace Auth;
+namespace Application\Components\Vault;
 
+\Application\AppKernal::getLoader()->LoadOnceFromDir(__DIR__.'/Config');
 
 use Session\SessionHandler;
-use Application\Core\AppMethods;
+use Application\Core\Lib\AppMethods;
 
 class Auth extends AppMethods{
 
@@ -21,7 +22,7 @@ class Auth extends AppMethods{
         $this->authTable = \Get::Config('Auth.DBTable.AuthTableName');
         $this->authField = \Get::Config('Auth.DBTable.AuthColumnName');
         $this->router = $this->getComponent('Router');
-        $this->templateHandler = $this->getComponent('TemplateHandler');
+        $this->templateHandler = $this->getComponent('Template');
     }
 
     public function SetPostParams()

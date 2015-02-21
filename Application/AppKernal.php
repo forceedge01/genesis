@@ -2,9 +2,10 @@
 
 namespace Application;
 
+use Application\Core\Lib\Debugger;
 
-require __DIR__ . '/Core/Interfaces/Debugger.Interface.php';
-require __DIR__ . '/Core/Lib/Debugger.Class.php';
+require __DIR__ . '/Core/Interfaces/DebuggerInterface.php';
+require __DIR__ . '/Core/Lib/Debugger.php';
 
 class AppKernal {
 
@@ -13,25 +14,24 @@ class AppKernal {
 
     public static function ComponentsRegister()
     {
-        \Set::Component('Session', 'Session\SessionHandler');
-        \Set::Component('HTMLGenerator', 'HTMLGenerator\HTMLGenerator');
-        \Set::Component('Router', 'Router\Router');
+        \Set::Component('Session', 'Application\Components\Session\SessionHandler');
+        \Set::Component('HTMLGenerator', 'Application\Components\HTMLGenerator\HTMLGenerator');
         \Set::Component('Auth', 'Auth\Auth');
-        \Set::Component('TemplateHandler', 'TemplateHandler\TemplateHandler');
         \Set::Component('DatabaseManager', 'DatabaseManager\Lib\DatabaseManager');
         \Set::Component('DBConnection', 'DatabaseManager\Lib\Database');
-    }
-
-    public static function BundlesRegister()
-    {
-
+        \Set::Component('Router', '\Application\Components\Router\Router');
+        \Set::Component('Template', '\Application\Components\TemplateHandler\TemplateHandler');
+        \Set::Component('Request', '\Application\Core\Lib\Request');
+        \Set::Component('Response', '\Application\Components\Response\Response');
     }
 
     public static function GenesisDependencies()
     {
+        // config and interface to implement
         return array(
-            'Router' => 'Application\Core\Interfaces\Router',
-            'TemplateHandler' => 'Application\Core\Interfaces\Template'
+            'routeHandler' => 'Application\Core\Interfaces\RouterInterface',
+            'templateHandler' => 'Application\Core\Interfaces\TemplateInterface',
+            'requestHandler' => 'Application\Core\Interfaces\RequestInterface'
         );
     }
 
@@ -55,22 +55,16 @@ class AppKernal {
      */
     public static function Initialize() {
 
-        Core\Debugger::debugMessage('Registering components register');
-
+        Debugger::debugMessage('Registering components register');
         self::ComponentsRegister();
-
-        Core\Debugger::debugMessage('Registering bundles register');
-
-        self::BundlesRegister();
     }
 
     public static function getLoader() {
 
-        Core\Debugger::debugMessage('Initiated fetching of loader object');
+        Debugger::debugMessage('Initiated fetching of loader object');
 
-        if(self::$loader)
-        {
-            Core\Debugger::debugMessage('Loader pre initialized, returning pre-feted');
+        if(self::$loader) {
+            Debugger::debugMessage('Loader pre initialized, returning pre-feted');
 
             return self::$loader;
         }
@@ -79,7 +73,7 @@ class AppKernal {
 
         self::$loader = new \Application\Loader();
 
-        Core\Debugger::debugMessage('Fetched loader');
+        Debugger::debugMessage('Fetched loader');
 
         return self::$loader;
     }

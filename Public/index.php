@@ -18,6 +18,7 @@ $loader = AppKernal::getLoader();
 
 // Load genesis framework
 $loader->LoadGenesis();
+$loader->LoadCoreConfiguration();
 
 // Initialize appkernal settings
 AppKernal::Initialize();
@@ -26,7 +27,7 @@ AppKernal::Initialize();
 $app = $loader->getAppInstance();
 
 // Instantiate router instance and forward the request
-$router = $app->getComponent('Router');
+$router = $app->routeHandler;
 
 // Register bundle configurations
 $loader->loadBundleConfigs();

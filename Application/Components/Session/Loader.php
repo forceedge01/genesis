@@ -1,3 +1,3 @@
 <?php
 
-require __DIR__ . '/SessionHandler.Class.php';
+require __DIR__ . '/SessionHandler.php';

@@ -3,7 +3,7 @@
 namespace Application\Repositories;
 
 use Application\Interfaces\Repositories\Repository;
-use Application\Core\AppMethods;
+use Application\Core\Lib\AppMethods;
 
 
 abstract class ApplicationRepository extends AppMethods implements Repository {

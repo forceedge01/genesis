@@ -1,29 +1,23 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Quickly build RAD/Agile web applications with Genesis.
 
-### What is this repository for? ###
+Installation
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+clone this repo to use instantly
 
-### How do I get set up? ###
+`
+git clone git@bitbucket.org:wqureshi/genesis.git`
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Start off by configuring your web server locally, i recommend using the php internal web server from the Public folder
 
-### Contribution guidelines ###
+`
+$ cd Genesis/Public
+$ php -S localhost:8010
+`
 
-* Writing tests
-* Code review
-* Other guidelines
+This should start the web server. Go to localhost:8010 in your web browser to look at your cloned project.
 
-### Who do I talk to? ###
+The intended database server to be used with Genesis is SQLite, as its a zero configuration database, you dont need to worry about anything else other than starting the PHP server which we have done above.
 
-* Repo owner or admin
-* Other community or team contact
+Thats it, your ready to roll! ;)

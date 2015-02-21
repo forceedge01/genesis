@@ -169,7 +169,7 @@ class Router extends AppMethods implements RouterInterface {
                 'Class' => $objectName,
                 'Controller' => $objectName  . ':' . str_replace('Action','',$action),
                 'Route' => $this->lastRoute,
-                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
+                'Backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, Debugger::DEBUG_BACKTRACE_LIMIT)
             );
 
             $this->ForwardToController('Action_Not_Found', $error);
@@ -208,7 +208,7 @@ class Router extends AppMethods implements RouterInterface {
         if($this->ActionDependencies) {
             $this->funcVariables = array_merge(
                 $this->funcVariables,
-                $this->GetCoreObject('DependencyInjector')->ResolveDependencies($this->ActionDependencies)
+                $this->GetComponent('DependencyInjector')->ResolveDependencies($this->ActionDependencies)
             );
         }
 
@@ -228,7 +228,7 @@ class Router extends AppMethods implements RouterInterface {
     {
         if($this->ControllerDependencies)
         {
-            return $this->GetCoreObject('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
+            return $this->GetComponent('DependencyInjector')->Inject($objectName, $this->ControllerDependencies);
         }
         else
         {
@@ -382,9 +382,9 @@ class Router extends AppMethods implements RouterInterface {
     private function GetControllerNamespace($bundle, $controller){
 
         if($bundle)
-            return '\\Bundles\\'.$this->GetBundleNameSpace ($bundle).'\\Controllers\\' . $controller . 'Controller';
+            return '\Bundles\\'.$this->GetBundleNameSpace ($bundle).'\Controllers\\' . $controller . 'Controller';
 
-        return '\\Application\\Controllers\\'.$controller . 'Controller';
+        return '\Application\Struct\Controllers\\'.$controller . 'Controller';
     }
 
     /**

@@ -3,12 +3,11 @@
 namespace Application\Models;
 
 
-
 use Application\Interfaces\Models\Model;
-use Application\Core\Lib\EventHandler;
+use Application\Core\Lib\AppMethods;
 
 
-abstract class ApplicationModel extends EventHandler implements Model{
+abstract class ApplicationModel extends AppMethods implements Model{
 
     private $entityObject, $observers;
 

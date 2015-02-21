@@ -11,6 +11,7 @@ abstract class Debugger implements DebuggerInterface{
 
     private $message, $file, $line, $errorNumber;
     const DEBUG = false;
+    const DEBUG_BACKTRACE_LIMIT = 1;
 
     public function __construct()
     {

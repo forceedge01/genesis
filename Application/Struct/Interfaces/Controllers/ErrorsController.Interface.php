@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Interfaces\Controllers;
+namespace Application\Struct\Interfaces\Controllers;
 
 
 
-interface Error{
+interface ErrorController{
 
     function RouteNotFoundAction($route, $pattern, $backtrace);
 

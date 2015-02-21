@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Core\Lib;
-
+namespace Application\Components\DependencyInjection;
 
 
 use Application\Core\Interfaces\DependencyInjector as DependencyInjectorInterface;
+use Application\Core\Lib\AppMethods;
 
 
 class DependencyInjector extends AppMethods implements DependencyInjectorInterface{

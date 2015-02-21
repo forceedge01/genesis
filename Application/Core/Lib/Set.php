@@ -13,7 +13,7 @@ class Set {
      */
     public static function Config($key, $config)
     {
-        \Application\Loader::$appConfiguration[$key] = $config;
+        \Application\Loader::$appConfiguration[$key] = isset(\Application\Loader::$appConfiguration[$key]) ? array_merge_recursive(\Application\Loader::$appConfiguration[$key], $config) : $config;
     }
 
     public static function OverwriteConfig($stringKey, $value)
